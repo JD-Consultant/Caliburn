@@ -32,7 +32,7 @@ function openComposer(withHistory = false) {
   render(
     <QueryClientProvider client={client}>
       {withHistory && <InterviewHistory jobFileId={fileId} />}
-      <InterviewComposer jobFileId={fileId} />
+      <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={fileId} />
     </QueryClientProvider>,
   );
   return client;
@@ -44,12 +44,74 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+test('waiting for the file lock protects the next input after a completed turn', async () => {
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  const posts: { command_id: string; text: string }[] = [];
+  vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+    if (options?.method === 'POST') {
+      if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
+      const command = JSON.parse(options.body) as { command_id: string; text: string };
+      posts.push(command);
+      return Promise.resolve(
+        Response.json({
+          job_file_id: fileId,
+          command_id: command.command_id,
+          execution_id: nextExecutionId,
+          source_id: sourceId,
+        }),
+      );
+    }
+    if (path.endsWith('/current')) return Promise.resolve(Response.json({ turn: null }));
+    return Promise.resolve(
+      Response.json(
+        path.endsWith(nextExecutionId)
+          ? { ...completed, execution_id: nextExecutionId, status: 'active' }
+          : completed,
+      ),
+    );
+  });
+  openComposer();
+  await screen.findByText('這次訪談已完成並保存。');
+  let acquired: () => void = () => {};
+  let release: () => void = () => {};
+  const locked = new Promise<void>((resolve) => {
+    acquired = resolve;
+  });
+  const held = navigator.locks.request('caliburn:interview-turn:' + fileId, {}, () => {
+    acquired();
+    return new Promise<void>((resolve) => {
+      release = resolve;
+    });
+  });
+  await locked;
+  const textbox = screen.getByRole('textbox', { name: '訪談內容' });
+  await userEvent.type(textbox, '固定的下一輪原文');
+  await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+  try {
+    expect(textbox).toBeDisabled();
+    expect(screen.getByRole('button', { name: '正在確認送出…' })).toBeDisabled();
+    await userEvent.type(textbox, '等待期間補充');
+    expect(textbox).toHaveValue('固定的下一輪原文');
+    expect(posts).toHaveLength(0);
+  } finally {
+    await act(async () => {
+      release();
+      await held;
+    });
+  }
+  await screen.findByText('顧問正在處理，尚未正式完成。');
+  expect(posts).toEqual([
+    { command_id: readTurnHint(fileId)?.command_id, text: '固定的下一輪原文' },
+  ]);
+  expect(posts[0]?.command_id).not.toBe(commandId);
+});
+
 test.each(['retained', 'discovered'] as const)(
   '%s completed turn accepts the next answer directly with a fresh command',
   async (entry) => {
     const posts: { command_id: string; text: string }[] = [];
     if (entry === 'retained') {
-      retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+      await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
     }
     const active = { ...completed, status: 'active', allowed_controls: ['pause', 'cancel'] };
     vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
@@ -100,7 +162,7 @@ test.each(['retained', 'discovered'] as const)(
 );
 
 test('a next-answer draft survives a completed-status refetch without being resent', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const requests: string[] = [];
   vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
     requests.push(options?.method ?? 'GET');
@@ -117,7 +179,7 @@ test('a next-answer draft survives a completed-status refetch without being rese
 });
 
 test('completed turns leave no footer process links even before their formal reply loads', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const reads: string[] = [];
   vi.stubGlobal('fetch', (path: string) => {
     reads.push(path);
@@ -182,7 +244,7 @@ test('completion confirmed by another page retires an uncertain command before t
   await screen.findByText(/送出結果尚未確認/);
   const originalHint = readTurnHint(fileId);
   if (!originalHint) throw new Error('Expected an uncertain command hint');
-  act(() => retainTurnHint(fileId, { ...originalHint, execution_id: executionId }));
+  await act(async () => retainTurnHint(fileId, { ...originalHint, execution_id: executionId }));
   await screen.findByText('這次訪談已完成並保存。');
   expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('');
   expect(screen.queryByText(/送出結果尚未確認/)).not.toBeInTheDocument();
@@ -194,7 +256,7 @@ test('completion confirmed by another page retires an uncertain command before t
 });
 
 test('history retry restores the completed reply and its process after the next answer starts', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   let historyAvailable = false;
   let posts = 0;
   const previous = {

@@ -1,0 +1,29 @@
+[project]
+name = "caliburn-embedder"
+version = "0.1.0"
+license = "MIT"
+description = "Linux CUDA embedding and reranking service"
+requires-python = "==3.11.16"
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn[standard]==0.54.0",
+    "pydantic==2.13.5",
+    "FlagEmbedding==1.4.0",
+    "torch==2.6.0+cu124",
+    "transformers==4.57.6",
+    "huggingface-hub>=0.34,<1",
+]
+
+[tool.uv]
+required-version = "==0.12.20"
+package = false
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+required-environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
 import { isReviseJdProfileRequest } from '../../shared/api/validation';
+import { useStoredCommand } from '../../shared/commands/use-stored-command';
 import { useEditSlot } from './edit-slots-context';
 import { InlineEditContext } from './inline-edit-context';
 import type { InlineEdit, InlineSaveResult } from './inline-edit-context';
@@ -14,14 +15,16 @@ import { InlineText } from './InlineText';
 import { jdProfileQuery } from './jd-profile-api';
 import { profileCommandFor, profileFields, profileLabels } from './profile-command';
 import { profileTarget, useSourceBadge } from './source-badge-context';
-import { useProfileCommand } from './useProfileCommand';
+import { jdCommandView, profileCommand } from './jd-commands';
 import { WorkStatus } from './WorkStatus';
 
 export function JdProfileEditor({
   jobFileId,
   readOnly = false,
+  refresh,
 }: {
   jobFileId: string;
+  refresh: () => Promise<void>;
   /** A Turn owns the JD: show it, but offer no manual edit (the App also refuses writes). */
   readOnly?: boolean;
 }) {
@@ -30,7 +33,10 @@ export function JdProfileEditor({
   const [inlineKey, setInlineKey] = useState<string | null>(null);
   // Reported by the open editor itself, so a field that vanished mid-edit cannot leave the page waiting.
   const [inlineEditorOpen, setInlineEditorOpen] = useState(false);
-  const command = useProfileCommand(jobFileId, () => setInlineKey(null));
+  const definition = profileCommand(jobFileId, refresh);
+  const closeEditor = () => setInlineKey(null);
+  const submission = useStoredCommand(definition, closeEditor);
+  const command = jdCommandView(submission, definition, closeEditor);
   const current = profile.data;
   // One edit at a time, here and in the collections: an open editor froze its revision.
   const { heldByAnother } = useEditSlot(inlineEditorOpen || command.locked);

@@ -4,6 +4,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, replace
 from uuid import UUID, uuid4
 
+import psycopg
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import event, text
@@ -11,9 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
+from caliburn.features.interviews import queries as interviews
 from caliburn.features.job_description.models import ProfileField
 from caliburn.features.job_description.source_changes import AddJdSource, ReviseJdSources
 from caliburn.features.job_description.sources import (
+    InterviewSource,
     JdSourceReference,
     JdSourceTarget,
     MemorySource,
@@ -29,16 +32,72 @@ from caliburn.features.work_memory.candidates import (
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
+from caliburn.workflows.jd_evidence import JdEvidenceWorkflow, MemoryEvidence
 from caliburn.workflows.jd_source_queries import (
     read_fixed_memory_source,
     read_memory_source_changes,
     read_memory_source_titles,
 )
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 
 pytestmark = pytest.mark.postgres
+
+
+def test_interview_overview_reads_one_header_batch_without_original_bodies(
+    client: TestClient,
+) -> None:
+    turn = start_turn(client)
+    file_id = turn.writer.scope.job_file_id
+    messages = client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]
+    opening_id = UUID(messages[0]["source_id"])
+    accepted_id = transact(
+        client,
+        lambda session: interviews.read_execution_input_source_id(
+            session, job_file_id=file_id, execution_id=turn.writer.scope.execution_id
+        ),
+    )
+    jd = JdCandidateWorkflow(client.app.state.database.sessions)
+    position = turn.candidate
+    for field, source_id in (
+        (ProfileField.JOB_TITLE, opening_id),
+        (ProfileField.PURPOSE, accepted_id),
+        (ProfileField.REPORTS_TO, opening_id),
+    ):
+        position = client.portal.call(
+            jd.edit,
+            turn.writer,
+            position.scope,
+            ReviseJdSources(
+                uuid4(),
+                position.revision_id,
+                JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=field),
+                (AddJdSource(InterviewSource(source_id)),),
+            ),
+        )
+    complete(client, replace(turn, candidate=position))
+    statements: list[str] = []
+
+    def capture(_connection, _cursor, statement, _parameters, _context, _many):
+        statements.append(statement)
+
+    engine = client.app.state.database.engine.sync_engine
+    event.listen(engine, "before_cursor_execute", capture)
+    try:
+        overview = client.portal.call(
+            JdEvidenceWorkflow(client.app.state.database.sessions).read_overview, file_id
+        )
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+    assert sorted(entry.source_label for entry in overview.references) == [
+        "訪談序號 1 · 系統開場",
+        "訪談序號 1 · 系統開場",
+        "訪談序號 2 · 員工",
+    ]
+    source_reads = [statement for statement in statements if "interview_texts" in statement]
+    assert len(source_reads) == 1
+    assert "interview_texts.interview_text" not in source_reads[0]
 
 
 @dataclass(frozen=True)
@@ -89,7 +148,7 @@ def comparison(client: TestClient) -> Iterator[SourceComparison]:
             ),
         )
         phase = await memory.handoff(writer, created.position, uuid4())
-        original = await memory.publish(writer, phase, uuid4())
+        original = await publish_memory_owner_fixture(memory.sessions, writer, phase, uuid4())
         async with sessions() as session:
             selected = await candidate_queries.read_snapshot_object(
                 session, file_id, original.snapshot_id, created.object_id
@@ -107,7 +166,7 @@ def comparison(client: TestClient) -> Iterator[SourceComparison]:
             ),
         )
         phase = await memory.handoff(writer, revised.position, uuid4())
-        current = await memory.publish(writer, phase, uuid4())
+        current = await publish_memory_owner_fixture(memory.sessions, writer, phase, uuid4())
         return SourceComparison(
             file_id,
             MemorySource(
@@ -366,3 +425,47 @@ def test_overview_groups_fixed_source_headers_by_snapshot(
     assert not any("memory_bodies" in statement for statement in statements)
     # 兩份歷史快照加上一次比較位置，不能為每條引用重讀目前位置。
     assert sum("memory_position_members" in statement for statement in statements) <= 3
+
+
+def test_memory_evidence_chain_survives_deletion_between_snapshot_and_body(
+    client: TestClient,
+    comparison: SourceComparison,
+    database_connection: psycopg.Connection,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    file_id = comparison.job_file_id
+    turn = start_turn(client, file_id=file_id)
+    sessions = client.app.state.database.sessions
+    position = client.portal.call(
+        JdCandidateWorkflow(sessions).edit,
+        turn.writer,
+        turn.candidate.scope,
+        ReviseJdSources(
+            uuid4(),
+            turn.candidate.revision_id,
+            JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=ProfileField.PURPOSE),
+            (AddJdSource(comparison.source),),
+        ),
+    )
+    complete(client, replace(turn, candidate=position))
+    workflow = JdEvidenceWorkflow(sessions)
+    overview = client.portal.call(workflow.read_overview, file_id)
+    original = candidate_queries.read_snapshot
+    deleted = False
+
+    async def delete_after_snapshot(session, requested_file, snapshot_id):
+        nonlocal deleted
+        snapshot = await original(session, requested_file, snapshot_id)
+        if not deleted:
+            deleted = True
+            database_connection.execute("DELETE FROM job_files WHERE job_file_id=%s", (file_id,))
+        return snapshot
+
+    monkeypatch.setattr(candidate_queries, "read_snapshot", delete_after_snapshot)
+    result = client.portal.call(
+        workflow.read_content, file_id, overview.revision_id, overview.references[0].citation_id
+    )
+    assert isinstance(result, MemoryEvidence)
+    assert result.revision.content.body == "每月核對庫存。"
+    assert [link.label for link in result.references] == ["訪談序號 2 · 員工"]
+    assert deleted

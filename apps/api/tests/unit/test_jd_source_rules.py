@@ -25,7 +25,7 @@ from caliburn.features.job_description.sources import (
     carry_source_references,
 )
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 def test_text_changes_remain_pending_after_revert_until_explicit_alignment() -> None:

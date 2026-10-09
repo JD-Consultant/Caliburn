@@ -1,6 +1,6 @@
 """A's professional method for the adopted product content criteria.
 
-Public content meaning: docs/product-concept.md (content criteria section).
+Public content meaning: docs/product/concepts.md (content criteria section).
 Role instructions below define A's method; tool contracts remain in their schemas.
 """
 

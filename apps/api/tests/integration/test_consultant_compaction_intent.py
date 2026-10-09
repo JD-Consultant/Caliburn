@@ -26,8 +26,8 @@ from caliburn.settings import DatabaseSettings, ModelSettings
 from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_context_histories import admit_writer, prepare, transact
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 

@@ -2,6 +2,7 @@
 
 from caliburn.contracts.generated.tools import create_jd_task_arguments as task
 from caliburn.contracts.generated.tools import revise_jd_profile_arguments as profile
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.job_description.models import (
     ClearProfileField,
     ProfileChange,
@@ -27,7 +28,7 @@ from caliburn.workflows.jd_task_writes import CreateTaskInput, TaskCapabilityInp
 def parse_profile_write(
     arguments: str,
 ) -> tuple[tuple[ProfileChange, ...], tuple[ProfileSourceIntent, ...]]:
-    parsed = profile.ReviseJdProfileArguments.model_validate_json(arguments)
+    parsed = parse_contract(profile.ReviseJdProfileArguments, arguments)
     changes: list[ProfileChange] = []
     sources: list[ProfileSourceIntent] = []
     for item in parsed.changes:
@@ -46,7 +47,7 @@ def parse_profile_write(
 
 
 def parse_task_write(arguments: str) -> CreateTaskInput:
-    parsed = task.CreateJdTaskArguments.model_validate_json(arguments)
+    parsed = parse_contract(task.CreateJdTaskArguments, arguments)
     return CreateTaskInput(
         parsed.parent_read_ref,
         parsed.title,

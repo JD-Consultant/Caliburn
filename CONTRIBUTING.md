@@ -9,10 +9,11 @@ Caliburn 的正式產品是本機 Web AI 職務分析與職務說明書 App。�
 ```text
 apps/api/        Python 3.14／FastAPI／LangGraph／PostgreSQL 後端（A／B1／B2、JD、Memory、PDF）
 apps/web/        React／TypeScript／MUI 介面
-docs/            現行架構、契約、開發規範與 runbook
+docs/            產品、架構、現行契約、程式規範與 runbook
 ```
 
-舊關聯式 App 與獨立 Memory 套件已退役，不能接回 import 或啟動。歷史決策與研究原件只在本機保存；RAG 仍保留，與 JD App 隔離且只能明示啟用。
+舊 JD App 與套件已退役；研究、施工與實驗原件只留本機，不隨公開 repository 或其歷史發布。
+RAG 保留 `packages/indexer-contract`、`packages/ocs-contract` 兩套共用契約；與 JD App 隔離且只能明示啟用。
 
 ## 工具與安裝
 
@@ -29,7 +30,7 @@ uv sync --project apps/api --locked
 
 Node／TypeScript 使用根目錄唯一的 `pnpm-lock.yaml`；不要新增 npm lockfile。Python 使用
 `apps/api/uv.lock`。資料庫與 OpenAI key 只經明示的環境變數／`apps/api/.env` 的單一 key 設定，
-不由安裝或啟動偷偷建立、清除或搬移；步驟見 [runbook 的首次初始化](docs/runbook.md#第一次初始化)。
+不由安裝或啟動偷偷建立、清除或搬移；步驟見[原生開發初始化](docs/operations/native-development.md)。
 
 ## 日常開發
 
@@ -65,18 +66,14 @@ pnpm check
 測試，以及文件引用、契約生成核對與 production build。真 PostgreSQL、真瀏覽器及真模型驗收仍依各計畫明示執行
 （見[後端 README](apps/api/README.md#測試與檢查)）；離線綠燈不能冒充 provider 或 UI 證據。
 
-使用 Conventional Commits，一個可審工作單位一個 commit，不加工具署名。保留他人未提交內容；研究、計畫、實驗原件與報告只留本機；公開提交保留程式、必要測試與架構／開發文件。未經 Owner 明確要求，不 push、merge、發布或執行付費模型驗證。
+使用 Conventional Commits，一個可審工作單位一個 commit，不加工具署名。保留他人未提交內容與本機研究原件；
+公開提交只包含程式、必要測試及產品／架構／開發文件。未經 Owner 明確要求，不 push、merge、發布或執行付費模型驗證。
 
 ## 隔離 RAG
 
-```powershell
-pnpm rag:up
-pnpm rag:dev
-pnpm rag:down
-```
-
-RAG 不在正式 JD App dependency graph。變更前讀
-[RAG 設計](docs/design/rag-pipeline.md)，不要把它接進 JD App composition root。
+JD App 不直接 import RAG 的 Python 套件，也不管理 RAG 服務的啟停。composition root 可依
+[公版明示接線](docs/architecture/rag-pipeline.md)，在明示設定後建立 HTTP client。
+變更前讀 [RAG 架構](docs/architecture/rag-pipeline.md)；獨立啟動及公版 Docker 模式見 [RAG 操作](docs/operations/rag.md)。
 
 ## 變更範圍與審查
 

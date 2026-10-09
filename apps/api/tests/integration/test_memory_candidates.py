@@ -20,6 +20,7 @@ from caliburn.features.executions.models import (
     StaleWriterError,
 )
 from caliburn.features.interviews.models import InterviewReadError
+from caliburn.features.work_memory import candidate_lifecycle
 from caliburn.features.work_memory.candidates import (
     CreateMemoryObject,
     DeleteMemoryObject,
@@ -41,9 +42,9 @@ from caliburn.features.work_memory.revisions import (
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.memory_candidates import (
     MemoryCandidateWorkflow,
-    publish_memory_candidate,
     start_memory_candidate,
 )
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
 SITUATION = MemoryLayer.WORK_SITUATION
@@ -72,9 +73,9 @@ async def writer(session: AsyncSession, file_id: UUID) -> ExecutionWriter:
 def source(database_connection: psycopg.Connection) -> tuple[UUID, UUID]:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'Memory','Memory','合成員工')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'Memory','Memory','合成員工')",
+        (file_id,),
     )
     add_interview(database_connection, file_id, uuid4(), 1, "app")
     add_interview(database_connection, file_id, source_id, 2, "employee")
@@ -147,7 +148,7 @@ def test_understanding_stage_cannot_handoff_back_to_situations(
         assert await workflow.handoff(runner, initial, command) == b2
         with pytest.raises(MemoryCandidateStateError):
             await workflow.handoff(runner, b2, uuid4())
-        snapshot = await workflow.publish(runner, b2, uuid4())
+        snapshot = await publish_memory_owner_fixture(workflow.sessions, runner, b2, uuid4())
         assert snapshot.covered_through_sequence == 2
 
     execute(database_settings, scenario)
@@ -161,9 +162,14 @@ def test_publish_is_one_fixed_graph_and_replay_returns_original_snapshot(
         position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
         assert await workflow.read_latest_snapshot(source[0]) is None
         publication = uuid4()
-        snapshot = await workflow.publish(runner, position, publication)
+        snapshot = await publish_memory_owner_fixture(
+            workflow.sessions, runner, position, publication
+        )
         assert snapshot.covered_through_sequence == 2
-        assert await workflow.publish(runner, position, publication) == snapshot
+        assert (
+            await publish_memory_owner_fixture(workflow.sessions, runner, position, publication)
+            == snapshot
+        )
         assert await workflow.read_latest_snapshot(source[0]) == snapshot
         case = await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, case_id)
         understanding = await workflow.read_snapshot_object(
@@ -191,7 +197,7 @@ def test_candidate_binding_tracks_new_situation_but_old_snapshot_never_changes(
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
         position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
-        first = await workflow.publish(runner, position, uuid4())
+        first = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         old_case = await workflow.read_snapshot_object(source[0], first.snapshot_id, case_id)
         old_understanding = await workflow.read_snapshot_object(
             source[0], first.snapshot_id, understanding_id
@@ -218,7 +224,7 @@ def test_candidate_binding_tracks_new_situation_but_old_snapshot_never_changes(
             {MemoryRevisionReference(case_id, latest_case.content_revision_id)}
         )
         assert current.content_revision_id == old_understanding.revision_id
-        second = await workflow.publish(runner, position, uuid4())
+        second = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         new_understanding = await workflow.read_snapshot_object(
             source[0], second.snapshot_id, understanding_id
         )
@@ -248,7 +254,7 @@ def test_delete_situation_removes_candidate_bindings_not_understandings_or_histo
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
         position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
-        original = await workflow.publish(runner, position, uuid4())
+        original = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         workflow, runner, situation_stage = await start(database, (source[0], later))
         deleted = await workflow.edit(
             runner, DeleteMemoryObject(uuid4(), situation_stage, SITUATION, case_id)
@@ -259,7 +265,7 @@ def test_delete_situation_removes_candidate_bindings_not_understandings_or_histo
         )
         assert not current.work_situation_references
         assert not await workflow.read_map(runner.scope, stage=position, layer=SITUATION)
-        snapshot = await workflow.publish(runner, position, uuid4())
+        snapshot = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         assert not (
             await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, understanding_id)
         ).work_situation_references
@@ -295,7 +301,7 @@ def test_role_and_stage_permissions_are_enforced_beyond_tool_registration(
         with pytest.raises(MemoryCandidateStateError):
             await workflow.read_map(runner.scope, stage=initial, layer=SITUATION)
         with pytest.raises(MemoryCandidateStateError):
-            await workflow.publish(runner, initial, uuid4())
+            await publish_memory_owner_fixture(workflow.sessions, runner, initial, uuid4())
 
     execute(database_settings, scenario)
 
@@ -395,7 +401,7 @@ def test_batch_reentry_keeps_original_source_boundary(
     execute(database_settings, scenario)
 
 
-def test_publication_and_execution_rollback_together_before_commit(
+def test_owner_publication_rolls_back_with_the_caller_transaction(
     database_settings: DatabaseSettings, source: tuple[UUID, UUID]
 ) -> None:
     async def scenario(database: Database) -> None:
@@ -404,7 +410,7 @@ def test_publication_and_execution_rollback_together_before_commit(
         command_id = uuid4()
         with pytest.raises(RuntimeError, match="before commit"):
             async with database.sessions.begin() as session:
-                await publish_memory_candidate(session, runner, position, command_id)
+                await candidate_lifecycle.publish(session, position, command_id)
                 raise RuntimeError("simulated interruption before commit")
         assert await workflow.read_latest_snapshot(source[0]) is None
         async with database.sessions() as session:
@@ -412,8 +418,11 @@ def test_publication_and_execution_rollback_together_before_commit(
                 await executions.read_execution(session, runner.scope)
             ).status == ExecutionStatus.ACTIVE
         assert await workflow.read_map(runner.scope, stage=position, layer=UNDERSTANDING)
-        result = await workflow.publish(runner, position, command_id)
-        assert await workflow.publish(runner, position, command_id) == result
+        result = await publish_memory_owner_fixture(workflow.sessions, runner, position, command_id)
+        assert (
+            await publish_memory_owner_fixture(workflow.sessions, runner, position, command_id)
+            == result
+        )
 
     execute(database_settings, scenario)
 
@@ -531,7 +540,7 @@ def test_new_snapshot_reuses_unchanged_objects_and_keeps_file_scope(
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
         position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
-        first = await workflow.publish(runner, position, uuid4())
+        first = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         workflow, runner, initial = await start(database, (source[0], later))
         unchanged = await workflow.edit(
             runner,
@@ -541,7 +550,7 @@ def test_new_snapshot_reuses_unchanged_objects_and_keeps_file_scope(
         )
         assert unchanged.position == initial
         position = await workflow.handoff(runner, unchanged.position, uuid4())
-        second = await workflow.publish(runner, position, uuid4())
+        second = await publish_memory_owner_fixture(workflow.sessions, runner, position, uuid4())
         assert second.snapshot_id != first.snapshot_id
         assert second.position_id == first.position_id
         assert second.covered_through_sequence == 4
@@ -590,8 +599,8 @@ def test_restore_retains_understanding_safe_point_and_rejects_abandoned_branch(
             == before
         )
         with pytest.raises(MemoryCandidateStateError):
-            await workflow.publish(runner, change.position, uuid4())
-        snapshot = await workflow.publish(runner, restored, uuid4())
+            await publish_memory_owner_fixture(workflow.sessions, runner, change.position, uuid4())
+        snapshot = await publish_memory_owner_fixture(workflow.sessions, runner, restored, uuid4())
         assert (
             await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, case_id)
         ).content.title == "每月盤點"
@@ -627,7 +636,9 @@ def test_delete_shared_source_removes_only_its_bindings_and_preserves_publicatio
                 frozenset({remove_id, keep.object_id}),
             ),
         )
-        published = await workflow.publish(runner, second.position, uuid4())
+        published = await publish_memory_owner_fixture(
+            workflow.sessions, runner, second.position, uuid4()
+        )
         workflow, runner, initial = await start(database, (source[0], later))
         removed = await workflow.edit(
             runner, DeleteMemoryObject(uuid4(), initial, SITUATION, remove_id)
@@ -641,7 +652,7 @@ def test_delete_shared_source_removes_only_its_bindings_and_preserves_publicatio
         )
         assert not one.work_situation_references
         assert {ref.object_id for ref in two.work_situation_references} == {keep.object_id}
-        latest = await workflow.publish(runner, b2, uuid4())
+        latest = await publish_memory_owner_fixture(workflow.sessions, runner, b2, uuid4())
         with pytest.raises(MemoryRevisionNotFoundError):
             await workflow.read_snapshot_object(source[0], latest.snapshot_id, remove_id)
         assert (
@@ -664,7 +675,7 @@ def test_already_covered_start_reentry_keeps_original_no_work_result(
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
         b2 = await workflow.handoff(runner, initial, uuid4())
-        snapshot = await workflow.publish(runner, b2, uuid4())
+        snapshot = await publish_memory_owner_fixture(workflow.sessions, runner, b2, uuid4())
         async with database.sessions.begin() as session:
             redundant = await writer(session, source[0])
         with pytest.raises(RuntimeError, match="before commit"):

@@ -20,6 +20,7 @@ from caliburn.contracts.generated.tools.interview_plan_write_result import (
 from caliburn.contracts.generated.tools.read_interview_plan_arguments import (
     ReadInterviewPlanArguments,
 )
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import (
     ExecutionKind,
     ExecutionNotFoundError,
@@ -128,7 +129,7 @@ class InterviewPlanTools:
         if name not in self.read_names:
             return _scope_rejection()
         try:
-            ReadInterviewPlanArguments.model_validate_json(arguments)
+            parse_contract(ReadInterviewPlanArguments, arguments)
         except ValidationError:
             return _invalid_arguments()
         try:
@@ -150,7 +151,7 @@ class InterviewPlanTools:
         if name not in self.write_names:
             return _scope_rejection()
         try:
-            intent = EditInterviewPlanArguments.model_validate_json(arguments)
+            intent = parse_contract(EditInterviewPlanArguments, arguments)
         except ValidationError:
             return _invalid_arguments()
         try:

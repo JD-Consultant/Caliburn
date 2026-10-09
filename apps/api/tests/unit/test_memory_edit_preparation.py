@@ -2,7 +2,7 @@
 
 import pytest
 
-from caliburn.features.work_memory.body_matching import BodyEditError
+from caliburn.adapters.body_matching import BodyEditError
 from caliburn.features.work_memory.edit_intents import (
     InterviewReferenceChange,
     MemoryBodyChange,

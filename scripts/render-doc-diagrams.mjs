@@ -19,6 +19,7 @@ const root = process.cwd();
 const output = path.resolve(values.output);
 if (!output.startsWith(root + path.sep)) throw new Error('輸出須位於工作區內。');
 const diagramRoot = path.resolve('docs/diagrams');
+const screenshotRoot = path.join(diagramRoot, 'screenshots');
 const portable = file => path.relative(root, file).replaceAll('\\', '/');
 const sha256 = content => createHash('sha256').update(content).digest('hex');
 async function artifactHash(file) {
@@ -63,6 +64,7 @@ for (const absoluteFile of await maintainedDocuments()) {
     if (!/\.(?:png|svg)$/i.test(imagePath)) continue;
     const png = imagePath.startsWith('/') ? path.resolve(root, `.${imagePath}`) : path.resolve(path.dirname(absoluteFile), imagePath);
     if (!png.startsWith(diagramRoot + path.sep)) continue;
+    if (png.startsWith(screenshotRoot + path.sep)) continue;
     const sourceFile = png.replace(/\.(?:png|svg)$/, '.mmd');
     const references = bySource.get(sourceFile) ?? [];
     references.push({ file, index: index + 1, title: reference.title });

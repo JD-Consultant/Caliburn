@@ -1,6 +1,6 @@
 # pdf-to-json — OCS PDF → 結構化 JSON(ETL)
 
-將官方職能基準（OCS/iCAP）**PDF** 轉成結構化 **JSON**，供 [`apps/ocs-indexer`](../ocs-indexer) 建立公版參考索引。
+將官方職能基準（OCS/iCAP）**PDF** 轉成結構化 **JSON**，供 [`apps/ocs-indexer`](../ocs-indexer/) 建立公版參考索引。
 這是「解析」bounded context 的離線 CLI 工具，沒有伺服器或使用者狀態。
 
 > **閱讀方式：**上半說明如何執行、轉換流程與程式位置；**下半 §1–10 定義 OCS 來源 JSON 的欄位語意契約**。
@@ -510,7 +510,7 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 
 ## 指路
 
-- 系統範圍：根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)；公版資料流見 [RAG 管線](../../docs/design/rag-pipeline.md)，本工具採 Pipes-and-Filters，程式位置見本頁 Codemap。
+- 系統範圍：根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)；公版資料流見 [RAG 管線](../../docs/architecture/rag-pipeline.md)，本工具採 Pipes-and-Filters，程式位置見本頁 Codemap。
 - 來源欄位語意：[§6 Field Contract](#6-field-contract)；結構與生成規則：[ocs-contract](../../packages/ocs-contract/README.md)。
 - 下游：[ocs-indexer](../ocs-indexer/README.md)(索引消費本輸出)；機器契約見 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)，不是 JD 著作契約。
-- 初始設計與建置沿革：[ARCHITECTURE.md](ARCHITECTURE.md)；已標為歷史，不作現行施工入口。
+- 設計分工：[ARCHITECTURE.md](ARCHITECTURE.md)；實際命令與支援範圍以本頁為準。

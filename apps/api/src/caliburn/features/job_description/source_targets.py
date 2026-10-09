@@ -2,7 +2,7 @@
 
 from caliburn.features.job_description.models import JdProfile, ProfileField
 from caliburn.features.job_description.sources import JdSourceTarget, SourceTargetKind
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 def source_target_contents(

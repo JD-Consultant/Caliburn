@@ -10,6 +10,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
@@ -24,8 +25,8 @@ from caliburn.workflows.memory_analysis.results import AnalysisOutcomeError
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_memory_batch_orchestration import complete_turn, start_turn
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -70,7 +71,9 @@ def test_legacy_recorded_rework_fails_before_any_new_model_work(
             async def unexpected_model_work(*args, **kwargs):
                 pytest.fail("Legacy rework must be rejected before model dispatch")
 
-            parent = MemoryBatchWorkflow(database.sessions, run_role=unexpected_model_work)
+            parent = MemoryBatchWorkflow(
+                database.sessions, run_role=unexpected_model_work, cpu=MemoryCpu()
+            )
             with pytest.raises(AnalysisOutcomeError, match="analysis_outcome_malformed"):
                 await parent.run(work.writer)
             assert (
@@ -83,7 +86,7 @@ def test_legacy_recorded_rework_fails_before_any_new_model_work(
                 await requests.failure_reason(turn.scope.job_file_id)
                 == "analysis_outcome_malformed"
             )
-            assert await requests.discover() == ()
+            assert (await requests.discover()).ready_file_ids == ()
         finally:
             await database.close()
 
@@ -154,9 +157,14 @@ def test_invalid_b2_final_is_durable_failure_without_publish_or_retry(
                 parent = MemoryBatchWorkflow(
                     database.sessions,
                     run_role=MemoryRoleDispatch(
-                        WorkSituationAnalystRunner(database.sessions, saver, client, settings),
-                        WorkUnderstandingAnalystRunner(database.sessions, saver, client, settings),
+                        WorkSituationAnalystRunner(
+                            database.sessions, saver, client, settings, cpu=MemoryCpu()
+                        ),
+                        WorkUnderstandingAnalystRunner(
+                            database.sessions, saver, client, settings, cpu=MemoryCpu()
+                        ),
                     ),
+                    cpu=MemoryCpu(),
                 )
                 assert (
                     await run_with_failure_boundary(
@@ -178,11 +186,11 @@ def test_invalid_b2_final_is_durable_failure_without_publish_or_retry(
             # Read a fresh owner instance to prove a durable reason, not a local exception.
             restarted = MemoryConsolidationWorkflow(database.sessions)
             assert await restarted.failure_reason(turn.scope.job_file_id) == reason
-            assert await restarted.discover() == ()
+            assert (await restarted.discover()).ready_file_ids == ()
             later = await start_turn(database, turn.scope.job_file_id)
             await restarted.request(later, uuid4())
             await complete_turn(database, later)
-            assert await restarted.discover() == ()
+            assert (await restarted.discover()).ready_file_ids == ()
             assert calls == 2
         finally:
             await client.close()
@@ -208,7 +216,9 @@ def test_unrelated_value_error_is_not_classified_as_model_outcome(
             async def invalid_local_contract(*args, **kwargs):
                 raise ValueError("synthetic local programming error")
 
-            parent = MemoryBatchWorkflow(database.sessions, run_role=invalid_local_contract)
+            parent = MemoryBatchWorkflow(
+                database.sessions, run_role=invalid_local_contract, cpu=MemoryCpu()
+            )
             with pytest.raises(ValueError, match="local programming error"):
                 await parent.run(work.writer)
             assert await requests.failure_reason(turn.scope.job_file_id) is None

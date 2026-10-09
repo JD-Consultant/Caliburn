@@ -135,6 +135,29 @@ class MemoryOperationRecord(Base):
     __tablename__ = "memory_operations"
     __table_args__ = (
         ForeignKeyConstraint(
+            ["job_file_id", "execution_id", "intent_source_id"],
+            [
+                "interview_inputs.job_file_id",
+                "interview_inputs.execution_id",
+                "interview_inputs.source_id",
+            ],
+            name="fk_memory_operations_intent_input",
+            ondelete="CASCADE",
+        ),
+        CheckConstraint(
+            "(kind = 'consolidation_intent' AND intent_source_id IS NOT NULL "
+            "AND failure_reason IS NULL AND failure_frontier IS NULL "
+            "AND request_payload IS NULL AND result_payload IS NULL) OR "
+            "(kind = 'batch_failure' AND intent_source_id IS NULL "
+            "AND failure_reason IS NOT NULL AND length(failure_reason) BETWEEN 1 AND 100 "
+            "AND failure_frontier IS NOT NULL AND failure_frontier >= 0 "
+            "AND request_payload IS NULL AND result_payload IS NULL) OR "
+            "(kind NOT IN ('consolidation_intent', 'batch_failure') "
+            "AND intent_source_id IS NULL AND failure_reason IS NULL AND failure_frontier IS NULL "
+            "AND request_payload IS NOT NULL AND result_payload IS NOT NULL)",
+            name="evidence_shape",
+        ),
+        ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_memory_operations_execution",
@@ -146,8 +169,11 @@ class MemoryOperationRecord(Base):
     command_id: Mapped[UUID] = mapped_column(primary_key=True)
     execution_id: Mapped[UUID]
     kind: Mapped[str] = mapped_column(Text)
-    request_payload: Mapped[object] = mapped_column(JSONB)
-    result_payload: Mapped[object] = mapped_column(JSONB)
+    intent_source_id: Mapped[UUID | None]
+    failure_reason: Mapped[str | None] = mapped_column(Text)
+    failure_frontier: Mapped[int | None]
+    request_payload: Mapped[object | None] = mapped_column(JSONB(none_as_null=True), nullable=True)
+    result_payload: Mapped[object | None] = mapped_column(JSONB(none_as_null=True), nullable=True)
 
 
 async def read_batch(

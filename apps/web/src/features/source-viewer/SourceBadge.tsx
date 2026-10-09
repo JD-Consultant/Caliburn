@@ -7,7 +7,7 @@ export function SourceBadge({
   onOpen,
 }: {
   summary: SourceSummary;
-  onOpen: (citationIds: string[]) => void;
+  onOpen: (citationIds: string[], trigger: HTMLButtonElement) => void;
 }) {
   const label = summary.needsRecheck
     ? `來源 ${String(summary.count)} 筆，待核對`
@@ -18,7 +18,7 @@ export function SourceBadge({
       className={summary.needsRecheck ? 'source-badge source-badge--recheck' : 'source-badge'}
       aria-label={label}
       title={label}
-      onClick={() => onOpen(summary.citationIds)}
+      onClick={(event) => onOpen(summary.citationIds, event.currentTarget)}
     >
       <LinkIcon />
       <span aria-hidden="true">{summary.count}</span>

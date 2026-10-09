@@ -1,7 +1,6 @@
 /** Read-only HTTP projections; the canonical schemas own the wire contract. */
 import { queryOptions } from '@tanstack/react-query';
-import { Ajv2020 } from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
+import { createSchemaValidator } from '../../shared/api/schema-policy';
 import sourcesSchema from '../../../../api/contracts/http/jd-sources-view.schema.json' with { type: 'json' };
 import contentSchema from '../../../../api/contracts/http/jd-source-content-view.schema.json' with { type: 'json' };
 import changesSchema from '../../../../api/contracts/http/jd-source-changes-view.schema.json' with { type: 'json' };
@@ -10,8 +9,7 @@ import type { JdSourceContentView } from '../../shared/api/generated/jd-source-c
 import type { JdSourceChangesView } from '../../shared/api/generated/jd-source-changes-view';
 import { ApiError, describeReadError, requestJson } from '../../shared/api/http';
 
-const validator = new Ajv2020();
-addFormats(validator);
+const validator = createSchemaValidator();
 const isSourcesView = validator.compile<JdSourcesView>(sourcesSchema);
 const isContentView = validator.compile<JdSourceContentView>(contentSchema);
 const isChangesView = validator.compile<JdSourceChangesView>(changesSchema);
@@ -47,10 +45,9 @@ export function describeSourceError(error: unknown): string {
   return describeReadError(error);
 }
 
-export function jdSourcesQuery(jobFileId: string) {
-  return queryOptions({
-    // Existing manual edit, A completion and undo invalidate this formal prefix.
-    queryKey: ['jd-profile', jobFileId, 'formal', 'sources'],
+export function jdSourcesQuery(jobFileId: string): ReturnType<typeof queryOptions<JdSourcesView>> {
+  return queryOptions<JdSourcesView>({
+    queryKey: ['jd-sources', jobFileId],
     queryFn: ({ signal }) =>
       requestJson(`/api/job-files/${encodeURIComponent(jobFileId)}/jd/sources`, isSourcesView, {
         signal,

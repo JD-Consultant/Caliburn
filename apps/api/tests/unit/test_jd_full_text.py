@@ -15,7 +15,7 @@ from caliburn.features.job_description.collaborators import Collaborator
 from caliburn.features.job_description.conditions import ConditionKind, JobCondition
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.jd_full_text import project_jd_full_text
 
 

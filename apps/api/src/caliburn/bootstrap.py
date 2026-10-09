@@ -1,5 +1,6 @@
 """Application composition root; dependency creation is explicit at startup."""
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
 from functools import partial
@@ -10,7 +11,9 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.job_file_checkpointer import JobFilePostgresSaver
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.occupation_references import OccupationReferenceClient
+from caliburn.adapters.owned_tasks import join_owned
 from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.adapters.process_lock import PostgresProcessLock
 from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
@@ -42,8 +45,7 @@ from caliburn.transport.http.logging import HttpLoggingMiddleware, unhandled_err
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
 from caliburn.workflows.consultant_activity import ConsultantActivityHub
-from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
-from caliburn.workflows.consultant_commentary import (
+from caliburn.workflows.consultant_activity import (
     PublicCommentaryUpdate as ScopedCommentaryUpdate,
 )
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
@@ -98,19 +100,22 @@ def create_app(
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         database = Database(configured.database) if configured.database else None
         _reset_runtime_state(app, database)
+        resources = AsyncExitStack()
         try:
-            async with AsyncExitStack() as resources:
-                if database is not None:
-                    await database.verify_schema()
-                    await _start_database_runtime(
-                        app, configured, database, resources, composition=components
-                    )
-                yield
-        finally:
-            app.state.consultant_supervisor = None
-            app.state.memory_supervisor = None
             if database is not None:
-                await database.close()
+                await database.verify_schema()
+                await _start_database_runtime(
+                    app, configured, database, resources, composition=components
+                )
+            yield
+        finally:
+            try:
+                # One owner task retains the entire dependency stack, including DB.
+                # Repeated cancellation of lifespan cannot skip ahead of saving runners.
+                await join_owned(asyncio.create_task(_close_resources(resources, database)))
+            finally:
+                app.state.consultant_supervisor = None
+                app.state.memory_supervisor = None
 
     app = FastAPI(
         title="Caliburn",
@@ -134,6 +139,14 @@ def create_app(
     return app
 
 
+async def _close_resources(resources: AsyncExitStack, database: Database | None) -> None:
+    try:
+        await resources.aclose()
+    finally:
+        if database is not None:
+            await database.close()
+
+
 def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
     """Workflows that need only the database exist at once; runtime services start later."""
     app.state.database = database
@@ -149,7 +162,6 @@ def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
     )
     app.state.consultant_status_workflow = None
     app.state.consultant_supervisor = None
-    app.state.consultant_commentary_hub = ConsultantCommentaryHub()
     app.state.consultant_activity_hub = ConsultantActivityHub()
     app.state.memory_supervisor = None
     app.state.consultant_control_workflow = None
@@ -212,8 +224,9 @@ async def _start_model_runtime(
             )
         )
         reference_client = OccupationReferenceClient(http_client)
-    hub: ConsultantCommentaryHub = app.state.consultant_commentary_hub
     activity_hub: ConsultantActivityHub = app.state.consultant_activity_hub
+    memory_cpu = MemoryCpu()
+    resources.push_async_callback(memory_cpu.aclose)
 
     def publish_reasoning_summary(scope: ExecutionScope, summary: PublicReasoningSummary) -> None:
         activity_hub.publish(scope.job_file_id, scope.execution_id, summary)
@@ -230,13 +243,6 @@ async def _start_model_runtime(
                 update.text,
             ),
         )
-        hub.publish(
-            scope.job_file_id,
-            scope.execution_id,
-            update.response_id,
-            update.message_id,
-            update.text,
-        )
 
     runner = ConsultantRunner(
         database.sessions,
@@ -252,12 +258,14 @@ async def _start_model_runtime(
     leader_lock = PostgresProcessLock(database.settings)
     memory_batch = MemoryBatchWorkflow(
         database.sessions,
+        cpu=memory_cpu,
         run_role=MemoryRoleDispatch(
             WorkSituationAnalystRunner(
                 database.sessions,
                 saver,
                 sdk,
                 model,
+                memory_cpu,
                 excluded_work_enabled=reference_client is not None,
             ),
             WorkUnderstandingAnalystRunner(
@@ -265,6 +273,7 @@ async def _start_model_runtime(
                 saver,
                 sdk,
                 model,
+                memory_cpu,
                 excluded_work_enabled=reference_client is not None,
             ),
         ),

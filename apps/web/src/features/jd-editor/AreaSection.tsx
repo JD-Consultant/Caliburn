@@ -1,5 +1,6 @@
 /** One responsibility: a collapsible header with its own actions; its tasks arrive as children. */
 import type { ReactNode } from 'react';
+import { useRef } from 'react';
 import { Paper, Stack, Typography } from '@mui/material';
 import type { Area } from '../../shared/api/generated/jd-work-view';
 import { IconAction } from '../../shared/ui/IconAction';
@@ -33,12 +34,14 @@ export function AreaSection({
   onDelete,
   children,
 }: AreaSectionProps) {
-  const fold = useFold();
+  const section = useRef<HTMLElement>(null);
+  const fold = useFold(section);
   const { expanded } = fold;
   const badge = useSourceBadge();
   const title = area.title ?? '尚未命名的職責';
   return (
     <Paper
+      ref={section}
       variant="outlined"
       component="section"
       aria-label={title}

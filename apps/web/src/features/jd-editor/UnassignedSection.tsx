@@ -1,5 +1,6 @@
 /** The tasks that belong to no responsibility: folds like a responsibility does, but has no name to edit. */
 import type { ReactNode } from 'react';
+import { useRef } from 'react';
 import { Paper, Stack, Typography } from '@mui/material';
 import { FoldToggle } from './FoldToggle';
 import { useFold } from './use-fold';
@@ -11,9 +12,11 @@ export function UnassignedSection({
   taskCount: number;
   children: ReactNode;
 }) {
-  const fold = useFold();
+  const section = useRef<HTMLElement>(null);
+  const fold = useFold(section);
   return (
     <Paper
+      ref={section}
       variant="outlined"
       component="section"
       aria-label="未歸屬任務"

@@ -9,7 +9,7 @@
 - 本文件：如何準備、觀察、評分及解讀。沿既有 pytest、角色 runner、Memory parent 與資料 owner，不增加模型評測平台或產品契約。
 - 每批比較另保留實際版本、命令、結果及未驗邊界；本資料集本身不是驗收通過證據。
 
-內容判準由[產品概念](../../../../../docs/product-concept.md#內容判準)維護，正式提示沿該頁角色入口查閱。oracle 的 analysis／writing／interview 數字保留當時方法來源的章節標識；執行及評分使用本文件的逐項判準、各例正反例與 hard_failures，不需取得內部原稿，也不以案例格式／件數定義所有職位。
+內容判準由[產品概念](../../../../../docs/product/concepts.md#內容判準)維護，正式提示沿該頁角色入口查閱。oracle 的 analysis／writing／interview 數字保留當時方法來源的章節標識；執行及評分使用本文件的逐項判準、各例正反例與 hard_failures，不需取得內部原稿，也不以案例格式／件數定義所有職位。
 
 ## 案例各辨別什麼
 

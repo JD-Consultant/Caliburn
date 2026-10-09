@@ -1,11 +1,11 @@
 # ocs-indexer — OCS 知識索引與查詢服務
 
-將 [`apps/pdf-to-json`](../pdf-to-json) 產出的 OCS（職能基準）JSON 建成 Qdrant 索引，
+將 [`apps/pdf-to-json`](../pdf-to-json/) 產出的 OCS（職能基準）JSON 建成 Qdrant 索引，
 透過 **無狀態查詢 HTTP API**（:8000）提供公版候選資料。職位整體參考使用獨立的
 document／task 索引；既有 profile／task 索引與介面保留原語意。
 
 本 app 是「檢索」bounded context，負責結構化候選池及語意搜尋，不保存對話、LLM 或使用者狀態。
-RAG 服務須明示啟動；JD App 可依 [公版接線](../../docs/design/rag-pipeline.md)配置 HTTP consumer，不成為 App 預設啟動依賴。
+RAG 服務須明示啟動；JD App 可依 [公版明示接線](../../docs/architecture/rag-pipeline.md)配置 HTTP consumer，不成為 App 預設啟動依賴。
 
 下圖為既有 profile／task 索引的資料流；新公版參考索引的使用方式見[職位整體參考 API](#職位整體參考-api)。
 
@@ -15,7 +15,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
                                                 查詢 client ◄── 無狀態 API(:8000) ◄──┘
 ```
 
-- **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder)
+- **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder/)
   提供（`POST /embed`），indexer 只作 HTTP client。不在 indexer 安裝 torch；
   原 Windows 行程內執行曾有 segfault。
 - **Qdrant 由本 app 管理：**其他服務經查詢 API 取資料，不直接存取 collection。
@@ -24,7 +24,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
 
 ### 與 JD App 一起用 Docker 啟動
 
-使用根目錄的 `compose.jd-app.yaml` 加 `compose.jd-app.rag.yaml`，首次選版與建索引後可用 `pnpm docker:rag:up` 一起啟動 App、PostgreSQL、查詢 API、Qdrant 與 GPU 模型。停止用 `pnpm docker:rag:stop`。完整設定、來源唯讀掛載與搜尋檢查見[操作手冊](../../docs/runbook.md#含公版參考的-docker-模式)。
+使用根目錄的 `compose.jd-app.yaml` 加 `compose.jd-app.rag.yaml`，首次選版與建索引後可用 `pnpm docker:rag:up` 一起啟動 App、PostgreSQL、查詢 API、Qdrant 與 GPU 模型。停止用 `pnpm docker:rag:stop`。完整設定、來源唯讀掛載與搜尋檢查見[操作手冊](../../docs/operations/rag.md#含公版參考的-docker-模式)。
 
 RAG 仍是獨立服務，不移入 App。查詢 API 映像依本目錄的 lockfile 安裝 API extra 與兩個契約套件，不安裝 torch，也不包含 `.env`、測試或來源 JSON。容器只走內網，不接收 App 的金鑰。`Dockerfile.dockerignore` 限制可進入建置的檔案；服務以非 root 使用者執行，套件採非 editable 安裝，不依賴開發原始碼路徑。
 
@@ -32,7 +32,7 @@ RAG 仍是獨立服務，不移入 App。查詢 API 映像依本目錄的 lockfi
 
 ### 職位整體參考 API
 
-2026-10-05 已實作；JD App 可選 consumer 依 [公版接線](../../docs/design/rag-pipeline.md) 明示啟用，獨立服務權責不變。
+2026-10-05 已實作；JD App 可選 consumer 依 [公版明示接線](../../docs/architecture/rag-pipeline.md) 明示啟用，獨立服務權責不變。
 
 輸入員工實際工作文字，取得最多五份去重公版及**完整已解析任務目錄**。
 顧問自行判斷是否適用；本服務不保存員工確認進度，也不判定 JD 完成。
@@ -69,7 +69,7 @@ manifest。原始 UTF-8 JSON 與 hash 綁定 `reference_id`，讀取不代換成
 未 ready／不相容 409、無效模型回覆 502、連線失敗 503，不將故障當空結果。
 
 契約權威：[`indexer_contract/references.py`](../../packages/indexer-contract/src/indexer_contract/references.py)。
-App 的接入與保存責任見[公版明示接線](../../docs/design/rag-pipeline.md)。
+App 的接入與保存責任見[公版明示接線](../../docs/architecture/rag-pipeline.md)。
 
 ### 既有 profile／task API
 
@@ -151,7 +151,7 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 
 ## Query API reference(:8000)
 
-**request/response schema 權威 = [`packages/indexer-contract`](../../packages/indexer-contract)**
+**request/response schema 權威 = [`packages/indexer-contract`](../../packages/indexer-contract/)**
 (共用 Pydantic)；自訂方法採 AIP-136 `:verb`。互動式 OpenAPI:`/docs`。
 預設綁 `127.0.0.1`、無 auth(對外請加反向代理;`create_app()` 是擴充點)。
 
@@ -193,8 +193,6 @@ src/jd_ocs_indexer/
 另有 `scripts/calibrate_match.py`(app 根):門檻校準,與生產共用 `matching` 的
 collapse/score_pairs(校準即生產);校準輸出在任務指定的本機位置保存，採用的門檻與適用條件同步維護於程式與公開說明。
 
-相似比對保留所有原項目，只提供分組與可能相似提示；星型群的成員須各自直接達到與中心的門檻，不以傳遞連通性擴群。既有門檻只反映原語料、模型與校準條件，換資料或模型須重驗，不能當通用相似度標準。
-
 ## CLI reference
 
 皆可 `uv run jd-ocs-indexer <cmd> --help`。中文亂碼:`$env:PYTHONIOENCODING="utf-8"`。
@@ -209,11 +207,14 @@ collapse/score_pairs(校準即生產);校準輸出在任務指定的本機位置
 | `smoke-query` | 索引驗證(原始輸出,格式不保證穩定) |
 | `serve [--host] [--port]` | 起查詢 API |
 
+相似比對保留所有原項目，只提供分組與可能相似提示；星型群的成員須各自直接達到與中心的門檻，不以傳遞連通性擴群。既有門檻只反映原語料、模型與校準條件，換資料或模型須重驗，不能當通用相似度標準。
+
 ## 指路
 
 **內部管線深文檔(改 ingest / 查詢邏輯前先讀):[`docs/pipeline.md`](docs/pipeline.md)** —— normalizer lockstep、
 builder embed 字串、RRF hybrid、competencies 去重、manifest 相容的「內部怎麼跑 + 為什麼」。
 
-架構見[獨立 RAG 責任](../../docs/design/rag-pipeline.md)，型別見[indexer-contract](../../packages/indexer-contract/README.md)。
+架構見[獨立 RAG 責任](../../docs/architecture/rag-pipeline.md)，型別見[indexer-contract](../../packages/indexer-contract/README.md)。
 
-[來源 JSON 欄位契約](../pdf-to-json/README.md#6-field-contract)與 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)；模型服務見[embedder README](../embedder/README.md)。
+[來源 JSON 欄位契約](../pdf-to-json/README.md#6-field-contract)與 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)·
+模型服務見[embedder README](../embedder/README.md)。

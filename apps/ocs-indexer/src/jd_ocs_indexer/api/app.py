@@ -1,13 +1,12 @@
 """create_app() factory + lifespan.
 
-Lifespan loads BGE-M3 + the Qdrant client once into app.state. Tests inject
-fakes via create_app(embedder=..., client=...) so no 2GB model / live Qdrant.
+Lifespan owns model HTTP clients, Qdrant, and the serialized retrieval worker.
+Tests inject fakes via create_app(embedder=..., client=...) without live services.
 The factory is also the extension point for future middleware (auth / CORS).
 """
 
 from __future__ import annotations
 
-import threading
 from contextlib import ExitStack, asynccontextmanager
 
 import httpx
@@ -16,6 +15,11 @@ from fastapi.responses import JSONResponse
 from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
 
 from jd_ocs_indexer.api import reference_routes, routes
+from jd_ocs_indexer.api.retrieval import (
+    RetrievalBusy,
+    RetrievalUnavailable,
+    RetrievalWorker,
+)
 from jd_ocs_indexer.config import Settings
 from jd_ocs_indexer.references.errors import (
     ReferenceIndexError,
@@ -74,18 +78,21 @@ def create_app(
                     ranker,
                     candidate_limit=s.reference_candidate_limit,
                 )
-            # GPU query calls share a bounded, serialized model lane. Reads do not hold it.
-            app.state.embed_lock = threading.Lock()
-            yield
+            app.state.retrieval = RetrievalWorker()
+            try:
+                yield
+            finally:
+                # Finish physical workers before ExitStack closes their clients.
+                await app.state.retrieval.aclose()
 
     app = FastAPI(title="jd-ocs-indexer query API", version="1.0", lifespan=lifespan)
 
     @app.exception_handler(UnexpectedResponse)
-    async def _qdrant_unexpected(request, exc):  # noqa: ANN001
+    async def _qdrant_unexpected(request, exc):
         return JSONResponse(status_code=502, content={"detail": "qdrant error"})
 
     @app.exception_handler(ResponseHandlingException)
-    async def _qdrant_unreachable(request, exc):  # noqa: ANN001
+    async def _qdrant_unreachable(request, exc):
         return JSONResponse(status_code=503, content={"detail": "qdrant unreachable"})
 
     from jd_ocs_indexer.embeddings.base import (
@@ -94,8 +101,10 @@ def create_app(
     )
 
     @app.exception_handler(EmbeddingMismatchError)
-    async def _embed_mismatch(request, exc):  # noqa: ANN001
-        return JSONResponse(status_code=409, content={"detail": f"embedding mismatch: {exc}"})
+    async def _embed_mismatch(request, exc):
+        return JSONResponse(
+            status_code=409, content={"detail": f"embedding mismatch: {exc}"}
+        )
 
     def reference_handler(status: int, code: str):
         async def handle(request, exc):
@@ -110,6 +119,8 @@ def create_app(
         (EmbeddingResponseError, 502, "embedding_provider_invalid_response"),
         (ReferenceQueryError, 422, "reference_query_invalid"),
         (httpx.HTTPError, 503, "model_service_unavailable"),
+        (RetrievalBusy, 503, "retrieval_busy"),
+        (RetrievalUnavailable, 503, "retrieval_unavailable"),
     ):
         app.add_exception_handler(error, reference_handler(status, code))
 

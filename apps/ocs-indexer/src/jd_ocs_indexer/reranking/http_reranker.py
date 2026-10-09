@@ -25,7 +25,9 @@ class HttpReranker:
 
     def __init__(self, base_url: str, *, client: httpx.Client | None = None) -> None:
         self._owns_client = client is None
-        self._client = client or httpx.Client(base_url=base_url.rstrip("/"), timeout=300)
+        self._client = client or httpx.Client(
+            base_url=base_url.rstrip("/"), timeout=300, trust_env=False
+        )
 
     def close(self) -> None:
         if self._owns_client:
@@ -35,14 +37,18 @@ class HttpReranker:
         scores = []
         for start in range(0, len(documents), 32):
             batch = documents[start : start + 32]
-            response = self._client.post("/rerank", json={"query": query, "documents": batch})
+            response = self._client.post(
+                "/rerank", json={"query": query, "documents": batch}
+            )
             if response.status_code == 422:
                 try:
                     code = response.json().get("detail", {}).get("code")
                 except (ValueError, AttributeError):
                     code = None
                 if code == "query_too_long":
-                    raise ReferenceQueryError("query leaves insufficient document token capacity")
+                    raise ReferenceQueryError(
+                        "query leaves insufficient document token capacity"
+                    )
             response.raise_for_status()
             try:
                 body = RerankResponse.model_validate(response.json())

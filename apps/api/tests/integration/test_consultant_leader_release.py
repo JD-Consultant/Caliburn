@@ -79,7 +79,7 @@ def test_leader_is_not_released_before_dependent_cleanup(
             await contender.acquire()
             assert calls == 1
             if exit_path == "scan_failure":
-                assert isinstance(supervisor.failure, ConnectionError)
+                assert supervisor.failure.error_type == "ConnectionError"
         finally:
             may_finish_cleanup.set()
             if operation is not None:

@@ -23,9 +23,11 @@ from caliburn.features.job_description import (
     revision_editing,
 )
 from caliburn.features.job_description.candidates import JdCandidateScope
-from caliburn.features.job_description.compound_edits import CreateItemWithSources
+from caliburn.features.job_description.compound_edits import (
+    CreateItemWithSources,
+    JdCompoundEditResult,
+)
 from caliburn.features.job_description.compound_edits import ItemCreation as ItemCreation
-from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.features.job_description.sources import (
     AddJdSource,
     JdSource,
@@ -85,7 +87,9 @@ class JdItemCreationWorkflow:
                 sources,
             )
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedItemCreation) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedItemCreation
+    ) -> JdCompoundEditResult:
         if (
             writer.scope.kind != ExecutionKind.CONSULTANT_TURN
             or writer.scope.execution_id != prepared.candidate.execution_id
@@ -107,5 +111,4 @@ class JdItemCreationWorkflow:
                 ),
                 candidate=prepared.candidate,
             )
-            assert result.created_item is not None
-            return f"created · read_ref: {jd_read_ref(result.created_item)}"
+            return result

@@ -28,6 +28,7 @@ _FIELDS = frozenset(
     {
         "job_file_id",
         "execution_id",
+        "command_id",
         "execution_kind",
         "http_request_id",
         "request_id",

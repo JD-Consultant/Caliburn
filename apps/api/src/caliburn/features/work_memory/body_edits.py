@@ -16,4 +16,4 @@ def apply_body_diff(
     body: str, diff: str, *, policy: BodyMatchPolicy = DEFAULT_BODY_MATCH_POLICY
 ) -> str:
     """Apply the shared editor under Memory's existing nonblank body policy."""
-    return _apply_body_diff(body, diff, policy=policy)
+    return _apply_body_diff(body, diff, policy=policy, allow_blank_body=False)

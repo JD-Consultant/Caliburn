@@ -1,9 +1,9 @@
-"""複合 JD 用例只保存一次、整包回滾，並唯讀恢復舊 checkpoint 的原操作鏈。"""
+"""複合 JD 用例只保存一次、整包回滾，以當前 checkpoint 恢復原 typed 結果。"""
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import replace
-from uuid import UUID, uuid4, uuid5
+from uuid import UUID, uuid4
 
 import psycopg
 import pytest
@@ -45,7 +45,6 @@ from caliburn.features.job_description.sources import (
     AlignJdSource,
     JdSourceReference,
     JdSourceTarget,
-    ReviseJdSources,
     SourceTargetKind,
 )
 from caliburn.features.job_description.tasks import (
@@ -59,9 +58,7 @@ from caliburn.features.job_description.tasks import (
 )
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
 from caliburn.workflows.jd_candidates import (
-    JdCandidateEdit,
     JdCandidateWorkflow,
-    apply_candidate_edit,
 )
 from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow, PreparedItemCreation
 from caliburn.workflows.jd_item_revision import JdItemRevisionWorkflow, PreparedItemRevision
@@ -268,15 +265,16 @@ def test_unknown_commit_replays_persisted_result_without_duplicate_or_rewind(
         "SELECT result_payload FROM jd_operations WHERE job_file_id = %s AND command_id = %s",
         (writer.scope.job_file_id, prepared.command_id),
     ).fetchone()[0]
-    expected = (
-        f"created · read_ref: {metadata['created_ref']}"
-        if metadata["created_ref"] is not None
-        else metadata["effect"]
-    )
+    committed_revision = client.portal.call(candidates.read, writer.scope).position.revision_id
     later = _later_edit(client, writer, candidates)
     counts = _counts(database_connection, writer.scope.job_file_id)
-    assert client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint)) == expected
+    replayed = client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint))
     assert _counts(database_connection, writer.scope.job_file_id) == counts
+    assert replayed.revision_id == committed_revision
+    assert replayed.effect == metadata["effect"]
+    assert (jd_read_ref(replayed.created_item) if replayed.created_item else None) == metadata[
+        "created_ref"
+    ]
     assert client.portal.call(candidates.read, writer.scope).position == later
 
 
@@ -310,235 +308,6 @@ def test_late_source_failure_rolls_back_every_revision_selection_and_operation(
     client.portal.call(workflow.execute, writer, prepared)
 
 
-async def _seed_old_transaction(
-    session: AsyncSession, file_id: UUID, prepared: PreparedCompound
-) -> tuple[UUID, str]:
-    """固定舊版衍生 ID 規約作為資料 fixture；只在測試建立部署前操作。"""
-    revision = prepared.expected_revision_id
-    created = None
-
-    async def apply(command: JdCandidateEdit) -> UUID:
-        return await apply_candidate_edit(session, file_id, prepared.candidate, command)
-
-    if isinstance(prepared, PreparedProfileWrite):
-        if prepared.changes:
-            revision = await apply(
-                ReviseJdProfile(
-                    uuid5(prepared.command_id, "profile_text"), revision, prepared.changes
-                )
-            )
-        for group in prepared.sources:
-            revision = await apply(
-                ReviseJdSources(
-                    uuid5(prepared.command_id, f"profile_source:{group.field}"),
-                    revision,
-                    JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=group.field),
-                    group.changes,
-                )
-            )
-    elif isinstance(prepared, PreparedTaskWrite):
-        revision = await apply(
-            EditJdTasks(uuid5(prepared.command_id, "task"), revision, prepared.task)
-        )
-        work = await work_queries.read_work_at(session, file_id, revision)
-        created = work.tasks[-1]
-        for cap in prepared.capabilities:
-            revision = await apply(
-                EditJdCapabilities(
-                    uuid5(prepared.command_id, f"link:{cap.capability_id}"),
-                    revision,
-                    SetTaskCapability(created.task_id, cap.capability_id, True),
-                )
-            )
-        groups = [(JdSourceTarget(SourceTargetKind.TASK, created.task_id), prepared.task_sources)]
-        groups.extend(
-            (
-                JdSourceTarget(SourceTargetKind.DETAIL, detail.detail_id, task_id=created.task_id),
-                sources,
-            )
-            for detail, sources in zip(created.details, prepared.detail_sources, strict=True)
-        )
-        groups.extend(
-            (
-                JdSourceTarget(
-                    SourceTargetKind.TASK_CAPABILITY, cap.capability_id, task_id=created.task_id
-                ),
-                cap.sources,
-            )
-            for cap in prepared.capabilities
-        )
-        for index, (target, sources) in enumerate(groups):
-            if sources:
-                revision = await apply(
-                    ReviseJdSources(
-                        uuid5(prepared.command_id, f"source:{index}"),
-                        revision,
-                        target,
-                        tuple(AddJdSource(s) for s in sources),
-                    )
-                )
-    elif isinstance(prepared, PreparedItemCreation):
-        revision = await apply(
-            EditJdAreas(uuid5(prepared.command_id, "item"), revision, prepared.item)
-        )
-        work = await work_queries.read_work_at(session, file_id, revision)
-        created = work.areas[-1]
-        revision = await apply(
-            ReviseJdSources(
-                uuid5(prepared.command_id, "sources"),
-                revision,
-                JdSourceTarget(SourceTargetKind.AREA, created.area_id),
-                tuple(AddJdSource(s) for s in prepared.sources),
-            )
-        )
-    else:
-        revision = await apply(
-            EditJdTasks(uuid5(prepared.command_id, "content"), revision, prepared.content)
-        )
-        work = await work_queries.read_work_at(session, file_id, revision)
-        task = work.tasks[0]
-        for index, cap in enumerate(prepared.capabilities):
-            revision = await apply(
-                EditJdCapabilities(uuid5(prepared.command_id, f"capability:{index}"), revision, cap)
-            )
-        groups = (
-            *prepared.sources,
-            BoundItemSources(
-                JdSourceTarget(
-                    SourceTargetKind.DETAIL, task.details[-1].detail_id, task_id=task.task_id
-                ),
-                tuple(AddJdSource(s) for s in prepared.added_details[0].sources),
-            ),
-        )
-        for index, group in enumerate(groups):
-            revision = await apply(
-                ReviseJdSources(
-                    uuid5(prepared.command_id, f"source:{index}"),
-                    revision,
-                    group.target,
-                    group.changes,
-                )
-            )
-    return (
-        revision,
-        f"created · read_ref: {jd_read_ref(created)}" if created is not None else "updated",
-    )
-
-
-@pytest.mark.parametrize("kind", ["profile", "task", "item_creation", "item_revision"])
-def test_old_unversioned_checkpoint_recovers_all_original_suboperations_without_new_writes(
-    client: TestClient, database_connection: psycopg.Connection, kind: str
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, kind)
-    checkpoint = snapshot_jd_write(prepared)
-    revision, result = transact(
-        client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, prepared)
-    )
-    assert client.portal.call(candidates.read, writer.scope).position.revision_id == revision
-    later = _later_edit(client, writer, candidates)
-    before = _counts(database_connection, writer.scope.job_file_id)
-    assert client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint)) == result
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert client.portal.call(candidates.read, writer.scope).position == later
-
-
-@pytest.mark.parametrize("kind", ["profile", "task", "item_creation", "item_revision"])
-def test_omitting_a_legacy_source_tail_rejects_changed_intent_and_keeps_original_result(
-    client: TestClient, database_connection: psycopg.Connection, kind: str
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, kind)
-    checkpoint = snapshot_jd_write(prepared)
-    original_revision, original_result = transact(
-        client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, prepared)
-    )
-    if isinstance(prepared, PreparedProfileWrite):
-        altered = replace(prepared, sources=prepared.sources[:1])
-    elif isinstance(prepared, PreparedTaskWrite):
-        altered = replace(
-            prepared, capabilities=tuple(replace(c, sources=()) for c in prepared.capabilities)
-        )
-    elif isinstance(prepared, PreparedItemCreation):
-        altered = replace(prepared, sources=())
-    else:
-        altered = replace(
-            prepared, added_details=tuple(replace(d, sources=()) for d in prepared.added_details)
-        )
-    before = _counts(database_connection, writer.scope.job_file_id)
-    with pytest.raises(JdCommandConflictError):
-        client.portal.call(workflow.execute, writer, altered)
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert (
-        client.portal.call(candidates.read, writer.scope).position.revision_id == original_revision
-    )
-    assert (
-        client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint))
-        == original_result
-    )
-
-
-def test_omitting_a_legacy_noop_tail_is_also_a_command_conflict(
-    client: TestClient, database_connection: psycopg.Connection
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, "profile")
-    assert isinstance(prepared, PreparedProfileWrite)
-    transact(client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, prepared))
-    position = client.portal.call(candidates.read, writer.scope).position
-    repeated = replace(prepared, command_id=uuid4(), expected_revision_id=position.revision_id)
-    transact(client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, repeated))
-    before = _counts(database_connection, writer.scope.job_file_id)
-    with pytest.raises(JdCommandConflictError):
-        client.portal.call(
-            workflow.execute, writer, replace(repeated, sources=repeated.sources[:1])
-        )
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert client.portal.call(workflow.execute, writer, repeated) == "unchanged"
-    assert client.portal.call(candidates.read, writer.scope).position == position
-
-
-def test_legacy_task_sparse_source_indexes_are_recovered_and_cannot_be_omitted(
-    client: TestClient, database_connection: psycopg.Connection
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, "task")
-    assert isinstance(prepared, PreparedTaskWrite)
-    sparse = replace(prepared, task_sources=(), detail_sources=((), ()))
-    revision, result = transact(
-        client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, sparse)
-    )
-    before = _counts(database_connection, writer.scope.job_file_id)
-    assert client.portal.call(workflow.execute, writer, sparse) == result
-    altered = replace(
-        sparse, capabilities=tuple(replace(c, sources=()) for c in sparse.capabilities)
-    )
-    with pytest.raises(JdCommandConflictError):
-        client.portal.call(workflow.execute, writer, altered)
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert client.portal.call(candidates.read, writer.scope).position.revision_id == revision
-
-
-def test_new_first_step_cannot_rewrite_an_existing_source_only_legacy_noop(
-    client: TestClient, database_connection: psycopg.Connection
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, "profile")
-    assert isinstance(prepared, PreparedProfileWrite)
-    transact(client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, prepared))
-    position = client.portal.call(candidates.read, writer.scope).position
-    repeated = replace(
-        prepared,
-        command_id=uuid4(),
-        expected_revision_id=position.revision_id,
-        changes=(),
-        sources=prepared.sources[:1],
-    )
-    transact(client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, repeated))
-    altered = replace(repeated, changes=(SetProfileField(ProfileField.JOB_TITLE, "不同意圖"),))
-    before = _counts(database_connection, writer.scope.job_file_id)
-    with pytest.raises(JdCommandConflictError):
-        client.portal.call(workflow.execute, writer, altered)
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert client.portal.call(workflow.execute, writer, repeated) == "unchanged"
-    assert client.portal.call(candidates.read, writer.scope).position == position
-
-
 def test_text_change_plus_explicit_alignment_uses_final_revision_as_reviewed_base(
     client: TestClient,
 ) -> None:
@@ -563,7 +332,7 @@ def test_text_change_plus_explicit_alignment_uses_final_revision_as_reviewed_bas
             ),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, revised) == "updated"
+    assert client.portal.call(workflow.execute, writer, revised).effect == "updated"
     preview = client.portal.call(candidates.read, writer.scope)
     references = transact(
         client,
@@ -584,40 +353,14 @@ def test_unchanged_compound_records_original_effect_without_new_revision(
     position = client.portal.call(candidates.read, writer.scope).position
     unchanged = replace(prepared, command_id=uuid4(), expected_revision_id=position.revision_id)
     before = _counts(database_connection, writer.scope.job_file_id)
-    assert client.portal.call(workflow.execute, writer, unchanged) == "unchanged"
+    assert client.portal.call(workflow.execute, writer, unchanged).effect == "unchanged"
     after = _counts(database_connection, writer.scope.job_file_id)
     assert after[0] == before[0]
     assert after[1] == before[1] + 1
     assert after[2:] == before[2:]
     later = _later_edit(client, writer, candidates)
-    assert client.portal.call(workflow.execute, writer, unchanged) == "unchanged"
+    assert client.portal.call(workflow.execute, writer, unchanged).effect == "unchanged"
     assert client.portal.call(candidates.read, writer.scope).position == later
-
-
-def test_incomplete_legacy_chain_is_rejected_without_rewriting_it(
-    client: TestClient, database_connection: psycopg.Connection
-) -> None:
-    writer, candidates, workflow, prepared = _case(client, "profile")
-    # 模擬損壞的舊資料：僅保存第一筆操作；既有不可變 trigger 不容刪改回執。
-    transact(
-        client,
-        lambda s: apply_candidate_edit(
-            s,
-            writer.scope.job_file_id,
-            prepared.candidate,
-            ReviseJdProfile(
-                uuid5(prepared.command_id, "profile_text"),
-                prepared.expected_revision_id,
-                prepared.changes,
-            ),
-        ),
-    )
-    before = _counts(database_connection, writer.scope.job_file_id)
-    position = client.portal.call(candidates.read, writer.scope).position
-    with pytest.raises(RuntimeError, match="missing suboperations"):
-        client.portal.call(workflow.execute, writer, prepared)
-    assert _counts(database_connection, writer.scope.job_file_id) == before
-    assert client.portal.call(candidates.read, writer.scope).position == position
 
 
 def test_formal_completion_adopts_compound_and_undo_restores_original_base(
@@ -672,9 +415,8 @@ def test_formal_completion_adopts_compound_and_undo_restores_original_base(
     assert client.get(f"/api/job-files/{file_id}/interviews").json() == history
 
 
-@pytest.mark.parametrize("legacy", [False, True])
 def test_owner_returns_original_created_item_and_final_revision_after_later_edit(
-    client: TestClient, legacy: bool
+    client: TestClient,
 ) -> None:
     from caliburn.features.executions import service as executions
     from caliburn.features.job_description import compound_service, revision_editing
@@ -687,13 +429,8 @@ def test_owner_returns_original_created_item_and_final_revision_after_later_edit
 
     writer, candidates, workflow, prepared = _case(client, "task")
     assert isinstance(prepared, PreparedTaskWrite)
-    if legacy:
-        original_revision, text = transact(
-            client, lambda s: _seed_old_transaction(s, writer.scope.job_file_id, prepared)
-        )
-    else:
-        text = client.portal.call(workflow.execute, writer, prepared)
-        original_revision = client.portal.call(candidates.read, writer.scope).position.revision_id
+    result = client.portal.call(workflow.execute, writer, prepared)
+    original_revision = client.portal.call(candidates.read, writer.scope).position.revision_id
     later = _later_edit(client, writer, candidates)
     command = CreateTaskWithSources(
         prepared.command_id,
@@ -717,7 +454,7 @@ def test_owner_returns_original_created_item_and_final_revision_after_later_edit
     original = transact(client, replay)
     assert original.revision_id == original_revision
     assert original.effect == "created" and isinstance(original.created_item, WorkTask)
-    assert f"created · read_ref: {jd_read_ref(original.created_item)}" == text
+    assert original == result
     assert original.created_item.title == prepared.task.title
     assert len(original.created_item.details) == 2
     assert client.portal.call(candidates.read, writer.scope).position == later

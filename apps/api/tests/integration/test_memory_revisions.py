@@ -17,7 +17,10 @@ from caliburn.features.work_memory.models import (
     MemorySourceWindow,
 )
 from caliburn.features.work_memory.revision_service import (
+    read_fixed_headers,
     read_fixed_revision,
+    read_fixed_revisions,
+    rebind_understanding_sources,
     write_object_revision,
 )
 from caliburn.features.work_memory.revisions import (
@@ -52,9 +55,9 @@ def ref(revision: MemoryObjectRevision) -> MemoryRevisionReference:
 def source_window(database_connection: psycopg.Connection) -> MemorySourceWindow:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id, creation_command_id, initial_display_name, "
-        "display_name, employee_name) VALUES (%s,%s,'Memory','Memory','合成員工')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id, initial_display_name, "
+        "display_name, employee_name) VALUES (%s,'Memory','Memory','合成員工')",
+        (file_id,),
     )
     for sequence, role, identity in ((1, "app", uuid4()), (2, "employee", source_id)):
         database_connection.execute(
@@ -226,6 +229,86 @@ def test_missing_or_foreign_revision_is_not_available(
                     s, job_file_id=file_id, reference=reference
                 ),
             )
+
+
+@pytest.mark.parametrize("read", [read_fixed_headers, read_fixed_revisions])
+def test_fixed_collection_rejects_missing_member_instead_of_returning_partial_data(
+    database_settings: DatabaseSettings, source_window: MemorySourceWindow, read
+) -> None:
+    situation = create_situation(database_settings, source_window)
+    references = frozenset({ref(situation), MemoryRevisionReference(situation.object_id, uuid4())})
+    with pytest.raises(MemoryRevisionNotFoundError):
+        execute(
+            database_settings,
+            lambda session: read(
+                session, job_file_id=source_window.job_file_id, references=references
+            ),
+        )
+    with pytest.raises(MemoryRevisionNotFoundError):
+        execute(
+            database_settings,
+            lambda session: read(
+                session, job_file_id=uuid4(), references=frozenset({ref(situation)})
+            ),
+        )
+
+
+def test_source_only_rebinding_validates_all_sources_before_writing(
+    database_settings: DatabaseSettings, source_window: MemorySourceWindow
+) -> None:
+    async def scenario(session: AsyncSession) -> None:
+        situation = await write_object_revision(
+            session,
+            source_window,
+            layer=MemoryLayer.WORK_SITUATION,
+            content=MemoryContent("情境", "描述", "正文"),
+            interview_references=frozenset({source_window.through_source_id}),
+        )
+        understanding = await write_object_revision(
+            session,
+            source_window,
+            layer=MemoryLayer.WORK_UNDERSTANDING,
+            content=MemoryContent("理解", "描述", "正文"),
+        )
+        with pytest.raises(InvalidMemoryChangeError):
+            await rebind_understanding_sources(
+                session, source_window, {ref(situation): frozenset()}
+            )
+        with pytest.raises(InvalidMemoryChangeError):
+            await rebind_understanding_sources(
+                session, source_window, {ref(understanding): frozenset({ref(understanding)})}
+            )
+        with pytest.raises(InterviewReadError):
+            await rebind_understanding_sources(
+                session,
+                replace(source_window, through_sequence=1),
+                {ref(understanding): frozenset({ref(situation)})},
+            )
+        result = await rebind_understanding_sources(
+            session, source_window, {ref(understanding): frozenset({ref(situation)})}
+        )
+        revised = await read_fixed_revision(
+            session,
+            job_file_id=source_window.job_file_id,
+            reference=result[understanding.object_id],
+        )
+        assert revised.body_id == understanding.body_id
+        assert revised.content == understanding.content
+        assert revised.work_situation_references == frozenset({ref(situation)})
+        assert (
+            await read_fixed_revision(
+                session, job_file_id=source_window.job_file_id, reference=ref(understanding)
+            )
+            == understanding
+        )
+        with pytest.raises(InvalidMemoryChangeError, match="one revision per understanding"):
+            await rebind_understanding_sources(
+                session,
+                source_window,
+                {ref(understanding): frozenset({ref(situation)}), ref(revised): frozenset()},
+            )
+
+    execute(database_settings, scenario)
 
 
 def test_wrong_layer_or_multiple_revisions_of_same_source_are_rejected(
@@ -439,9 +522,9 @@ def test_database_cannot_use_another_files_body_or_source(
     original = create_situation(database_settings, source_window)
     other_file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,display_name,"
-        "employee_name) VALUES (%s,%s,'Other','Other','Synthetic')",
-        (other_file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,display_name,"
+        "employee_name) VALUES (%s,'Other','Other','Synthetic')",
+        (other_file_id,),
     )
     with pytest.raises(psycopg.errors.ForeignKeyViolation):
         database_connection.execute(

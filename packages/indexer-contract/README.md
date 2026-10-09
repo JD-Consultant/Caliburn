@@ -6,7 +6,7 @@ shapes are maintained in [references.py](src/indexer_contract/references.py); em
 completion remain outside this contract.
 
 The formal JD App can opt into the reference API over HTTP under
-[公版接線](../../docs/design/rag-pipeline.md). It validates the HTTP boundary
+[公版明示接線](../../docs/architecture/rag-pipeline.md). It validates the HTTP boundary
 in its own adapter and does not import this Python package. Older profile/task consumer designs
 remain historical; the optional reference integration does not restore retired consumer code.
 

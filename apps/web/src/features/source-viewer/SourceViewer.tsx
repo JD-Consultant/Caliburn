@@ -1,5 +1,5 @@
 /** Read-only sources of the formal JD, loaded only on disclosure. */
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Chip, Tab, Tabs, Typography } from '@mui/material';
 import type { Reference } from '../../shared/api/generated/jd-sources-view';
@@ -19,6 +19,7 @@ interface ViewerProps {
   /** Optional control from the page, e.g. a badge on a JD item opens the sheet for that item. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  returnFocusTo?: HTMLButtonElement | null;
   onlyCitationIds?: readonly string[] | null;
   onClearFilter?: () => void;
 }
@@ -31,11 +32,25 @@ function SourceDisclosure({
   jobFileId,
   open: controlledOpen,
   onOpenChange,
+  returnFocusTo,
   onlyCitationIds = null,
   onClearFilter,
 }: ViewerProps) {
   const [innerOpen, setInnerOpen] = useState(false);
   const open = controlledOpen ?? innerOpen;
+  const disclosure = useRef<HTMLButtonElement>(null);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  const wasOpen = useRef(false);
+  useLayoutEffect(() => {
+    if (open) opener.current = returnFocusTo ?? disclosure.current;
+    else if (wasOpen.current) {
+      const trigger = opener.current;
+      if (trigger && canReturnFocus(trigger)) trigger.focus();
+      else disclosure.current?.focus();
+      opener.current = null;
+    }
+    wasOpen.current = open;
+  }, [open, returnFocusTo]);
   const setOpen = (next: boolean) => {
     if (onOpenChange) onOpenChange(next);
     else setInnerOpen(next);
@@ -44,6 +59,7 @@ function SourceDisclosure({
   return (
     <Box component="section" sx={{ minWidth: 0 }}>
       <Button
+        ref={disclosure}
         size="small"
         variant="outlined"
         aria-expanded={open}
@@ -65,6 +81,22 @@ function SourceDisclosure({
       </Box>
     </Box>
   );
+}
+
+function canReturnFocus(trigger: HTMLButtonElement): boolean {
+  if (!trigger.isConnected || trigger.disabled) return false;
+  for (let element: HTMLElement | null = trigger; element; element = element.parentElement) {
+    if (element.hidden || element.inert || element.getAttribute('aria-disabled') === 'true')
+      return false;
+    const style = element.ownerDocument.defaultView?.getComputedStyle(element);
+    if (
+      style?.display === 'none' ||
+      style?.visibility === 'hidden' ||
+      style?.visibility === 'collapse'
+    )
+      return false;
+  }
+  return true;
 }
 
 /**

@@ -13,7 +13,7 @@ from caliburn.features.job_description.sources import (
     MemorySourceLayer,
     SourceTargetKind,
 )
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.turn_jd_markdown import project_turn_jd_changes
 
 

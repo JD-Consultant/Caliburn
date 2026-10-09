@@ -7,6 +7,8 @@ updated: 2026-07-04
 
 # ocs-indexer 管線內部 — ingest + 查詢(深文檔)
 
+本文描述既有 **profile／task 索引與 API**；其中 API／Web 知識包的消費方式保留舊產品脈絡。新公版參考採獨立 document／task 索引，操作見 [App README](../README.md#職位整體參考-api)，查詢與固定來源契約見[公版參考 API](../README.md)。
+
 > **主讀者 = agent。** [`../README.md`](../README.md) 是「面」(端點 / codemap / payload schema);
 > 這份是「**內部怎麼跑 + 為什麼**」——動 `normalizer` / `builder` / payload / 查詢邏輯前先讀。
 > **living**:改管線的碼,同 commit 更新本檔。payload 欄位權威在 `ingestion/payloads.py`(pydantic)。
@@ -87,7 +89,7 @@ hybrid_search(level="profile"|"task", limit=top_k)
 
 ### 4.3 manifest 相容(查詢前必驗)
 
-本節限既有 profile／task 索引。現行 `assert_compatible` 對缺 manifest 的舊索引放行並警告，只有 revision 不同也警告；provider、model 或 dim 不同才拒絕。職位整體 reference 索引的 ready／固定來源／模型身分檢查是另一套嚴格契約。
+本節限既有 profile／task 索引。現行 `assert_compatible` 對缺 manifest 的舊索引放行並警告，只有 revision 不同也警告；provider、model 或 dim 不同才拒絕。這是既有相容行為，不等於所有索引已核身分；職位整體 reference 索引的 ready／固定來源／模型身分檢查是另一套嚴格契約。
 
 `_manifest` 點存嵌入身分;**每個 semantic 查詢前 `assert_compatible`**——provider、model 或維度不一致就 **409**,不會拿錯維度的向量硬查。換 provider/維度 = **建新 collection,不混用**。
 
@@ -103,7 +105,7 @@ hybrid_search(level="profile"|"task", limit=top_k)
 ## 6. 指路
 
 - 面 / 端點 / payload schema:[`../README.md`](../README.md)。
-- 架構：[RAG 服務邊界](../../../docs/design/rag-pipeline.md)；介面：[RAG 契約](../../../packages/indexer-contract/README.md)；模型：[embedder](../../embedder/README.md)。
+- 架構：[RAG 服務邊界](../../../docs/architecture/rag-pipeline.md)；介面：[RAG 契約](../../../packages/indexer-contract/README.md)；模型：[embedder](../../embedder/README.md)。
 - 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3。
-- 現行 App 可選 HTTP 接入：[API README](../../api/README.md#公版參考工具的可選啟用)。
-- 文檔怎麼寫:[`docs/README.md`](../../../docs/README.md)、[`docs/design/README.md`](../../../docs/design/README.md)。
+- 現行 App 的可選 HTTP 接入見 [API README](../../api/README.md#公版參考工具的可選啟用)。
+- 文件維護：[文件導覽](../../../docs/README.md)、[文件維護](../../../CONTRIBUTING.md#文件維護)。

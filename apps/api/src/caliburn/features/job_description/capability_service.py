@@ -20,7 +20,6 @@ from caliburn.features.job_description.capability_changes import (
     capability_change_payload,
 )
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfileRevision,
     StaleJdRevisionError,
 )
@@ -53,12 +52,12 @@ async def recover_capability_result(
     )
     if operation is None:
         return None
-    if (
-        operation.kind != "edit_capabilities"
-        or operation.expected_revision_id != command.expected_revision_id
-        or operation.request_payload != capability_change_payload(command.change)
-    ):
-        raise JdCommandConflictError("command_id was already used with different JD intent")
+    revision_editing.require_matching_edit_intent(
+        operation,
+        kind="edit_capabilities",
+        expected_revision_id=command.expected_revision_id,
+        request_payload=capability_change_payload(command.change),
+    )
     return await read_capabilities_at(session, job_file_id, operation.result_revision_id)
 
 

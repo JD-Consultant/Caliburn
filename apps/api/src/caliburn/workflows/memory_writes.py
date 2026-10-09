@@ -1,18 +1,18 @@
 """Resolve a new model intent once; execution reuses the original bound candidate command."""
 
-import asyncio
 from typing import Literal
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.body_matching import BodyEditError, BodyMatchPolicy
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStateError, ExecutionStatus
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import InterviewReadScope
 from caliburn.features.work_memory import candidate_queries, read_queries
 from caliburn.features.work_memory.body_edits import DEFAULT_BODY_MATCH_POLICY
-from caliburn.features.work_memory.body_matching import BodyEditError, BodyMatchPolicy
 from caliburn.features.work_memory.candidates import (
     CreateMemoryObject,
     DeleteMemoryObject,
@@ -56,9 +56,11 @@ class MemoryWritePreparation:
         self,
         sessions: async_sessionmaker[AsyncSession],
         *,
+        cpu: MemoryCpu,
         body_policy: BodyMatchPolicy = DEFAULT_BODY_MATCH_POLICY,
     ) -> None:
         self.sessions = sessions
+        self.cpu = cpu
         self.body_policy = body_policy
 
     async def prepare(
@@ -130,7 +132,7 @@ class MemoryWritePreparation:
             )
         # Patch search can be expensive. Release the read session first and keep the
         # event loop responsive; apply later uses this exact position, never latest.
-        content_changes = await asyncio.to_thread(
+        content_changes = await self.cpu.run(
             prepare_content_changes, before.content, intent.changes, policy=self.body_policy
         )
         after = (
@@ -139,7 +141,7 @@ class MemoryWritePreparation:
             else apply_content_changes(before.content, content_changes)
         )
         require_unique_title(object_id, after, entries)
-        preview = await asyncio.to_thread(
+        preview = await self.cpu.run(
             _update_preview,
             layer,
             before.content,

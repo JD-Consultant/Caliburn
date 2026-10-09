@@ -13,7 +13,7 @@ function renderActions() {
   clients.push(client);
   return render(
     <QueryClientProvider client={client}>
-      <UndoTurnJd jobFileId={fileId} executionId={executionId} onUndone={async () => {}} />
+      <UndoTurnJd jobFileId={fileId} executionId={executionId} refresh={async () => {}} />
     </QueryClientProvider>,
   );
 }

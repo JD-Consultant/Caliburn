@@ -22,6 +22,7 @@ from caliburn.contracts.generated.tools.work_situation_view import (
     WorkSituationView,
 )
 from caliburn.contracts.generated.tools.work_understanding_view import WorkUnderstandingView
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import ExecutionNotFoundError, ExecutionStateError
 from caliburn.features.interviews.models import (
     InterviewScopeError,
@@ -230,10 +231,10 @@ class MemoryReadTools:
 
 def _parse_arguments(name: str, arguments: str) -> ReadArguments:
     if name == "read_interview":
-        return ReadInterviewArguments.model_validate_json(arguments)
+        return parse_contract(ReadInterviewArguments, arguments)
     if name.endswith("_map"):
-        return MemoryMapArguments.model_validate_json(arguments)
-    return ReadMemoryObjectArguments.model_validate_json(arguments)
+        return parse_contract(MemoryMapArguments, arguments)
+    return parse_contract(ReadMemoryObjectArguments, arguments)
 
 
 def _invalid_arguments() -> str:

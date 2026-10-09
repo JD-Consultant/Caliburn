@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.database import consistent_read_session
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -70,7 +71,7 @@ class JdCandidateWorkflow:
 
     async def read(self, scope: ExecutionScope) -> JdCandidatePreview:
         _require_consultant(scope)
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             execution = await executions.read_execution(session, scope)
             if execution.status not in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
                 raise ExecutionStateError("This execution no longer has a live preview")

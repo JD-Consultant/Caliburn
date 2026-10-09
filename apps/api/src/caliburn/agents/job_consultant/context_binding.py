@@ -29,23 +29,14 @@ from caliburn.contracts.generated.tools.historical_interview import (
     Speaker,
 )
 from caliburn.contracts.generated.tools.memory_map import MemoryMap, MemoryMapItem
-from caliburn.features.executions import history
-from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStateError
-from caliburn.features.interview_plans import service as plans
 from caliburn.features.interview_plans.models import PlanPosition
-from caliburn.features.interviews import queries as interviews
-from caliburn.features.interviews.models import InterviewReadScope
-from caliburn.features.job_description import candidate_service
 from caliburn.features.job_description.candidates import JdCandidatePosition, JdCandidateScope
-from caliburn.features.job_files import service as job_files
-from caliburn.features.work_memory import candidate_queries as memory
-from caliburn.features.work_memory import consolidation_requests, read_queries
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.jd_reads import DEFAULT_JD_READ_MAX_RESULT_CHARACTERS
+from caliburn.workflows.consultant_context import ConsultantContextData, ConsultantContextWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.interview_plans import start_interview_plan
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
 REFERENCE_DATA_KIND = "consultant_turn_reference"
@@ -165,6 +156,7 @@ async def read_saved_turn_context(
 async def capture_turn_context(
     role_history: RoleContextHistory,
     *,
+    data: ConsultantContextWorkflow,
     template: ResponseRequest,
     prepared_history: NativeItems,
     jd_read_max_result_characters: int = DEFAULT_JD_READ_MAX_RESULT_CHARACTERS,
@@ -186,7 +178,10 @@ async def capture_turn_context(
 
     async def capture_context(state: _CaptureState) -> _CaptureState:
         request = _restore_request(state.get("request_snapshot"))
-        return await _capture_data(role_history, request)
+        captured = await data.capture(
+            role_history.writer, plan_enabled=has_interview_plan_tools(request)
+        )
+        return _project_data(scope, captured, request)
 
     builder = StateGraph(_CaptureState)
     builder.add_node("capture_context", capture_context)
@@ -205,15 +200,7 @@ async def capture_turn_context(
     if saved.created_at is None:
         if template.create_payload()["input"]:
             raise ValueError("The role template must not contain history, maps or current input")
-        async with role_history.sessions() as session:
-            prepared = await history.read_context_history(session, scope, role_history.role)
-            if prepared is None or prepared.prepared is None:
-                raise ValueError("Adopt role history preparation before capturing new Turn data")
-            prior_plan = await plans.read_base(session, scope.job_file_id, scope.execution_id)
-            if prior_plan is not None:
-                raise ExecutionStateError(
-                    "The Turn's plan start exists without a recoverable initial context"
-                )
+        await data.require_uncaptured_start(role_history.writer)
         initial = {
             "request_snapshot": {**template.create_payload(), "input": prepared_history},
             "jd_read_max_result_characters": jd_read_max_result_characters,
@@ -236,47 +223,29 @@ async def capture_turn_context(
     return result
 
 
-async def _capture_data(work: RoleContextHistory, request: ResponseRequest) -> _CaptureState:
-    scope = work.writer.scope
-    plan_enabled = has_interview_plan_tools(request)
-    async with work.sessions.begin() as session:
-        await job_files.lock_job_file(session, scope.job_file_id)
-        await executions.lock_active_writer(session, work.writer)
-        snapshot = await memory.read_latest_snapshot(session, scope.job_file_id)
-        snapshot_id = snapshot.snapshot_id if snapshot is not None else None
-        frontier = await interviews.read_history_frontier(session, scope.job_file_id)
-        original = await interviews.read_execution_input(
-            session, job_file_id=scope.job_file_id, execution_id=scope.execution_id
+def _project_data(
+    scope: ExecutionScope, captured: ConsultantContextData, request: ResponseRequest
+) -> _CaptureState:
+    snapshot_id = captured.snapshot_id
+    frontier = captured.interview_scope.through_sequence
+    original = captured.current_input
+    position = captured.candidate_position
+    covered = captured.covered_through_sequence
+    recent = captured.recent
+    memory_failure = captured.memory_failure_reason
+    plan = captured.plan
+    maps = {
+        f"{layer.value}_map": MemoryMap(
+            items=[
+                MemoryMapItem(target_title=item.title, description=item.description)
+                for item in entries
+            ]
+        ).model_dump(mode="json")
+        for layer, entries in (
+            (MemoryLayer.WORK_SITUATION, captured.situation_map),
+            (MemoryLayer.WORK_UNDERSTANDING, captured.understanding_map),
         )
-        position = await candidate_service.start_candidate(
-            session, scope.job_file_id, scope.execution_id
-        )
-        maps = {}
-        for layer in MemoryLayer:
-            view = await read_queries.bind_published_view(
-                session, scope.job_file_id, snapshot_id, layer
-            )
-            entries = await read_queries.read_map(session, view)
-            maps[f"{layer.value}_map"] = MemoryMap(
-                items=[
-                    MemoryMapItem(target_title=item.title, description=item.description)
-                    for item in entries
-                ]
-            ).model_dump(mode="json")
-        covered = snapshot.covered_through_sequence if snapshot is not None else 0
-        recent = await interviews.read_recent_interviews(
-            session,
-            InterviewReadScope(scope.job_file_id, frontier),
-            covered_through_sequence=covered,
-        )
-        memory_failure = await consolidation_requests.read_block(session, scope.job_file_id)
-        plan = (
-            await start_interview_plan(
-                session, work.writer, InterviewReadScope(scope.job_file_id, frontier)
-            )
-            if plan_enabled
-            else None
-        )
+    }
     historical = HistoricalInterview(
         data_kind="historical_interview",
         messages=[

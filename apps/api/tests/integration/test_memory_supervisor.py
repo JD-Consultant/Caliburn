@@ -97,7 +97,10 @@ def test_shutdown_preserves_active_batch_and_restart_resumes_same_scope(
     execute(database_settings, scenario)
 
 
-def test_unknown_runner_error_is_not_poll_retry(database_settings: DatabaseSettings) -> None:
+@pytest.mark.parametrize("raises_error", [False, True], ids=["returned", "failed"])
+def test_returned_or_failed_runner_is_not_poll_retry(
+    database_settings: DatabaseSettings, raises_error: bool
+) -> None:
     # Use the same real discovery/admission setup via a completed synthetic turn.
     async def scenario(database: Database) -> None:
         from caliburn.workflows.memory_supervisor import MemorySupervisor
@@ -122,6 +125,7 @@ def test_unknown_runner_error_is_not_poll_retry(database_settings: DatabaseSetti
             await executions.finish_execution(session, writer, ExecutionStatus.COMPLETED)
         calls = 0
         failed = asyncio.Event()
+        seen: list[ExecutionWriter] = []
 
         async def leader() -> None:
             return None
@@ -129,8 +133,10 @@ def test_unknown_runner_error_is_not_poll_retry(database_settings: DatabaseSetti
         async def run(batch_writer: ExecutionWriter) -> None:
             nonlocal calls
             calls += 1
+            seen.append(batch_writer)
             failed.set()
-            raise ConnectionError("synthetic unknown save")
+            if raises_error:
+                raise ConnectionError("synthetic unknown save")
 
         supervisor = MemorySupervisor(
             database.sessions, run=run, check_leadership=leader, poll_interval_seconds=0.01
@@ -141,6 +147,10 @@ def test_unknown_runner_error_is_not_poll_retry(database_settings: DatabaseSetti
         await supervisor.scan()
         await supervisor.scan()
         await supervisor.close()
-        assert calls == 1 and len(supervisor.failures) == 1
+        assert calls == 1 and len(supervisor.failures) == int(raises_error)
+        async with database.sessions() as session:
+            execution = await executions.read_execution(session, seen[0].scope)
+            assert execution.status == ExecutionStatus.ACTIVE
+            assert execution.writer_id == seen[0].writer_id
 
     execute(database_settings, scenario)

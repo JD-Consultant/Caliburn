@@ -17,12 +17,12 @@ function renderUndo() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
   const onUndone = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
-  render(
+  const view = render(
     <QueryClientProvider client={client}>
-      <UndoTurnJd jobFileId={fileId} executionId={executionId} onUndone={onUndone} />
+      <UndoTurnJd jobFileId={fileId} executionId={executionId} refresh={onUndone} />
     </QueryClientProvider>,
   );
-  return { client, onUndone };
+  return { ...view, client, onUndone };
 }
 
 afterEach(() => {
@@ -100,4 +100,34 @@ test('an invalid successful response cannot claim the undo is confirmed', async 
   expect(await screen.findByText(/撤回結果尚未確認/)).toBeVisible();
   expect(screen.queryByText(/撤回已確認/)).not.toBeInTheDocument();
   expect(onUndone).not.toHaveBeenCalled();
+});
+
+test('confirmed undo refreshes remaining observers after its dialog unmounts', async () => {
+  let resolve: (response: Response) => void = () => {};
+  const pending = new Promise<Response>((done) => {
+    resolve = done;
+  });
+  vi.stubGlobal('fetch', vi.fn().mockReturnValue(pending));
+  const { unmount, onUndone } = renderUndo();
+  await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));
+  await userEvent.click(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
+  unmount();
+  await act(async () => {
+    resolve(Response.json(originalResult));
+    await pending;
+  });
+  expect(onUndone).toHaveBeenCalledOnce();
+});
+
+test('a failed refresh keeps known undo success and cannot resend the operation', async () => {
+  const fetcher = vi.fn().mockResolvedValue(Response.json(originalResult));
+  vi.stubGlobal('fetch', fetcher);
+  const { onUndone } = renderUndo();
+  onUndone.mockRejectedValue(new Error('synthetic read failure'));
+  await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));
+  await userEvent.click(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
+  expect(await screen.findByText(/撤回已確認/)).toBeVisible();
+  expect(screen.getByText(/撤回已保存，但畫面尚未更新/)).toBeVisible();
+  expect(screen.queryByRole('button', { name: '撤回這輪 JD' })).not.toBeInTheDocument();
+  expect(fetcher).toHaveBeenCalledOnce();
 });

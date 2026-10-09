@@ -1,4 +1,4 @@
-"""背景監督失敗可追查，日誌不得改變停止、保留原例外或釋放所有權的行為。"""
+"""背景監督失敗可追查，日誌不得改變停止、原件保留或釋放所有權的行為。"""
 
 import asyncio
 import json
@@ -60,7 +60,7 @@ def logged_failures(caplog):
 
 
 @pytest.mark.parametrize("kind", ["consultant_turn", "memory_batch"])
-async def test_monitor_failure_logs_safe_metadata_and_preserves_original_failure(
+async def test_monitor_failure_logs_safe_metadata_and_preserves_failure_kind(
     kind, monkeypatch, caplog
 ):
     supervisor, _leader, scan_method = make_supervisor(kind)
@@ -79,7 +79,7 @@ async def test_monitor_failure_logs_safe_metadata_and_preserves_original_failure
         await supervisor.start()
         supervisor.notify()
         await asyncio.wait_for(asyncio.shield(supervisor._monitor), 1)
-        assert supervisor.failure is failure
+        assert supervisor.failure.error_type == type(failure).__name__
         assert scans == 2
         [payload] = logged_failures(caplog)
         assert payload["event"] == "supervisor.monitor_failed"
@@ -123,7 +123,10 @@ async def test_consultant_release_failure_is_logged_without_replacing_or_retryin
         with pytest.raises(OSError) as stopped:
             await supervisor.close()
         assert stopped.value is release_error
-        assert supervisor.failure is (scan_error if scan_fails else release_error)
+        assert (
+            supervisor.failure.error_type
+            == type(scan_error if scan_fails else release_error).__name__
+        )
         assert leader.release_calls == 1
         payloads = logged_failures(caplog)
         assert [payload["event"] for payload in payloads] == (

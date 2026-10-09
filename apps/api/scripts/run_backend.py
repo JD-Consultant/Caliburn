@@ -61,6 +61,9 @@ def main() -> None:
             port=arguments.port,
             loop="asyncio:SelectorEventLoop",
             proxy_headers=False,
+            # Native HTTP drain precedes lifespan; preserve 80s of the launcher's
+            # 90s total grace for borrowers, saved originals and dependency cleanup.
+            timeout_graceful_shutdown=10,
             log_config=None,
         )
     finally:

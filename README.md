@@ -20,9 +20,7 @@ Caliburn 是本機 Web AI 職務分析工具。員工用自己的話說明工作
 
 ## 使用流程
 
-![Caliburn 實際介面：訪談、職務說明書與來源回查](docs/assets/product/interview-and-jd-source.jpg)
 
-庫存管理示例：左側進行訪談，右側查看 JD，並可展開來源核對內容依據。
 
 1. **建立職務檔案。** 為這份工作建立獨立的訪談與 JD。
 2. **說明實際工作。** 描述日常工作、案件或具體情境，依顧問追問補充細節。
@@ -33,14 +31,15 @@ Caliburn 是本機 Web AI 職務分析工具。員工用自己的話說明工作
 
 ## 開始使用
 
-Caliburn 在本機啟動後，透過瀏覽器操作。AI 訪談需要 OpenAI API key；沒有 key 時，仍可人工編輯 JD，並在 PDF 資源設定完成後匯出。
+依[快速開始](docs/operations/getting-started.md)用 Git 取得專案，再以 Docker 初始化。AI 訪談需 OpenAI API key；未設定時仍可人工編輯 JD 與匯出 PDF。
 
-安裝、設定與啟動步驟見[操作手冊](docs/runbook.md#快速開始)。
+日常啟停、更新與備份見[操作手冊](docs/operations/README.md)。
 
 ## 延伸閱讀
 
-- [產品介紹](docs/product-introduction.md)：使用情境、需求與產品價值。
-- [文件導覽](docs/README.md)：開發、架構、維護與驗證責任。
+- [產品介紹](docs/product/README.md)：使用情境、需求與產品價值。
+- [架構導覽](docs/architecture/README.md)：程式分工、資料保存與分析接續。
+- [文件導覽](docs/README.md)：開發、維護與驗證責任。
 
 ## 授權
 

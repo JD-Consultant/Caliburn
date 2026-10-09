@@ -16,7 +16,8 @@ from caliburn.features.job_description.models import (
     JdProfile,
     StaleJdRevisionError,
 )
-from caliburn.features.job_description.work_queries import JdWorkRevision, read_work_at
+from caliburn.features.job_description.work_models import JdWorkRevision
+from caliburn.features.job_description.work_queries import read_work_at
 
 
 @dataclass(frozen=True, slots=True)

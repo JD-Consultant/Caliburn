@@ -8,6 +8,7 @@ import sys
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from response_capacity import CapacityProbe, request_fixture
 
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.agent_execution.tool_steps import (
     PausedResponseLoop,
@@ -17,6 +18,7 @@ from caliburn.agent_execution.tool_steps import (
 
 
 async def run(mode: str, thread_id: str) -> None:
+    require_isolated_test_database(os.environ["CALIBURN_TEST_DATABASE_URL"], environment=os.environ)
     provider = CapacityProbe([100])
     pause_requested = True
     acknowledgements = 0

@@ -9,6 +9,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --filter @caliburn/frontend... --frozen-lockfile
 COPY apps/web/ apps/web/
 COPY apps/api/contracts/http/ apps/api/contracts/http/
+COPY apps/api/contracts/tools/interview-plan.schema.json apps/api/contracts/tools/interview-plan.schema.json
 RUN pnpm --filter @caliburn/frontend build
 
 FROM python:3.14.8-slim-trixie@sha256:89fb7d3da20043c370643435258bdd7ab755d326d359001d02988ed15ae5219e AS api-build

@@ -51,3 +51,26 @@ def test_malformed_saved_command_is_rejected_before_effects() -> None:
         restore_jd_write({"kind": "profile", "payload": '{"command_id":"not-a-uuid"}'})
     with pytest.raises(ValidationError):
         restore_jd_write({"kind": "task", "payload": "{}", "unrecognized": True})
+
+
+@pytest.mark.parametrize("operation", ["delete", "move"])
+def test_lifecycle_prepared_facts_survive_native_serializer(operation):
+    from caliburn.features.job_description.areas import DeleteArea, EditJdAreas
+    from caliburn.features.job_description.tasks import MoveTask
+    from caliburn.workflows.jd_item_deletion import PreparedItemDeletion
+    from caliburn.workflows.jd_item_movement import PreparedItemMovement
+
+    candidate = JdCandidateScope(uuid4(), uuid4())
+    command_id, revision_id, item_id = uuid4(), uuid4(), uuid4()
+    command = (
+        PreparedItemDeletion(
+            candidate, EditJdAreas(command_id, revision_id, DeleteArea(item_id)), 2
+        )
+        if operation == "delete"
+        else PreparedItemMovement(
+            command_id, candidate, revision_id, MoveTask(item_id, None, None, ()), (), True
+        )
+    )
+    serializer = create_graph_serializer()
+    saved = serializer.dumps_typed(snapshot_jd_write(command))
+    assert restore_jd_write(serializer.loads_typed(saved)) == command

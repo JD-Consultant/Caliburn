@@ -5,6 +5,8 @@ import { Alert, Button } from '@mui/material';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import { CloseIcon, PauseIcon, PlayIcon } from '../../shared/ui/icons';
 import { ApiError } from '../../shared/api/http';
+import { refreshQueries } from '../../shared/api/refresh-queries';
+import { reportDiagnostic } from '../../shared/diagnostics';
 import { consultantTurnQuery, controlConsultantTurn, isTerminalTurn } from './interview-turn-api';
 import type { ConsultantControl } from './interview-turn-api';
 
@@ -20,9 +22,19 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
     retry: false,
     networkMode: 'always',
     onSettled: () =>
-      queryClient.invalidateQueries({
-        queryKey: consultantTurnQuery(turn.job_file_id, turn.execution_id).queryKey,
-        exact: true,
+      refreshQueries(queryClient, [
+        {
+          queryKey: consultantTurnQuery(turn.job_file_id, turn.execution_id).queryKey,
+          exact: true,
+        },
+      ]).catch(() => {
+        // The query displays its read failure independently of the control's outcome.
+        reportDiagnostic({
+          event: 'command_failure',
+          kind: 'refresh',
+          jobFileId: turn.job_file_id,
+          executionId: turn.execution_id,
+        });
       }),
   });
 

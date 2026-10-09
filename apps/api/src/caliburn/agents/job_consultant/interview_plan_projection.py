@@ -21,7 +21,6 @@ from caliburn.agents.job_consultant.interview_plan_context import (
 from caliburn.features.executions.models import ExecutionScope
 from caliburn.features.interview_plans.models import PlanSnapshot, PlanStateError
 from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.interview_plans import InterviewPlanWorkflow
 
 type CompactWindow = Callable[[ResponseRequest, ReceivedInputCount, UUID], Awaitable[NativeItems]]
 type ReadPlan = Callable[[ExecutionScope], Awaitable[PlanSnapshot | None]]
@@ -75,15 +74,9 @@ def bind_interview_plan_compaction(
     work: RoleContextHistory,
     original: CompactWindow,
     *,
-    read_plan: ReadPlan | None = None,
+    read_plan: ReadPlan,
 ) -> CompactWindow:
     """Delegate native recovery/accounting first, including inactive paid-C recovery."""
-    workflow = InterviewPlanWorkflow(work.sessions)
-
-    async def read_bound_plan(_scope: ExecutionScope) -> PlanSnapshot | None:
-        return await workflow.read_active(work.writer)
-
-    reader = read_plan or read_bound_plan
 
     async def compact(
         request: ResponseRequest, count: ReceivedInputCount, parent_id: UUID
@@ -102,7 +95,7 @@ def bind_interview_plan_compaction(
         async def capture_projection(state: _ProjectionState) -> _ProjectionState:
             _restore_binding(state.get("input_binding"), scope, parent_id, c_thread)
             await work.ensure_active()
-            plan = await reader(scope)
+            plan = await read_plan(scope)
             if plan is None:
                 raise PlanStateError("The captured plan capability has no retained candidate")
             if (plan.position.job_file_id, plan.position.execution_id) != (

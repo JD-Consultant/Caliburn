@@ -1,15 +1,15 @@
 """Typed responsibility-group HTTP intents; no storage or transaction logic."""
 
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
 from caliburn.contracts.generated import edit_jd_areas_request as wire
 from caliburn.contracts.generated.jd_areas_view import Area, JdAreasView
-from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_description import areas
-from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
 from caliburn.features.job_files.models import JobFileNotFoundError
+from caliburn.transport.http.contracts import canonical_body
 from caliburn.transport.http.jd_dependencies import JdEditing
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
@@ -60,7 +60,9 @@ async def read_areas(job_file_id: UUID, workflow: JdEditing) -> JdAreasView:
 
 @router.post("/areas", response_model=JdAreasView)
 async def edit_areas(
-    job_file_id: UUID, body: wire.EditJdAreasRequest, workflow: JdEditing
+    job_file_id: UUID,
+    body: Annotated[wire.EditJdAreasRequest, canonical_body(wire.EditJdAreasRequest)],
+    workflow: JdEditing,
 ) -> JdAreasView:
     try:
         command = areas.EditJdAreas(
@@ -73,9 +75,3 @@ async def edit_areas(
         raise HTTPException(status_code=404, detail={"code": "jd_area_not_found"}) from error
     except areas.InvalidAreaChangeError as error:
         raise HTTPException(status_code=422, detail={"code": "invalid_area_change"}) from error
-    except JdCommandConflictError as error:
-        raise HTTPException(status_code=409, detail={"code": "jd_command_conflict"}) from error
-    except StaleJdRevisionError as error:
-        raise HTTPException(status_code=409, detail={"code": "jd_revision_stale"}) from error
-    except ExecutionBusyError as error:
-        raise HTTPException(status_code=409, detail={"code": "consultant_turn_active"}) from error

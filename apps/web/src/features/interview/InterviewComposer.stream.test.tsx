@@ -60,11 +60,11 @@ class TestEventSource extends EventTarget {
 }
 
 const clients: QueryClient[] = [];
-beforeEach(() => {
+beforeEach(async () => {
   localStorage.clear();
   TestEventSource.instances = [];
   vi.stubGlobal('EventSource', TestEventSource);
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
 });
 afterEach(() => {
   clients.splice(0).forEach((client) => client.clear());
@@ -86,10 +86,10 @@ function mount(
     <QueryClientProvider client={client}>
       {strict ? (
         <StrictMode>
-          <InterviewComposer jobFileId={id} />
+          <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={id} />
         </StrictMode>
       ) : (
-        <InterviewComposer jobFileId={id} />
+        <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={id} />
       )}
     </QueryClientProvider>
   );
@@ -147,6 +147,42 @@ const summary: ReasoningSummary = {
   summary_index: 0,
   text: '先釐清範圍',
 };
+
+test('stream diagnostics contain only categories and subscription IDs; a failed sink leaves valid display updates working', async () => {
+  const diagnostic = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  try {
+    const view = mount();
+    const stream = await currentStream();
+    act(() => {
+      stream.dispatchEvent(new MessageEvent('commentary', { data: 'private-invalid-json' }));
+      stream.emit({ ...update, job_file_id: otherFile, text: 'private-foreign-text' });
+      stream.dispatchEvent(new Event('error'));
+    });
+    for (const kind of ['invalid_json', 'invalid_response', 'stream_disconnected']) {
+      expect(diagnostic).toHaveBeenCalledWith('caliburn', {
+        event: 'stream_failure',
+        kind,
+        jobFileId: fileId,
+        executionId,
+      });
+    }
+    expect(JSON.stringify(diagnostic.mock.calls)).not.toContain('private');
+    diagnostic.mockImplementation(() => {
+      throw new Error('synthetic broken sink');
+    });
+    act(() => {
+      stream.emit({ private: 'untrusted' });
+      stream.emit(update);
+    });
+    expect(await screen.findByText(update.text)).toBeVisible();
+    diagnostic.mockClear();
+    view.unmount();
+    expect(stream.close).toHaveBeenCalledOnce();
+    expect(diagnostic).not.toHaveBeenCalled();
+  } finally {
+    diagnostic.mockRestore();
+  }
+});
 
 test('同一活動串流分開呈現摘要與公開訊息；同段替換，不洩露私有欄位或當成正式回答', async () => {
   mount();
@@ -390,7 +426,7 @@ test('StrictMode 與換檔只有一條有效訂閱，舊檔 callback 不污染�
   const { changeFile } = mount(() => status, true);
   const first = await currentStream();
   act(() => first.emit(update));
-  retainTurnHint(otherFile, { command_id: commandId, execution_id: otherExecution });
+  await retainTurnHint(otherFile, { command_id: commandId, execution_id: otherExecution });
   status = { ...active, job_file_id: otherFile, execution_id: otherExecution };
   changeFile(otherFile);
   await waitFor(() =>

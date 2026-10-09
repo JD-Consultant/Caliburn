@@ -16,6 +16,7 @@ from caliburn.contracts.generated.tools.delete_memory_object_arguments import (
     DeleteMemoryObjectArguments,
 )
 from caliburn.contracts.generated.tools.memory_write_result import MemoryWriteResult
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.work_memory.edit_intents import (
     CreateMemoryIntent,
     DeleteMemoryIntent,
@@ -35,13 +36,13 @@ from caliburn.features.work_memory.models import MemoryContent
 
 def parse_write_intent(name: str, arguments: str) -> MemoryWriteIntent:
     if name == "create_work_situation":
-        created = CreateWorkSituationArguments.model_validate_json(arguments)
+        created = parse_contract(CreateWorkSituationArguments, arguments)
         return CreateMemoryIntent(
             MemoryContent(created.title, created.description, created.body),
             InterviewSourceSelection(tuple(item.root for item in created.interview_references)),
         )
     if name == "create_work_understanding":
-        created_understanding = CreateWorkUnderstandingArguments.model_validate_json(arguments)
+        created_understanding = parse_contract(CreateWorkUnderstandingArguments, arguments)
         return CreateMemoryIntent(
             MemoryContent(
                 created_understanding.title,
@@ -53,16 +54,16 @@ def parse_write_intent(name: str, arguments: str) -> MemoryWriteIntent:
             ),
         )
     if name in ("delete_work_situation", "delete_work_understanding"):
-        deleted = DeleteMemoryObjectArguments.model_validate_json(arguments)
+        deleted = parse_contract(DeleteMemoryObjectArguments, arguments)
         return DeleteMemoryIntent(deleted.target_title)
     if name == "update_work_situation":
-        revised = situation.UpdateWorkSituationArguments.model_validate_json(arguments)
+        revised = parse_contract(situation.UpdateWorkSituationArguments, arguments)
         return ReviseMemoryIntent(
             revised.target_title, tuple(_situation_change(item) for item in revised.changes)
         )
     if name == "update_work_understanding":
-        revised_understanding = understanding.UpdateWorkUnderstandingArguments.model_validate_json(
-            arguments
+        revised_understanding = parse_contract(
+            understanding.UpdateWorkUnderstandingArguments, arguments
         )
         return ReviseMemoryIntent(
             revised_understanding.target_title,

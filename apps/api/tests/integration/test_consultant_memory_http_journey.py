@@ -14,8 +14,8 @@ from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.settings import ModelSettings, Settings
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.fixtures.response_transport import response_http_reply
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 

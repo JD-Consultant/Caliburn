@@ -8,6 +8,7 @@ from openai import AsyncOpenAI
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import restore_response
 from caliburn.agent_execution.context_compaction import (
@@ -24,13 +25,14 @@ from caliburn.agent_execution.tool_steps import (
     read_completed_response_history,
     run_response_loop,
 )
-from caliburn.agents.memory_analysis.context import capture_analysis_context, stage_thread_id
+from caliburn.agents.memory_analysis.context import capture_analysis_context
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
     AgentRole,
     ContextPosition,
     HistoryWindowKind,
     context_thread_id,
+    stage_thread_id,
 )
 from caliburn.features.executions.models import ExecutionKind, ExecutionWriter
 from caliburn.features.work_memory import candidate_queries
@@ -52,6 +54,7 @@ from caliburn.workflows.memory_analysis.results import (
     parse_outcome,
 )
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.memory_context import MemoryAnalysisContextWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from caliburn.workflows.memory_writes import MemoryWritePreparation
 from caliburn.workflows.model_runtime import bind_model_runtime, fix_execution_policy
@@ -74,6 +77,7 @@ class MemoryAnalysisRunner:
     checkpointer: BaseCheckpointSaver[str]
     client: AsyncOpenAI
     settings: ModelSettings
+    cpu: MemoryCpu
     excluded_work_enabled: bool = False
 
     async def run(
@@ -94,7 +98,7 @@ class MemoryAnalysisRunner:
             raise ValueError("The role does not match this Memory batch stage")
         binding = CandidateMemoryRead(writer.scope, stage)
         history = RoleContextHistory(self.sessions, writer, role, self.checkpointer)
-        thread_id = stage_thread_id(history, stage)
+        thread_id = stage_thread_id(history.response_thread_id, stage.generation_id, stage.stage_id)
         if recovery is not None:
             permitted_boundary = context_thread_id(
                 writer.scope, role, HistoryWindowKind.PREPARED_HISTORY
@@ -154,6 +158,7 @@ class MemoryAnalysisRunner:
         request = await capture_analysis_context(
             history,
             stage,
+            data=MemoryAnalysisContextWorkflow(self.sessions),
             template=template,
             history_items=items,
             situation_changes=situation_changes,
@@ -230,7 +235,7 @@ class MemoryAnalysisRunner:
         return MemoryAnalysisTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), binding),
             MemoryWriteTools(
-                MemoryWritePreparation(self.sessions),
+                MemoryWritePreparation(self.sessions, cpu=self.cpu),
                 MemoryCandidateWorkflow(self.sessions),
                 binding,
                 writer,

@@ -24,6 +24,7 @@ export function createJobFile(command: CreateJobFileRequest): Promise<JobFile> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(command),
+    correlation: { commandId: command.command_id },
   });
 }
 
@@ -32,6 +33,7 @@ export function renameJobFile(jobFileId: string, command: RenameJobFileRequest):
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(command),
+    correlation: { jobFileId, commandId: command.command_id },
   });
 }
 

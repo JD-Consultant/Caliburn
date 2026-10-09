@@ -4,6 +4,7 @@ import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-
 import type { WorkIntent } from './jd-work-api';
 import type { WorkDialogContent } from './WorkDialog';
 import { FoldableSection } from './FoldableSection';
+import { navigateJdLink } from './jd-navigation';
 import { InlineText } from './InlineText';
 import { capabilityDescriptionField, capabilityNameField } from './inline-fields';
 import { itemTarget, useSourceBadge } from './source-badge-context';
@@ -86,7 +87,11 @@ export function CapabilitiesSection({
               <Box component="ul" sx={{ pl: 3, my: 0.5 }}>
                 {users.map((task) => (
                   <li key={task.task_id}>
-                    <Link href={`#jd-task-${task.task_id}`} sx={{ overflowWrap: 'anywhere' }}>
+                    <Link
+                      onClick={navigateJdLink}
+                      href={`#jd-task-${task.task_id}`}
+                      sx={{ overflowWrap: 'anywhere' }}
+                    >
                       {baseline.areas.find((area) => area.area_id === task.area_id)?.title ??
                         (task.area_id ? '尚未命名的職責' : '未歸屬任務')}
                       ／{task.title ?? task.description ?? '尚未命名的任務'}

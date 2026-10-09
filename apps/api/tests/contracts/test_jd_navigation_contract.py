@@ -8,7 +8,7 @@ from uuid import UUID
 from jsonschema import Draft202012Validator
 
 from caliburn.features.job_description.models import JdProfile
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.model_tools.jd_navigation import project_jd_map
 
 

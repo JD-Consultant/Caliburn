@@ -1,5 +1,6 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen } from '@testing-library/react';
+import { createAppQueryClient } from './query-client';
+import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
@@ -36,7 +37,7 @@ const emptyWork = {
 };
 
 function renderApp(path = '/') {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = createAppQueryClient();
   clients.push(client);
   const view = render(
     <QueryClientProvider client={client}>
@@ -60,6 +61,22 @@ function history(text: string): Response {
       },
     ],
   });
+}
+
+/** Native messaging boundary; cleanup and refresh still run through the real App. */
+function stubLifecycleChannel() {
+  const connection = {
+    onmessage: null as ((event: MessageEvent<unknown>) => void) | null,
+    postMessage: vi.fn(),
+    close: vi.fn(),
+  };
+  vi.stubGlobal(
+    'BroadcastChannel',
+    vi.fn(function () {
+      return connection;
+    }),
+  );
+  return connection;
 }
 
 beforeEach(() => {
@@ -183,9 +200,9 @@ test('不存在的檔案顯示錯誤而非上一份內容或伺服器除錯文�
     );
   vi.stubGlobal('fetch', fetch);
   renderApp(`/job-files/${firstFile.job_file_id}`);
-  expect(await screen.findByRole('alert')).toHaveTextContent('找不到這份職務檔案');
+  await waitFor(() => expect(screen.getByText('這份職務檔案已刪除')).toBeVisible());
   expect(screen.queryByText('private debug')).not.toBeInTheDocument();
-  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch.mock.calls.filter(([path]) => path !== '/api/job-files')).toHaveLength(1);
 });
 
 test('歷史訪談以原文字串顯示，不解析成 HTML', async () => {
@@ -401,7 +418,7 @@ test('cancelling a candidate removes only the preview and keeps the formal JD', 
     ...emptyProfile,
     profile: { ...emptyProfile.profile, job_title: '原正式工程師' },
   };
-  retainTurnHint(firstFile.job_file_id, {
+  await retainTurnHint(firstFile.job_file_id, {
     command_id: '60000000-0000-4000-8000-000000000006',
     execution_id: executionId,
   });
@@ -454,7 +471,7 @@ test('cancelling a candidate removes only the preview and keeps the formal JD', 
 
 test('狀態查詢失敗不沿用候選或控制；查回 failed 仍保留正式 JD 且不重送輸入', async () => {
   const executionId = '50000000-0000-4000-8000-000000000005';
-  retainTurnHint(firstFile.job_file_id, {
+  await retainTurnHint(firstFile.job_file_id, {
     command_id: '60000000-0000-4000-8000-000000000006',
     execution_id: executionId,
   });
@@ -607,4 +624,375 @@ test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不
   expect(statusReads).toBeGreaterThanOrEqual(2);
   expect(workReads).toBeGreaterThanOrEqual(2);
   expect(writes).toEqual([`${turnUrl}/undo-jd`]);
+});
+
+test('invalid job file identity mounts no data queries', async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal('fetch', fetcher);
+  renderApp('/job-files/not-a-uuid');
+  expect(await screen.findByText('找不到這份職務檔案')).toBeInTheDocument();
+  expect(fetcher).not.toHaveBeenCalled();
+});
+
+test('confirmed missing metadata cleans only that file local recovery data', async () => {
+  const connection = stubLifecycleChannel();
+  for (const id of [firstFile.job_file_id, secondFile.job_file_id]) {
+    sessionStorage.setItem(`caliburn.pending-jd-profile.${id}`, '{}');
+    sessionStorage.setItem(`caliburn.pending-jd-work.${id}`, '{}');
+    sessionStorage.setItem(`caliburn.pending-job-file-rename.${id}`, '{}');
+    await retainTurnHint(id, {
+      command_id: '60000000-0000-4000-8000-000000000006',
+      execution_id: null,
+    });
+  }
+  vi.stubGlobal('fetch', () =>
+    Promise.resolve(Response.json({ detail: { code: 'job_file_not_found' } }, { status: 404 })),
+  );
+  renderApp(`/job-files/${firstFile.job_file_id}`);
+  await waitFor(() => expect(screen.getByText('這份職務檔案已刪除')).toBeVisible());
+  await act(async () => {
+    await Promise.resolve();
+  });
+  for (const kind of ['jd-profile', 'jd-work', 'job-file-rename']) {
+    expect(sessionStorage.getItem(`caliburn.pending-${kind}.${firstFile.job_file_id}`)).toBeNull();
+    expect(sessionStorage.getItem(`caliburn.pending-${kind}.${secondFile.job_file_id}`)).toBe('{}');
+  }
+  expect(localStorage.getItem(`caliburn:interview-turn:${firstFile.job_file_id}`)).toBeNull();
+  expect(localStorage.getItem(`caliburn:interview-turn:${secondFile.job_file_id}`)).not.toBeNull();
+  expect(connection.postMessage).toHaveBeenCalledExactlyOnceWith({
+    type: 'job_file_deleted',
+    job_file_id: firstFile.job_file_id,
+  });
+});
+
+test.each(['sessionStorage', 'localStorage'] as const)(
+  'a confirmed DELETE remains deleted when %s cleanup fails',
+  async (deniedStorage) => {
+    const connection = stubLifecycleChannel();
+    let exists = true;
+    const key = 'caliburn.pending-jd-profile.' + firstFile.job_file_id;
+    sessionStorage.setItem(key, '{}');
+    sessionStorage.setItem('caliburn.pending-jd-work.' + firstFile.job_file_id, '{}');
+    await retainTurnHint(firstFile.job_file_id, {
+      command_id: '60000000-0000-4000-8000-000000000006',
+      execution_id: null,
+    });
+    const transport = vi.fn((_path: string, options?: RequestInit) => {
+      if (options?.method === 'DELETE') {
+        exists = false;
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      return Promise.resolve(Response.json({ job_files: exists ? [firstFile] : [] }));
+    });
+    vi.stubGlobal('fetch', transport);
+    const removeSession = Storage.prototype.removeItem.bind(sessionStorage);
+    const removeLocal = Storage.prototype.removeItem.bind(localStorage);
+    const removal = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(function (
+      this: Storage,
+      target: string,
+    ) {
+      if (
+        (deniedStorage === 'sessionStorage' && this === sessionStorage && target === key) ||
+        (deniedStorage === 'localStorage' && this === localStorage)
+      )
+        throw new DOMException('synthetic denied', 'SecurityError');
+      if (this === sessionStorage) removeSession(target);
+      else removeLocal(target);
+    });
+    try {
+      renderApp();
+      await userEvent.click(await screen.findByRole('button', { name: /刪除 前端職務/ }));
+      await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
+      expect(await screen.findByText(/職務檔案已刪除，但瀏覽器資料未能完整清理/)).toBeVisible();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(screen.queryByRole('link', { name: /開啟 前端職務/ })).not.toBeInTheDocument();
+      expect(sessionStorage.getItem(key)).toBe(deniedStorage === 'sessionStorage' ? '{}' : null);
+      expect(
+        sessionStorage.getItem('caliburn.pending-jd-work.' + firstFile.job_file_id),
+      ).toBeNull();
+      if (deniedStorage === 'localStorage')
+        expect(
+          localStorage.getItem('caliburn:interview-turn:' + firstFile.job_file_id),
+        ).not.toBeNull();
+      else
+        expect(localStorage.getItem('caliburn:interview-turn:' + firstFile.job_file_id)).toBeNull();
+      expect(screen.getAllByRole('alert')).toHaveLength(1);
+      expect(
+        transport.mock.calls.filter(([, options]) => options?.method === 'DELETE'),
+      ).toHaveLength(1);
+      expect(
+        transport.mock.calls.filter(([, options]) => options?.method !== 'DELETE'),
+      ).toHaveLength(2);
+
+      removal.mockRestore();
+      act(() => {
+        connection.onmessage?.(
+          new MessageEvent('message', {
+            data: { type: 'job_file_deleted', job_file_id: firstFile.job_file_id },
+          }),
+        );
+      });
+      await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+      expect(sessionStorage.getItem(key)).toBeNull();
+      expect(localStorage.getItem('caliburn:interview-turn:' + firstFile.job_file_id)).toBeNull();
+      expect(screen.queryByRole('link', { name: /開啟 前端職務/ })).not.toBeInTheDocument();
+      expect(
+        transport.mock.calls.filter(([, options]) => options?.method === 'DELETE'),
+      ).toHaveLength(1);
+      expect(connection.postMessage).toHaveBeenCalledTimes(1);
+    } finally {
+      removal.mockRestore();
+    }
+  },
+);
+
+test('confirmed DELETE cleans only that file and refreshes the active list exactly once', async () => {
+  const connection = stubLifecycleChannel();
+  for (const id of [firstFile.job_file_id, secondFile.job_file_id]) {
+    for (const kind of ['jd-profile', 'jd-work', 'job-file-rename'])
+      sessionStorage.setItem(`caliburn.pending-${kind}.${id}`, '{}');
+    await retainTurnHint(id, {
+      command_id: '60000000-0000-4000-8000-000000000006',
+      execution_id: null,
+    });
+  }
+  let deleted = false;
+  let listReadsAfterDelete = 0;
+  const transport = vi.fn((path: string, options?: RequestInit) => {
+    if (options?.method === 'DELETE') {
+      expect(path).toBe(`/api/job-files/${firstFile.job_file_id}`);
+      deleted = true;
+      return Promise.resolve(new Response(null, { status: 204 }));
+    }
+    expect(path).toBe('/api/job-files');
+    if (deleted) listReadsAfterDelete++;
+    return Promise.resolve(
+      Response.json({ job_files: deleted ? [secondFile] : [firstFile, secondFile] }),
+    );
+  });
+  vi.stubGlobal('fetch', transport);
+  const { client } = renderApp();
+  // No window-focus or reconnect event belongs to this single deletion scenario.
+  client.setQueryDefaults(['job-files'], { refetchOnWindowFocus: false });
+  await screen.findByRole('link', { name: /開啟.*合成員工甲/ });
+  expect(transport).toHaveBeenCalledTimes(1);
+  const scopes = [
+    'job-file',
+    'interviews',
+    'jd-profile',
+    'jd-work',
+    'jd-source-content',
+    'jd-source-changes',
+    'consultant-turn',
+    'consultant-turn-by-command',
+    'current-consultant-turn',
+    'reasoning-summaries',
+    'turn-jd-changes',
+  ];
+  for (const scope of scopes) {
+    client.setQueryData([scope, firstFile.job_file_id, 'detail'], 'target data');
+    client.setQueryData([scope, secondFile.job_file_id, 'detail'], 'other data');
+  }
+
+  await userEvent.click(screen.getByRole('button', { name: /刪除.*合成員工甲/ }));
+  await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  await waitFor(() => expect(client.isFetching()).toBe(0));
+  expect(screen.queryByRole('link', { name: /開啟.*合成員工甲/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /開啟.*合成員工乙/ })).toBeVisible();
+  for (const scope of scopes) {
+    expect(client.getQueryData([scope, firstFile.job_file_id, 'detail'])).toBeUndefined();
+    expect(client.getQueryData([scope, secondFile.job_file_id, 'detail'])).toBe('other data');
+  }
+  for (const kind of ['jd-profile', 'jd-work', 'job-file-rename']) {
+    expect(sessionStorage.getItem(`caliburn.pending-${kind}.${firstFile.job_file_id}`)).toBeNull();
+    expect(sessionStorage.getItem(`caliburn.pending-${kind}.${secondFile.job_file_id}`)).toBe('{}');
+  }
+  expect(localStorage.getItem(`caliburn:interview-turn:${firstFile.job_file_id}`)).toBeNull();
+  expect(localStorage.getItem(`caliburn:interview-turn:${secondFile.job_file_id}`)).not.toBeNull();
+  expect(transport.mock.calls.filter(([, options]) => options?.method === 'DELETE')).toHaveLength(
+    1,
+  );
+  expect(listReadsAfterDelete).toBe(1);
+  expect(connection.postMessage).toHaveBeenCalledExactlyOnceWith({
+    type: 'job_file_deleted',
+    job_file_id: firstFile.job_file_id,
+  });
+  await waitFor(() => expect(screen.getByRole('button', { name: '建立職務檔案' })).toHaveFocus());
+});
+
+test('a list refresh failure after DELETE warns once without retrying deletion', async () => {
+  let deleted = false;
+  const transport = vi.fn((_path: string, options?: RequestInit) => {
+    if (options?.method === 'DELETE') {
+      deleted = true;
+      return Promise.resolve(new Response(null, { status: 204 }));
+    }
+    return deleted
+      ? Promise.reject(new TypeError('synthetic lost list response'))
+      : Promise.resolve(Response.json({ job_files: [firstFile] }));
+  });
+  vi.stubGlobal('fetch', transport);
+  const { client } = renderApp();
+  client.setQueryData(['jd-work', firstFile.job_file_id], 'deleted JD');
+  await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
+  await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
+  expect(await screen.findByText(/職務檔案已刪除，但清單未能重新讀取/)).toBeVisible();
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(client.getQueryData(['jd-work', firstFile.job_file_id])).toBeUndefined();
+  expect(screen.queryByRole('button', { name: '重試刪除' })).not.toBeInTheDocument();
+  expect(transport.mock.calls.filter(([, options]) => options?.method === 'DELETE')).toHaveLength(
+    1,
+  );
+  expect(transport.mock.calls.filter(([, options]) => options?.method !== 'DELETE')).toHaveLength(
+    2,
+  );
+});
+
+test('a received deletion refreshes once and ignores repeated or invalid notifications', async () => {
+  const connection = stubLifecycleChannel();
+  const targetKey = `caliburn.pending-jd-work.${firstFile.job_file_id}`;
+  sessionStorage.setItem(targetKey, '{}');
+  sessionStorage.setItem(`caliburn.pending-jd-work.${secondFile.job_file_id}`, '{}');
+  await retainTurnHint(firstFile.job_file_id, {
+    command_id: '60000000-0000-4000-8000-000000000006',
+    execution_id: null,
+  });
+  let deleted = false;
+  const transport = vi.fn(() =>
+    Promise.resolve(Response.json({ job_files: deleted ? [secondFile] : [firstFile, secondFile] })),
+  );
+  vi.stubGlobal('fetch', transport);
+  const { client } = renderApp();
+  await screen.findByRole('link', { name: /開啟.*合成員工甲/ });
+  client.setQueryData(['jd-work', firstFile.job_file_id], 'target data');
+  client.setQueryData(['jd-work', secondFile.job_file_id], 'other data');
+  act(() => {
+    for (const data of [
+      null,
+      {},
+      { type: 'other', job_file_id: firstFile.job_file_id },
+      { type: 'job_file_deleted', job_file_id: 'invalid' },
+    ])
+      connection.onmessage?.(new MessageEvent('message', { data }));
+  });
+  expect(transport).toHaveBeenCalledTimes(1);
+  expect(sessionStorage.getItem(targetKey)).toBe('{}');
+  const removal = vi.spyOn(Storage.prototype, 'removeItem');
+  try {
+    deleted = true;
+    const data = { type: 'job_file_deleted', job_file_id: firstFile.job_file_id };
+    act(() => {
+      connection.onmessage?.(new MessageEvent('message', { data }));
+      connection.onmessage?.(new MessageEvent('message', { data }));
+    });
+    await waitFor(() =>
+      expect(screen.queryByRole('link', { name: /合成員工甲/ })).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(client.isFetching()).toBe(0));
+    act(() => connection.onmessage?.(new MessageEvent('message', { data })));
+    expect(transport).toHaveBeenCalledTimes(2);
+    expect(connection.postMessage).not.toHaveBeenCalled();
+    expect(removal.mock.calls.filter(([key]) => key === targetKey)).toHaveLength(1);
+    expect(client.getQueryData(['jd-work', firstFile.job_file_id])).toBeUndefined();
+    expect(client.getQueryData(['jd-work', secondFile.job_file_id])).toBe('other data');
+    expect(sessionStorage.getItem(targetKey)).toBeNull();
+    expect(sessionStorage.getItem(`caliburn.pending-jd-work.${secondFile.job_file_id}`)).toBe('{}');
+    expect(localStorage.getItem(`caliburn:interview-turn:${firstFile.job_file_id}`)).toBeNull();
+  } finally {
+    removal.mockRestore();
+  }
+});
+
+test('other metadata 404 errors do not confirm deletion or clear recovery data', async () => {
+  const connection = stubLifecycleChannel();
+  const key = `caliburn.pending-jd-work.${firstFile.job_file_id}`;
+  sessionStorage.setItem(key, '{}');
+  const transport = vi.fn(() =>
+    Promise.resolve(Response.json({ detail: { code: 'resource_not_found' } }, { status: 404 })),
+  );
+  vi.stubGlobal('fetch', transport);
+  const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
+  client.setQueryData(['jd-work', firstFile.job_file_id], 'saved JD');
+  expect(await screen.findByText(/找不到這項資料或服務/)).toBeVisible();
+  expect(screen.queryByText('這份職務檔案已刪除')).not.toBeInTheDocument();
+  expect(sessionStorage.getItem(key)).toBe('{}');
+  expect(client.getQueryData(['jd-work', firstFile.job_file_id])).toBe('saved JD');
+  expect(connection.postMessage).not.toHaveBeenCalled();
+  expect(transport).toHaveBeenCalledTimes(1);
+});
+
+test('late DELETE success after unmount still cleans the file without refreshing or focusing the old page', async () => {
+  const connection = stubLifecycleChannel();
+  const key = `caliburn.pending-jd-work.${firstFile.job_file_id}`;
+  sessionStorage.setItem(key, '{}');
+  let finishDelete: (response: Response) => void = () => {
+    throw new Error('DELETE has not started');
+  };
+  const response = new Promise<Response>((resolve) => {
+    finishDelete = resolve;
+  });
+  const transport = vi.fn((_path: string, options?: RequestInit) =>
+    options?.method === 'DELETE'
+      ? response
+      : Promise.resolve(Response.json({ job_files: [firstFile] })),
+  );
+  vi.stubGlobal('fetch', transport);
+  const { client, unmount } = renderApp();
+  await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
+  await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
+  client.setQueryData(['jd-work', firstFile.job_file_id], 'target data');
+  client.setQueryData(['jd-work', secondFile.job_file_id], 'other data');
+  const createButton = screen.getByRole('button', { name: '建立職務檔案', hidden: true });
+  const focus = vi.spyOn(createButton, 'focus');
+  unmount();
+  await act(async () => {
+    finishDelete(new Response(null, { status: 204 }));
+    await response;
+  });
+  await waitFor(() => expect(sessionStorage.getItem(key)).toBeNull());
+  expect(client.getQueryData(['jd-work', firstFile.job_file_id])).toBeUndefined();
+  expect(client.getQueryData(['jd-work', secondFile.job_file_id])).toBe('other data');
+  expect(transport.mock.calls.filter(([, options]) => options?.method === 'DELETE')).toHaveLength(
+    1,
+  );
+  expect(transport.mock.calls.filter(([, options]) => options?.method !== 'DELETE')).toHaveLength(
+    1,
+  );
+  expect(focus).not.toHaveBeenCalled();
+  expect(connection.close).toHaveBeenCalledTimes(1);
+  expect(connection.postMessage).not.toHaveBeenCalled();
+  focus.mockRestore();
+});
+
+test('notification failure after DELETE warns once and still cleans and refreshes', async () => {
+  const connection = stubLifecycleChannel();
+  connection.postMessage.mockImplementation(() => {
+    throw new DOMException('synthetic closed', 'InvalidStateError');
+  });
+  const key = `caliburn.pending-jd-work.${firstFile.job_file_id}`;
+  sessionStorage.setItem(key, '{}');
+  let deleted = false;
+  const transport = vi.fn((_path: string, options?: RequestInit) => {
+    if (options?.method === 'DELETE') {
+      deleted = true;
+      return Promise.resolve(new Response(null, { status: 204 }));
+    }
+    return Promise.resolve(Response.json({ job_files: deleted ? [] : [firstFile] }));
+  });
+  vi.stubGlobal('fetch', transport);
+  renderApp();
+  await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
+  await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
+  expect(await screen.findByText(/職務檔案已刪除，但瀏覽器資料未能完整清理/)).toBeVisible();
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(sessionStorage.getItem(key)).toBeNull();
+  expect(screen.getByRole('heading', { name: '尚無職務檔案' })).toBeVisible();
+  expect(screen.getAllByRole('alert')).toHaveLength(1);
+  expect(transport.mock.calls.filter(([, options]) => options?.method === 'DELETE')).toHaveLength(
+    1,
+  );
+  expect(transport.mock.calls.filter(([, options]) => options?.method !== 'DELETE')).toHaveLength(
+    2,
+  );
 });

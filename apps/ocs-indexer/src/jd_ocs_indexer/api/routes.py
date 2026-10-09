@@ -1,7 +1,8 @@
-"""FastAPI router. Blocking embed/Qdrant work runs in a threadpool; the embed
-lock serializes BGE-M3 calls (FlagEmbedding is not guaranteed thread-safe)."""
+"""HTTP projection; retrieval owns model admission, reads use ordinary workers."""
 
 from __future__ import annotations
+
+from functools import partial
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
@@ -32,23 +33,31 @@ router = APIRouter()
 @router.post("/occupations:search", response_model=OccupationSearchResponse)
 async def search_occupations(req: SearchRequest, request: Request):
     app = request.app
-    def _run():
-        with app.state.embed_lock:
-            return service.search_occupations(
-                app.state.client, app.state.embedder,
-                app.state.settings.qdrant_collection, query=req.query, top_k=req.top_k)
-    return await run_in_threadpool(_run)
+    return await app.state.retrieval.run(
+        partial(
+            service.search_occupations,
+            app.state.client,
+            app.state.embedder,
+            app.state.settings.qdrant_collection,
+            query=req.query,
+            top_k=req.top_k,
+        )
+    )
 
 
 @router.post("/tasks:search", response_model=TaskSearchResponse)
 async def search_tasks(req: SearchRequest, request: Request):
     app = request.app
-    def _run():
-        with app.state.embed_lock:
-            return service.search_tasks(
-                app.state.client, app.state.embedder,
-                app.state.settings.qdrant_collection, query=req.query, top_k=req.top_k)
-    return await run_in_threadpool(_run)
+    return await app.state.retrieval.run(
+        partial(
+            service.search_tasks,
+            app.state.client,
+            app.state.embedder,
+            app.state.settings.qdrant_collection,
+            query=req.query,
+            top_k=req.top_k,
+        )
+    )
 
 
 # AIP-136 custom method (`:verb`). 刻意偏離嚴格 AIP-231:POST body {ids}
@@ -58,8 +67,11 @@ async def search_tasks(req: SearchRequest, request: Request):
 async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
     app = request.app
     return await run_in_threadpool(
-        service.batch_get_tasks, app.state.client,
-        app.state.settings.qdrant_collection, ids=req.ids)
+        service.batch_get_tasks,
+        app.state.client,
+        app.state.settings.qdrant_collection,
+        ids=req.ids,
+    )
 
 
 # 相似比對(ADR 0022):池進 → {真重複群, 灰區對} 出。確定性、非破壞;
@@ -68,29 +80,41 @@ async def batch_get_tasks(req: TaskBatchGetRequest, request: Request):
 async def match_items(req: MatchRequest, request: Request):
     app = request.app
     if len(req.items) > 500:
-        raise HTTPException(status_code=413, detail={"code": "too_many_items", "max": 500})
+        raise HTTPException(
+            status_code=413, detail={"code": "too_many_items", "max": 500}
+        )
     if req.kind not in core.THRESHOLDS:
-        raise HTTPException(status_code=422, detail={"code": "unknown_kind", "kind": req.kind})
+        raise HTTPException(
+            status_code=422, detail={"code": "unknown_kind", "kind": req.kind}
+        )
     if len({it.id for it in req.items}) != len(req.items):
         # id 唯一是管線前置條件(collapse/score 以 id 為鍵;撞號會靜默吃掉配對)
         raise HTTPException(status_code=422, detail={"code": "duplicate_item_ids"})
 
-    def _run():
-        with app.state.embed_lock:
-            return matching_service.match_items(app.state.embedder, kind=req.kind, items=req.items)
-
     try:
-        return await run_in_threadpool(_run)
-    except httpx.HTTPError as exc:   # embedder 掛/超時 → 503(api 端據此降級)
-        raise HTTPException(status_code=503, detail={"code": "embedder_unavailable"}) from exc
+        return await app.state.retrieval.run(
+            partial(
+                matching_service.match_items,
+                app.state.embedder,
+                kind=req.kind,
+                items=req.items,
+            )
+        )
+    except httpx.HTTPError as exc:  # embedder 掛/超時 → 503(api 端據此降級)
+        raise HTTPException(
+            status_code=503, detail={"code": "embedder_unavailable"}
+        ) from exc
 
 
 @router.get("/occupations/{ocs_code}", response_model=OccupationDetail)
 async def get_occupation(ocs_code: str, request: Request):
     app = request.app
     result = await run_in_threadpool(
-        service.get_occupation, app.state.client,
-        app.state.settings.qdrant_collection, ocs_code=ocs_code)
+        service.get_occupation,
+        app.state.client,
+        app.state.settings.qdrant_collection,
+        ocs_code=ocs_code,
+    )
     if result is None:
         raise HTTPException(status_code=404, detail="ocs_code not found")
     return result
@@ -100,8 +124,11 @@ async def get_occupation(ocs_code: str, request: Request):
 async def get_occupation_tasks(ocs_code: str, request: Request):
     app = request.app
     result = await run_in_threadpool(
-        service.get_occupation_tasks, app.state.client,
-        app.state.settings.qdrant_collection, ocs_code=ocs_code)
+        service.get_occupation_tasks,
+        app.state.client,
+        app.state.settings.qdrant_collection,
+        ocs_code=ocs_code,
+    )
     if result is None:
         raise HTTPException(status_code=404, detail="ocs_code not found")
     return result
@@ -111,8 +138,11 @@ async def get_occupation_tasks(ocs_code: str, request: Request):
 async def get_competencies(ocs_code: str, request: Request):
     app = request.app
     result = await run_in_threadpool(
-        service.get_competencies, app.state.client,
-        app.state.settings.qdrant_collection, ocs_code=ocs_code)
+        service.get_competencies,
+        app.state.client,
+        app.state.settings.qdrant_collection,
+        ocs_code=ocs_code,
+    )
     if result is None:
         raise HTTPException(status_code=404, detail="ocs_code not found")
     return result

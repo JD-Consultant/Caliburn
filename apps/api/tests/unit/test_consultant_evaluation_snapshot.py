@@ -81,7 +81,7 @@ async def test_authorized_comparison_freezes_entire_batch_before_first_await(
 
     async def run_candidate(settings, composition, case, **kwargs):
         observed.append((composition.consultant_configuration, case))
-        return {"all_inputs_completed": True}
+        return scripted.CandidateRun({"all_inputs_completed": True}, True)
 
     def reject_provider(settings):
         raise AssertionError("This test must not construct a provider client")
@@ -116,9 +116,9 @@ def test_scripted_comparison_keeps_all_candidates_fixed_after_manifest(monkeypat
         mutate()
         return DatabaseSettings(url=url, schema="eval_synthetic")
 
-    async def run_candidate(settings, composition, case):
+    async def run_candidate(settings, composition, case, **kwargs):
         observed.append((composition.consultant_configuration, case))
-        return {"all_inputs_completed": True}
+        return scripted.CandidateRun({"all_inputs_completed": True}, True)
 
     monkeypatch.setattr(
         ConsultantComparison, "model_validate_json", classmethod(lambda cls, raw: comparison)

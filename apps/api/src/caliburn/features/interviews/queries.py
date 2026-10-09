@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from sqlalchemy import Select
+from sqlalchemy import ColumnElement, ScalarSelect, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.interviews import persistence
@@ -15,6 +15,7 @@ from caliburn.features.interviews.models import (
     InterviewReadError,
     InterviewReadScope,
     InterviewScopeError,
+    InterviewSourceHeader,
     InterviewSourceNotAvailableError,
     InterviewSpeaker,
     InvalidInterviewSelectionError,
@@ -46,6 +47,15 @@ async def read_execution_input(
     if original is None:
         raise InterviewInputNotFoundError("No accepted input exists in this execution scope")
     return StoredInterviewInput(original.source_id, original.interview_text)
+
+
+async def read_execution_input_source_id(
+    session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
+) -> UUID | None:
+    """Private accepted-input identity, with no body load or formal qualification."""
+    return await persistence.read_execution_input_source_id(
+        session, job_file_id=job_file_id, execution_id=execution_id
+    )
 
 
 async def read_accepted_input(
@@ -84,6 +94,23 @@ def formal_exchange_positions_projection(scope: InterviewReadScope) -> Select[UU
     )
 
 
+def consolidation_exchange_positions_projection(
+    job_file_id: UUID | None = None,
+) -> Select[UUID, int, UUID, UUID]:
+    return persistence.consolidation_exchange_positions_projection(job_file_id)
+
+
+def accepted_input_positions_projection(
+    job_file_id: UUID | None = None,
+) -> Select[UUID, UUID, UUID]:
+    return persistence.accepted_input_positions_projection(job_file_id)
+
+
+def history_frontier_of(job_file_id: UUID | ColumnElement[UUID]) -> ScalarSelect[int]:
+    """Formal frontier of one file, composable into a larger read as a correlated lookup."""
+    return persistence.formal_frontier_of(job_file_id)
+
+
 def _check_sequence(scope: InterviewReadScope, sequence: int) -> None:
     if type(sequence) is not int or sequence < 1:
         raise InvalidInterviewSelectionError("Select positive integer formal interview sequences")
@@ -107,6 +134,23 @@ async def read_interview_messages(
             "The entire selection must exist as formal interview sources"
         )
     return messages
+
+
+async def read_interview_source_headers(
+    session: AsyncSession, scope: InterviewReadScope, *, source_ids: tuple[UUID, ...]
+) -> tuple[InterviewSourceHeader, ...]:
+    """Validate the complete fixed source selection without reading interview bodies."""
+    if not source_ids:
+        raise InvalidInterviewSelectionError("Select at least one formal interview source")
+    selected = tuple(dict.fromkeys(source_ids))
+    headers = await persistence.list_formal_source_headers(
+        session, scope.job_file_id, scope.through_sequence, selected
+    )
+    if len(headers) != len(selected):
+        raise InterviewSourceNotAvailableError(
+            "The entire selection must exist as formal interview sources within the fixed boundary"
+        )
+    return headers
 
 
 async def read_interview_sources(

@@ -8,11 +8,12 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 
+from caliburn.adapters.body_matching import BodyEditError
 from caliburn.adapters.database import Database
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.interviews.models import InterviewScopeError
-from caliburn.features.work_memory.body_matching import BodyEditError
 from caliburn.features.work_memory.candidates import (
     MemoryCandidateStateError,
     MemoryEdit,
@@ -65,9 +66,9 @@ def execute[T](settings: DatabaseSettings, operation: Callable[[Database], Await
 def source(database_connection: psycopg.Connection) -> tuple[UUID, UUID]:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'寫入','寫入','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'寫入','寫入','合成人員')",
+        (file_id,),
     )
     for sequence, identity, speaker in [(1, uuid4(), "app"), (2, source_id, "employee")]:
         database_connection.execute(
@@ -98,7 +99,7 @@ async def start(
 async def create_situation(
     database: Database, writer: ExecutionWriter, binding: CandidateMemoryRead, title: str = "盤點"
 ) -> UUID:
-    prepared = await MemoryWritePreparation(database.sessions).prepare(
+    prepared = await MemoryWritePreparation(database.sessions, cpu=MemoryCpu()).prepare(
         binding,
         command_id=uuid4(),
         layer=SITUATION,
@@ -119,7 +120,7 @@ def test_prepare_and_apply_all_fields_and_sources_as_one_candidate_change(
         writer, binding = await start(database, source)
         identity = await create_situation(database, writer, binding)
         reads = MemoryReadWorkflow(database.sessions)
-        prepared = await MemoryWritePreparation(database.sessions).prepare(
+        prepared = await MemoryWritePreparation(database.sessions, cpu=MemoryCpu()).prepare(
             binding,
             command_id=uuid4(),
             layer=SITUATION,
@@ -158,7 +159,7 @@ def test_rejected_preparation_leaves_existing_candidate_and_source_unchanged(
     async def scenario(database: Database) -> None:
         writer, binding = await start(database, source)
         await create_situation(database, writer, binding)
-        prepare = MemoryWritePreparation(database.sessions)
+        prepare = MemoryWritePreparation(database.sessions, cpu=MemoryCpu())
         with pytest.raises(BodyEditError):
             await prepare.prepare(
                 binding,
@@ -216,7 +217,7 @@ def test_original_prepared_command_replays_after_title_is_reused_without_retarge
     async def scenario(database: Database) -> None:
         writer, binding = await start(database, source)
         original_id = await create_situation(database, writer, binding)
-        prepare = MemoryWritePreparation(database.sessions)
+        prepare = MemoryWritePreparation(database.sessions, cpu=MemoryCpu())
         prepared = await prepare.prepare(
             binding,
             command_id=uuid4(),
@@ -250,7 +251,7 @@ def test_stale_prepared_write_cannot_silently_apply_against_new_position(
     async def scenario(database: Database) -> None:
         writer, binding = await start(database, source)
         await create_situation(database, writer, binding)
-        prepared = await MemoryWritePreparation(database.sessions).prepare(
+        prepared = await MemoryWritePreparation(database.sessions, cpu=MemoryCpu()).prepare(
             binding,
             command_id=uuid4(),
             layer=SITUATION,
@@ -273,7 +274,7 @@ def test_b2_changes_its_own_relationships_without_duplicate_add_effect(
         writer, binding = await start(database, source)
         await create_situation(database, writer, binding)
         edits = MemoryCandidateWorkflow(database.sessions)
-        prepare = MemoryWritePreparation(database.sessions)
+        prepare = MemoryWritePreparation(database.sessions, cpu=MemoryCpu())
         # A role switch uses the latest position, not the original stage start.
         latest = await prepare.prepare(
             binding,
@@ -340,7 +341,7 @@ def tools_for(
     capacity: int = 1_000_000,
 ) -> MemoryWriteTools:
     return MemoryWriteTools(
-        MemoryWritePreparation(database.sessions),
+        MemoryWritePreparation(database.sessions, cpu=MemoryCpu()),
         MemoryCandidateWorkflow(database.sessions),
         binding,
         writer,
@@ -588,7 +589,7 @@ def test_understanding_tool_roundtrip_with_own_reference_branch_and_empty_source
 ) -> None:
     async def scenario(database: Database) -> None:
         writer, binding = await start(database, source)
-        prepare = MemoryWritePreparation(database.sessions)
+        prepare = MemoryWritePreparation(database.sessions, cpu=MemoryCpu())
         case = await prepare.prepare(
             binding,
             command_id=uuid4(),

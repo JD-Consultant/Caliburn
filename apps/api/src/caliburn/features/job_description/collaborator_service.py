@@ -1,6 +1,5 @@
 """Collaborator commands share fixed JD revisions and a caller-selected editing scope."""
 
-from dataclasses import replace
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,21 +10,13 @@ from caliburn.features.job_description import (
     revision_editing,
 )
 from caliburn.features.job_description.candidates import JdCandidateScope
+from caliburn.features.job_description.collaborator_changes import apply_collaborator_change
 from caliburn.features.job_description.collaborators import (
-    Collaborator,
-    CollaboratorChange,
-    CollaboratorField,
-    CollaboratorNotFoundError,
-    CreateCollaborator,
-    DeleteCollaborator,
     EditJdCollaborators,
     JdCollaboratorsRevision,
-    ReorderCollaborator,
-    ReviseCollaborator,
     collaborator_change_payload,
 )
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfileRevision,
     StaleJdRevisionError,
 )
@@ -53,69 +44,18 @@ async def recover_collaborator_result(
     )
     if operation is None:
         return None
-    if (
-        operation.kind != "edit_collaborators"
-        or operation.expected_revision_id != command.expected_revision_id
-        or operation.request_payload != collaborator_change_payload(command.change)
-    ):
-        raise JdCommandConflictError("command_id was already used with different JD intent")
+    revision_editing.require_matching_edit_intent(
+        operation,
+        kind="edit_collaborators",
+        expected_revision_id=command.expected_revision_id,
+        request_payload=collaborator_change_payload(command.change),
+    )
     return JdCollaboratorsRevision(
         operation.result_revision_id,
         await collaborator_persistence.read_collaborators(
             session, job_file_id, operation.result_revision_id
         ),
     )
-
-
-def apply_collaborator_change(
-    collaborators: tuple[Collaborator, ...], change: CollaboratorChange
-) -> tuple[tuple[Collaborator, ...], Collaborator | None]:
-    """Return ordered membership and, only for changed text, one new fixed content revision."""
-    if isinstance(change, CreateCollaborator):
-        created = Collaborator(uuid4(), uuid4(), change.name, change.scope_text)
-        return (*collaborators, created), created
-    target = next(
-        (
-            collaborator
-            for collaborator in collaborators
-            if collaborator.collaborator_id == change.collaborator_id
-        ),
-        None,
-    )
-    if target is None:
-        raise CollaboratorNotFoundError("Collaborator is not in the selected JD")
-    if isinstance(change, ReviseCollaborator):
-        name, scope_text = target.name, target.scope_text
-        for item in change.changes:
-            if item.field is CollaboratorField.NAME:
-                name = item.value
-            else:
-                scope_text = item.value
-        revised = replace(target, name=name, scope_text=scope_text)
-        if revised == target:
-            return collaborators, None
-        revised = replace(revised, content_revision_id=uuid4())
-        return tuple(
-            revised if collaborator.collaborator_id == target.collaborator_id else collaborator
-            for collaborator in collaborators
-        ), revised
-    remaining = tuple(
-        collaborator
-        for collaborator in collaborators
-        if collaborator.collaborator_id != target.collaborator_id
-    )
-    if isinstance(change, DeleteCollaborator):
-        return remaining, None
-    if isinstance(change, ReorderCollaborator):
-        if change.before_collaborator_id == target.collaborator_id:
-            return collaborators, None
-        if change.before_collaborator_id is None:
-            return (*remaining, target), None
-        for index, neighbour in enumerate(remaining):
-            if neighbour.collaborator_id == change.before_collaborator_id:
-                return (*remaining[:index], target, *remaining[index:]), None
-        raise CollaboratorNotFoundError("Ordering neighbour is not in this JD")
-    raise TypeError("Unsupported collaborator change")
 
 
 async def edit_collaborators(

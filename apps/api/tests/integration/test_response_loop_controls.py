@@ -31,9 +31,9 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
 ):
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'控制','控制','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'控制','控制','合成人員')",
+        (file_id,),
     )
 
     async def scenario():

@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     ForeignKeyConstraint,
+    Index,
     Text,
     func,
     or_,
@@ -87,6 +88,7 @@ class JobDescriptionRecord(Base):
 class JdOperationRecord(Base):
     __tablename__ = "jd_operations"
     __table_args__ = (
+        Index("ix_jd_operations_result_revision", "job_file_id", "result_revision_id"),
         ForeignKeyConstraint(
             ["job_file_id", "expected_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
@@ -161,20 +163,6 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> JdOperationRecord | None:
     return await session.get(JdOperationRecord, (job_file_id, command_id))
-
-
-async def read_operations(
-    session: AsyncSession, job_file_id: UUID, command_ids: tuple[UUID, ...]
-) -> tuple[JdOperationRecord, ...]:
-    """批讀明確列舉的原操作；用於舊複合意圖的完整性核對，不推測交易時間。"""
-    return tuple(
-        await session.scalars(
-            select(JdOperationRecord).where(
-                JdOperationRecord.job_file_id == job_file_id,
-                JdOperationRecord.command_id.in_(command_ids),
-            )
-        )
-    )
 
 
 async def read_revision_interval(

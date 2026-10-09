@@ -1,0 +1,37 @@
+%% title: 現行：跨分頁保留訪談命令與晚到 ACK
+%% legend: 實線實心箭頭為等待完成的呼叫，虛線為回覆；critical 區塊是同檔案 Web Lock 內的儲存操作，HTTP 在區塊外。只畫舊 ACK 晚於下一輪保留的交錯。
+sequenceDiagram
+  participant A as 分頁 A
+  participant Store as 共用 localStorage
+  participant B as 分頁 B
+  participant API as 訪談 HTTP API
+  Note over Store: hint 只保存識別：C 是命令，E 是執行<br/>訪談原文不寫入 localStorage
+  critical 檔案 Web Lock：保留第一輪
+    A->>Store: 讀取、確認 slot 可用、保留 C1
+    Store-->>A: 已保留，釋鎖
+  end
+  A->>API: POST C1 與訪談原文
+  Note over A,API: 第一輪已完成；A 尚未收到 POST 回覆
+  B->>API: 依 C1 查原 Turn
+  API-->>B: C1 對應 E1
+  critical 同一 Web Lock：恢復識別
+    B->>Store: 比對 C1，補入 E1
+    Store-->>B: 已更新，釋鎖
+  end
+  B->>API: 查 E1 狀態
+  API-->>B: E1 已完成
+  critical 同一 Web Lock：準備下一輪
+    B->>Store: 重新核對仍為已確認的 C1<br/>替換為 C2
+    Store-->>B: 已保留，釋鎖
+  end
+  B->>API: POST C2 與下一則原文
+  API-->>B: 已受理 C2，execution 為 E2
+  critical 同一 Web Lock：只回填自己的命令
+    B->>Store: 比對 C2，補入 E2
+    Store-->>B: 已更新，釋鎖
+  end
+  API-->>A: 晚到的 C1／E1 ACK
+  critical 同一 Web Lock：晚到 ACK 核對
+    A->>Store: 讀到 C2，與 C1 不同，不寫入
+    Store-->>A: 保留 C2／E2，釋鎖
+  end

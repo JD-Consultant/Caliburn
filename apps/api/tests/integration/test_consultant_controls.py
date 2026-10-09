@@ -32,9 +32,9 @@ from caliburn.settings import DatabaseSettings, ModelSettings
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import ConsultantControlWorkflow
 from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_consultant_completion import complete, start_turn
 from tests.integration.test_execution_control import admit_scope
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -99,6 +99,7 @@ def test_cancel_fences_and_discards_before_local_task_is_interrupted(client: Tes
             result = await controls.cancel(turn.writer.scope)
             assert result.status == ExecutionStatus.CANCELLED
             assert observed == [ExecutionStatus.CANCELLED]
+            assert turn.writer.scope not in supervisor.failures
         finally:
             await supervisor.close()
 

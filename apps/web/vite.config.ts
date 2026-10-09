@@ -9,6 +9,7 @@ const isolatedApi = process.env.CALIBURN_API_PROXY;
 export default defineConfig({
   plugins: [react()],
   server: {
+    headers: { 'Content-Security-Policy': "frame-ancestors 'none'" },
     proxy: {
       '/api': isolatedApi ?? 'http://127.0.0.1:8100',
     },

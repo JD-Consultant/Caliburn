@@ -37,7 +37,7 @@ class MemoryBodyChange(BaseModel):
 
 
 class AddItem(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class AddInterviewReferences(BaseModel):
@@ -53,7 +53,7 @@ class AddInterviewReferences(BaseModel):
 
 
 class RemoveItem(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class RemoveInterviewReferences(BaseModel):

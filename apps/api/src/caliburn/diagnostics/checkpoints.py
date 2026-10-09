@@ -17,6 +17,7 @@ from caliburn.diagnostics.projection import role_for_thread
 
 CHANNELS = (
     "request_id",
+    "operation_seed",
     "request_snapshot",
     "response_snapshot",
     "tool_results",
@@ -100,13 +101,17 @@ def _read_thread(
 
 
 def _decode(serializer: Any, kind: str, blob: bytes, channel: str) -> JsonValue:
+    if channel == "operation_seed" and kind == "null" and not blob:
+        return None
     if kind not in {"json", "msgpack"}:
         raise ValueError("Unsupported checkpoint encoding for diagnostic JSON")
     try:
         value = serializer.loads_typed((kind, blob))
         # logical request 使用原生 UUID channel；只在已知欄位轉成 JSON 字串。
-        if channel == "request_id" and isinstance(value, UUID):
+        if channel in {"request_id", "operation_seed"} and isinstance(value, UUID):
             return str(value)
+        if channel == "operation_seed" and value is None:
+            return None
         if value is None:
             raise ValueError("Saved diagnostic channel is unavailable")
         return JSON_VALUE.validate_python(value)

@@ -39,10 +39,11 @@ uv run --locked python -m evaluations.consultant_comparison evaluations/consulta
 - `manifest.json`：案例、整批固定候選、實際提示／工具、輸入檔及來源 archive 的 SHA256。
 - `source.zip`：受測後端程式、評測入口與鎖定依賴；不含環境檔、憑證或資料庫。
 - 各候選的 `runtime.json`：隔離 schema 與執行配置；不含 API key。
-- 各候選的 `result.json`：完成狀態、正式訪談／JD／Plan，以及原始模型請求、工具參數／結果與捕捉綁定的診斷副本。
+- 各候選的 `result.json`：沿正式 HTTP 觀察到的完成狀態與訪談／JD／Plan，取得後先保存。
+- `diagnostics.json`：其後擷取的原始模型請求、工具參數／結果與捕捉綁定。擷取失敗則留下 `diagnostics-failure.json` 的階段及安全錯誤種類，正式結果仍保留；CLI 回非零、程式化入口回 `CandidateRun.diagnostics_available=False`，停止這批比較而不重送模型。
 - 失敗時的 `failure.json`：錯誤類別。原件保留，入口停止，不自動追加輸入或重跑。
 
-manifest 與 App 使用首次等待前固定的同一候選。實際發送內容仍以 result 的診斷為準；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)，不必建立另一套 UI。
+manifest 與 App 使用首次等待前固定的同一候選。實際發送內容以 `diagnostics.json` 為準；缺少診斷須明列觀測未完成；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)，不必建立另一套 UI。
 
 ## 使用真 provider
 

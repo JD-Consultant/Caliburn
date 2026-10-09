@@ -56,9 +56,9 @@ def runner() -> Iterator[asyncio.Runner]:
 def file_id(database_connection: psycopg.Connection) -> UUID:
     value = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'compact','compact','synthetic')",
-        (value, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'compact','compact','synthetic')",
+        (value,),
     )
     return value
 

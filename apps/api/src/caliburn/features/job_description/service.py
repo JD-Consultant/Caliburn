@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from caliburn.features.job_description import persistence, revision_editing
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfile,
     JdProfileRevision,
     ReviseJdProfile,
@@ -44,12 +43,12 @@ async def recover_profile_result(
     )
     if operation is None:
         return None
-    if (
-        operation.kind != "revise_profile"
-        or operation.expected_revision_id != command.expected_revision_id
-        or operation.request_payload != profile_change_payload(command.changes)
-    ):
-        raise JdCommandConflictError("command_id was already used with different JD intent")
+    revision_editing.require_matching_edit_intent(
+        operation,
+        kind="revise_profile",
+        expected_revision_id=command.expected_revision_id,
+        request_payload=profile_change_payload(command.changes),
+    )
     return await persistence.read_revision(session, job_file_id, operation.result_revision_id)
 
 

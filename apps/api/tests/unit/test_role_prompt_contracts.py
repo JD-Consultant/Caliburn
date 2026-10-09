@@ -8,6 +8,7 @@ from uuid import uuid4
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.agents.job_consultant import runner as consultant_runner
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.planning_instructions import (
@@ -85,7 +86,9 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         if effort is None
         else ModelSettings(api_key="synthetic-never-sent", reasoning_effort=effort)
     )
-    runner_options = {"interview_plans_enabled": plans_enabled} if layer is None else {}
+    runner_options = (
+        {"interview_plans_enabled": plans_enabled} if layer is None else {"cpu": MemoryCpu()}
+    )
     runner = runner_class(sessions, InMemorySaver(), Mock(), settings, **runner_options)
     with pytest.raises(CapturedPreparationError) as captured:
         if layer is None:

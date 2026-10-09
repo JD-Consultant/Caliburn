@@ -59,9 +59,9 @@ def test_late_or_held_response_requires_current_writer_before_tools(
 ) -> None:
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'恢復','恢復','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'恢復','恢復','合成人員')",
+        (file_id,),
     )
 
     async def scenario() -> None:

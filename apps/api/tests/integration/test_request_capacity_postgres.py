@@ -54,9 +54,9 @@ def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound
 ):
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'計數','計數','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'計數','計數','合成人員')",
+        (file_id,),
     )
 
     async def scenario():

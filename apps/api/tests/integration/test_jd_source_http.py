@@ -37,6 +37,7 @@ from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 
 pytestmark = pytest.mark.postgres
@@ -159,7 +160,9 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
                 frozenset({situation.object_id}),
             ),
         )
-        old = await memory.publish(writer, understanding.position, uuid4())
+        old = await publish_memory_owner_fixture(
+            memory.sessions, writer, understanding.position, uuid4()
+        )
         writer, stage = await start(source2)
         changed = await memory.edit(
             writer,
@@ -172,7 +175,7 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
             ),
         )
         phase = await memory.handoff(writer, changed.position, uuid4())
-        latest = await memory.publish(writer, phase, uuid4())
+        latest = await publish_memory_owner_fixture(memory.sessions, writer, phase, uuid4())
         return old, latest, understanding.object_id
 
     old, latest, object_id = client.portal.call(publish_scenarios)
@@ -320,7 +323,7 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
                 MemoryContent("庫存管理", "新物件", "不能展示同名替代物件。"),
             ),
         )
-        await memory.publish(writer, recreated.position, uuid4())
+        await publish_memory_owner_fixture(memory.sessions, writer, recreated.position, uuid4())
 
     client.portal.call(remove_and_recreate_source)
     removed_view = client.get(endpoint).json()

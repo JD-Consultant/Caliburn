@@ -1,12 +1,12 @@
 """Formal reference state bounded by the caller's existing interview read scope."""
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.features.executions import service as executions
-from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
-from caliburn.features.interviews import service as interview_service
+from caliburn.features.executions import queries as executions
+from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import InterviewReadScope
-from caliburn.features.occupation_references import service
+from caliburn.features.occupation_references import queries as references
 from caliburn.features.occupation_references.models import OccupationReferenceState
 from caliburn.workflows.memory_reads import MemoryReadBinding, resolve_interview_scope
 
@@ -26,25 +26,23 @@ async def read_formal_reference_state(
     session: AsyncSession, scope: InterviewReadScope
 ) -> OccupationReferenceState:
     """Read the latest completed Turn at the caller's fixed employee-input frontier."""
-    latest_sequence = 0
-    state = OccupationReferenceState()
-    for candidate in await service.list_candidates(session, scope.job_file_id):
-        execution = await executions.read_execution(
-            session,
-            ExecutionScope(
-                scope.job_file_id, candidate.execution_id, ExecutionKind.CONSULTANT_TURN
-            ),
+    formal = interviews.formal_exchange_positions_projection(scope).subquery(
+        "formal_reference_turns"
+    )
+    completed = executions.completed_consultant_executions_projection(scope.job_file_id).subquery(
+        "completed_reference_turns"
+    )
+    heads = references.candidate_heads_projection(scope.job_file_id).subquery("reference_heads")
+    row = (
+        await session.execute(
+            select(heads.c.execution_id, heads.c.generation_id, heads.c.current_revision_id)
+            .select_from(formal)
+            .join(completed, completed.c.execution_id == formal.c.execution_id)
+            .join(heads, heads.c.execution_id == formal.c.execution_id)
+            .order_by(formal.c.employee_input_sequence.desc())
+            .limit(1)
         )
-        if execution.status != ExecutionStatus.COMPLETED:
-            continue
-        exchange = await interview_service.read_formal_exchange(
-            session, job_file_id=scope.job_file_id, execution_id=candidate.execution_id
-        )
-        if exchange is None:
-            continue
-        sequence = exchange.employee_input.interview_sequence
-        # F identifies the triggering employee message; its final reply is later than F.
-        if latest_sequence < sequence <= scope.through_sequence:
-            latest_sequence = sequence
-            state = candidate.state
-    return state
+    ).one_or_none()
+    if row is None:
+        return OccupationReferenceState()
+    return await references.read_head_state(session, scope.job_file_id, *row)

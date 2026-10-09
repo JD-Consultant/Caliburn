@@ -1,17 +1,21 @@
+%% title: 現行：人工 JD 集合查詢的同版讀取
+%% legend: 時序圖；實線實心箭頭：呼叫並等待；虛線：回覆。同一短唯讀交易內固定修訂。
 sequenceDiagram
   participant UI as 人工編輯畫面
   participant API as JD 查詢
   participant DB as 既有 JD 保存
   UI->>API: GET 全部 JD 集合
+  Note over API,DB: 首 SELECT 前開始唯讀交易<br/>REPEATABLE READ
   API->>DB: 讀一次目前 head
   DB-->>API: 固定修訂 R
   API->>DB: 讀 R 的職責
   DB-->>API: 職責集合
-  Note over DB: 即使另一請求此時發布 R2<br/>R 的選用與內容不變
+  Note over DB: 另一請求發布 R2 或刪除檔案<br/>本次快照仍可讀完整 R
   API->>DB: 讀 R 的任務及明細
   DB-->>API: 任務集合
   API->>DB: 讀 R 的知識／技能與任務關係
   DB-->>API: 共用定義及有序關係
   API->>DB: 讀 R 的協作對象與共通條件
   DB-->>API: 協作與條件集合
+  Note over API,DB: 純值投影完成，結束交易
   API-->>UI: R + 全部集合與關係

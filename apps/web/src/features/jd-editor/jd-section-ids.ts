@@ -8,5 +8,5 @@ export const jdSections = [
   { id: 'jd-conditions', label: '工作條件' },
 ] as const;
 
-/** Sent to a section element to ask it to open itself; the section bar sends it before jumping there. */
+/** Bubbles from a JD destination to open every enclosing fold before scrolling and focus. */
 export const revealSectionEvent = 'jd-reveal-section';

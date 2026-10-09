@@ -64,9 +64,9 @@ def test_saved_response_is_settled_after_ack_loss_without_querying_model_again(
 ) -> None:
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'計量','計量','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'計量','計量','合成人員')",
+        (file_id,),
     )
 
     async def scenario() -> None:
@@ -199,9 +199,9 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
 ) -> None:
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'准入','准入','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'准入','准入','合成人員')",
+        (file_id,),
     )
 
     async def scenario():

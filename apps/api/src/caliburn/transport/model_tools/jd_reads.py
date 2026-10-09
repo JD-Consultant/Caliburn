@@ -4,6 +4,7 @@ from openai.types.responses import FunctionToolParam
 from pydantic import JsonValue, ValidationError
 
 from caliburn.contracts.generated.tools.read_jd_arguments import ReadJdArguments, View
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import ExecutionNotFoundError, ExecutionStateError
 from caliburn.features.interviews.models import (
     InterviewScopeError,
@@ -81,7 +82,7 @@ class JdReadTools:
                 "scope_not_allowed", "沒有這項 JD 讀取能力。", "使用 read_jd 的已定 view。"
             )
         try:
-            parsed = ReadJdArguments.model_validate_json(arguments)
+            parsed = parse_contract(ReadJdArguments, arguments)
             needs_ref = parsed.view in (View.ITEM, View.WORK_TASKS)
             if needs_ref != (parsed.read_ref is not None) or (
                 parsed.read_ref is not None and not parsed.read_ref.strip()

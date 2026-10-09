@@ -34,6 +34,7 @@ from caliburn.settings import ModelSettings, Settings
 from evaluations.consultant_cases import ConsultantComparison
 from evaluations.consultant_comparison import (
     BASE_URL,
+    CandidateRun,
     prepare_isolated_database,
     run_candidate,
     save_new,
@@ -51,7 +52,7 @@ async def run_authorized_comparison(
     guard_version: str,
     declared_cost_limits: Mapping[str, str | int],
     output_directory: Path,
-) -> tuple[dict[str, object], ...]:
+) -> tuple[CandidateRun, ...]:
     """執行固定案例的有限候選；非完成即停止，不重跑／追加輸入或重設 guard。"""
     if not authorization_reference.strip() or not guard_version.strip() or not declared_cost_limits:
         raise ValueError("Record the effective authorization, guard version and batch limits")
@@ -87,7 +88,7 @@ async def run_authorized_comparison(
             await asyncio.to_thread(
                 save_new, destination / "runtime.json", {"schema": database.schema}
             )
-            result = await run_candidate(
+            outcome = await run_candidate(
                 Settings(database=database, model=model, dev_origin=BASE_URL),
                 AppComposition(
                     consultant_configuration=candidate.configuration,
@@ -95,11 +96,11 @@ async def run_authorized_comparison(
                     create_responses_client=create_guarded_client,
                 ),
                 case,
+                output_directory=destination,
                 timeout_seconds=model.turn_timeout_seconds + model.request_timeout_seconds,
             )
-            await asyncio.to_thread(save_new, destination / "result.json", result)
-            results.append(result)
-            if not result["all_inputs_completed"]:
+            results.append(outcome)
+            if not outcome.result["all_inputs_completed"] or not outcome.diagnostics_available:
                 break
         except Exception as error:
             await asyncio.to_thread(

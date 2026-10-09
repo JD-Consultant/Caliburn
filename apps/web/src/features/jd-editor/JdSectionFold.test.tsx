@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 /** The four supporting sections fold to their heading and count (Notion toggles, GOV.UK accordion); the section bar opens them. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
@@ -85,7 +87,11 @@ function renderEditor(withOutline = false, view: JdWorkView = jd) {
   return render(
     <QueryClientProvider client={client}>
       {withOutline && <JdOutline />}
-      <JdWorkEditor key={fileId} jobFileId={fileId} />
+      <JdWorkEditor
+        refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+        key={fileId}
+        jobFileId={fileId}
+      />
     </QueryClientProvider>,
   );
 }
@@ -103,6 +109,58 @@ const sections = [
   { name: '主要協作對象', first: '採購部', count: '2 項', add: '新增協作對象' },
   { name: '工作條件與責任邊界', first: '辦公室工作', count: '3 項', add: '新增條件' },
 ];
+
+test.each([false, true])(
+  'cross links reveal nested task folds before scrolling (unassigned=%s)',
+  async (unassigned) => {
+    const targetTask = task(1, '實作網頁', unassigned ? null : areaId);
+    const view: JdWorkView = {
+      ...workJd,
+      tasks: [targetTask],
+      task_links: [
+        { task_id: targetTask.task_id, capability_id: '31000000-0000-4000-8000-000000000001' },
+      ],
+    };
+    const scrollIntoView = vi.fn(function (this: HTMLElement) {
+      expect(this.closest('[hidden]')).toBeNull();
+    });
+    Object.defineProperty(Element.prototype, 'scrollIntoView', {
+      value: scrollIntoView,
+      configurable: true,
+    });
+    renderEditor(false, view);
+    await screen.findByRole('button', { name: '收合任務 實作網頁' });
+    await userEvent.click(screen.getByRole('button', { name: '收合任務 實作網頁' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: unassigned ? '收合未歸屬任務' : '收合職責 網站交付' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: '收合職責與任務' }));
+    const knowledge = screen.getByRole('region', { name: '所需知識' });
+    await userEvent.click(within(knowledge).getByRole('link', { name: /實作網頁/ }));
+    expect(screen.getByRole('button', { name: '收合職責與任務' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: '收合任務 實作網頁' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    const article = screen.getByRole('article', { name: '實作網頁' });
+    expect(article).toHaveFocus();
+    expect(window.location.hash).toBe(`#jd-task-${targetTask.task_id}`);
+    expect(scrollIntoView.mock.contexts.at(-1)).toBe(article);
+    await userEvent.click(within(knowledge).getByRole('button', { name: '收合所需知識' }));
+    await userEvent.click(within(article).getByRole('link', { name: '財務知識' }));
+    const capability = screen.getByRole('article', { name: '知識：財務知識' });
+    expect(capability).toBeVisible();
+    expect(capability).toHaveFocus();
+    expect(within(knowledge).getByRole('button', { name: '收合所需知識' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(scrollIntoView.mock.contexts.at(-1)).toBe(capability);
+  },
+);
 
 test.each(sections)(
   '$name folds to its heading and count and opens again',

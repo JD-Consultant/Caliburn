@@ -54,7 +54,7 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
     ExecutionWriter,
 )
-from caliburn.features.interview_plans.models import PlanStateError
+from caliburn.features.interview_plans.models import PlanSnapshot, PlanStateError
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
 from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
@@ -66,9 +66,9 @@ from caliburn.transport.model_tools.memory_consolidation import MemoryConsolidat
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
-    occupation_reference_write_result_format,
 )
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_context import ConsultantContextWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.execution_controls import ConsultantExecutionControls
 from caliburn.workflows.interview_plans import InterviewPlanWorkflow
@@ -183,6 +183,7 @@ class ConsultantRunner:
         turn_payload["stream"] = commentary is not None or reasoning_summary is not None
         context = await capture_turn_context(
             role_history,
+            data=ConsultantContextWorkflow(self.sessions),
             template=ResponseRequest.from_snapshot(turn_payload),
             prepared_history=prepared,
             jd_read_max_result_characters=self.configuration.jd_read_max_result_characters,
@@ -196,7 +197,14 @@ class ConsultantRunner:
             recovery=recovery,
         )
         if context.plan_position is not None:
-            compact_window = bind_interview_plan_compaction(role_history, compact_window)
+            plan_workflow = InterviewPlanWorkflow(self.sessions)
+
+            async def read_plan(_scope: ExecutionScope) -> PlanSnapshot | None:
+                return await plan_workflow.read_active(writer)
+
+            compact_window = bind_interview_plan_compaction(
+                role_history, compact_window, read_plan=read_plan
+            )
 
         runtime = ResponseStepRuntime(
             request_model=executor.request_model,
@@ -280,16 +288,12 @@ class ConsultantRunner:
         if _references_enabled(context.request):
             if self.occupation_references is None:
                 raise ExecutionStateError("The saved Turn requires its occupation reference client")
-            result_format = occupation_reference_write_result_format(
-                context.request.create_payload()["tools"]
-            )
             workflow = OccupationReferenceWorkflow(self.sessions, self.occupation_references)
             await workflow.start(writer)
             references = OccupationReferenceTools(
                 workflow,
                 self.occupation_references,
                 writer,
-                write_result_format=result_format,
             )
         return ConsultantTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), context.memory_binding),

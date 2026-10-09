@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
@@ -46,8 +46,8 @@ for (const termination of ["backend_exits", "launcher_terminates", "launcher_int
     // uv 自己決定專案環境；離線執行不下載依賴，也不改成 exact sync。
     const env = { ...process.env, UV_OFFLINE: "1" };
     const pythonExecutable = await prepareBackendPython(root, { env });
-    await mkdir(path.join(root, ".research-tmp"), { recursive: true });
-    const directory = await mkdtemp(path.join(root, ".research-tmp", "launcher-owned-"));
+    await mkdir(path.join(root, ".tmp"), { recursive: true });
+    const directory = await mkdtemp(path.join(root, ".tmp", "launcher-owned-"));
     const pythonReady = path.join(directory, "python.json");
     const nodeReady = path.join(directory, "node.json");
     const probe = path.join(directory, "owned_service.py");
@@ -98,10 +98,65 @@ with socket.socket() as server:
     } finally {
       signals.emit("SIGTERM");
       await settled;
-      // 反例失敗也只清理這次握有的 PID；保留合成探針資料供查核。
+      // 反例失敗也只清理這次握有的 PID；失敗時保留合成探針資料供查核。
       for (const owned of [python, node]) {
         if (owned && isAlive(owned.pid)) process.kill(owned.pid, "SIGKILL");
       }
     }
+    await rm(directory, { recursive: true, force: true });
   });
 }
+
+test("a real POSIX descendant ignoring SIGTERM is forced after its group leader exits", {
+  skip: process.platform === "win32" ? "Requires native POSIX process groups" : false,
+}, async () => {
+  await mkdir(path.join(root, ".tmp"), { recursive: true });
+  const directory = await mkdtemp(path.join(root, ".tmp", "launcher-posix-owned-"));
+  const readyFile = path.join(directory, "descendant.json");
+  const ignoredFile = path.join(directory, "ignored.json");
+  const descendantProgram = [
+    "const fs = require('node:fs');",
+    "process.on('SIGTERM', () => fs.writeFileSync(process.argv[2], '{}'));",
+    "fs.writeFileSync(process.argv[1], JSON.stringify({pid: process.pid}));",
+    "setInterval(() => {}, 1000);",
+  ].join(" ");
+  const leaderProgram = [
+    "const {spawn} = require('node:child_process');",
+    "const child = spawn(process.execPath, ['-e', process.argv[1], process.argv[2], process.argv[3]], {stdio:'ignore'});",
+    "child.unref(); setInterval(() => {}, 1000);",
+  ].join(" ");
+  const signals = new EventEmitter();
+  const warnings = [];
+  let leader, descendant;
+  const running = runAppProcesses([{
+    command: process.execPath, args: ["-e", leaderProgram, descendantProgram, readyFile, ignoredFile],
+  }], {
+    cwd: root, signals, shutdownTimeoutMs: 150, forcedShutdownTimeoutMs: 2_000,
+    warn: (message) => warnings.push(message),
+    start: (invocation) => {
+      leader = spawn(invocation.command, invocation.args, {stdio: "ignore", detached: true});
+      return leader;
+    },
+  });
+  const settled = running.then((result) => ({result}), (error) => ({error}));
+  try {
+    descendant = await readReady(readyFile);
+    assert.equal(isAlive(descendant.pid), true);
+    leader.kill("SIGTERM");
+    const {error} = await settled;
+    if (error) throw error;
+    await assertStopped(descendant.pid);
+    assert.deepEqual(await readReady(ignoredFile), {});
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /normal shutdown deadline expired/u);
+  } finally {
+    // 只清理這次 spawn 建立的群組；ESRCH 代表它已正常消失。
+    if (leader?.pid) {
+      try { process.kill(-leader.pid, "SIGKILL"); }
+      catch (error) { if (error.code !== "ESRCH") throw error; }
+    }
+    signals.emit("SIGTERM");
+    await settled;
+  }
+  await rm(directory, {recursive: true, force: true});
+});

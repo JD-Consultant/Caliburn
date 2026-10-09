@@ -64,9 +64,9 @@ def model_failure_log(caplog):
 def retry_file_id(database_connection):
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'重試','重試','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'重試','重試','合成人員')",
+        (file_id,),
     )
     return file_id
 
@@ -148,9 +148,9 @@ def test_transient_rejection_retries_same_payload_with_new_budgeted_attempt(
 ):
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'重试','重试','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'重试','重试','合成人員')",
+        (file_id,),
     )
 
     async def scenario():

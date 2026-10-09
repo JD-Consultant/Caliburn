@@ -1,7 +1,7 @@
 /** A submission keeps its identity until the backend acknowledges the original result. */
 import { useRef, useState } from 'react';
 import type { SubmitEvent } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -12,96 +12,96 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
-import { ApiError } from '../../shared/api/http';
-import { isCreateJobFileRequest } from '../../shared/api/validation';
+import type { JobFile } from '../../shared/api/generated/job-file-list';
+import { useStoredCommand } from '../../shared/commands/use-stored-command';
+import type { StoredCommandState } from '../../shared/commands/use-stored-command';
 import { focusDialogInput } from '../../shared/ui/dialog-focus';
-import {
-  clearPendingCreation,
-  readPendingCreation,
-  retainPendingCreation,
-} from './creation-command';
-import { createJobFile } from './job-file-api';
+import { creationCommand } from './job-file-commands';
+import type { CreationRejection } from './job-file-commands';
 
 interface Props {
   onClose: () => void;
   onCreated: (jobFileId: string) => void;
 }
 
-function restoreCreation(): { command: CreateJobFileRequest | null; error: string | null } {
-  try {
-    return { command: readPendingCreation(), error: null };
-  } catch {
-    return {
-      command: null,
-      error: '無法讀取本分頁的待確認建立紀錄。請先確認瀏覽器儲存權限，勿重複建立。',
-    };
+function creationMessage<C>(
+  command: StoredCommandState<C, JobFile, CreationRejection>,
+): string | null {
+  switch (command.issue) {
+    case null:
+      break;
+    case 'display':
+      return '本次建立已成功，但畫面未能更新。請返回清單核對目前狀態。';
+    case 'restore':
+      return '無法讀取本分頁的待確認建立紀錄。請先確認瀏覽器儲存權限，勿重複建立。';
+    case 'invalid':
+      return '請填寫職務檔案名稱與受訪員工姓名，各 1–200 字，不能只有空白。';
+    case 'retain':
+      return '瀏覽器無法保留本次建立識別，尚未送出。請確認儲存權限後重試。';
   }
+  const outcome = command.outcome;
+  if (!outcome) return null;
+  if (outcome.status === 'unknown')
+    return '建立結果尚未確認。請重新確認原請求，不會另外建立一份檔案。';
+  if (outcome.status === 'rejected' && outcome.reason === 'deleted') {
+    const detail =
+      outcome.acknowledgement === 'changed'
+        ? '本分頁另有待確認請求，請返回清單核對。'
+        : outcome.acknowledgement === 'unavailable'
+          ? '瀏覽器待確認紀錄未能清除，請確認儲存權限後重新確認原結果。'
+          : outcome.refreshFailed
+            ? '清單未能重新讀取，請返回清單核對。'
+            : '可返回清單，或另行建立新檔案。';
+    return `這次建立的檔案已刪除，原請求不會重新建立。${detail}`;
+  }
+  if (outcome.acknowledgement === 'changed')
+    return outcome.status === 'accepted'
+      ? '本次建立已成功，但本分頁待確認紀錄已變更。請返回清單核對目前狀態。'
+      : '本次建立未被接受，但本分頁待確認紀錄已變更。請返回清單核對目前狀態。';
+  if (outcome.status === 'accepted')
+    return outcome.refreshFailed
+      ? '本次建立已成功，但清單未能重新讀取。請返回清單核對目前狀態。'
+      : null;
+  return outcome.acknowledgement === 'unavailable'
+    ? '建立未被接受，且瀏覽器待確認紀錄未能清除。請確認儲存權限後重試。'
+    : '這次建立未被接受，請檢查名稱與姓名後重新送出。';
 }
 
 export function CreateJobFileDialog({ onClose, onCreated }: Props) {
-  const [restored] = useState(restoreCreation);
+  const queryClient = useQueryClient();
+  const submission = useStoredCommand(creationCommand(queryClient), (file) =>
+    onCreated(file.job_file_id),
+  );
   const nameInput = useRef<HTMLInputElement>(null);
-  const [pending, setPending] = useState(restored.command);
-  const inFlight = useRef(false);
+  const pending = submission.pending;
   const hasPending = pending !== null;
-  const [displayName, setDisplayName] = useState(restored.command?.display_name ?? '');
-  const [employeeName, setEmployeeName] = useState(restored.command?.employee_name ?? '');
-  const [message, setMessage] = useState(restored.error);
-  const mutation = useMutation({ mutationFn: createJobFile, retry: false });
+  const [displayName, setDisplayName] = useState(pending?.display_name ?? '');
+  const [employeeName, setEmployeeName] = useState(pending?.employee_name ?? '');
+  const message = creationMessage(submission);
+  const outcome = submission.outcome;
+  const settledWithoutCurrentCommand =
+    outcome?.status !== 'unknown' && outcome?.acknowledgement === 'changed'
+      ? outcome.status === 'accepted'
+        ? 'success'
+        : 'rejected'
+      : null;
 
-  async function submit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
+  function submit(event: SubmitEvent<HTMLFormElement>): void {
     event.preventDefault();
-    if (inFlight.current || restored.error) return;
-    const command = pending ?? {
-      command_id: crypto.randomUUID(),
-      display_name: displayName,
-      employee_name: employeeName,
-    };
-    if (!isCreateJobFileRequest(command)) {
-      setMessage('請填寫職務檔案名稱與受訪員工姓名，各 1–200 字，不能只有空白。');
-      return;
-    }
-    try {
-      retainPendingCreation(command);
-    } catch {
-      setMessage('瀏覽器無法保留本次建立識別，尚未送出。請確認儲存權限後重試。');
-      return;
-    }
-    setPending(command);
-    inFlight.current = true;
-    setMessage(null);
-    try {
-      const file = await mutation.mutateAsync(command);
-      // An acknowledged result stays successful even if local cleanup is unavailable.
-      // A leftover command can only retrieve the same original result on the next visit.
-      try {
-        clearPendingCreation();
-      } catch {
-        /* Server remains authoritative. */
-      }
-      onCreated(file.job_file_id);
-    } catch (error) {
-      if (error instanceof ApiError && [400, 409, 422].includes(error.status ?? 0)) {
-        try {
-          clearPendingCreation();
-          setPending(null);
-          setMessage('這次建立未被接受，請檢查名稱與姓名後重新送出。');
-        } catch {
-          setMessage('建立未被接受，且瀏覽器待確認紀錄未能清除。請確認儲存權限後重試。');
-        }
-      } else {
-        setMessage('建立結果尚未確認。請重新確認原請求，不會另外建立一份檔案。');
-      }
-    } finally {
-      inFlight.current = false;
-    }
+    if (submission.blocked) return;
+    void submission.send(
+      pending ?? {
+        command_id: crypto.randomUUID(),
+        display_name: displayName,
+        employee_name: employeeName,
+      },
+    );
   }
 
   return (
     <Dialog
       open
-      onClose={mutation.isPending ? undefined : onClose}
+      onClose={submission.isSending ? undefined : onClose}
       fullWidth
       maxWidth="sm"
       aria-labelledby="create-file-title"
@@ -122,8 +122,12 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <p>一位受訪員工、一份獨立工作記錄。名稱與姓名不會自動填入 JD。</p>
-            {message && <Alert severity="warning">{message}</Alert>}
-            {hasPending && !message && !mutation.isPending && (
+            {message && (
+              <Alert severity={settledWithoutCurrentCommand === 'success' ? 'info' : 'warning'}>
+                {message}
+              </Alert>
+            )}
+            {hasPending && !message && !submission.isSending && (
               <Alert severity="info">有尚未確認的建立請求，請先取得原結果。</Alert>
             )}
             <TextField
@@ -132,7 +136,7 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               required
-              disabled={hasPending || !!restored.error}
+              disabled={hasPending || submission.blocked}
               slotProps={{ htmlInput: { maxLength: 200 } }}
             />
             <TextField
@@ -140,21 +144,31 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
               value={employeeName}
               onChange={(e) => setEmployeeName(e.target.value)}
               required
-              disabled={hasPending || !!restored.error}
+              disabled={hasPending || submission.blocked}
               slotProps={{ htmlInput: { maxLength: 200 } }}
             />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button variant="outlined" onClick={onClose} disabled={mutation.isPending}>
+          <Button variant="outlined" onClick={onClose} disabled={submission.isSending}>
             返回清單
           </Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={mutation.isPending || !!restored.error}
+            disabled={
+              submission.isSending || submission.blocked || settledWithoutCurrentCommand !== null
+            }
           >
-            {mutation.isPending ? '確認中…' : hasPending ? '重新確認建立結果' : '建立'}
+            {submission.isSending
+              ? '確認中…'
+              : settledWithoutCurrentCommand === 'success'
+                ? '建立已成功'
+                : settledWithoutCurrentCommand === 'rejected'
+                  ? '建立未被接受'
+                  : hasPending
+                    ? '重新確認建立結果'
+                    : '建立'}
           </Button>
         </DialogActions>
       </form>

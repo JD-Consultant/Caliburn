@@ -10,7 +10,7 @@ from caliburn.features.job_description.capabilities import JdCapabilitiesRevisio
 from caliburn.features.job_description.collaborators import JdCollaboratorsRevision
 from caliburn.features.job_description.conditions import JdConditionsRevision
 from caliburn.features.job_description.tasks import JdTasksRevision
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.transport.http.jd_areas import areas_view
 from caliburn.transport.http.jd_capabilities import capabilities_view

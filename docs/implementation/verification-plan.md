@@ -1,7 +1,7 @@
 # 實作驗證與需求追溯
 
-- 狀態：**持續維護的驗證與需求追溯表** 。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)及當次授權比較的條件與限制判讀。
-- 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[共用執行與恢復](agent-execution.md)、[JD 工具與保存](jd-storage.md)。實驗原件與結果由產品驗證與實驗資料路由。
+- 狀態：**持續維護的驗證與需求追溯表**。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)判讀。
+- 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[共用執行與恢復](agent-execution.md)、[JD 工具與保存](jd-storage.md)。執行原件與結果只留本機。
 
 安排測試時先選[驗證層級](#1-分層測試不以-mock-冒充產品)，再查[V 責任對照](#2-v-驗收與責任對照)及[E／JDT 接縫](#3-執行工具-gate-不遺漏)。測例寫法、命令入口與證據要求分別見[§4](#4-行為反例的寫法)、[§5](#5-命令與證據)；已驗及未驗結果由[§6 的入口](#6-已知限制與未驗範圍)查閱。
 
@@ -11,12 +11,13 @@
 |---|---|---|
 | Unit | pytest／Vitest；純命令、來源判定、投影、context transition | 快且確定，不需模型金鑰／資料庫；測效果不是所有內部呼叫 |
 | Contract | JSON Schema／生成物／真 SDK mock transport | 實際 wire、角色、枚舉、scope、items 次序與 call pairing；生成不漂移 |
-| Integration | 真 PostgreSQL＋官方 saver＋HTTPX／獨立程序 | 交易、固定歷史、原操作、控制資格與重啟；不用 SQLite／MemorySaver 替代 |
-| UI journey | Playwright Test＋離線 scripted provider | 真 API／PG、候選預覽、SSE 重連、人工鎖定、引用查看、PDF |
+| Integration | 真 PostgreSQL＋官方 saver＋HTTP client／獨立程序 | 交易、固定歷史、原操作、控制資格與重啟；不用 SQLite／MemorySaver 替代 |
+| Browser protocol | Playwright Test＋明示攔截的 HTTP 回覆 | 真瀏覽器的跨頁、Web Locks、焦點及送出次序；攔截回覆不算後端交易或模型證據 |
+| UI journey | Playwright Test＋真 API／PG＋需要時的 scripted provider | 候選預覽、SSE 重連、人工鎖定、引用查看、PDF；依實際接線標明哪些回覆由替身提供 |
 | Provider | 有界 OpenAI direct API | strict 真接受、reasoning／compact 接續、模型能力／計量；不讀內部推理 |
 | Quality／product | 合成訪談及授權的真人試點 | 事實、責任、範圍、細節、精簡與引導，兼看成本／耗時，不以 token 越少越好 |
 
-測試資料預設全合成且有明確已知／未知。使用者取消、來源刪除、同名重用、無既有依賴的新情境、多工具失敗、持續 quota 問題都要有反例，不只測順路。
+測試資料預設全合成，並明確區分已知／未知資訊。除了正常路徑，也須涵蓋使用者取消、來源刪除、同名重用、無既有依賴的新情境、多工具失敗及持續 quota 問題等反例。
 
 ## 2. V 驗收與責任對照
 
@@ -109,7 +110,7 @@
 4. 新輸入 b 新 Turn 組裝：含有效輪前 C、目前 maps，不含 a 或包含 a 的輪中 C；同時存在的獨立 Memory 新發布不被回滾。
 5. 互換順序再測完成先贏時返回同一正式結果，不假造取消成功。所有切斷由 hooks／barriers 控制，不靠固定 sleep。
 
-這測例驗外部可見效果；不要求 production 新增名為 barrier 的 API。測試注入在 adapter／repository 邊界，僅測試 fixture 可用。
+這個測例驗證外部可見效果，不要求 production 新增名為 barrier 的 API。測試注入位於 adapter／repository 邊界，僅供測試 fixture 使用。
 
 另以 property-based／parametrized 測試對 Memory 快照生成合法 CRUD 序列：任意歷史快照不變、同身分單一修訂、delete 不改歷史、changed-back 仍新修訂。可使用 Hypothesis 等成熟工具；有具體不變量才引入，不另造 fuzz framework。
 
@@ -125,9 +126,85 @@
 | 契約 | 從唯一 schema 再生並確認無差異 |
 | 文件 | links／anchors、JSON fences、Mermaid 語法與差異一致性；純文字整理不重跑產品全套 |
 
-證據紀錄沿[貢獻指南](../../CONTRIBUTING.md#驗證與提交)。本頁補充測試需可核對的內容：commit／版本、配置、資料 scope、命令、期望、觀察、失敗與限制；provider 加實際 usage／成本及 request IDs（不含密鑰），整合加程序／交易交錯記錄。原話及完整 request 只保留當次測試必要且授權的資料。
+證據紀錄沿[貢獻指南](../../CONTRIBUTING.md#驗證與提交)，須能核對下列內容：
 
-**變更驗收：** 按適用範圍核對確定性、機制及核心旅程測例；真模型重大事實、權限、引用錯誤逐項揭露，不能用平均分掩蓋。非確定品質用[既有案例 rubric](../../apps/api/tests/fixtures/job_analysis_quality/rubric.md)，結果分布及樣本限制明說，不臨時改評分規則求過關。真實節時 ROI（V25）可列後續試點，不杜撰數字，也不因此新增營收／使用者研究平台。
+- 所有測試：commit／版本、配置、資料 scope、命令、期望、觀察、失敗與限制。
+- Provider 測試：另記實際 usage／成本及 request IDs，不含密鑰。
+- 整合測試：另記程序／交易交錯。
+
+原話及完整 request 只保留當次測試必要且授權的資料。
+
+變更驗收按適用範圍核對確定性、機制及核心旅程測例。真模型的重大事實、權限、引用錯誤須逐項揭露，不能用平均分掩蓋。
+
+非確定品質用[既有案例 rubric](../../apps/api/tests/fixtures/job_analysis_quality/rubric.md)，明說結果分布及樣本限制，不臨時改評分規則求過關。
+
+真實節時 ROI（V25）可列後續試點，不杜撰數字，也不因此新增營收／使用者研究平台。
+
+### 5.1 Web 與交付的現行測試入口
+
+以下按責任列出可執行的代表測試，以及各自要辨認的差異，方便修改接線後選擇反例；這不是最近一次通過清單。
+
+正式 App 的 QueryClient factory 與輸入 validator 直接供整合／契約測試使用，避免測試另建一套政策而漏掉實際行為。
+
+- **HTTP 失敗與原命令**
+
+  [HTTP 邊界](../../apps/web/src/shared/api/http.test.ts)、[命令拒絕](../../apps/web/src/app/command-boundaries.test.tsx)
+
+  timeout、取消、非 JSON／非法格式及業務拒絕分開；一般錯誤不能退休待確認命令
+
+- **卸載、晚到成功與刷新**
+
+  [共用命令](../../apps/web/src/shared/commands/use-stored-command.test.tsx)、[真 API 晚到回應](../../apps/web/tests/e2e/command-lifecycle-focus.spec.ts)
+
+  原表單卸載仍刷新並條件清理；較新命令不被刪除；刷新失敗不改判已知成功
+
+- **訪談 hint 跨頁競爭**
+
+  [store](../../apps/web/src/features/interview/turn-hint-store.test.ts)、[多分頁](../../apps/web/tests/e2e/hint-concurrency.spec.ts)
+
+  同檔共鎖、不同檔並行、舊 ACK、清除後回覆、等待鎖期間的原文保護；部分 Turn／POST 回覆由瀏覽器攔截提供
+
+- **刪除與路由範圍**
+
+  [刪除清理](../../apps/web/src/app/use-deleted-job-files.test.tsx)、[UUID 路由](../../apps/web/tests/e2e/uuid-route.spec.ts)
+
+  重複通知去重、失敗後只重試本機步驟、漏接後 metadata 確認；非法 UUID 不發檔案查詢
+
+- **SSE 與已保存歷史**
+
+  [SSE hook](../../apps/web/src/features/interview/use-consultant-activity-stream.test.tsx)、[活動 HTTP](../../apps/api/tests/integration/test_activity_stream.py)、[摘要 HTTP](../../apps/api/tests/integration/test_reasoning_summary_http.py)
+
+  CLOSED 有限恢復與 CONNECTING 原生重連分開；無模型設定仍可讀已保存歷史；不以斷線宣告完成
+
+- **JD 導覽與草稿**
+
+  [工作區語意](../../apps/web/src/app/WorkspaceLayout.test.tsx)、[JD 導覽](../../apps/web/tests/e2e/jd-navigation.spec.ts)、[逐欄編輯](../../apps/web/tests/e2e/jd-inline-edit.spec.ts)
+
+  展開祖先後才捲動／聚焦；窄寬切換保留掛載；背景讀取不替換草稿基底
+
+- **測試接線**
+
+  [QueryClient 政策](../../apps/web/src/app/query-client.test.tsx)、[輸入契約](../../apps/web/src/shared/api/canonical-input.contract.test.ts)
+
+  測正式 factory／validator，不能以測試副本證明正式接線
+
+- **關閉期限與自有程序**
+
+  [啟動器單元](../../scripts/run-app.test.mjs)、[真程序](../../scripts/run-app.process.test.mjs)、[checkpoint 等鎖](../../apps/api/tests/integration/test_launcher_checkpoint_shutdown.py)
+
+  90 秒正常期限、五秒強制確認；POSIX 子群組及 Windows 路徑依平台區分；PG 測試用合成取消通知，不冒充真 console Ctrl+C
+
+- **Docker／RAG 連線範圍**
+
+  [Compose 解析](../../scripts/docker-compose.test.mjs)
+
+  基本模式、公版 overlay 及獨立 RAG 分開核對；設定解析不等於目標 GPU／模型已可運作
+
+#### 瀏覽器測試的共同界線
+
+[Playwright 配置](../../apps/web/playwright.config.ts)要求明示 loopback 測試 App，使用單一 Chromium worker、零重試，失敗保留 trace／截圖。
+
+真正 PostgreSQL、程序與瀏覽器測試須使用隔離合成資料；所需外部環境不可用時明列未完成，不能把攔截或 skip 當成整合通過。
 
 ## 6. 已知限制與未驗範圍
 
@@ -136,8 +213,8 @@
 | 要確認的結果 | 證據入口 |
 |---|---|
 | A／B 接續、壓縮、Memory 發布及取消恢復 | [架構驗證反例矩陣](../architecture/verification.md#2-核心反例矩陣) |
-| JD 分析、來源核對、Plan 及真人使用效果 | [架構驗證與限制](../architecture/verification.md)、實驗發現 |
-| PDF、文字層及前端互動的覆蓋 | [介面與交付](interface-and-delivery.md)、產品驗證原件 |
+| JD 分析、來源核對、Plan 及真人使用效果 | [架構驗證與限制](../architecture/verification.md) |
+| PDF、文字層及前端互動的覆蓋 | [介面與交付](interface-and-delivery.md) |
 | 已確認的後續工作及產品政策 | [架構與現行責任](../architecture/README.md) |
 
 舊證據不能代表後續版本的所有情境，A 與 B 的證據也不能互相替代；具體結論須沿原件核對。

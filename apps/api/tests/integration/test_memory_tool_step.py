@@ -13,6 +13,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
@@ -51,9 +52,9 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
 ) -> None:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'接續','接續','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'接續','接續','合成人員')",
+        (file_id,),
     )
     for sequence, identity, speaker in [(1, uuid4(), "app"), (2, source_id, "employee")]:
         database_connection.execute(
@@ -79,7 +80,10 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
             assert stage is not None
             binding = CandidateMemoryRead(scope, stage)
             tools = MemoryWriteTools(
-                MemoryWritePreparation(database.sessions), candidates, binding, writer
+                MemoryWritePreparation(database.sessions, cpu=MemoryCpu()),
+                candidates,
+                binding,
+                writer,
             )
             payload = json.loads(
                 (Path(__file__).parents[1] / "fixtures/native-response.json").read_text(

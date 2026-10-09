@@ -13,7 +13,7 @@ from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.candidate_service import JdCandidatePreview
 from caliburn.features.job_description.candidates import JdCandidatePosition, JdCandidateScope
 from caliburn.features.job_description.models import JdProfile
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.model_tools.jd_reads import JdReadTools, jd_read_definitions
 from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead

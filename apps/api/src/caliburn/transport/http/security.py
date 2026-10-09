@@ -6,10 +6,10 @@ Vite forwards /api to port 8100 while the browser's Origin stays at port 5173.
 No CORS middleware is needed for that same-origin proxy arrangement.
 """
 
-from starlette.datastructures import Headers
+from starlette.datastructures import Headers, MutableHeaders
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import PlainTextResponse
-from starlette.types import ASGIApp, Receive, Scope, Send
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 _LOCAL_HOSTS = ("127.0.0.1", "localhost", "[::1]")
 _LOCAL_ORIGINS = frozenset(
@@ -54,7 +54,17 @@ class LocalHttpSecurityMiddleware:
         if scope["type"] == "http" and len(Headers(scope=scope).getlist("host")) != 1:
             await PlainTextResponse("Invalid host header", status_code=400)(scope, receive, send)
             return
-        await self._host_guard(scope, receive, send)
+
+        async def send_protected(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
+                media_type = headers.get("content-type", "").partition(";")[0].strip().lower()
+                if media_type == "text/html":
+                    # A separate policy composes with any existing CSP rather than weakening it.
+                    headers.append("Content-Security-Policy", "frame-ancestors 'none'")
+            await send(message)
+
+        await self._host_guard(scope, receive, send_protected)
 
     async def _check_request(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http" and not _request_allowed(

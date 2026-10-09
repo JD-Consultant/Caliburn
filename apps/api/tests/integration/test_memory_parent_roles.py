@@ -11,6 +11,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
@@ -26,8 +27,8 @@ from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYP
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_memory_batch_orchestration import complete_turn, start_turn
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -119,9 +120,14 @@ def test_actual_roles_publish_atomically_and_continue_next_batch(
                 parent = MemoryBatchWorkflow(
                     database.sessions,
                     run_role=MemoryRoleDispatch(
-                        WorkSituationAnalystRunner(database.sessions, saver, client, settings),
-                        WorkUnderstandingAnalystRunner(database.sessions, saver, client, settings),
+                        WorkSituationAnalystRunner(
+                            database.sessions, saver, client, settings, cpu=MemoryCpu()
+                        ),
+                        WorkUnderstandingAnalystRunner(
+                            database.sessions, saver, client, settings, cpu=MemoryCpu()
+                        ),
                     ),
+                    cpu=MemoryCpu(),
                 )
                 candidates = MemoryCandidateWorkflow(database.sessions)
 
@@ -181,7 +187,7 @@ def test_actual_roles_publish_atomically_and_continue_next_batch(
                     latest_map = await read_queries.read_map(session, latest_view)
                 assert original_map[0].description == "核對帳物"
                 assert latest_map[0].description == "核對帳物、主管核准"
-                assert await requests.discover() == ()
+                assert (await requests.discover()).ready_file_ids == ()
         finally:
             await client.close()
             await database.close()

@@ -14,11 +14,13 @@ from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_files.models import (
     CreateJobFile,
     CreationCommandConflictError,
+    JobFileCreationDeletedError,
     JobFileNotFoundError,
     RenameCommandConflictError,
     RenameJobFile,
     StaleJobFileNameError,
 )
+from caliburn.transport.http.contracts import canonical_body
 from caliburn.workflows.job_files import JobFileWorkflow
 
 router = APIRouter(prefix="/api/job-files", tags=["job-files"])
@@ -45,7 +47,9 @@ async def delete_job_file(job_file_id: UUID, workflow: JobFiles) -> Response:
 
 @router.post("", status_code=201, response_model=JobFile, responses={200: {"model": JobFile}})
 async def create_job_file(
-    body: CreateJobFileRequest, response: Response, workflow: JobFiles
+    body: Annotated[CreateJobFileRequest, canonical_body(CreateJobFileRequest)],
+    response: Response,
+    workflow: JobFiles,
 ) -> JobFile:
     try:
         created = await workflow.create(
@@ -55,6 +59,8 @@ async def create_job_file(
                 employee_name=body.employee_name,
             )
         )
+    except JobFileCreationDeletedError as error:
+        raise HTTPException(status_code=410, detail={"code": "creation_result_deleted"}) from error
     except CreationCommandConflictError as error:
         raise HTTPException(
             status_code=409, detail={"code": "creation_command_conflict"}
@@ -97,7 +103,9 @@ async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> Inter
 
 @router.post("/{job_file_id}/rename", response_model=JobFile)
 async def rename_job_file(
-    job_file_id: UUID, body: RenameJobFileRequest, workflow: JobFiles
+    job_file_id: UUID,
+    body: Annotated[RenameJobFileRequest, canonical_body(RenameJobFileRequest)],
+    workflow: JobFiles,
 ) -> JobFile:
     try:
         result = await workflow.rename(

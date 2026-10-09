@@ -11,7 +11,7 @@ from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.features.job_description.export_projection import project_jd_export_html
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 @pytest.mark.parametrize("paragraph_count", [1, 80])

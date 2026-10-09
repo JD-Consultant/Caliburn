@@ -12,6 +12,8 @@
 !apps/api/contracts/
 !apps/api/contracts/http/
 !apps/api/contracts/http/**
+!apps/api/contracts/tools/
+!apps/api/contracts/tools/interview-plan.schema.json
 !apps/api/src/
 !apps/api/src/**
 !apps/api/scripts/

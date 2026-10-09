@@ -13,20 +13,20 @@ import os
 import platform
 import sys
 import zipfile
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from time import monotonic
 from uuid import UUID, uuid4
 
 import httpx2
 from alembic import command
-from psycopg.conninfo import conninfo_to_dict
 from sqlalchemy import create_engine
 from sqlalchemy.schema import CreateSchema
 
 from caliburn.adapters.database import migration_config
-from caliburn.adapters.database_settings import DatabaseSettings
+from caliburn.adapters.database_settings import DatabaseSettings, require_isolated_test_database
 from caliburn.adapters.openai_responses import create_responses_client
+from caliburn.adapters.owned_tasks import join_owned
 from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.diagnostics.inspection import read_diagnostics
@@ -40,6 +40,14 @@ from evaluations.consultant_cases import (
 )
 
 BASE_URL = "http://127.0.0.1:8100"
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateRun:
+    """Formal case outcome and independent diagnostic capture status."""
+
+    result: dict[str, object]
+    diagnostics_available: bool
 
 
 async def drive_case(
@@ -107,8 +115,9 @@ async def run_candidate(
     composition: AppComposition,
     case: EvaluationCase,
     *,
+    output_directory: Path,
     timeout_seconds: float = 60,
-) -> dict[str, object]:
+) -> CandidateRun:
     """借用已遷移的獨立 namespace；生命週期、工具、保存與取消皆由正式 App 擁有。
 
     呼叫者負責資料／付費授權與整批護欄，可注入真 SDK、其受控 transport 或本機替身。
@@ -116,11 +125,14 @@ async def run_candidate(
     """
     if settings.database is None or settings.model is None:
         raise ValueError("Evaluation requires explicit database and model settings")
-    _require_test_database(settings.database.url)
+    require_isolated_test_database(settings.database.url, environment=os.environ)
     if settings.database.schema in {"public", "caliburn"}:
         raise ValueError("Evaluation requires an independently prepared schema")
     if timeout_seconds <= 0:
         raise ValueError("Evaluation observation timeout must be positive")
+    for filename in ("result.json", "diagnostics.json", "diagnostics-failure.json"):
+        if (output_directory / filename).exists():
+            raise FileExistsError("Candidate output already exists; use a new comparison directory")
     app = create_app(settings, composition=composition)
     async with (
         app.router.lifespan_context(app),
@@ -132,19 +144,41 @@ async def run_candidate(
         ) as client,
     ):
         result = await drive_case(client, case, timeout_seconds=timeout_seconds)
-    # 診斷副本只供本機查閱；擷取失敗不改正式訪談／JD，也不偽造成功副本。
+        # Persist the observed formal result before shutdown or optional diagnostics can fail.
+        save = asyncio.create_task(
+            asyncio.to_thread(save_new, output_directory / "result.json", result),
+            name="evaluation-formal-result-save",
+        )
+        await join_owned(save)
+    diagnostics_available = await capture_diagnostics(settings.database, result, output_directory)
+    return CandidateRun(result, diagnostics_available)
+
+
+async def capture_diagnostics(
+    database: DatabaseSettings, result: dict[str, object], output_directory: Path
+) -> bool:
+    """Keep observation failures separate from the already saved formal case result."""
     job_file_id = UUID(result["job_file_id"])
-    await asyncio.to_thread(refresh_diagnostics, settings.database, job_file_id=job_file_id)
-    result["diagnostics"] = await asyncio.to_thread(
-        read_diagnostics, settings.database, job_file_id=job_file_id
-    )
-    result["background_settlement"] = "inspect_diagnostic_execution_statuses"
-    return result
+    stage = "refresh"
+    try:
+        await asyncio.to_thread(refresh_diagnostics, database, job_file_id=job_file_id)
+        stage = "read"
+        diagnostics = await asyncio.to_thread(read_diagnostics, database, job_file_id=job_file_id)
+        stage = "save"
+        await asyncio.to_thread(save_new, output_directory / "diagnostics.json", diagnostics)
+    except Exception as error:
+        await asyncio.to_thread(
+            save_new,
+            output_directory / "diagnostics-failure.json",
+            {"stage": stage, "error_type": type(error).__name__},
+        )
+        return False
+    return True
 
 
 def prepare_isolated_database(url: str) -> DatabaseSettings:
     """只新增自有 schema 並使用套件正式 migrations；不刪除舊 namespace。"""
-    _require_test_database(url)
+    require_isolated_test_database(url, environment=os.environ)
     settings = DatabaseSettings(url=url, schema="eval_" + uuid4().hex)
     engine = create_engine(
         settings.sqlalchemy_url, connect_args={"options": f"-c search_path={settings.schema}"}
@@ -159,19 +193,6 @@ def prepare_isolated_database(url: str) -> DatabaseSettings:
     finally:
         engine.dispose()
     return settings
-
-
-def _require_test_database(url: str) -> None:
-    info = conninfo_to_dict(url)
-    if info.get("host") not in {"localhost", "127.0.0.1", "::1"} or not info.get(
-        "dbname", ""
-    ).endswith("_test"):
-        raise ValueError("Use an explicit loopback database whose name ends in _test")
-    # libpq 可由 hostaddr／service 改變實際位置；測試入口只接受明示 URL 的單一目標。
-    if any(key in info for key in ("hostaddr", "service", "servicefile")) or any(
-        os.environ.get(key) for key in ("PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE")
-    ):
-        raise ValueError("Test database target cannot be redirected by hostaddr or service")
 
 
 def scripted_composition(
@@ -275,19 +296,23 @@ def main() -> int:
                     "model": {
                         key: value for key, value in asdict(model).items() if key != "api_key"
                     },
-                    "diagnostics": "result.json:diagnostics (captured request and actual tools)",
+                    "diagnostics": "diagnostics.json (captured request and actual tools)",
+                    "background_settlement": "inspect_diagnostic_execution_statuses",
                 },
             )
             with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
-                result = runner.run(
+                outcome = runner.run(
                     run_candidate(
                         Settings(database=database, model=model, dev_origin=BASE_URL),
                         scripted_composition(candidate),
                         case,
+                        output_directory=destination,
                     )
                 )
-            save_new(destination / "result.json", result)
-            if not result["all_inputs_completed"]:
+            if not outcome.diagnostics_available:
+                print("Formal result saved; diagnostic capture failed.", file=sys.stderr)
+                return 1
+            if not outcome.result["all_inputs_completed"]:
                 return 1
         except Exception as error:
             save_new(destination / "failure.json", {"error_type": type(error).__name__})

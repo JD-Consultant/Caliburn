@@ -13,6 +13,51 @@ API_ROOT = Path(__file__).resolve().parents[1]
 WEB_ROOT = API_ROOT.parent / "web"
 
 
+def contract_resources(schemas: list[Path]) -> dict[Path, str]:
+    """Package the canonical tree and its generated model-to-resource index."""
+    root = API_ROOT / "src/caliburn/contracts/generated"
+    outputs = {}
+    manifest = {}
+    for schema in schemas:
+        family = schema.parent.name
+        text = schema.read_text(encoding="utf-8", newline="")
+        title = json.loads(text)["title"]
+        module = schema.name.removesuffix(".schema.json").replace("-", "_")
+        prefix = "tools." if family == "tools" else ""
+        qualified = f"caliburn.contracts.generated.{prefix}{module}.{title}"
+        manifest[qualified] = f"{family}/{schema.name}"
+        outputs[root / family / schema.name] = text
+    outputs[root / "schema-manifest.json"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    return outputs
+
+
+def write_outputs(outputs: dict[Path, str], *, check: bool) -> bool:
+    matches = True
+    for target, content in outputs.items():
+        if check:
+            newline = "" if target.suffix == ".json" else None
+            existing = (
+                target.read_text(encoding="utf-8", newline=newline) if target.exists() else ""
+            )
+            if existing != content:
+                matches = False
+                print(
+                    "".join(
+                        difflib.unified_diff(
+                            existing.splitlines(keepends=True),
+                            content.splitlines(keepends=True),
+                            fromfile=str(target),
+                            tofile="regenerated",
+                        )
+                    ),
+                    end="",
+                )
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content, encoding="utf-8", newline="\n")
+    return matches
+
+
 def stage_contract_schemas(
     schemas: list[Path], directory: Path, *, contracts_root: Path
 ) -> dict[Path, Path]:
@@ -51,7 +96,6 @@ def stage_contract_schemas(
 
 
 def generate(check: bool, schema_names: list[str] | None = None) -> bool:
-    matches = True
     schemas = [
         schema
         for family in ("http", "tools")
@@ -67,6 +111,7 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
         staged = stage_contract_schemas(
             all_schemas, Path(directory) / "schemas", contracts_root=API_ROOT / "contracts"
         )
+        matches = write_outputs(contract_resources(all_schemas), check=check)
         for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
             output_directory = Path("tools") if schema.parent.name == "tools" else Path()
@@ -119,35 +164,7 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
                 / python_output.name: python_output.read_text(encoding="utf-8"),
                 WEB_ROOT / "src/shared/api/generated" / output_directory / f"{stem}.ts": typescript,
             }
-            if schema.parent.name == "tools":
-                outputs[API_ROOT / "src/caliburn/contracts/generated/tools" / schema.name] = (
-                    schema.read_text(encoding="utf-8", newline="")
-                )
-            for target, content in outputs.items():
-                if check:
-                    # Packaged schemas retain the authored wire, including its line endings.
-                    newline = "" if target.suffix == ".json" else None
-                    existing = (
-                        target.read_text(encoding="utf-8", newline=newline)
-                        if target.exists()
-                        else ""
-                    )
-                    if existing != content:
-                        matches = False
-                        print(
-                            "".join(
-                                difflib.unified_diff(
-                                    existing.splitlines(keepends=True),
-                                    content.splitlines(keepends=True),
-                                    fromfile=str(target),
-                                    tofile="regenerated",
-                                )
-                            ),
-                            end="",
-                        )
-                else:
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    target.write_text(content, encoding="utf-8", newline="\n")
+            matches = write_outputs(outputs, check=check) and matches
     return matches
 
 

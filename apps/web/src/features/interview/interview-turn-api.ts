@@ -1,17 +1,16 @@
 /** Scoped polling and original input commands; browser hints carry IDs only. */
 import { queryOptions, skipToken } from '@tanstack/react-query';
-import { Ajv2020 } from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
+import { createSchemaValidator } from '../../shared/api/schema-policy';
 import acceptedSchema from '../../../../api/contracts/http/accepted-interview-input.schema.json' with { type: 'json' };
 import submitSchema from '../../../../api/contracts/http/submit-interview-input.schema.json' with { type: 'json' };
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import type { AcceptedInterviewInput } from '../../shared/api/generated/accepted-interview-input';
 import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
+import { isCanonicalUuid } from '../../shared/api/uuid';
 import { ApiError, requestJson } from '../../shared/api/http';
 import { isConsultantTurn, isCurrentConsultantTurn } from '../../shared/api/validation';
 
-const validator = new Ajv2020();
-addFormats(validator);
+const validator = createSchemaValidator();
 const isAcceptedInput = validator.compile<AcceptedInterviewInput>(acceptedSchema);
 export const isSubmitInterviewInput = validator.compile<SubmitInterviewInput>(submitSchema);
 
@@ -24,19 +23,15 @@ function hintKey(jobFileId: string): string {
   return `caliburn:interview-turn:${jobFileId}`;
 }
 
-function isUuid(value: unknown): value is string {
-  return typeof value === 'string' && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value);
-}
-
 function parseHint(raw: string): TurnHint {
   const hint: unknown = JSON.parse(raw);
   if (
     typeof hint !== 'object' ||
     hint === null ||
     !('command_id' in hint) ||
-    !isUuid(hint.command_id) ||
+    !isCanonicalUuid(hint.command_id) ||
     !('execution_id' in hint) ||
-    (hint.execution_id !== null && !isUuid(hint.execution_id))
+    (hint.execution_id !== null && !isCanonicalUuid(hint.execution_id))
   )
     throw new Error('Invalid interview recovery hint');
   return { command_id: hint.command_id, execution_id: hint.execution_id };
@@ -48,26 +43,104 @@ export function readTurnHint(jobFileId: string): TurnHint | null {
 }
 
 const HINT_CHANGED = 'caliburn:interview-turn-hint-changed';
+const INTERVIEW_DELETED = 'caliburn:interview-deleted';
+
+/** Stop live reservations synchronously, before React commits the workspace unmount. */
+export function subscribeInterviewDeletion(jobFileId: string, onDeleted: () => void): () => void {
+  const listener = (event: Event) => {
+    if (event instanceof CustomEvent && event.detail === jobFileId) onDeleted();
+  };
+  window.addEventListener(INTERVIEW_DELETED, listener);
+  return () => window.removeEventListener(INTERVIEW_DELETED, listener);
+}
 
 function notifyHintChanged(): void {
   window.dispatchEvent(new Event(HINT_CHANGED));
 }
 
-export function retainTurnHint(jobFileId: string, hint: TurnHint): void {
-  localStorage.setItem(
-    hintKey(jobFileId),
-    JSON.stringify({
-      command_id: hint.command_id,
-      execution_id: hint.execution_id,
-    }),
-  );
+/** Every read/compare/write shares the same origin-wide file lock; network never runs here. */
+async function withHintLock<T>(
+  jobFileId: string,
+  action: () => T,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (!navigator.locks) throw new Error('Web Locks unavailable');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5_000);
+  try {
+    const acquisitionSignal = signal
+      ? AbortSignal.any([signal, controller.signal])
+      : controller.signal;
+    return await navigator.locks.request(hintKey(jobFileId), { signal: acquisitionSignal }, () => {
+      acquisitionSignal.throwIfAborted();
+      return action();
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function writeHint(jobFileId: string, hint: TurnHint): void {
+  localStorage.setItem(hintKey(jobFileId), JSON.stringify(hint));
   notifyHintChanged();
 }
 
-export function clearTurnHint(jobFileId: string, commandId: string): void {
-  if (readTurnHint(jobFileId)?.command_id !== commandId) return;
-  localStorage.removeItem(hintKey(jobFileId));
-  notifyHintChanged();
+/** Reserve only an empty slot or the exact previously verified completed hint. */
+export async function retainTurnHint(
+  jobFileId: string,
+  hint: TurnHint,
+  completedHint: TurnHint | null = null,
+  signal?: AbortSignal,
+): Promise<void> {
+  await withHintLock(
+    jobFileId,
+    () => {
+      const existing = readTurnHint(jobFileId);
+      if (existing?.command_id === hint.command_id) {
+        if (existing.execution_id !== null) return;
+      } else if (
+        existing &&
+        (!completedHint ||
+          existing.command_id !== completedHint.command_id ||
+          existing.execution_id !== completedHint.execution_id)
+      ) {
+        throw new Error('Another interview command is pending');
+      }
+      writeHint(jobFileId, hint);
+    },
+    signal,
+  );
+}
+
+/** Late acknowledgements may resolve their own existing command, never recreate or replace one. */
+export async function resolveTurnHint(jobFileId: string, hint: TurnHint): Promise<void> {
+  await withHintLock(jobFileId, () => {
+    const existing = readTurnHint(jobFileId);
+    if (
+      !existing ||
+      existing.command_id !== hint.command_id ||
+      (existing.execution_id !== null && existing.execution_id !== hint.execution_id)
+    )
+      return;
+    writeHint(jobFileId, hint);
+  });
+}
+
+export async function clearTurnHint(jobFileId: string, commandId: string): Promise<void> {
+  await withHintLock(jobFileId, () => {
+    if (readTurnHint(jobFileId)?.command_id !== commandId) return;
+    localStorage.removeItem(hintKey(jobFileId));
+    notifyHintChanged();
+  });
+}
+
+/** Confirmed deletion prevents later POST acknowledgements from restoring local recovery data. */
+export async function clearDeletedInterview(jobFileId: string): Promise<void> {
+  window.dispatchEvent(new CustomEvent(INTERVIEW_DELETED, { detail: jobFileId }));
+  await withHintLock(jobFileId, () => {
+    localStorage.removeItem(hintKey(jobFileId));
+    notifyHintChanged();
+  });
 }
 
 /** Same-tab writes and other tabs' `storage` events; for `useSyncExternalStore`. */
@@ -124,7 +197,8 @@ export async function submitInterviewInput(
   jobFileId: string,
   command: SubmitInterviewInput,
 ): Promise<AcceptedInterviewInput> {
-  if (!isSubmitInterviewInput(command)) throw new ApiError('請填寫有內容的訪談文字。', 422);
+  if (!isSubmitInterviewInput(command))
+    throw new ApiError('請填寫有內容的訪談文字。', { status: 422 });
   const accepted = await requestJson(
     `/api/job-files/${encodeURIComponent(jobFileId)}/inputs`,
     isAcceptedInput,
@@ -132,6 +206,7 @@ export async function submitInterviewInput(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(command),
+      correlation: { jobFileId, commandId: command.command_id },
     },
   );
   if (accepted.job_file_id !== jobFileId || accepted.command_id !== command.command_id) {
@@ -154,7 +229,7 @@ export async function controlConsultantTurn(
   const turn = await requestJson(
     `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/${encodeURIComponent(executionId)}/${control}`,
     isConsultantTurn,
-    { method: 'POST', cache: 'no-store' },
+    { method: 'POST', cache: 'no-store', correlation: { jobFileId, executionId } },
   );
   if (turn.job_file_id !== jobFileId || turn.execution_id !== executionId) {
     throw new ApiError('收到的控制結果不屬於這次訪談，尚未採用。');

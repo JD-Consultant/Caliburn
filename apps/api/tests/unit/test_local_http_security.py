@@ -11,6 +11,20 @@ from starlette.types import Message, Receive, Scope, Send
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 
 
+def test_html_responses_prevent_framing_without_restricting_scripts() -> None:
+    app = FastAPI()
+    app.add_middleware(LocalHttpSecurityMiddleware)
+
+    @app.get("/")
+    def index() -> Response:
+        return Response("<html>Local workspace</html>", media_type="text/html")
+
+    with TestClient(app, base_url="http://127.0.0.1:8100") as client:
+        response = client.get("/")
+        assert response.status_code == 200
+        assert response.headers["content-security-policy"] == "frame-ancestors 'none'"
+
+
 @pytest.fixture
 def guarded_client() -> Iterator[tuple[TestClient, list[bytes]]]:
     app = FastAPI()

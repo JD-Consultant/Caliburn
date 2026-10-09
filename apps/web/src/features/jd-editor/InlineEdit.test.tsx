@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -36,7 +38,12 @@ function renderEditor(readOnly = false) {
   clients.push(client);
   const page = (locked: boolean) => (
     <QueryClientProvider client={client}>
-      <JdWorkEditor key={fileId} jobFileId={fileId} readOnly={locked} />
+      <JdWorkEditor
+        refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+        key={fileId}
+        jobFileId={fileId}
+        readOnly={locked}
+      />
     </QueryClientProvider>
   );
   const view = render(page(readOnly));
@@ -317,7 +324,9 @@ test('leaving the editor with an unconfirmed result hands the re-confirmation to
 });
 
 test('a rejected change keeps the draft and asks to read the current JD instead of rebasing', async () => {
-  const server = stubServer(() => Promise.resolve(Response.json({}, { status: 409 })));
+  const server = stubServer(() =>
+    Promise.resolve(Response.json({ detail: { code: 'jd_revision_stale' } }, { status: 409 })),
+  );
   renderEditor();
   const field = await typeTaskName('改寫網頁');
 
@@ -372,7 +381,9 @@ test('an untouched draft closes without writing after the displayed field change
 test.each(['本機修改的任務', '背景新版任務'])(
   'a changed draft %s retains its opening revision and handles conflict after a background field change',
   async (draft) => {
-    const server = stubServer(() => Promise.resolve(Response.json({}, { status: 409 })));
+    const server = stubServer(() =>
+      Promise.resolve(Response.json({ detail: { code: 'jd_revision_stale' } }, { status: 409 })),
+    );
     const { client } = renderEditor();
     await userEvent.click(await screen.findByRole('heading', { name: '實作網頁' }));
     const field = await screen.findByRole('textbox', { name: '任務名稱' });
@@ -407,7 +418,10 @@ test('a failed background refresh keeps the work draft, shows the error and bloc
   let readFails = false;
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
   fetch.mockImplementation((_path, options) => {
-    if (options?.method === 'POST') return Promise.resolve(Response.json({}, { status: 409 }));
+    if (options?.method === 'POST')
+      return Promise.resolve(
+        Response.json({ detail: { code: 'jd_revision_stale' } }, { status: 409 }),
+      );
     return Promise.resolve(readFails ? Response.json({}, { status: 503 }) : Response.json(current));
   });
   vi.stubGlobal('fetch', fetch);

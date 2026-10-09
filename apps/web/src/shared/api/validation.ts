@@ -1,6 +1,5 @@
 /** Runtime guards use the same SSOT as generated types; no second field definitions. */
-import { Ajv2020 } from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
+import { createSchemaValidator } from './schema-policy';
 import interviewPlanSchema from '../../../../api/contracts/tools/interview-plan.schema.json' with { type: 'json' };
 import interviewPlanViewSchema from '../../../../api/contracts/http/interview-plan-view.schema.json' with { type: 'json' };
 import type { InterviewPlanView } from './generated/interview-plan-view';
@@ -47,8 +46,7 @@ import type { EditJdConditionsRequest } from './generated/edit-jd-conditions-req
 import type { JdCollaboratorsView } from './generated/jd-collaborators-view';
 import type { JdConditionsView } from './generated/jd-conditions-view';
 
-const validator = new Ajv2020();
-addFormats(validator);
+const validator = createSchemaValidator();
 validator.addSchema(interviewPlanSchema, 'tools/interview-plan.schema.json');
 validator.addSchema(jdAreasSchema, 'jd-areas-view.schema.json');
 validator.addSchema(jdTasksSchema, 'jd-tasks-view.schema.json');

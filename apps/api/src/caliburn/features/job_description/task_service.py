@@ -12,7 +12,6 @@ from caliburn.features.job_description import (
 )
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfileRevision,
     StaleJdRevisionError,
 )
@@ -40,12 +39,12 @@ async def recover_task_result(
     )
     if operation is None:
         return None
-    if (
-        operation.kind != "edit_tasks"
-        or operation.expected_revision_id != command.expected_revision_id
-        or operation.request_payload != task_edit_payload(command.change)
-    ):
-        raise JdCommandConflictError("command_id was already used with different JD intent")
+    revision_editing.require_matching_edit_intent(
+        operation,
+        kind="edit_tasks",
+        expected_revision_id=command.expected_revision_id,
+        request_payload=task_edit_payload(command.change),
+    )
     return JdTasksRevision(
         operation.result_revision_id,
         await task_persistence.read_tasks(session, job_file_id, operation.result_revision_id),

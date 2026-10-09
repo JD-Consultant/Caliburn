@@ -18,6 +18,7 @@ from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionStateError
 from caliburn.features.interviews.models import InterviewReadScope
 from caliburn.settings import DatabaseSettings
+from caliburn.workflows.consultant_context import ConsultantContextWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.interview_plans import start_interview_plan
 from tests.fixtures.response_capacity import synthetic_capacity_limits
@@ -60,7 +61,10 @@ def test_new_capability_captures_full_unformed_note_before_app_data_and_raw(
                     ),
                 )
                 context = await capture_turn_context(
-                    work, template=role_template, prepared_history=prepared
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=role_template,
+                    prepared_history=prepared,
                 )
                 items = context.request.create_payload()["input"]
                 assert len(items) == 3
@@ -73,7 +77,10 @@ def test_new_capability_captures_full_unformed_note_before_app_data_and_raw(
                 assert context.plan_position is not None
                 # A different live template cannot replace the original capability or input.
                 restored = await capture_turn_context(
-                    work, template=template("new live role must not replace"), prepared_history=[]
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=template("new live role must not replace"),
+                    prepared_history=[],
                 )
                 assert restored.request.create_payload() == context.request.create_payload()
                 assert restored.plan_position == context.plan_position
@@ -153,7 +160,10 @@ def test_original_pending_graph_resumes_but_missing_capture_cannot_use_today(
                     # The original unfinished graph resumes its own template, then forms
                     # its first complete binding; only the plan base was saved earlier.
                     restored = await capture_turn_context(
-                        work, template=today, prepared_history=prepared
+                        work,
+                        data=ConsultantContextWorkflow(database.sessions),
+                        template=today,
+                        prepared_history=prepared,
                     )
                     assert restored.plan_position == base.position
                     assert (
@@ -162,7 +172,12 @@ def test_original_pending_graph_resumes_but_missing_capture_cannot_use_today(
                     )
                 else:
                     with pytest.raises(ExecutionStateError, match="without a recoverable initial"):
-                        await capture_turn_context(work, template=today, prepared_history=prepared)
+                        await capture_turn_context(
+                            work,
+                            data=ConsultantContextWorkflow(database.sessions),
+                            template=today,
+                            prepared_history=prepared,
+                        )
         finally:
             await database.close()
 
@@ -198,12 +213,20 @@ def test_original_v1_capture_does_not_gain_plan_when_live_template_gains_tools(
                     ),
                 )
                 original = await capture_turn_context(
-                    work, template=template(), prepared_history=prepared
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=template(),
+                    prepared_history=prepared,
                 )
                 upgraded = ResponseRequest.from_snapshot(
                     {**template().create_payload(), "tools": consultant_tool_definitions()}
                 )
-                restored = await capture_turn_context(work, template=upgraded, prepared_history=[])
+                restored = await capture_turn_context(
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=upgraded,
+                    prepared_history=[],
+                )
                 assert restored.request.create_payload() == original.request.create_payload()
                 assert restored.plan_position is None
         finally:

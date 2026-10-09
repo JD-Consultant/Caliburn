@@ -8,6 +8,7 @@ from decimal import Decimal
 from uuid import UUID, uuid4
 
 from caliburn.adapters.database import Database
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.features.executions import budgets
 from caliburn.features.executions.budget_models import (
     BudgetExceededError,
@@ -19,6 +20,7 @@ from caliburn.settings import DatabaseSettings
 
 
 async def run() -> None:
+    require_isolated_test_database(os.environ["CALIBURN_TEST_DATABASE_URL"], environment=os.environ)
     settings = DatabaseSettings(url=os.environ["CALIBURN_TEST_DATABASE_URL"], schema=sys.argv[1])
     scope = ExecutionScope(UUID(sys.argv[2]), UUID(sys.argv[3]), ExecutionKind.CONSULTANT_TURN)
     writer = ExecutionWriter(scope, UUID(sys.argv[4]))

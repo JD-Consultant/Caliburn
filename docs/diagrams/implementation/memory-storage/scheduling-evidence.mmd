@@ -1,0 +1,27 @@
+%% title: 現行：Memory 調度證據與原輸入；局部 ER
+%% legend: 虛線為非識別 FK；圈為零、短線為一、鳥足為多。CHECK 的互斥條件見正文。
+erDiagram
+  direction LR
+  executions ||..o{ memory_operations : operation_execution
+  interview_inputs |o..o{ memory_operations : intent_input
+  executions {
+    uuid execution_id PK
+    uuid job_file_id FK
+    text kind
+    text status
+  }
+  interview_inputs {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid execution_id FK,UK
+    uuid source_id FK,UK
+  }
+  memory_operations {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid execution_id FK
+    text kind
+    uuid intent_source_id FK "僅整理要求非空"
+    text failure_reason "僅失敗證據非空"
+    int failure_frontier "僅失敗證據非空"
+  }

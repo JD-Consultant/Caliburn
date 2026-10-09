@@ -17,10 +17,16 @@ from caliburn.features.interviews.models import (
     InterviewMessage,
     InterviewReadError,
     InterviewReadScope,
+    InterviewSourceHeader,
     InterviewSpeaker,
 )
 
 pytestmark = pytest.mark.postgres
+
+
+@pytest.fixture(params=[queries.read_interview_sources, queries.read_interview_source_headers])
+def reader(request):
+    return request.param
 
 
 def transact[T](client: TestClient, operation: Callable[[AsyncSession], Awaitable[T]]) -> T:
@@ -122,6 +128,7 @@ def test_pending_or_cancelled_input_rejects_the_entire_selection(
     client: TestClient,
     source_history: tuple[InterviewReadScope, list[InterviewMessage]],
     status: ExecutionStatus,
+    reader,
 ) -> None:
     scope, history = source_history
     private_text = "尚無正式資格的原話不能外露"
@@ -144,9 +151,7 @@ def test_pending_or_cancelled_input_rejects_the_entire_selection(
     with pytest.raises(InterviewReadError) as error:
         transact(
             client,
-            lambda s: queries.read_interview_sources(
-                s, scope, source_ids=(history[1].source_id, source_id)
-            ),
+            lambda s: reader(s, scope, source_ids=(history[1].source_id, source_id)),
         )
     assert private_text not in str(error.value)
     assert str(source_id) not in str(error.value)
@@ -158,6 +163,7 @@ def test_unavailable_or_out_of_scope_source_rejects_the_entire_selection(
     database_connection: psycopg.Connection,
     source_history: tuple[InterviewReadScope, list[InterviewMessage]],
     invalid_source: str,
+    reader,
 ) -> None:
     scope, history = source_history
     forbidden_text = history[4].interview_text
@@ -174,9 +180,7 @@ def test_unavailable_or_out_of_scope_source_rejects_the_entire_selection(
     with pytest.raises(InterviewReadError) as error:
         transact(
             client,
-            lambda s: queries.read_interview_sources(
-                s, scope, source_ids=(history[1].source_id, source_id)
-            ),
+            lambda s: reader(s, scope, source_ids=(history[1].source_id, source_id)),
         )
     assert forbidden_text not in str(error.value)
     assert str(source_id) not in str(error.value)
@@ -214,7 +218,46 @@ def test_old_scope_does_not_expand_after_new_formal_interviews(
     assert scope.through_sequence == 4
 
 
-def test_empty_source_selection_is_rejected(client: TestClient) -> None:
+def test_empty_source_selection_is_rejected(client: TestClient, reader) -> None:
     scope = InterviewReadScope(create_file(client), 1)
     with pytest.raises(InterviewReadError):
-        transact(client, lambda s: queries.read_interview_sources(s, scope, source_ids=()))
+        transact(client, lambda s: reader(s, scope, source_ids=()))
+
+
+def test_source_headers_deduplicate_sort_and_keep_the_fixed_frontier(
+    client, source_history, database_connection
+):
+    scope, history = source_history
+    source_ids = (history[3].source_id, history[1].source_id, history[3].source_id)
+    expected = tuple(
+        InterviewSourceHeader(message.source_id, message.interview_sequence, message.speaker)
+        for message in (history[1], history[3])
+    )
+    assert (
+        transact(
+            client,
+            lambda session: queries.read_interview_source_headers(
+                session, scope, source_ids=source_ids
+            ),
+        )
+        == expected
+    )
+    later = add_formal_message(
+        database_connection, scope.job_file_id, 6, InterviewSpeaker.EMPLOYEE, "後來原文"
+    )
+    assert (
+        transact(
+            client,
+            lambda session: queries.read_interview_source_headers(
+                session, scope, source_ids=source_ids
+            ),
+        )
+        == expected
+    )
+    with pytest.raises(InterviewReadError):
+        transact(
+            client,
+            lambda session: queries.read_interview_source_headers(
+                session, scope, source_ids=(*source_ids, later.source_id)
+            ),
+        )

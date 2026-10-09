@@ -167,3 +167,10 @@ def completed_consultant_executions_projection(job_file_id: UUID) -> Select[UUID
         ExecutionRecord.kind == ExecutionKind.CONSULTANT_TURN.value,
         ExecutionRecord.status == ExecutionStatus.COMPLETED.value,
     )
+
+
+def consolidation_executions_projection(job_file_id: UUID | None = None) -> Select[UUID, UUID, str]:
+    statement = select(
+        ExecutionRecord.job_file_id, ExecutionRecord.execution_id, ExecutionRecord.status
+    ).where(ExecutionRecord.kind == ExecutionKind.CONSULTANT_TURN.value)
+    return statement.where(ExecutionRecord.job_file_id == job_file_id) if job_file_id else statement

@@ -1,8 +1,8 @@
 /**
  * The open or closed state of one foldable block of the JD: a section, a responsibility, a task. Folding is
  * presentation only, so the block's content stays mounted and nothing reloads or resets. Pass the ref of the
- * block's element when the section bar should be able to open it: the bar announces that on the element, so
- * neither side imports the other.
+ * block's element so JD navigation can open it. The reveal event bubbles from the destination through its
+ * foldable ancestors, without navigation owning or copying their local state.
  */
 import { useEffect, useId, useState } from 'react';
 import type { RefObject } from 'react';

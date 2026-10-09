@@ -16,5 +16,5 @@ class RenameJobFileRequest(BaseModel):
         ...,
         max_length=200,
         min_length=1,
-        pattern="^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$",
+        pattern="^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
     )

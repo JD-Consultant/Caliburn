@@ -9,6 +9,7 @@ Usage (from apps/api): python -m tests.fixtures.scripted_backend --port 8101
 """
 
 import argparse
+import os
 from dataclasses import replace
 
 import httpx2
@@ -16,6 +17,7 @@ import uvicorn
 from fastapi import FastAPI
 from openai import AsyncOpenAI
 
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
@@ -50,8 +52,10 @@ def main() -> None:
     settings = Settings.from_environment()
     if settings.database is None:
         parser.error("Configure CALIBURN_DATABASE_URL for an isolated test database.")
-    if not settings.database.url.rstrip("/").endswith("_test"):
-        parser.error("The scripted backend only runs against a database whose name ends in _test.")
+    try:
+        require_isolated_test_database(settings.database.url, environment=os.environ)
+    except ValueError as error:
+        parser.error(str(error))
     uvicorn.run(
         create_scripted_app(settings, ScriptedModel()),
         host="127.0.0.1",

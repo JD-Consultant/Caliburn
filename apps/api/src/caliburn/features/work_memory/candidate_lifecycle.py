@@ -13,8 +13,11 @@ from caliburn.features.work_memory.candidates import (
     MemoryCandidateStateError,
     MemorySnapshot,
 )
-from caliburn.features.work_memory.revision_service import write_object_revision
-from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionReference
+from caliburn.features.work_memory.revision_service import (
+    read_fixed_headers,
+    rebind_understanding_sources,
+)
+from caliburn.features.work_memory.revisions import MemoryLayer
 
 
 async def _recover_control(
@@ -138,27 +141,24 @@ async def publish(
         raise MemoryCandidateStateError("Only the current understanding stage can complete Memory")
     await require_base(session, record)
     members = await queries.read_members(session, position.job_file_id, position.position_id)
-    fixed_members = members.copy()
-    for reference in members.values():
-        revision = await queries.read_selected(
-            session, position.job_file_id, members, reference.object_id
-        )
+    headers = await read_fixed_headers(
+        session, job_file_id=position.job_file_id, references=frozenset(members.values())
+    )
+    bindings = {}
+    for reference, revision in headers.items():
         if revision.layer != MemoryLayer.WORK_UNDERSTANDING:
             continue
+        if any(source.object_id not in members for source in revision.work_situation_references):
+            raise MemoryCandidateStateError("A selected understanding source is absent")
         fixed_sources = frozenset(
             members[source.object_id] for source in revision.work_situation_references
         )
         if fixed_sources == revision.work_situation_references:
             continue
-        fixed = await write_object_revision(
-            session,
-            queries.source_window(record),
-            layer=revision.layer,
-            content=revision.content,
-            previous=reference,
-            work_situation_references=fixed_sources,
-        )
-        fixed_members[fixed.object_id] = MemoryRevisionReference(fixed.object_id, fixed.revision_id)
+        bindings[reference] = fixed_sources
+    fixed_members = members | await rebind_understanding_sources(
+        session, queries.source_window(record), bindings
+    )
     if fixed_members != members:
         next_position_id = uuid4()
         await position_persistence.insert_position(

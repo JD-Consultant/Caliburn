@@ -1,6 +1,7 @@
 """Generated revise-item wire to bounded application choices, without database access."""
 
 from caliburn.contracts.generated.tools import revise_jd_item_arguments as wire
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.job_description.sources import MemorySourceLayer
 from caliburn.features.job_description.tasks import DetailKind
 from caliburn.workflows.jd_item_revision import (
@@ -29,7 +30,7 @@ from caliburn.workflows.jd_sources import (
 
 
 def parse_item_revision(arguments: str) -> ReviseItemInput:
-    parsed = wire.ReviseJdItemArguments.model_validate_json(arguments)
+    parsed = parse_contract(wire.ReviseJdItemArguments, arguments)
     changes: list[ItemRevisionChange] = []
     for change in parsed.changes:
         if isinstance(change, wire.SetItemText):

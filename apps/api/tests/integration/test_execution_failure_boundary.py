@@ -123,9 +123,15 @@ def test_terminal_settlement_acknowledgement_failure_is_not_settled_twice(
     with supervised_client(database_settings) as running:
         supervisor = getattr(running.app.state, f"{role}_supervisor")
         deadline = time.monotonic() + 3
-        while not supervisor.failures and time.monotonic() < deadline:
+        while (
+            not settlements or supervisor.has_file_runner(turn.writer.scope.job_file_id)
+        ) and time.monotonic() < deadline:
             time.sleep(0.02)
-        assert supervisor.failures
+        assert settlements
+        assert not supervisor.has_file_runner(turn.writer.scope.job_file_id)
+        # The one failed acknowledgement is followed by an owner read, not a second
+        # settlement. A proven durable terminal outcome no longer needs a handoff.
+        assert not supervisor.failures
     assert len(settlements) == 1
     if role == "memory":
         assert client.portal.call(requests.failure_reason, turn.writer.scope.job_file_id) == (
@@ -221,7 +227,7 @@ def test_escaped_memory_failure_is_durable_and_does_not_block_interview(
         ),
     )
     assert batch.status == "discarded"
-    assert client.portal.call(requests.discover) == ()
+    assert client.portal.call(requests.discover).ready_file_ids == ()
     accepted = client.post(
         f"/api/job-files/{turn.writer.scope.job_file_id}/inputs",
         json={"command_id": str(uuid4()), "text": "繼續補充工作"},

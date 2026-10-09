@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+from uuid import UUID
 
 from caliburn.features.executions.models import ExecutionScope
 
@@ -52,3 +53,29 @@ def context_thread_id(scope: ExecutionScope, role: AgentRole, kind: HistoryWindo
     if not isinstance(role, AgentRole) or not isinstance(kind, HistoryWindowKind):
         raise ValueError("Expected an agent role and history window kind")
     return f"{scope.job_file_id}:{scope.execution_id}:{role.value}:{kind.value}"
+
+
+@dataclass(frozen=True, slots=True)
+class StageContextIdentity:
+    """Parsed native stage identity; execution and candidate eligibility stay with callers."""
+
+    root_thread_id: str
+    generation_id: UUID
+    stage_id: UUID
+
+
+def stage_thread_id(root_thread_id: str, generation_id: UUID, stage_id: UUID) -> str:
+    """Preserve the persisted native thread format used by both Memory roles."""
+    return f"{root_thread_id}:stage:{generation_id}:{stage_id}"
+
+
+def parse_stage_thread_id(thread_id: str) -> StageContextIdentity | None:
+    """Parse only stage syntax; callers decide the permitted root and canonical spelling."""
+    root, separator, suffix = thread_id.partition(":stage:")
+    parts = suffix.split(":")
+    if not separator or len(parts) != 2:
+        return None
+    try:
+        return StageContextIdentity(root, UUID(parts[0]), UUID(parts[1]))
+    except ValueError:
+        return None

@@ -1,10 +1,12 @@
-/** Route composition only; feature modules own their screens and data queries. */
+/** Routes and confirmed deletion lifecycle; features own their screens and data queries. */
 import type { ReactNode } from 'react';
 import { Link as RouterLink, Outlet, Route, Routes } from 'react-router';
-import { Container, Link } from '@mui/material';
+import { Alert, Container, Link } from '@mui/material';
 import { JobFilesPage } from '../features/job-files/JobFilesPage';
 import { AppHeader } from './AppHeader';
 import { JobFilePage } from './JobFilePage';
+import { DeletedJobFilesContext } from './deleted-job-files-context';
+import { useDeletedJobFiles } from './use-deleted-job-files';
 
 function PageContainer({ children }: { children: ReactNode }) {
   return (
@@ -25,30 +27,34 @@ function HeaderLayout() {
 }
 
 export function App() {
+  const deletion = useDeletedJobFiles();
   return (
-    <Routes>
-      <Route element={<HeaderLayout />}>
-        <Route
-          path="/"
-          element={
-            <PageContainer>
-              <JobFilesPage />
-            </PageContainer>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <PageContainer>
-              <h1>找不到這個頁面</h1>
-              <Link component={RouterLink} to="/">
-                返回職務檔案清單
-              </Link>
-            </PageContainer>
-          }
-        />
-      </Route>
-      <Route path="/job-files/:jobFileId" element={<JobFilePage />} />
-    </Routes>
+    <DeletedJobFilesContext.Provider value={deletion.context}>
+      {deletion.warning && <Alert severity="warning">{deletion.warning}</Alert>}
+      <Routes>
+        <Route element={<HeaderLayout />}>
+          <Route
+            path="/"
+            element={
+              <PageContainer>
+                <JobFilesPage onDeleted={deletion.context.confirmDeleted} />
+              </PageContainer>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <PageContainer>
+                <h1>找不到這個頁面</h1>
+                <Link component={RouterLink} to="/">
+                  返回職務檔案清單
+                </Link>
+              </PageContainer>
+            }
+          />
+        </Route>
+        <Route path="/job-files/:jobFileId" element={<JobFilePage />} />
+      </Routes>
+    </DeletedJobFilesContext.Provider>
   );
 }

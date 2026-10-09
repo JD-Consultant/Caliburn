@@ -27,7 +27,7 @@ from caliburn.features.job_description.sources import (
     SourceTargetKind,
 )
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.model_tools.jd_detail_projection import (
     jd_read_source_targets,
     project_jd_item,

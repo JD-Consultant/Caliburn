@@ -33,9 +33,9 @@ OPERATION_INSERT = (
 def create_file_revision(connection: psycopg.Connection) -> tuple[UUID, UUID]:
     job_file_id, revision_id = uuid4(), uuid4()
     connection.execute(
-        "INSERT INTO job_files (job_file_id, creation_command_id, initial_display_name, "
-        "display_name, employee_name) VALUES (%s,%s,'candidate test','candidate test','synthetic')",
-        (job_file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id, initial_display_name, "
+        "display_name, employee_name) VALUES (%s,'candidate test','candidate test','synthetic')",
+        (job_file_id,),
     )
     connection.execute(
         "INSERT INTO jd_revisions (job_file_id, revision_id) VALUES (%s,%s)",

@@ -1,18 +1,32 @@
+%% title: 現行：建立命令的恢復與結果收束
+%% legend: 實線實心箭頭為等待完成的呼叫，虛線為回覆；alt 為替代路徑，opt 為有條件的畫面動作。省略本機欄位驗證與 409 內容衝突。
 sequenceDiagram
-  participant UI as 建立表單
+  participant UI as useStoredCommand
   participant Tab as 本分頁 sessionStorage
   participant API as 檔案 HTTP／Workflow
   participant DB as PostgreSQL
   UI->>Tab: 保留原命令識別及原輸入
   UI->>API: POST 原命令
-  API->>DB: 原子建立檔案與正式開場，或查回原結果
+  API->>DB: 原子建立檔案／開場／命令紀錄<br/>或讀回原命令結果
   DB-->>API: 原操作結果
   alt 前端取得合法成功結果
     API-->>UI: 原檔案識別
-    UI->>Tab: 清除待確認命令
-    UI->>API: 按檔案 ID 回讀 metadata／正式訪談
+    UI->>API: 取消舊清單 GET 後重新讀取
+    API-->>UI: 目前清單或讀取失敗
+    UI->>Tab: 重新比對原命令 ID 與 payload<br/>只清除仍相符的紀錄
+    Tab-->>UI: 已清除／紀錄已變／清理不可用
+    opt 原表單仍掛載、紀錄未被替換且刷新成功
+      UI->>UI: 完成回呼，導向原檔案
+    end
+  else 原檔案已刪除
+    API-->>UI: 410 creation_result_deleted
+    UI->>API: 重新讀取清單
+    API-->>UI: 目前清單或讀取失敗
+    UI->>Tab: 只清除仍相符的原命令
+    Note over UI,DB: 原隨機 command ID 留在後端<br/>這次重送不重新建立檔案
   else 回應遺失或結果格式無法採用
     UI->>Tab: 保留原命令，禁止改 payload
     Note over UI,Tab: 同分頁 reload／重開表單<br/>重新確認原請求
     UI->>API: 重送同一命令，不另建新識別
   end
+  Note over UI,Tab: 刷新與條件清理不依賴原表單掛載<br/>讀取／清理失敗不改寫已知後端結果

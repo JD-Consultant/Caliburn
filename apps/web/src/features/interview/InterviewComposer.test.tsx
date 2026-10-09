@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { InterviewComposer } from './InterviewComposer';
-import { readTurnHint, retainTurnHint } from './interview-turn-api';
+import { clearDeletedInterview, readTurnHint, retainTurnHint } from './interview-turn-api';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const executionId = '20000000-0000-4000-8000-000000000002';
@@ -38,7 +38,7 @@ function renderComposer() {
     client,
     ...render(
       <QueryClientProvider client={client}>
-        <InterviewComposer jobFileId={fileId} />
+        <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={fileId} />
       </QueryClientProvider>,
     ),
   };
@@ -47,7 +47,178 @@ function renderComposer() {
 beforeEach(() => localStorage.clear());
 afterEach(() => {
   clients.splice(0).forEach((client) => client.clear());
+  vi.useRealTimers();
   vi.unstubAllGlobals();
+});
+
+async function holdFileLock(): Promise<() => Promise<void>> {
+  let release: () => void = () => {};
+  let acquired: () => void = () => {};
+  const locked = new Promise<void>((resolve) => {
+    acquired = resolve;
+  });
+  const held = navigator.locks.request('caliburn:interview-turn:' + fileId, {}, () => {
+    acquired();
+    return new Promise<void>((resolve) => {
+      release = resolve;
+    });
+  });
+  await locked;
+  return async () => {
+    release();
+    await held;
+  };
+}
+
+test('waiting for the file lock protects the first input until exactly one POST', async () => {
+  const release = await holdFileLock();
+  const posts: { command_id: string; text: string }[] = [];
+  vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+    if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
+    if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
+    const command = JSON.parse(options.body) as { command_id: string; text: string };
+    posts.push(command);
+    return Promise.resolve(
+      Response.json({
+        job_file_id: fileId,
+        command_id: command.command_id,
+        execution_id: executionId,
+        source_id: sourceId,
+      }),
+    );
+  });
+  renderComposer();
+  const textbox = screen.getByRole('textbox', { name: '訪談內容' });
+  await userEvent.type(textbox, input);
+  await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+  try {
+    expect(textbox).toBeDisabled();
+    expect(screen.getByRole('button', { name: '正在確認送出…' })).toBeDisabled();
+    await userEvent.type(textbox, '等待期間補充');
+    expect(textbox).toHaveValue(input);
+    expect(posts).toHaveLength(0);
+    const form = textbox.closest('form');
+    if (!form) throw new Error('Expected composer form');
+    fireEvent.submit(form);
+  } finally {
+    await act(release);
+  }
+  await screen.findByText('顧問正在處理，尚未正式完成。');
+  expect(posts).toEqual([{ command_id: readTurnHint(fileId)?.command_id, text: input }]);
+});
+
+test('lock acquisition timeout sends nothing and unlocks the original draft for editing', async () => {
+  const release = await holdFileLock();
+  const fetch = vi.fn();
+  vi.stubGlobal('fetch', fetch);
+  renderComposer();
+  const textbox = screen.getByRole('textbox', { name: '訪談內容' });
+  await userEvent.type(textbox, input);
+  await waitFor(() => expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled());
+  const form = textbox.closest('form');
+  if (!form) throw new Error('Expected composer form');
+  vi.useFakeTimers();
+  try {
+    await act(async () => {
+      fireEvent.submit(form);
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(textbox).toBeDisabled();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5_000);
+    });
+    expect(screen.getByText(/尚未送出/)).toBeVisible();
+    expect(screen.queryByText(/送出結果尚未確認/)).not.toBeInTheDocument();
+    expect(textbox).toBeEnabled();
+    expect(textbox).toHaveValue(input);
+    expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(readTurnHint(fileId)).toBeNull();
+  } finally {
+    vi.useRealTimers();
+    await act(release);
+  }
+  await userEvent.type(textbox, '可繼續編輯');
+  expect(textbox).toHaveValue(input + '可繼續編輯');
+});
+
+test('unmount aborts a queued reservation so releasing the lock cannot send a late POST', async () => {
+  const release = await holdFileLock();
+  const fetch = vi.fn();
+  vi.stubGlobal('fetch', fetch);
+  const { unmount } = renderComposer();
+  await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
+  await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+  unmount();
+  await act(release);
+  expect(fetch).not.toHaveBeenCalled();
+  expect(readTurnHint(fileId)).toBeNull();
+});
+
+test('unmount after reservation storage succeeds prevents the post-lock POST', async () => {
+  const release = await holdFileLock();
+  const fetch = vi.fn();
+  vi.stubGlobal('fetch', fetch);
+  const { unmount } = renderComposer();
+  await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
+  await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+  const save = localStorage.setItem.bind(localStorage);
+  const stored = vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key, value) => {
+    save(key, value);
+    unmount();
+  });
+  await act(release);
+  expect(stored).toHaveBeenCalledOnce();
+  const hint = readTurnHint(fileId);
+  expect(hint?.command_id).toBeTypeOf('string');
+  expect(hint?.execution_id).toBeNull();
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+test('without Web Locks discovery remains readable but input cannot be submitted', async () => {
+  const locks = navigator.locks;
+  Object.defineProperty(navigator, 'locks', { configurable: true, value: undefined });
+  const fetch = vi.fn();
+  vi.stubGlobal('fetch', fetch);
+  try {
+    const { client } = renderComposer();
+    await waitFor(() =>
+      expect(client.getQueryData(['current-consultant-turn', fileId])).toEqual({ turn: null }),
+    );
+    expect(screen.getByText(/仍可查詢既有處理/)).toBeVisible();
+    expect(screen.getByRole('button', { name: '送出訪談' })).toBeDisabled();
+    await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
+    const form = screen.getByRole('textbox', { name: '訪談內容' }).closest('form');
+    if (!form) throw new Error('Expected composer form');
+    fireEvent.submit(form);
+    await screen.findByText(/尚未送出/);
+    expect(fetch).not.toHaveBeenCalled();
+  } finally {
+    Object.defineProperty(navigator, 'locks', { configurable: true, value: locks });
+  }
+});
+
+test('an accepted POST whose execution hint cannot be saved remains known accepted', async () => {
+  vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+    if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage unavailable');
+    });
+    return Promise.resolve(
+      Response.json({
+        job_file_id: fileId,
+        command_id: readTurnHint(fileId)?.command_id,
+        execution_id: executionId,
+        source_id: sourceId,
+      }),
+    );
+  });
+  renderComposer();
+  await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
+  await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+  expect(await screen.findByText(/原輸入已受理/)).toBeVisible();
+  expect(screen.queryByText(/尚未送出|送出結果尚未確認/)).not.toBeInTheDocument();
+  expect(await screen.findByText('顧問正在處理，尚未正式完成。')).toBeVisible();
 });
 
 test('uncertain acceptance preserves text and retries the same persisted command', async () => {
@@ -90,7 +261,7 @@ test('uncertain acceptance preserves text and retries the same persisted command
 });
 
 test('reload verifies the saved execution and follows it to completion without resending', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   let reads = 0;
   const fetch = vi
     .fn<(path: string, options?: RequestInit) => Promise<Response>>()
@@ -112,7 +283,7 @@ test('reload verifies the saved execution and follows it to completion without r
 test.each(['failed', 'cancelled'] as const)(
   '%s input stays explicitly nonformal',
   async (status) => {
-    retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+    await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...active, status })));
     renderComposer();
     expect(await screen.findByText(/未列入正式訪談/)).toBeVisible();
@@ -139,11 +310,13 @@ test('storage failure prevents a POST and keeps the draft', async () => {
   await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
   expect(await screen.findByText(/尚未送出/)).toBeVisible();
   expect(screen.getByLabelText('訪談內容')).toHaveValue(input);
+  expect(screen.getByLabelText('訪談內容')).toBeEnabled();
+  expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled();
   expect(fetch).not.toHaveBeenCalled();
 });
 
 test('wrong-file status is rejected without exposing its original input or opening a new turn', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const fetch = vi.fn().mockResolvedValue(Response.json({ ...active, job_file_id: sourceId }));
   vi.stubGlobal('fetch', fetch);
   renderComposer();
@@ -184,7 +357,7 @@ test('reload after lost POST acknowledgement recovers by the same command withou
 });
 
 test('unresolved command lookup keeps the identity and allows read-only retry', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: null });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: null });
   const fetch = vi
     .fn<(path: string, options?: RequestInit) => Promise<Response>>()
     .mockResolvedValueOnce(
@@ -202,7 +375,7 @@ test('unresolved command lookup keeps the identity and allows read-only retry', 
 });
 
 test('saved commentary is safe nonformal text and leaves the composer on completion', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const publicText = '<script>not executable</script> 正在核對職責';
   let reads = 0;
   vi.stubGlobal(
@@ -293,3 +466,74 @@ test('a pre-admission rejection on retry does not erase an earlier uncertain acc
   expect(readTurnHint(fileId)).toEqual(hint);
   expect(screen.getByLabelText('訪談內容')).toBeDisabled();
 });
+
+test.each(['timeout', 'abort', 'non-json'] as const)(
+  'an uncertain %s response keeps the original pending command and text',
+  async (failure) => {
+    const writes: string[] = [];
+    vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+      if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
+      writes.push(typeof options.body === 'string' ? options.body : '');
+      if (failure === 'non-json')
+        return Promise.resolve(new Response('<html>unknown</html>', { status: 200 }));
+      return Promise.reject(
+        new DOMException(
+          'synthetic transport failure',
+          failure === 'timeout' ? 'TimeoutError' : 'AbortError',
+        ),
+      );
+    });
+    renderComposer();
+    await userEvent.type(screen.getByLabelText('訪談內容'), input);
+    await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
+    expect(await screen.findByText(/送出結果尚未確認/)).toBeVisible();
+    const original = readTurnHint(fileId);
+    expect(original?.execution_id).toBeNull();
+    expect(screen.getByLabelText('訪談內容')).toHaveValue(input);
+    await userEvent.click(screen.getByRole('button', { name: '重新確認原請求' }));
+    await waitFor(() => expect(writes).toHaveLength(2));
+    expect(writes[1]).toBe(writes[0]);
+    expect(readTurnHint(fileId)).toEqual(original);
+  },
+);
+
+test.each(['delete-first', 'submit-first'] as const)(
+  'confirmed deletion cancels a queued reservation before React unmounts (%s)',
+  async (order) => {
+    let release: () => void = () => {};
+    const held = navigator.locks.request(
+      'caliburn:interview-turn:' + fileId,
+      { mode: 'exclusive' },
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    const posts: string[] = [];
+    vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+      if (options?.method === 'POST')
+        posts.push(typeof options.body === 'string' ? options.body : '');
+      return Promise.resolve(Response.json(active));
+    });
+    renderComposer();
+    await userEvent.type(screen.getByLabelText('訪談內容'), input);
+    await waitFor(() => expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled());
+    let deletion: Promise<void> = Promise.resolve();
+    act(() => {
+      const form = screen.getByLabelText('訪談內容').closest('form');
+      if (!form) throw new Error('Expected composer form');
+      if (order === 'delete-first') deletion = clearDeletedInterview(fileId);
+      fireEvent.submit(form);
+      if (order === 'submit-first') deletion = clearDeletedInterview(fileId);
+    });
+    await act(async () => {
+      release();
+      await held;
+      await deletion;
+    });
+    expect(posts).toEqual([]);
+    expect(readTurnHint(fileId)).toBeNull();
+  },
+);

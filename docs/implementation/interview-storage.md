@@ -1,8 +1,8 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證範圍見[實作驗證](verification-plan.md)。
+- 狀態：**現行職務檔案、訪談與准入保存接線**。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)，測試責任見[驗證對照](verification-plan.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[Memory 選讀與來源](memory-tools.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
-- 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
+- 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[目前資料表](../../apps/api/src/caliburn/features/job_files/persistence.py)及[遷移序列](../../apps/api/src/caliburn/migrations/versions/)。建檔收據的現行結構由 [0030](../../apps/api/src/caliburn/migrations/versions/0030_job_file_creation_receipts.py)建立，不能只讀最初的 `0001` 判定。
 
 | 維護問題 | 閱讀位置 |
 |---|---|
@@ -14,47 +14,67 @@
 
 ## 1. 原文、正式資格與執行身分分開，不複製原話
 
-以下兩個視圖涵蓋職務檔案、訪談與准入的七張相關業務表；JD、Memory 與 Graph checkpoint 另有各自的保存責任。同名表是同一份資料，不是副本；拆圖避免多條跨層線遮住節點。
+下列兩圖涵蓋職務檔案、訪談與准入的八張相關業務表；JD、Memory 與 Graph checkpoint 各有自己的保存責任。兩圖中的同名表是同一份資料；分圖呈現是為了避免跨層連線遮住節點。
 
 以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
 
-**原文與正式資格：**
+### 原文與正式資格
 
 ![現行：1. 原文、正式資格與執行身分分開，不複製原話—原文與正式資格](../diagrams/implementation/interview-storage/raw-text-formal-qualification.png)
 
 [圖源](../diagrams/implementation/interview-storage/raw-text-formal-qualification.mmd) · [SVG](../diagrams/implementation/interview-storage/raw-text-formal-qualification.svg)
 
-**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
+建檔命令在 `job_file_creations.command_id`，不在 `job_files`。收據的 `result_file_id` 可空且唯一：檔案刪除後設為 NULL，命令仍保留；兩端的 `0..1` 表示 FK／唯一約束本身的範圍，不表示建立工作流允許缺少收據。
+
+### 檔案准入與改名結果
+
+下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)；型別與欄位同樣簡化。
+
+`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
 
 ![現行：1. 原文、正式資格與執行身分分開，不複製原話—檔案准入與改名結果](../diagrams/implementation/interview-storage/execution-admission-renames.png)
 
 [圖源](../diagrams/implementation/interview-storage/execution-admission-renames.mmd) · [SVG](../diagrams/implementation/interview-storage/execution-admission-renames.svg)
 
+### 各表的保存責任
+
 | 儲存 | 擁有的內容與身分 | 關係／約束 |
 |---|---|---|
-| `job_files` | UUID 職務檔案、目前顯示名稱、受訪者及建立命令的原始結果資料 | 同名可存在；建立命令唯一。名稱不是隔離鍵 |
+| `job_files` | UUID 職務檔案、目前顯示名稱、受訪者及建立時的結果資料 | 同名可存在；名稱不是隔離鍵 |
+| `job_file_creations` | 建檔命令 UUID 及可空的結果檔案連結 | 命令唯一、結果唯一；刪檔後 FK 設 NULL，保留命令已結束身分，不能重新綁定 |
 | `job_file_renames` | 原改名命令的期望名稱修訂、新名稱與結果修訂 | 檔案＋命令複合主鍵、FK、結果不可變；不複製員工姓名／訪談／JD |
-| `interview_texts` | 不可變來源、所屬檔案、真實發話者、完整訪談原文 | 沒有正式序號；UPDATE／DELETE 拒絕 |
+| `interview_texts` | 不可變來源、所屬檔案、真實發話者、完整訪談原文 | 沒有正式序號；拒絕單獨 UPDATE／DELETE，整檔刪除例外見 §11 |
 | `formal_interviews` | 檔案內的正式順序及指向原文的來源身分 | 同檔案複合外鍵；來源最多取得一次正式資格；正整數、不可改寫 |
 | `interview_inputs` | 原提交命令、原文來源與 A 執行的固定關係 | 同檔案複合 FK；命令限檔案內唯一；不可改寫。只有員工提交有此關係，App 開場沒有 |
 | `interview_replies` | 已正式採用的完整答覆來源與原提交的固定關係 | 每次提交最多一份；同檔案複合 FK、不可改寫；原文仍只在 `interview_texts` 保存 |
 | `executions` | 工作種類、持久准入狀態與可被取代的 writer 身分 | 同檔案各一個活躍／暫停 A、各一個活躍 Memory；不保存模型窗口、圖節點或候選正文 |
 
-一份檔案可有多筆原文；原文可以尚無正式資格。正式歷史從 `formal_interviews` JOIN `interview_texts` 投影，不直接掃全部原文。複合 FK `(job_file_id, source_id)` 防止把甲檔案的原文編入乙檔案；`source_id` 與正式序號是不同身分。這是既定「原文保存不等於正式可用」的儲存分離，**不是新增一份可自行編輯的對話副本** 。
+一份檔案可有多筆原文，原文可以尚無正式資格。正式歷史從 `formal_interviews` JOIN `interview_texts` 投影，不直接掃全部原文。
+
+複合 FK `(job_file_id, source_id)` 防止把甲檔案的原文編入乙檔案；`source_id` 與正式序號是不同身分。這樣分開保存，承接既定的「原文保存不等於正式可用」；沒有新增可自行編輯的對話副本。
 
 App 開場在建立時取得序號 1。已接受員工輸入進原文與提交關係，暫不授予正式資格。A 完成 workflow 在共同完成交易中呼叫 §8 的序號分配介面；沒有任意新增正式訊息的對外 API。單獨停止執行資格不能代替整個 Turn 的候選／context 回退。
 
 ## 2. 建立與重送
 
-HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.service` 依建立命令插入 → 新建時由 `interviews.service` 保存 App 開場及正式序號 1 → 一起 COMMIT → 返回結果。
+依[建檔命令與刪除邊界](../architecture/persistence.md#6-保留失效與清理)採用獨立建檔收據。建立流程依序為：
 
-- 同一建立命令併發重送：PostgreSQL unique＋`INSERT … ON CONFLICT DO NOTHING` 排除重複建立，再查該命令的原結果。不是先查再假設沒有競爭。
-- 同一命令、不同輸入：拒絕；不能悄悄把這次輸入套在原檔案。
-- 同一命令原結果：用建立時名稱、受訪者、身分與時間重建 typed result；目前名稱已改也不冒充原結果。初始建立資料受不可變保護；**不為這個小命令另建通用收據平台** 。
+1. HTTP 驗證生成 DTO。
+2. `JobFileWorkflow.create` 開短交易。
+3. `job_files.service` 保留命令收據並建立檔案。
+4. 新建時保存 App 開場、正式序號 1 及初始 JD。
+5. 一起 COMMIT，再返回結果。
+
+### 原命令與失敗情境
+
+- 同一建立命令併發重送：收據 unique＋`INSERT … ON CONFLICT DO NOTHING` 排除重複建立。其後以一條 receipt LEFT JOIN root 查詢取得全部原結果欄位；純重播不取得額外列鎖。
+- 結果仍存在、同一命令不同輸入：拒絕；不能悄悄把這次輸入套在原檔案。
+- 結果仍存在、同一命令原結果：用建立時名稱、受訪者、身分與時間重建 typed result；目前名稱已改也不冒充原結果。初始建立資料受不可變保護；收據只屬 job_files owner，不建立通用命令平台。
+- 結果已刪除：原命令仍為已結束，任何 payload 皆回 `410 creation_result_deleted`，不重建檔案；收據不保留原名稱、姓名、內容、hash 或 file ID。非 NULL 收據卻沒有 root 屬完整性錯誤，不能猜成已刪或新建。
 - 開場寫入後發生錯誤：整個短交易回滾；檔案、原文與正式資格不留下半套。重送原命令可重新建立。
-- DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交須使用隔離資料庫與程序驗證。
+- DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交的驗證範圍見[驗證對照](verification-plan.md)。
 
-開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[產品內容判準](../product-concept.md#內容判準)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
+開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[產品內容判準](../product/concepts.md#內容判準)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
 
 ## 3. 程式分責
 
@@ -78,11 +98,11 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 
 僅使用 `CALIBURN_DATABASE_URL`／`CALIBURN_DATABASE_SCHEMA`；不讀舊 `DATABASE_URL` 或自動載入 `.env`。schema 驗證為單一小寫識別符，不拼接任意使用者字串。URL 不出現在 settings repr。
 
-初始化使用 Alembic 的標準 migration；啟動只核對 head，不自動建表或升級。未設定新 DB 可啟動 health，但資料 API 明確 503；指定空或錯版 schema 則啟動失敗，避免帶著半套結構繼續。命令見 [backend README](../../apps/api/README.md#目標資料庫初始化)。
+初始化使用 Alembic 的標準 migration；啟動只核對 head，不自動建表或升級。未設定新 DB 時可啟動 health，但資料 API 明確回 503；指定空或錯版 schema 時則啟動失敗，避免帶著不完整結構繼續執行。命令見 [backend README](../../apps/api/README.md#目標資料庫初始化)。
 
-遷移與連線都固定同一 search path；migration 額外核對 `current_schema()`。版本表使用該 default schema，避免同時配置顯式 `version_table_schema` 後，autogenerate 將同一張表再次視為一般表。正式環境的帳號／權限與備份須按[操作手冊](../runbook.md)配置，不能由隔離測試推定任意部署皆安全。
+遷移與連線都固定同一 search path；migration 額外核對 `current_schema()`。版本表使用該 default schema，避免同時配置顯式 `version_table_schema` 後，autogenerate 將同一張表再次視為一般表。正式環境的帳號／權限與備份須按[操作手冊](../operations/README.md)配置，不能由隔離測試推定任意部署皆安全。
 
-Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
+Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
 
 ## 5. 官方機制與本案取捨
 
@@ -93,25 +113,44 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http)；Python／TypeS
 
 ## 6. 輸入接受、重送與新提交
 
-[InterviewInputWorkflow](../../apps/api/src/caliburn/workflows/interview_inputs.py)以一個短交易依序：鎖定職務檔案列 → 查原命令 → 若尚未成立則取得 A 准入 → 保存原文及提交關係 → COMMIT。命令身分由 HTTP client 提供；execution／source UUID 由 App 配置，不讓模型填寫。
+[InterviewInputWorkflow](../../apps/api/src/caliburn/workflows/interview_inputs.py)在一個短交易內依序執行：
+
+1. 鎖定職務檔案列。
+2. 查原命令。
+3. 若原命令尚未成立，則取得 A 准入並保存原文及提交關係。
+4. COMMIT。
+
+命令身分由 HTTP client 提供；execution／source UUID 由 App 配置，不讓模型填寫。
 
 - 原命令已存在：核對完整原文字串，返回相同 source／execution。即使原 Turn 已取消，這仍是「當時曾接受」的原結果，不表示再次執行；UI 之後查當前執行狀態，不能由 200 推論 A 活躍。
-- 使用者決定重新提交相同文字：使用**新命令** ，得到新執行／來源；舊輸入不進正式歷史。與瀏覽器斷線重送原命令不同。
+- 使用者決定重新提交相同文字：使用**新命令**，得到新執行／來源；舊輸入不進正式歷史。這與瀏覽器斷線後重送原命令不同。
 - 同命令不同文字回 409；同檔案另一個活躍／暫停 A 回 409，未接受內容不承諾已保存。輸入驗證不做 trim 或補標籤，完整保留實際文字；空白／NUL 拒絕。
 - 原文寫入後交易失敗：原文、提交關係與准入一起回滾。不能只留下活躍 A 卻沒有其輸入，也不能留下可被背景取用的半套來源。
 - 正式訪談 API 始終只讀正式資格 JOIN 原文。可保存、可供原工作接續、可給其他 Agent 引用，是三種不同能力。
 
-HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervisor，由其核持久資格啟動／恢復 A。控制沿[程序監督](agent-supervision.md)，正式完成沿[候選採用](jd-storage.md#31-本輪候選與可恢復位置)；202 不代表 AI 已產生或正式保存答覆。
+HTTP 202 **只證明輸入與准入已保存**；bootstrap 喚醒本機 supervisor，由其核持久資格啟動／恢復 A。控制沿[程序監督](agent-supervision.md)，正式完成沿[候選採用](jd-storage.md#31-本輪候選與可恢復位置)；202 不代表 AI 已產生或正式保存答覆。
 
 ## 7. 准入與 writer fencing 的實際界線
 
+### 同檔案准入
+
 [Execution service](../../apps/api/src/caliburn/features/executions/service.py)使用 PostgreSQL partial unique index 限制 `(job_file_id, kind)` 中 status 為 active／paused 的列。A 與 Memory 的種類不同，可以同檔並行；不同檔案互不鎖整個 App。額外以 CHECK 拒絕 Memory 的 paused／cancelled，使用者不管理 Memory。
 
-執行准入與 writer 領取分開：輸入可先可靠保存，尚無 writer。Runner 提供 App 產生且可重用的 `writer_id`，以列鎖核對原 writer 身分後領取；相同領取可重入，競爭者不能覆蓋已成立身分。受控恢復可明確比較並取代舊 writer，之後遲到的舊 writer 不得寫入。這是資料庫檢查用的 **fencing** ，不是授權憑證、租約、自動逾時或已確認程序停止的證據。
+### Writer 領取與接管
 
-需具副作用的 workflow 必須在**同一交易** 內 `lock_active_writer` 後才改候選／完成；不能檢查後先 COMMIT，再以記憶體裡的結果寫入。取消／完成也鎖同一執行列，因此終態只能有一個勝者。terminal 結果不可反向改為 active；原結果查回不授予新的寫入資格。這僅保證資格裁決，不等於完整 JD、正式訪談與背景意圖已共同提交。
+執行准入與 writer 領取分開：輸入可在尚無 writer 時先可靠保存。Runner 提供 App 產生且可重用的 `writer_id`，以列鎖核對原 writer 身分後領取；相同領取可重入，競爭者不能覆蓋已成立身分。
 
-固定短鎖順序為 **職務檔案 → 執行 → 相關領域記錄** 。A 接受與人工 JD 修改共享職務檔案列的短鎖；人工 workflow 鎖檔案後呼叫 `require_manual_edit_allowed`。單純候選工具／控制只需執行列時不得反向再取檔案鎖。檔案鎖／交易不跨模型呼叫、等待使用者或 backoff。
+受控恢復可明確比較並取代舊 writer，之後遲到的舊 writer 不得寫入。這是資料庫檢查用的 **fencing**，不是授權憑證、租約、自動逾時或已確認程序停止的證據。
+
+### 提交資格與鎖順序
+
+需具副作用的 workflow 必須在**同一交易**內 `lock_active_writer` 後才改候選／完成；不能檢查後先 COMMIT，再以記憶體裡的結果寫入。取消／完成也鎖同一執行列，因此終態只能有一個勝者。
+
+terminal 結果不可反向改為 active；原結果查回不授予新的寫入資格。這僅保證資格裁決，不等於完整 JD、正式訪談與背景意圖已共同提交。
+
+固定短鎖順序為 **職務檔案 → 執行 → 相關領域記錄**。A 接受與人工 JD 修改共享職務檔案列的短鎖；人工 workflow 鎖檔案後呼叫 `require_manual_edit_allowed`。單純候選工具／控制只需執行列時不得反向再取檔案鎖。檔案鎖／交易不跨模型呼叫、等待使用者或 backoff。
+
+### 狀態與恢復邊界
 
 `pause_execution` 表示 runner 已到安全點；UI「要求暫停」先保存控制意圖，兩者分開。`finish_execution` 只改准入資格，由 A／Memory workflow 與所需業務效果一起提交。被取消／失敗來源的原文仍保留，不取得正式序號或模型可見歷史資格。
 
@@ -121,7 +160,11 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 ## 8. 正式答覆與序號：參與完成交易，不自成完成 API
 
-`record_formal_interview(session, writer, reply_text=...)` 是 [A 完成交易的訪談參與介面](../../apps/api/src/caliburn/workflows/interview_completion.py)，不擁有 session／COMMIT，不呼叫模型，也不自行把 execution 標成 completed。調用者必須已辨認完整正式答覆，不把進度文字、工具請求或串流片段交入；A 完成 workflow 在同一交易採用 JD、來源並確立背景要求資格，再裁決完成，不能把本介面另包成獨立正式化 endpoint。
+`record_formal_interview(session, writer, reply_text=...)` 是 [A 完成交易的訪談參與介面](../../apps/api/src/caliburn/workflows/interview_completion.py)，不擁有 session／COMMIT，不呼叫模型，也不自行把 execution 標成 completed。
+
+調用者必須已辨認完整正式答覆，不把進度文字、工具請求或串流片段交入；A 完成 workflow 在同一交易採用 JD、來源並確立背景要求資格，再裁決完成，不能把本介面另包成獨立正式化 endpoint。
+
+參與介面依序執行：
 
 1. 核種類為 A，鎖職務檔案，查這次 execution 原已成立的正式交流。已完成重送承接原 pair；相同 execution 配不同答覆拒絕，不讀目前最後兩則冒充。
 2. 未完成原結果則鎖當前 writer，確認仍 active；paused、cancelled、failed、過期 writer、錯誤檔案及 Memory 不可授予正式訪談資格。
@@ -132,7 +175,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 依據：[PostgreSQL sequence](https://www.postgresql.org/docs/current/functions-sequence.html)明示 `nextval` 不隨交易 abort 回收，不能提供無跳號序列；本案利用已需的檔案列鎖與短交易分配。這是正式序號的產品要求，不推廣成所有內部 ID 都要連號。
 
-驗證：訪談交易、A 共同完成、程序恢復。測試層級各自成立，不由底層交易通過推定模型品質。
+驗證責任見[驗證對照](verification-plan.md)中的訪談交易、A 共同完成及程序恢復；各層證據分開判讀，不由底層交易通過推定模型品質。
 
 ## 9. 有界來源查詢與近期歷史投影
 
@@ -154,22 +197,35 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 | `read_interview_range` | 閉區間內全部正式原文；任一缺失、非法或超出 App 固定上界就整筆拒絕，無部分成功 |
 | `read_recent_interviews` | `(K,H/F]` 完整原文，必要時補最近合法前問；`context_sequences` 明示只為語境補入的序號，不改涵蓋 |
 
-所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的資料保存模組。即使後面又有正式訪談，原 scope 不會擴張。直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
+所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的資料保存模組。即使後面又有正式訪談，原 scope 不會擴張。
+
+直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
 
 A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工作恢復沿原範圍。模型可見投影與錯誤由[工具邊界](memory-tools.md)負責，完整請求容量由[模型外送](model-requests.md#4-固定請求計數與容量准入)核對。來源查詢不自行刷新角色基準。
 
-**人的公開歷史回看。** 歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。
+### 人的公開歷史回看
+
+歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。
+
+UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。
 
 ## 10. 列表改名：名稱新鮮度與原操作結果
 
 改名只改職務檔案的顯示標籤，同名仍可存在；stable ID、員工姓名、訪談與 JD 不受影響。HTTP 用 `POST /api/job-files/{job_file_id}/rename`，參數由[唯一 schema](../../apps/api/contracts/http/rename-job-file-request.schema.json)定義；這不是 Memory 的 title 解析，也不把 UI 修訂參數搬進模型工具。
 
-`JobFileWorkflow.rename` 開短交易 → 取得檔案列鎖 → 先查原命令 → 有結果則校驗 payload 並回原結果 → 新命令才核 `expected_name_revision` → 修改 label、保存原結果 → 同次提交。列鎖釋放後才返回 HTTP；不持鎖等待人或模型，不改 A／Memory 執行資格。
+`JobFileWorkflow.rename` 依序處理：
+
+1. 開短交易並取得檔案列鎖。
+2. 先查原命令；有結果則校驗 payload 並回原結果。
+3. 新命令才核 `expected_name_revision`，修改 label 並保存原結果。
+4. 同次提交，列鎖釋放後才返回 HTTP。
+
+過程不持鎖等待人或模型，也不改 A／Memory 執行資格。
 
 - `name_revision` 只代表此 label 的新鮮度，從 1 開始。DB trigger 在 label 真正改變時加一；改回同字仍前進，不讓舊分頁繞過檢查。同值命令可確認，但不增加修訂。
-- 過期基準回 409，不默默覆蓋；同命令不同 payload 亦拒絕。原命令先查，所以即使後來已有新名稱，重送仍回原結果而**不再次改名** 。UI 成功後須 GET 最新 metadata，不把舊結果寫成目前名稱。
+- 過期基準回 409，不默默覆蓋；同命令不同 payload 亦拒絕。原命令先查，所以即使後來已有新名稱，重送仍回原結果而**不再次改名**。UI 成功後須 GET 最新 metadata，不把舊結果寫成目前名稱。
 - 建立重送仍用不可變 `initial_display_name`、初始修訂 1 及原建立資料，不受 rename 結果影響。新欄位由 [0004 migration](../../apps/api/src/caliburn/migrations/versions/0004_job_file_renames.py)加入，不重寫舊 migration。
-- 只存最小的原命令及結果欄位；現行表頭無法證明某個舊命令是否已提交，因此此資料不能只放 UI。這是職務檔案領域模組保存的結果，不是新通用收據服務、Graph checkpoint 或全文版本平台。首版不清除可重送命令結果。
+- 只存最小的原命令及結果欄位；現行表頭無法證明某個舊命令是否已提交，因此此資料不能只放 UI。這是職務檔案領域模組保存的結果，不是通用收據服務、Graph checkpoint 或全文版本平台。目前不自動清除可重送命令結果；整檔刪除依 §11 處理。
 
 研究借鑑 [Google AIP-154](https://google.aip.dev/154)的資源新鮮度檢查與 [PostgreSQL row lock](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)；本案採明確 label counter 而非完整資源 ETag，原操作重送保證沿本案既有交易契約。測例涵蓋舊命令重送、同基準競爭、同名隔離、改回同字、原結果不可改、後段失敗一起回滾；不由此宣稱全產品程序故障或交付安全已完成。
 
@@ -177,14 +233,23 @@ A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工
 
 使用者在清單確認後，`DELETE /api/job-files/{job_file_id}` 移除整份職務檔案及其訪談、JD、Memory、引用與執行紀錄。成功回 HTTP 204，沒有 JSON 正文；目標已不存在也回 204，因此回應遺失時可重送同一個檔案 ID。這不是隱藏清單或軟刪除，不提供 Undo。
 
-`JobFileWorkflow.delete` 先鎖住既有顧問與 Memory 執行管理程序的派送入口，再在短交易中取得職務檔案列鎖，檢查是否有 active／paused 的執行，刪除根記錄及該檔案的原生 checkpoint。任一同檔案的執行還在運作或收尾，或資料庫仍有未結束工作時，回 HTTP 409，公開錯誤碼為 `job_file_busy`，不刪任何資料。即使取消或完成狀態已提交，也必須等原執行真正退出後再刪除。
+建檔收據的結果 FK 在同一刪除交易設 NULL，只永久保留隨機命令 UUID，拒絕晚到的原建檔重送；不保留原檔案身分或內容。此最小例外沿 [建檔命令與刪除邊界](../architecture/persistence.md#6-保留失效與清理)，刪除失敗或回滾不產生已刪終態。
+
+### 刪除准入與短交易
+
+`JobFileWorkflow.delete` 先鎖住既有顧問與 Memory 執行管理程序的派送入口，再在短交易中取得職務檔案列鎖，檢查是否有 active／paused 的執行，刪除根記錄及該檔案的原生 checkpoint。
+
+任一同檔案的執行還在運作或收尾，或資料庫仍有未結束工作時，回 HTTP 409，公開錯誤碼為 `job_file_busy`，不刪任何資料。即使取消或完成狀態已提交，也必須等原執行真正退出後再刪除。
 
 派送鎖持有至刪除交易提交，避免檢查後又啟動新的原生寫入；檔案列鎖與輸入准入共用，避免刪除後仍接受新的工作。刪除不等待模型，也不在持有資料庫列鎖時等待執行收尾；其他閒置檔案仍可正常刪除。未啟用模型時沒有背景執行管理程序，仍保留相同的資料庫忙碌檢查與交易。
+
+### 業務資料與 checkpoint 一起清理
 
 - 業務關係使用 PostgreSQL `ON DELETE CASCADE`；既有跨檔案複合外鍵仍保留。Migration `0025_job_file_deletion` 同步 ORM 與資料庫，不清空資料庫或其他 namespace。
 - 原文、固定修訂與原操作結果的保護仍成立；只有所屬檔案根記錄已刪除時，才允許其 cascade 清理。不能用單獨刪除原文或執行記錄繞過歷史保護；資料庫也檢查整份刪除時不能有未結束工作。
 - 原生 checkpoint 沒有業務外鍵。Adapter 按 App 的 `{job_file_id}:` thread 前綴找出該檔案的 threads，使用官方 `AsyncPostgresSaver.adelete_thread` 清除 checkpoint、blob 與 write。Saver 借用當前 SQLAlchemy session 的 psycopg connection，不另開可自行提交的 pool；任一步失敗，業務資料與 checkpoint 一起回滾。
 - 原生寫入另由 `JobFilePostgresSaver` 保護：`aput`／`aput_writes` 在官方寫入連線的同一交易內，先取得所屬檔案的 `FOR KEY SHARE` 鎖。刪除根列的排他鎖與它互斥；已開始的保存先完成，刪除才清理，刪除先成立則後到的保存拒絕。取消或重複取消不能提早釋放保存交易。這不改寫框架表、不另存 checkpoint，也不把模型等待放進交易。
-- 必須透過上述 HTTP／workflow 刪除；手動 SQL 刪根記錄不會代為呼叫原生 Saver。刪除不操作 OpenAI、不刪容器或 volume，也不影響其他檔案及隔離實驗資料庫。
 
-機制依據為 PostgreSQL 的[外鍵 cascade](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)、[trigger 條件](https://www.postgresql.org/docs/current/sql-createtrigger.html)與[列鎖互斥](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)，原生 Saver 的刪除與連線行為亦核對鎖定版本原碼。確認、錯誤及重讀行為見[介面讀寫邊界](interface-and-delivery.md#11-讀寫邊界)。
+必須透過上述 HTTP／workflow 刪除；手動 SQL 刪根記錄不會代為呼叫原生 Saver。刪除不操作 OpenAI、不刪容器或 volume，也不影響其他檔案及隔離實驗資料庫。
+
+機制依據為 PostgreSQL 的[外鍵 cascade](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)、[trigger 條件](https://www.postgresql.org/docs/current/sql-createtrigger.html)與[列鎖互斥](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)，原生 Saver 的刪除與連線行為亦核對鎖定版本原碼。確認、錯誤及重讀行為見[介面讀寫邊界](interface-and-delivery.md#11-讀寫邊界)；測試責任見[驗證對照](verification-plan.md)。

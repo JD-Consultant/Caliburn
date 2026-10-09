@@ -17,6 +17,11 @@ from caliburn.features.executions.models import (
     ExecutionStateError,
     ExecutionWriter,
 )
+from caliburn.workflows.runner_failures import (
+    RunnerFailure,
+    capture_runner_failure,
+    has_terminal_outcome,
+)
 
 _LOG = logging.getLogger(__name__)
 
@@ -55,8 +60,8 @@ class ConsultantSupervisor:
         self._dispatch_lock = asyncio.Lock()
         self._tasks: dict[ExecutionScope, asyncio.Task[None]] = {}
         self._attempted: set[ExecutionScope] = set()
-        self._failures: dict[ExecutionScope, BaseException] = {}
-        self._failure: Exception | None = None
+        self._failures: dict[ExecutionScope, RunnerFailure] = {}
+        self._failure: RunnerFailure | None = None
         self._monitor: asyncio.Task[None] | None = None
         self._shutdown: asyncio.Task[None] | None = None
         self._leader_release: asyncio.Task[None] | None = None
@@ -68,19 +73,19 @@ class ConsultantSupervisor:
         return self._monitor is not None and not self._monitor.done() and not self._closing
 
     @property
-    def failure(self) -> Exception | None:
-        """Local diagnostic only; never serialize raw exceptions into HTTP/model output."""
+    def failure(self) -> RunnerFailure | None:
+        """Safe monitor disposition, without retaining its exception stack."""
         return self._failure
 
     @property
-    def failures(self) -> Mapping[ExecutionScope, BaseException]:
-        """Retain typed original-result handoffs for reconciliation, without logging payloads."""
+    def failures(self) -> Mapping[ExecutionScope, RunnerFailure]:
+        """Explicit recovery data is local only; never serialize it into HTTP/model output."""
         return MappingProxyType(self._failures)
 
     def stopped_reason(self, scope: ExecutionScope) -> str | None:
         """Safe disposition hint, not product completion/failure or retry permission."""
         error = self._failures.get(scope)
-        if isinstance(error, asyncio.CancelledError):
+        if error is not None and error.interrupted:
             return "runner_interrupted"
         if error is not None:
             return "runner_failed"
@@ -152,6 +157,21 @@ class ConsultantSupervisor:
         self._failures.pop(scope, None)
         self._wake.set()
 
+    def release_terminal_result(self, scope: ExecutionScope) -> None:
+        """Control owner only, after confirmed terminal commit and invocation exit."""
+        if self.has_runner(scope):
+            raise ExecutionStateError("The consultant invocation is still finishing")
+        self._failures.pop(scope, None)
+
+    def forget_deleted_file(self, job_file_id: UUID) -> None:
+        """Deletion owner only, after confirmed deletion while holding dispatch."""
+        if self.has_file_runner(job_file_id):
+            raise ExecutionStateError("The consultant invocation is still finishing")
+        for scope in tuple(self._failures):
+            if scope.job_file_id == job_file_id:
+                del self._failures[scope]
+        self._attempted = {scope for scope in self._attempted if scope.job_file_id != job_file_id}
+
     async def close(self) -> None:
         if self._monitor is None and self._leader_release is None:
             return
@@ -181,7 +201,7 @@ class ConsultantSupervisor:
         except Exception as error:
             # One failed supervision I/O attempt is the bounded policy. No reconnect
             # followed by writer takeover, no provider retry, no product status change.
-            self._failure = error
+            self._failure = capture_runner_failure(error)
             _LOG.error(
                 "supervisor.monitor_failed",
                 extra={
@@ -198,7 +218,7 @@ class ConsultantSupervisor:
                 # close() observes the same failed release task. Keep the original
                 # scan failure, if any, without letting a monitor exception go unread.
                 if self._failure is None:
-                    self._failure = error
+                    self._failure = capture_runner_failure(error)
                 _LOG.error(
                     "supervisor.release_failed",
                     extra={
@@ -262,13 +282,19 @@ class ConsultantSupervisor:
             await self._run(writer)
         except asyncio.CancelledError as error:
             # Includes ResultSaveCancelledError: retain its original typed handoff.
-            self._failures[writer.scope] = error
+            self._failures[writer.scope] = capture_runner_failure(error)
             raise
         except Exception as error:
-            self._failures[writer.scope] = error
+            self._failures[writer.scope] = capture_runner_failure(error)
         finally:
-            self._tasks.pop(writer.scope, None)
-            self._wake.set()
+            try:
+                if writer.scope in self._failures and await has_terminal_outcome(
+                    self._sessions, writer.scope
+                ):
+                    self._failures.pop(writer.scope, None)
+            finally:
+                self._tasks.pop(writer.scope, None)
+                self._wake.set()
 
     async def _stop_runners(self) -> None:
         tasks = tuple(self._tasks.values())

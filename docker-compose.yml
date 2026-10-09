@@ -7,8 +7,8 @@ services:
     image: qdrant/qdrant:v1.18.2          # pin；對齊 qdrant-client>=1.18（apps/ocs-indexer）
     profiles: [rag]
     ports:
-      - "6333:6333"                        # REST（indexer 走這個，prefer_grpc=False）
-      - "6334:6334"                        # gRPC
+      - "127.0.0.1:6333:6333"              # REST（indexer 走這個，prefer_grpc=False）
+      - "127.0.0.1:6334:6334"              # gRPC
     volumes:
       - qdrant_storage:/qdrant/storage     # named volume（Windows 友善，官方建議）
     healthcheck:
@@ -26,7 +26,7 @@ services:
     profiles: [rag]
     gpus: all                              # RTX 4060 已驗證（Docker Desktop + WSL2 nvidia）
     ports:
-      - "8082:80"                          # indexer EMBEDDER_URL=http://localhost:8082
+      - "127.0.0.1:8082:80"                # indexer EMBEDDER_URL=http://localhost:8082
     environment:
       MODEL_ID: BAAI/bge-m3
       DEVICE: cuda
@@ -34,7 +34,7 @@ services:
     volumes:
       - hf_cache:/root/.cache/huggingface  # 避免每次重抓 BGE-M3 權重
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:80/health', timeout=4).read()"]
       interval: 10s
       timeout: 5s
       retries: 10

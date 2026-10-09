@@ -73,7 +73,7 @@
       "type": "object", "additionalProperties": false,
       "properties": {
         "kind": {"type": "string", "const": "interview"},
-        "interview_sequence": {"type": "integer", "minimum": 1}
+        "interview_sequence": {"type": "integer", "maximum": 9007199254740991, "minimum": 1}
       },
       "required": ["kind", "interview_sequence"]
     },

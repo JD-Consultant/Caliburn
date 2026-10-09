@@ -18,9 +18,11 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.features.work_memory.stage_changes import build_situation_handoff_changes
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_stage_changes import read_situation_handoff_changes
+from caliburn.workflows.memory_stage_changes import read_situation_handoff_snapshot
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
 SITUATION = MemoryLayer.WORK_SITUATION
@@ -60,9 +62,9 @@ def sources(database_connection: psycopg.Connection) -> tuple[UUID, UUID, UUID]:
     """A file whose first batch covers employee source 2 and whose second covers source 4."""
     file_id, first, second = uuid4(), uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'差異','差異','合成員工')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'差異','差異','合成員工')",
+        (file_id,),
     )
     add_interview(database_connection, file_id, uuid4(), 1, "app")
     add_interview(database_connection, file_id, first, 2, "employee")
@@ -120,7 +122,9 @@ def test_b2_handoff_names_added_removed_renamed_edited_and_changed_back_situatio
                 frozenset({ids["inventory"], ids["returns"]}),
             ),
         )
-        published = await workflow.publish(runner, understanding.position, uuid4())
+        published = await publish_memory_owner_fixture(
+            workflow.sessions, runner, understanding.position, uuid4()
+        )
         assert published.covered_through_sequence == 2
 
         # Batch two: B1 edits situations, then B2 receives what changed.
@@ -153,7 +157,8 @@ def test_b2_handoff_names_added_removed_renamed_edited_and_changed_back_situatio
         b2 = await workflow.handoff(runner, added.position, uuid4())
 
         async with database.sessions() as session:
-            changes = await read_situation_handoff_changes(session, b2)
+            snapshot = await read_situation_handoff_snapshot(session, b2)
+        changes = build_situation_handoff_changes(snapshot)
         by_title = {change["target_title"]: change for change in changes}
 
         # Every kind is named exactly once; the untouched situation is not reported.
@@ -200,6 +205,6 @@ def test_only_the_understanding_stage_receives_situation_changes(
         _workflow, _runner, situation_stage = await start(database, file_id, first)
         async with database.sessions() as session:
             with pytest.raises(MemoryPermissionError):
-                await read_situation_handoff_changes(session, situation_stage)
+                await read_situation_handoff_snapshot(session, situation_stage)
 
     execute(database_settings, scenario)

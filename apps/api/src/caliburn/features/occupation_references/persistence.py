@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, ForeignKeyConstraint, Text, UniqueConstraint, select
+from sqlalchemy import CheckConstraint, ForeignKeyConstraint, Select, Text, UniqueConstraint, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -114,24 +114,21 @@ class ReferenceCandidateRecord(Base):
     current_revision_id: Mapped[UUID]
 
 
+def candidate_heads_projection(job_file_id: UUID) -> Select[UUID, UUID, UUID]:
+    """Expose coordinates only; the workflow selects qualification before JSON decoding."""
+    return select(
+        ReferenceCandidateRecord.execution_id,
+        ReferenceCandidateRecord.generation_id,
+        ReferenceCandidateRecord.current_revision_id,
+    ).where(ReferenceCandidateRecord.job_file_id == job_file_id)
+
+
 async def read_candidate(
     session: AsyncSession, job_file_id: UUID, execution_id: UUID
 ) -> ReferenceCandidateRecord | None:
     return await session.get(
         ReferenceCandidateRecord, (job_file_id, execution_id), populate_existing=True
     )
-
-
-async def list_candidates(
-    session: AsyncSession, job_file_id: UUID
-) -> tuple[ReferenceCandidateRecord, ...]:
-    records = await session.scalars(
-        select(ReferenceCandidateRecord)
-        .where(ReferenceCandidateRecord.job_file_id == job_file_id)
-        .order_by(ReferenceCandidateRecord.execution_id)
-        .execution_options(populate_existing=True)
-    )
-    return tuple(records)
 
 
 async def read_operation(

@@ -1,42 +1,83 @@
 # 文件圖源與圖片
 
-受維護文件的圖源集中於此。正文引用同名 PNG，旁邊提供 `.mmd` 圖源及可放大的 SVG；相同圖直接共用一組圖片，不在報告或正文另抄來源。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。
+本目錄集中文件設計圖與產品截圖，供公開責任文件共用。設計圖依責任文件分目錄，保存 `.mmd` 圖源、同名 PNG 與可放大的 SVG；產品截圖放在 `screenshots/`。公開圖源只收架構及操作說明所需內容。
 
-產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。現有符號的閱讀方式見[讀圖約定](#讀圖約定)。研究及報告專用圖只留本機，不列入公開圖庫。
+產品權責、圖說及適用範圍由各責任文件維護；研究與報告專用圖源留在本機，不列入公開圖庫。圖名保留「現行」「目標／未實作」「候選」或「歷史」，截圖註明日期及受測範圍；集中存放不會改變狀態。
+
+依用途查閱：[讀圖約定](#讀圖約定) · [查找圖源](#按責任文件查圖) · [編輯與重繪](#編輯與重繪)。
 
 ## 讀圖約定
 
-各圖的範圍、狀態、省略與產品含義以其圖說為準。下表解釋現有公開圖的符號，方便對照正文；不藉圖種推導新元件、部署或產品保證。
+各圖的範圍、狀態、省略與產品含義以其圖說為準。以下約定用來對照正文，不藉圖種推導新元件、部署或產品保證。
 
-| 圖種 | 現有圖如何閱讀與核對 |
+### 系統、容器、部署及模組關係
+
+按圖例辨認元素種類、邊界、技術及具名單向關係。C4 容器不等於 Docker 容器，模組圖也不表示呼叫順序。依據：[C4 notation](https://c4model.com/diagrams/notation)。
+
+### 基本流程
+
+| 符號 | 意義 |
 |---|---|
-| 系統、容器、部署及模組關係 | 按圖例辨認元素種類、邊界、技術及具名單向關係；C4 容器不等於 Docker 容器，模組圖不表示呼叫順序。依 [C4 notation](https://c4model.com/diagrams/notation) |
-| 基本流程 | 終端形表示局部起訖，矩形是處理，菱形是互斥分支，平行四邊形是跨邊界資料交接，兩側雙線矩形是另有定義的子流程，六角形是初始化／準備；箭頭表示控制順序，暫停與後續接續須有明確條件。依 [Microsoft 流程圖](https://support.microsoft.com/en-us/visio/create-a-basic-flowchart-in-visio)及 [Mermaid 形狀](https://mermaid.js.org/syntax/flowchart.html) |
-| 時序及狀態 | 同步訊息是實線實心箭頭、非同步是開放箭頭、reply 是虛線；狀態轉移分事件、條件與效果。圖中終態只屬該圖，不代表業務正式完成。依 [UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) §17.4.4、§14.2.4 及 [Mermaid 時序](https://mermaid.js.org/syntax/sequenceDiagram.html)／[狀態](https://mermaid.js.org/syntax/stateDiagram.html) |
-| ER | 圈是零、短線是一、鳥足是多，兩端各讀最小／最大基數；實線識別關係表示父鍵參與子表主鍵，虛線是非識別關係。PK／FK／UK 分別為主鍵／外鍵／唯一鍵，複合約束看圖說與 DDL；線不表示提交順序。依 [Mermaid ER](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) |
+| 終端形 | 局部起訖 |
+| 矩形 | 處理 |
+| 菱形 | 互斥分支 |
+| 平行四邊形 | 跨邊界資料交接 |
+| 兩側雙線矩形 | 另有定義的子流程 |
+| 六角形 | 初始化／準備 |
+| 箭頭 | 控制順序；暫停與後續接續須有明確條件 |
 
-同一設計圖只維護一份可編輯來源，正文嵌入 PNG 並附圖源／SVG。更新時核對語意與正文、解析渲染、中文／裁切／箭線／圖例及引用同步；能渲染不證明符號或產品契約正確。截圖與既有來源素材保留原格式與位元組，搬移核對雜湊及來源說明。
+依據：[Microsoft 流程圖](https://support.microsoft.com/en-us/visio/create-a-basic-flowchart-in-visio)、[Mermaid 形狀](https://mermaid.js.org/syntax/flowchart.html)。
+
+### 時序及狀態
+
+- 同步訊息：實線實心箭頭。
+- 非同步訊息：開放箭頭。
+- 回覆（reply）：虛線。
+- 狀態轉移：分清事件、條件與效果。
+
+圖中終態只屬該圖，不代表業務正式完成。依據：[UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) §17.4.4、§14.2.4，以及 [Mermaid 時序](https://mermaid.js.org/syntax/sequenceDiagram.html)／[狀態](https://mermaid.js.org/syntax/stateDiagram.html)。
+
+### ER
+
+- **基數**：圈是零、短線是一、鳥足是多；兩端各讀最小／最大基數。
+- **關係**：實線識別關係表示父鍵參與子表主鍵，虛線是非識別關係。
+- **鍵與約束**：PK／FK／UK 分別為主鍵／外鍵／唯一鍵；複合約束看圖說與 DDL。
+
+關係線不表示提交順序。依據：[Mermaid ER](https://mermaid.js.org/syntax/entityRelationshipDiagram.html)。
+
+### 圖面與正文
+
+正文嵌入 PNG 並附圖源／SVG。更新時核對圖面語意與正文是否一致，檢查解析渲染、中文、裁切、箭線與圖例，並同步引用；能渲染不證明符號或產品契約正確。截圖與既有來源素材保留原格式與位元組，搬移時核對雜湊及來源說明。
+
+## 產品截圖
+
+| 圖片 | 日期、用途與來源 |
+|---|---|
+| [職務檔案清單](screenshots/job-file-list.jpg) | 2026-10-05，呈現改名與刪除入口；此圖只展示操作位置，不是行為驗收證據 |
+
+截圖保留原始格式，不配 `.mmd` 或衍生 SVG，也不交由 Mermaid 重繪。
 
 ## 按責任文件查圖
 
 | 責任文件 | 圖面內容 | 圖源目錄 |
 |---|---|---|
-| [產品介紹](../product-introduction.md) | 使用者的核心流程 | [來源](product-introduction) |
-| [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README) |
-| [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries) |
-| [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence) |
-| [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations) |
-| [程式組織](../standards/code-organization.md) | 模組依賴 | [來源](implementation/code-organization) |
-| [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution) |
-| [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests) |
-| [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage) |
-| [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選與快照 | [來源](implementation/memory-storage) |
-| [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage) |
-| [介面與交付](../implementation/interface-and-delivery.md) | 命令重送、串流、來源查詢 | [來源](implementation/interface-and-delivery) |
+| [產品介紹](../product/README.md) | 使用者的核心流程 | [來源](product/README/) |
+| [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README/) |
+| [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries/) |
+| [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence/) |
+| [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations/) |
+| [程式組織](../standards/code-organization.md) | 模組依賴 | [來源](standards/code-organization/) |
+| [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution/) |
+| [Agent 程序監督](../implementation/agent-supervision.md) | 正常關閉與共用資源釋放 | [來源](implementation/agent-supervision/) |
+| [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests/) |
+| [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage/) |
+| [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選、快照與調度證據 | [來源](implementation/memory-storage/) |
+| [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage/) |
+| [介面與交付](../implementation/interface-and-delivery.md) | 命令恢復、跨分頁 hint、串流、來源查詢 | [來源](implementation/interface-and-delivery/) |
 
 ## 圖面重用
 
-同一張公開架構圖只維護一份圖源，引用方補充適用範圍；私人報告及研究的專用圖不納入公開清單。
+同一張公開設計圖只維護一份可編輯圖源，引用方補充其視角與省略範圍。
 
 ## Agent 六張流程圖
 
@@ -51,7 +92,9 @@
 
 ## 編輯與重繪
 
-每組圖維持同名 `.mmd`、`.svg`、`.png`。產圖器遍歷受維護正文的圖片引用，核對中央圖源並依來源路徑去重；新增圖須同時接好責任正文的圖片與圖源連結。`%% title:` 提供獨立圖片的圖名與狀態，未提供時取責任正文的圖片 alt；`%% legend:` 提供必要圖例。既有 `%% diagram:` 只作唯一性檢查，不是產品 ID，也不需要再維護報告對應程式表。
+每組 Mermaid 設計圖維持同名 `.mmd`、`.svg`、`.png`。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。產圖器遍歷受維護正文的圖片引用，略過 `screenshots/`，核對中央圖源並依來源路徑去重；新增設計圖須同時接好責任正文的圖片與圖源連結。
+
+`%% title:` 提供獨立圖片的圖名與狀態，未提供時取責任正文的圖片 alt；`%% legend:` 提供必要圖例。既有 `%% diagram:` 只作唯一性檢查，不是產品 ID，也不需要再維護報告對應程式表。
 
 在 repository 根目錄執行；先依 Web README 安裝既有開發依賴。Mermaid 是文件工具，不加入產品執行依賴。
 

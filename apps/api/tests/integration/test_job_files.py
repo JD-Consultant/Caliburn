@@ -9,8 +9,94 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.interviews import service as interview_service
+from caliburn.features.job_files import persistence as files
 
 pytestmark = pytest.mark.postgres
+
+
+@pytest.mark.parametrize("changed_input", [False, True])
+def test_deleted_creation_is_a_terminal_result_without_recreating(
+    client: TestClient, database_connection: psycopg.Connection, changed_input: bool
+) -> None:
+    payload = {"command_id": str(uuid4()), "display_name": "原檔案", "employee_name": "員工"}
+    original = client.post("/api/job-files", json=payload).json()
+    assert client.delete(f"/api/job-files/{original['job_file_id']}").status_code == 204
+    if changed_input:
+        payload["employee_name"] = "另一位員工"
+    replay = client.post("/api/job-files", json=payload)
+    assert replay.status_code == 410
+    assert replay.json() == {"detail": {"code": "creation_result_deleted"}}
+    assert client.get("/api/job-files").json() == {"job_files": []}
+    assert database_connection.execute("SELECT * FROM job_file_creations").fetchall() == [
+        (UUID(payload["command_id"]), None)
+    ]
+    assert (
+        client.post("/api/job-files", json={**payload, "command_id": str(uuid4())}).status_code
+        == 201
+    )
+
+
+@pytest.mark.parametrize("delete_before_projection", [False, True])
+def test_replay_and_delete_share_one_projection_without_locking_or_recreation(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, delete_before_projection: bool
+) -> None:
+    payload = {"command_id": str(uuid4()), "display_name": "原結果", "employee_name": "員工"}
+    first = client.post("/api/job-files", json=payload)
+    file_id = UUID(first.json()["job_file_id"])
+    read_creation = files.read_creation
+
+    async def interleave(session, command_id):
+        # The duplicate INSERT has completed. Deletion uses its own formal workflow
+        # and transaction; awaiting it would deadlock if replay held a receipt lock.
+        import asyncio
+
+        if delete_before_projection:
+            await asyncio.wait_for(client.app.state.job_file_workflow.delete(file_id), 5)
+        result = await read_creation(session, command_id)
+        if not delete_before_projection:
+            await asyncio.wait_for(client.app.state.job_file_workflow.delete(file_id), 5)
+        return result
+
+    monkeypatch.setattr(files, "read_creation", interleave)
+    replay = client.post("/api/job-files", json=payload)
+    assert replay.status_code == (410 if delete_before_projection else 200)
+    if not delete_before_projection:
+        assert replay.json() == first.json()
+    assert client.get("/api/job-files").json() == {"job_files": []}
+
+
+def test_creation_receipt_cannot_be_forged_rebound_or_removed(
+    client: TestClient, database_connection: psycopg.Connection
+) -> None:
+    command_id = uuid4()
+    file_id = UUID(
+        client.post(
+            "/api/job-files",
+            json={
+                "command_id": str(command_id),
+                "display_name": "完整",
+                "employee_name": "員工",
+            },
+        ).json()["job_file_id"]
+    )
+    for query, parameters in (
+        ("INSERT INTO job_file_creations VALUES (%s,NULL)", (uuid4(),)),
+        ("UPDATE job_file_creations SET command_id=%s", (uuid4(),)),
+        ("UPDATE job_file_creations SET result_file_id=NULL", ()),
+        ("DELETE FROM job_file_creations", ()),
+    ):
+        with pytest.raises(psycopg.errors.CheckViolation):
+            database_connection.execute(query, parameters)
+    client.delete(f"/api/job-files/{file_id}")
+    with pytest.raises(psycopg.errors.CheckViolation):
+        database_connection.execute("UPDATE job_file_creations SET result_file_id=%s", (uuid4(),))
+    with pytest.raises(psycopg.errors.ForeignKeyViolation):
+        database_connection.execute(
+            "INSERT INTO job_file_creations VALUES (%s,%s)", (uuid4(), uuid4())
+        )
+    assert database_connection.execute("SELECT * FROM job_file_creations").fetchall() == [
+        (command_id, None)
+    ]
 
 
 def test_create_and_resend_keeps_one_file_and_one_formal_opening(client: TestClient) -> None:
@@ -91,6 +177,21 @@ def test_concurrent_resends_commit_only_one_file_and_opening(client: TestClient)
     assert len(client.get(f"/api/job-files/{job_file_id}/interviews").json()["messages"]) == 1
 
 
+def test_concurrent_conflicting_creation_keeps_only_the_winning_intent(client: TestClient) -> None:
+    command_id = str(uuid4())
+    payloads = [
+        {"command_id": command_id, "display_name": "same command", "employee_name": employee}
+        for employee in ("first", "second")
+    ]
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        responses = list(
+            executor.map(lambda payload: client.post("/api/job-files", json=payload), payloads)
+        )
+    assert sorted(response.status_code for response in responses) == [201, 409]
+    winner = next(response.json() for response in responses if response.status_code == 201)
+    assert client.get("/api/job-files").json() == {"job_files": [winner]}
+
+
 def test_opening_failure_rolls_back_file_and_original_text_then_allows_same_command(
     client: TestClient, database_connection: psycopg.Connection, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -108,6 +209,7 @@ def test_opening_failure_rolls_back_file_and_original_text_then_allows_same_comm
     assert client.get("/api/job-files").json() == {"job_files": []}
     assert database_connection.execute("SELECT count(*) FROM interview_texts").fetchone() == (0,)
     assert database_connection.execute("SELECT count(*) FROM formal_interviews").fetchone() == (0,)
+    assert database_connection.execute("SELECT count(*) FROM job_file_creations").fetchone() == (0,)
     assert client.post("/api/job-files", json=payload).status_code == 201
 
 

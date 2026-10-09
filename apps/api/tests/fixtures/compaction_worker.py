@@ -13,6 +13,7 @@ from openai.types.responses import Response
 from openai.types.responses.compacted_response import CompactedResponse
 from response_capacity import synthetic_capacity_limits
 
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.context_compaction import (
@@ -28,6 +29,7 @@ from caliburn.agent_execution.tool_steps import (
 
 
 async def run(mode, thread_id):
+    require_isolated_test_database(os.environ["CALIBURN_TEST_DATABASE_URL"], environment=os.environ)
     calls = {"model": 0, "compact": 0, "count": 0}
     window = [
         {"type": "compaction", "id": "cmp_test", "encrypted_content": "synthetic-opaque"},

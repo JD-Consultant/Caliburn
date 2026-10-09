@@ -18,6 +18,7 @@ from psycopg.conninfo import make_conninfo
 from psycopg.rows import dict_row
 
 from caliburn.adapters.database import Database
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.job_consultant.runner import ConsultantRunner
@@ -26,7 +27,7 @@ from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import DatabaseSettings, ModelSettings
 from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.consultant_controls import run_consultant_with_controls
-from tests.unit.test_response_loop import response_at
+from tests.fixtures.response_loop import response_at
 
 ORIGINAL_REPLY = "已記下職務名稱。最近一個頁面你親自做到哪裡？"
 
@@ -105,6 +106,7 @@ class CrashSaver(AsyncPostgresSaver):
 
 
 async def run(boundary: str, schema: str, job_file: str, execution: str, writer: str) -> None:
+    require_isolated_test_database(os.environ["CALIBURN_TEST_DATABASE_URL"], environment=os.environ)
     settings = DatabaseSettings(url=os.environ["CALIBURN_TEST_DATABASE_URL"], schema=schema)
     database = Database(settings)
     scope = ExecutionScope(UUID(job_file), UUID(execution), ExecutionKind.CONSULTANT_TURN)

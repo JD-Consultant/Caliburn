@@ -6,7 +6,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.adapters.response_serialization import snapshot_response
 from caliburn.agent_execution.public_messages import project_commentary, read_public_commentary
-from tests.unit.test_response_loop import response_at
+from tests.fixtures.response_loop import response_at
 
 
 def test_projection_discards_reasoning_tools_annotations_final_and_incomplete_messages() -> None:

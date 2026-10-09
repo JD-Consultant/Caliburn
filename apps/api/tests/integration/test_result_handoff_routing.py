@@ -10,6 +10,7 @@ import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 from psycopg.errors import UndefinedTable
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agent_execution.context_compaction import (
     CompactionSaveError,
@@ -27,9 +28,9 @@ from caliburn.features.job_description import service as jd_service
 from caliburn.settings import ModelSettings
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_memory_batch_orchestration import complete_turn, start_turn
 from tests.unit.test_context_compaction import COMPACTED
-from tests.unit.test_response_loop import response_at
 from tests.unit.test_result_save_retries import TransientResultFault
 
 pytestmark = pytest.mark.postgres
@@ -121,9 +122,14 @@ def test_roles_reuse_all_four_originals_without_reissuing_or_resetting_budget(cl
         b = MemoryBatchWorkflow(
             database.sessions,
             run_role=MemoryRoleDispatch(
-                WorkSituationAnalystRunner(database.sessions, saver, sdk, settings),
-                WorkUnderstandingAnalystRunner(database.sessions, saver, sdk, settings),
+                WorkSituationAnalystRunner(
+                    database.sessions, saver, sdk, settings, cpu=MemoryCpu()
+                ),
+                WorkUnderstandingAnalystRunner(
+                    database.sessions, saver, sdk, settings, cpu=MemoryCpu()
+                ),
             ),
+            cpu=MemoryCpu(),
         )
         runner = a if role == "a" else b
 
@@ -136,7 +142,9 @@ def test_roles_reuse_all_four_originals_without_reissuing_or_resetting_budget(cl
                 return turn
             await requests.request(turn, uuid4())
             await complete_turn(database, turn)
-            work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+            work = await requests.claim(
+                (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+            )
             assert work is not None
             return work.writer
 

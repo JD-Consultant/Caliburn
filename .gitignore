@@ -23,8 +23,6 @@ pnpm-debug.log*
 .research-tmp/
 tmp/
 output/
-!apps/api/app/consultant/skills/output/
-!apps/api/app/consultant/skills/output/SKILL.md
 
 # editor / OS / local agent state
 .vscode/
@@ -36,17 +34,10 @@ Thumbs.db
 .worktrees/
 .superpowers/
 
-
-# personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
-CLAUDE.local.md
-Codex.local.md
-
-# Local engineering scratch and service initialization state.
-.tmp/
-.qdrant-initialized
-
-
 # Private engineering records remain on this machine, outside published Git history.
+/docs/adr/
+/docs/specs/
+/docs/current-decisions.md
 /docs/archive/
 /docs/plans/
 /docs/research/
@@ -57,30 +48,22 @@ Codex.local.md
 /docs/history.md
 /docs/history-commit-map.csv
 /docs/superpowers/plans/
+/docs/superpowers/specs/
 /experiments/
 /scratch/
 /apps/ocs-indexer/docs/plans/
+/apps/ocs-indexer/docs/specs/
 /apps/pdf-to-json/SETUP_COMPLETE.md
 
+# personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
+/AGENTS.override.md
+CLAUDE.local.md
+Codex.local.md
 
-# Historical private aliases must remain local.
-/docs/guides/2026-09-09-job-analysis-and-jd-content-research.md
-/docs/IMPLEMENTATION_PLAN.md
-/docs/PROJECT-STATUS.md
-/docs/V2_PLAN.md
-/docs/worktree-progress-map-2026-09-15.md
-/SETUP_COMPLETE.md
-/task-4-report.md
-/.superpowers/
-/apps/api/evals/interview_v4/reports/
-/apps/api/evals/interview_vnext/reports/
+# Local engineering scratch.
+.tmp/
 
 # Architecture decision and design originals are retained locally.
-/docs/adr/
-/docs/specs/
-/apps/ocs-indexer/docs/specs/
-/docs/current-decisions.md
-/docs/superpowers/specs/
 /docs/diagrams/specs/
 /docs/BUG_LOG.md
 /docs/DESIGN_DECISIONS.md
@@ -89,8 +72,19 @@ Codex.local.md
 /docs/roadmap.md
 /packages/consultant-memory/read-tools-results.md
 /docs/standards/work-analysis/2026-09-09-job-analysis-and-jd-content-research.md
+/docs/guides/2026-09-09-job-analysis-and-jd-content-research.md
 /docs/standards/work-analysis/2026-09-09-jd-sample-basis-and-review.md
 /docs/guides/2026-09-09-jd-sample-basis-and-review.md
+
+# Historical private aliases remain excluded if recreated locally.
+/apps/api/evals/interview_v4/reports/
+/apps/api/evals/interview_vnext/reports/
+/docs/IMPLEMENTATION_PLAN.md
+/docs/PROJECT-STATUS.md
+/docs/V2_PLAN.md
+/docs/worktree-progress-map-2026-09-15.md
+/SETUP_COMPLETE.md
+/task-4-report.md
 
 # Local documentation workspace and previous private workflow locations.
 /docs-local/

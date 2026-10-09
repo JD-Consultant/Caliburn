@@ -13,6 +13,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agent_execution.tool_steps import (
     ResponseStepSaveError,
@@ -30,7 +31,8 @@ from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYP
 from caliburn.workflows.memory_analysis.results import AnalysisComplete
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
-from tests.unit.test_response_loop import response_at
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
+from tests.fixtures.response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -55,9 +57,9 @@ def test_b1_b2_publish_preserves_role_boundaries_native_history_and_fixed_fronti
 ) -> None:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'B roles','B roles','synthetic')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'B roles','B roles','synthetic')",
+        (file_id,),
     )
     for sequence, identity, speaker, text in [
         (1, uuid4(), "app", "你實際做什麼？"),
@@ -199,12 +201,14 @@ def test_b1_b2_publish_preserves_role_boundaries_native_history_and_fixed_fronti
                     saver,
                     sdk,
                     ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
+                    cpu=MemoryCpu(),
                 )
                 b2 = WorkUnderstandingAnalystRunner(
                     database.sessions,
                     saver,
                     sdk,
                     ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
+                    cpu=MemoryCpu(),
                 )
                 if recover_first_response:
                     original_put, original_writes = saver.aput, saver.aput_writes
@@ -325,7 +329,9 @@ def test_b1_b2_publish_preserves_role_boundaries_native_history_and_fixed_fronti
                 assert (
                     await reader.read_object(binding, MemoryLayer.WORK_UNDERSTANDING, "PRIVATE_B2")
                 ).content.body == "PRIVATE_B2 工作理解"
-                published = await candidates.publish(writer, second.stage, uuid4())
+                published = await publish_memory_owner_fixture(
+                    candidates.sessions, writer, second.stage, uuid4()
+                )
                 assert published.through_source_id == source_id
                 assert published.covered_through_sequence == 2
                 assert await candidates.read_latest_snapshot(file_id) == published

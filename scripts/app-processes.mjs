@@ -1,10 +1,46 @@
 import { execFile, spawn } from "node:child_process";
+import { setTimeout as delay } from "node:timers/promises";
 import { promisify } from "node:util";
 
 const executeFile = promisify(execFile);
 
 function isRunning(child) {
   return child.exitCode === null && child.signalCode === null;
+}
+
+function processGroupIsAlive(child) {
+  if (!child.pid) return false;
+  try {
+    process.kill(-child.pid, 0);
+    return true;
+  } catch (error) {
+    if (error.code === "ESRCH") return false;
+    if (error.code === "EPERM") return true;
+    throw error;
+  }
+}
+
+async function waitForGroupsGone(children, isProcessGroupAlive, signal) {
+  while (children.some(isProcessGroupAlive)) {
+    try {
+      await delay(25, undefined, { signal });
+    } catch (error) {
+      if (signal.aborted) return;
+      throw error;
+    }
+  }
+}
+
+async function waitForOwnedClosure(closed, children, milliseconds, platform, isProcessGroupAlive) {
+  if (platform === "win32") return waitWithin(closed, milliseconds);
+  const controller = new AbortController();
+  try {
+    return await waitWithin(Promise.all([
+      closed, waitForGroupsGone(children, isProcessGroupAlive, controller.signal),
+    ]), milliseconds);
+  } finally {
+    controller.abort();
+  }
 }
 
 async function stopProcessTree(child, force = false) {
@@ -55,7 +91,11 @@ export async function runAppProcesses(invocations, {
   }),
   stop = stopProcessTree,
   signals = process,
-  shutdownTimeoutMs = 5_000,
+  platform = process.platform,
+  isProcessGroupAlive = processGroupIsAlive,
+  shutdownTimeoutMs = 90_000,
+  forcedShutdownTimeoutMs = 5_000,
+  warn = (message) => process.stderr.write(`${message}\n`),
 } = {}) {
   if (invocations.length === 0) throw new Error("No App processes to start.");
   const children = [];
@@ -114,16 +154,38 @@ export async function runAppProcesses(invocations, {
     failure = error;
   } finally {
     try {
-      // Windows 終端的 Ctrl+C 已送到同一 console；先留正常關閉時間。
-      if (process.platform === "win32" && result?.signal === "SIGINT") {
-        await waitWithin(Promise.all(closures), shutdownTimeoutMs);
+      const closed = Promise.all(closures);
+      const errors = [];
+      // A POSIX group can outlive its pnpm/Python leader; only Windows uses PID liveness.
+      let graceful = children.length === 0 ||
+        (platform === "win32" && children.every((child) => !isRunning(child)));
+      if (!graceful && platform === "win32") {
+        // 真實 Ctrl+C 已廣播至同一 console；Windows kill 並非正常關閉訊號。
+        if (!failure && result?.signal === "SIGINT") {
+          graceful = await waitWithin(closed, shutdownTimeoutMs);
+        }
+      } else if (!graceful) {
+        const stopped = await Promise.allSettled(
+          children.map(async (child) => stop(child, false)),
+        );
+        errors.push(...stopped.filter((item) => item.status === "rejected").map((item) => item.reason));
+        graceful = await waitForOwnedClosure(
+          closed, children, shutdownTimeoutMs, platform, isProcessGroupAlive,
+        );
       }
-      const stopped = await Promise.allSettled(children.map(async (child) => stop(child)));
-      const errors = stopped.filter((item) => item.status === "rejected").map((item) => item.reason);
-      if (!await waitWithin(Promise.all(closures), shutdownTimeoutMs)) {
-        const forced = await Promise.allSettled(children.map(async (child) => stop(child, true)));
+      if (!graceful) {
+        const reason = platform === "win32" && (failure || result?.signal !== "SIGINT")
+          ? "A normal shutdown signal could not be delivered."
+          : `The ${shutdownTimeoutMs / 1_000}-second normal shutdown deadline expired.`;
+        warn(`${reason} Forcing owned App processes to stop. Saved results may remain unconfirmed; query the original execution ID before retrying.`);
+        const forced = await Promise.allSettled(
+          (platform === "win32" ? children.filter(isRunning) : children)
+            .map(async (child) => stop(child, true)),
+        );
         errors.push(...forced.filter((item) => item.status === "rejected").map((item) => item.reason));
-        if (!await waitWithin(Promise.all(closures), shutdownTimeoutMs)) {
+        if (!await waitForOwnedClosure(
+          closed, children, forcedShutdownTimeoutMs, platform, isProcessGroupAlive,
+        )) {
           errors.push(new Error("App processes did not close before the shutdown deadline."));
         }
       }

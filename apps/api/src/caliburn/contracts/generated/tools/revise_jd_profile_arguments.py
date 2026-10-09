@@ -77,7 +77,7 @@ class InterviewSource(BaseModel):
         extra="forbid",
     )
     kind: Literal["interview"]
-    interview_sequence: StrictInt = Field(..., ge=1)
+    interview_sequence: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class Kind(StrEnum):

@@ -62,12 +62,6 @@ class MemoryCandidateWorkflow:
             await _lock_writer(session, writer)
             return await candidate_lifecycle.restore(session, position, target, command_id)
 
-    async def publish(
-        self, writer: ExecutionWriter, position: MemoryBatchPosition, command_id: UUID
-    ) -> MemorySnapshot:
-        async with self.sessions.begin() as session:
-            return await publish_memory_candidate(session, writer, position, command_id)
-
     async def discard(
         self, writer: ExecutionWriter, position: MemoryBatchPosition, command_id: UUID
     ) -> None:
@@ -145,24 +139,6 @@ async def _lock_writer(session: AsyncSession, writer: ExecutionWriter) -> None:
 async def _require_active_read(session: AsyncSession, scope: ExecutionScope) -> None:
     if (await executions.read_execution(session, scope)).status != ExecutionStatus.ACTIVE:
         raise ExecutionStateError("This execution no longer has a live Memory candidate")
-
-
-async def publish_memory_candidate(
-    session: AsyncSession, writer: ExecutionWriter, position: MemoryBatchPosition, command_id: UUID
-) -> MemorySnapshot:
-    """Join completion transaction; scheduler/checkpoint acknowledgement is separate."""
-    _require_owner(writer.scope, position)
-    await job_files.lock_job_file(session, writer.scope.job_file_id)
-    original = await candidate_lifecycle.recover_publication(session, position, command_id)
-    if original is not None:
-        execution = await executions.read_execution(session, writer.scope)
-        if execution.status != ExecutionStatus.COMPLETED:
-            raise ExecutionStateError("A published Memory must have completed its execution")
-        return original
-    await executions.lock_active_writer(session, writer)
-    result = await candidate_lifecycle.publish(session, position, command_id)
-    await executions.finish_execution(session, writer, ExecutionStatus.COMPLETED)
-    return result
 
 
 async def start_memory_candidate(

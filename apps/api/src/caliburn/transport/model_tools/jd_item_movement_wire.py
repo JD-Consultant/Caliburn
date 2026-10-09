@@ -1,6 +1,7 @@
 """Canonical generated movement arguments to bounded application intentions."""
 
 from caliburn.contracts.generated.tools import move_jd_item_arguments as wire
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.job_description.tasks import DetailKind
 from caliburn.workflows.jd_item_movement import (
     CurrentItemContainer,
@@ -13,7 +14,7 @@ from caliburn.workflows.jd_item_movement import (
 
 
 def parse_item_movement(arguments: str) -> MoveItemInput:
-    parsed = wire.MoveJdItemArguments.model_validate_json(arguments)
+    parsed = parse_contract(wire.MoveJdItemArguments, arguments)
     destination = (
         CurrentItemContainer()
         if isinstance(parsed.destination, wire.CurrentContainer)

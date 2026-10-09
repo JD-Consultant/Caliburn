@@ -1,26 +1,16 @@
-# Caliburn：工程代理工作指引
+# Caliburn 專案文件入口
 
-Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過訪談說明實際工作，人與 AI 共同編修有根據的 JD。以繁體中文溝通，先說結論與證據，再給必要細節。
+Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過訪談說明實際工作，人與 AI 共同編修有根據的 JD。
 
-## 工作入口
-
-修改前確認工作目錄、分支、未提交內容與局部指引，保留既有工作。先界定本次問題、授權範圍與完成條件，再按責任選讀；現行程式與實測說明現況，公開責任文件與正式 Schema 說明應有契約。發現落差時先核對適用範圍及接續決定。
+依任務選讀下列文件，並遵循相關規範：
 
 | 工作 | 閱讀入口 |
 |---|---|
+| 第一次使用或了解產品 | [專案介紹](README.md)、[第一次使用](docs/operations/getting-started.md)及[產品概念](docs/product/concepts.md) |
 | 查功能、狀態、架構或跨層責任 | [架構導覽](docs/architecture/README.md)及[文件導覽](docs/README.md) |
-| 修改程式、Prompt、Tool 或契約 | [貢獻指南](CONTRIBUTING.md)、[程式規範](docs/standards/README.md)及受影響[實作接線](docs/implementation/README.md) |
+| 修改或審查程式、Prompt | [貢獻指南](CONTRIBUTING.md)、[程式組織](docs/standards/code-organization.md)、[程式撰寫規範](docs/standards/coding-standard.md)及受影響[實作接線](docs/implementation/README.md) |
+| 修改 API、Tool 或跨語言格式 | [契約策略](docs/standards/contract-strategy.md)、[正式 Schema](apps/api/contracts/)及受影響消費端 |
+| 比較 Prompt、Tool 或模型效果 | [模型品質比較](CONTRIBUTING.md#模型品質比較)及[執行證據要求](docs/standards/coding-standard.md#71-讓執行證據可查可比較可驗證) |
 | 設計驗證或判讀結果 | [驗證範圍](docs/architecture/verification.md)、[驗證責任](docs/implementation/verification-plan.md)與相關測試 |
 | 維護文件或圖稿 | [文件維護](CONTRIBUTING.md#文件維護)及[圖庫](docs/diagrams/README.md) |
-| 啟停、設定或操作資料 | [runbook](docs/runbook.md)、[後端](apps/api/README.md)與[介面](apps/web/README.md) |
-
-本機若存在 docs-local/README.md，執行內部研究、架構決策、工作分析方法維護或接續長任務時，先讀其導航與適用指引；該目錄只保存本機流程與原件，不能取代公開現行契約。新 checkout 沿上表即可理解、建置及驗證，任務需要的私人決策由本次工作另行提供。
-
-## 執行界線
-
-- 已授權範圍內的可逆工程細節自主完成。改變產品效果、資料權責、跨層契約、明顯費用或不可逆結果且尚未取得授權時，附證據、選項及建議供使用者決定，同時推進不依賴答案的工作。
-- 長任務維護當前目標、剩餘工作、依賴及驗收條件。可獨立工作依效益委派，交代讀寫範圍、產出與檢查方式；主代理整合並核對相互影響，插入問題後接回主線。
-- 金鑰不得輸出或提交。真模型與其他有成本外送依有效授權、資料範圍及費用界線執行；清資料、重建 volume、merge、push、發布與對外傳送須有相應授權。只停止已確認身分的自有程序。
-- 使用者明確指示優先於本檔及 Skill 慣例，仍遵守系統及工具界線。Skill 造成暫停或改向時，指出檔案、具體規則與影響，區分明文要求與自行判斷。
-
-根指引只保留跨任務入口與操作界線；局部規則就近維護。更新時整合重複、衝突及失效指令；CLAUDE.md 只引用本檔。
+| 啟停、設定或操作資料 | [runbook](docs/operations/README.md)、[後端](apps/api/README.md)與[介面](apps/web/README.md) |

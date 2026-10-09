@@ -7,6 +7,7 @@ from caliburn.contracts.generated.tools.excluded_work_view import ExcludedWorkVi
 from caliburn.contracts.generated.tools.read_excluded_work_arguments import (
     ReadExcludedWorkArguments,
 )
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import ExecutionNotFoundError, ExecutionStateError
 from caliburn.features.interviews.models import (
     InterviewScopeError,
@@ -66,7 +67,7 @@ class ExcludedWorkReadTools:
                 "使用 read_excluded_work；此入口沒有公版選擇或修改能力。",
             )
         try:
-            ReadExcludedWorkArguments.model_validate_json(arguments)
+            parse_contract(ReadExcludedWorkArguments, arguments)
         except ValidationError:
             return reject_tool_call(
                 "invalid_arguments",

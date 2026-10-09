@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
+import { useStoredCommand } from '../../shared/commands/use-stored-command';
 import { AddIcon } from '../../shared/ui/icons';
 import { commandFor, isWorkCommand, jdWorkQuery } from './jd-work-api';
 import type { WorkIntent } from './jd-work-api';
@@ -12,7 +13,7 @@ import { draftNoticeOf, statusOf } from './inline-session';
 import type { InlineEdit, InlineSaveResult } from './inline-edit-context';
 import type { InlineIntent } from './inline-fields';
 import { useFold } from './use-fold';
-import { useWorkCommand } from './useWorkCommand';
+import { jdCommandView, workCommand } from './jd-commands';
 import { WorkDialog } from './WorkDialog';
 import type { WorkDialogContent } from './WorkDialog';
 import { WorkStatus } from './WorkStatus';
@@ -28,8 +29,10 @@ import { UnassignedSection } from './UnassignedSection';
 export function JdWorkEditor({
   jobFileId,
   readOnly = false,
+  refresh,
 }: {
   jobFileId: string;
+  refresh: () => Promise<void>;
   /** A Turn owns the JD: show it, but offer no manual edit (the App also refuses writes). */
   readOnly?: boolean;
 }) {
@@ -42,10 +45,13 @@ export function JdWorkEditor({
   // True while an inline editor is on screen; the editor reports its own mount and unmount, so a field
   // that vanished mid-edit cannot leave the page waiting on an editor that no longer exists.
   const [inlineEditorOpen, setInlineEditorOpen] = useState(false);
-  const command = useWorkCommand(jobFileId, () => {
+  const closeEditor = () => {
     setDialog(null);
     setInlineKey(null);
-  });
+  };
+  const definition = workCommand(jobFileId, refresh);
+  const submission = useStoredCommand(definition, closeEditor);
+  const command = jdCommandView(submission, definition, closeEditor);
   const current = work.data;
   // One edit at a time, here and in the basic data: an open editor froze its revision, so any other write
   // would make its save conflict.

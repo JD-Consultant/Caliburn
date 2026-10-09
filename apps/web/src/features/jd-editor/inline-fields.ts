@@ -159,7 +159,7 @@ export const collaboratorNameField = (collaborator: Collaborator): InlineField =
 export const collaboratorScopeField = (collaborator: Collaborator): InlineField =>
   collaboratorField(collaborator, 'scope_text');
 
-/** A condition's text is required: only its category can be missing, and that is changed in the dialog. */
+/** Condition text is required; ConditionsSection's move menu owns category changes. */
 export function conditionTextField(condition: Condition): InlineField {
   return {
     key: `condition:${condition.condition_id}:text`,

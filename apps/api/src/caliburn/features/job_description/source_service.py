@@ -12,7 +12,6 @@ from caliburn.features.job_description import (
 )
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfileRevision,
     StaleJdRevisionError,
 )
@@ -36,12 +35,12 @@ async def recover_source_result(
     )
     if original is None:
         return None
-    if (
-        original.kind != "edit_sources"
-        or original.expected_revision_id != command.expected_revision_id
-        or original.request_payload != source_change_payload(command)
-    ):
-        raise JdCommandConflictError("command_id was used with different source intent")
+    revision_editing.require_matching_edit_intent(
+        original,
+        kind="edit_sources",
+        expected_revision_id=command.expected_revision_id,
+        request_payload=source_change_payload(command),
+    )
     return original.result_revision_id
 
 

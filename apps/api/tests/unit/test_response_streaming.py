@@ -219,7 +219,11 @@ async def test_executor_handoff_attaches_original_attempt_without_failure_retry(
     captured, updates = [], []
     raw = terminal()
     failure = asyncio.CancelledError() if cancelled else OSError("synthetic close failure")
-    reserve = AsyncMock(return_value=attempt_id)
+    reserve = AsyncMock(
+        return_value=model_requests._OutboundAdmission(
+            attempt_id, asyncio.get_running_loop().time() + 60
+        )
+    )
     record = AsyncMock(side_effect=AssertionError("An intact R must not enter provider retry"))
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_reserve_request", reserve)
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_record_failure", record)
@@ -378,7 +382,11 @@ async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
     attempt_id = uuid4()
     captured = []
     saver = InMemorySaver()
-    reserve = AsyncMock(return_value=attempt_id)
+    reserve = AsyncMock(
+        return_value=model_requests._OutboundAdmission(
+            attempt_id, asyncio.get_running_loop().time() + 60
+        )
+    )
     record = AsyncMock(side_effect=AssertionError("Never resend an intact R"))
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_reserve_request", reserve)
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_record_failure", record)

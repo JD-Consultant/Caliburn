@@ -10,6 +10,7 @@ from pydantic import ConfigDict, TypeAdapter, ValidationError, with_config
 from caliburn.contracts.generated.tools.request_memory_consolidation_arguments import (
     RequestMemoryConsolidationArguments,
 )
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -50,7 +51,7 @@ class MemoryConsolidationTools:
 
     def prepare(self, arguments: str, command_id: UUID) -> str | dict[str, object]:
         try:
-            RequestMemoryConsolidationArguments.model_validate_json(arguments)
+            parse_contract(RequestMemoryConsolidationArguments, arguments)
         except ValidationError:
             return reject_tool_call(
                 "invalid_arguments", "整理通知不接受參數。", "使用空物件 {}；來源範圍由 App 固定。"
@@ -69,5 +70,7 @@ class MemoryConsolidationTools:
             str(self.writer.scope.job_file_id),
         ):
             raise ValueError("A saved notification belongs to another execution")
-        result = await self.workflow.request(self.writer, UUID(command["command_id"]))
-        return json.dumps(result, ensure_ascii=False)
+        await self.workflow.request(self.writer, UUID(command["command_id"]))
+        return json.dumps(
+            {"message": "已記錄整理要求；本輪成功完成後由系統處理。"}, ensure_ascii=False
+        )

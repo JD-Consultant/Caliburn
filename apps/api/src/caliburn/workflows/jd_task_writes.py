@@ -25,8 +25,9 @@ from caliburn.features.job_description.capabilities import (
 from caliburn.features.job_description.compound_edits import (
     BoundTaskCapability,
     CreateTaskWithSources,
+    JdCompoundEditResult,
 )
-from caliburn.features.job_description.navigation import jd_read_ref, resolve_jd_read_ref
+from caliburn.features.job_description.navigation import resolve_jd_read_ref
 from caliburn.features.job_description.sources import (
     AddJdSource,
     InvalidJdSourceError,
@@ -140,7 +141,9 @@ class JdTaskWriteWorkflow:
                 tuple(links),
             )
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedTaskWrite) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedTaskWrite
+    ) -> JdCompoundEditResult:
         if writer.scope.execution_id != prepared.candidate.execution_id:
             raise ExecutionStateError("This prepared edit belongs to a different Turn")
         async with self.sessions.begin() as session:
@@ -161,8 +164,7 @@ class JdTaskWriteWorkflow:
                 ),
                 candidate=prepared.candidate,
             )
-            assert result.created_item is not None
-            return f"created · read_ref: {jd_read_ref(result.created_item)}"
+            return result
 
 
 async def _resolve_sources(

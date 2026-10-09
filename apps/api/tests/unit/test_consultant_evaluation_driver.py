@@ -1,13 +1,15 @@
 """固定案例只送公開輸入，失敗不自動重送，評閱標準不進模型輸入。"""
 
 import json
+import os
 from uuid import uuid4
 
 import httpx2
 import pytest
 
+from caliburn.adapters.database_settings import require_isolated_test_database
 from evaluations.consultant_cases import EvaluationCase
-from evaluations.consultant_comparison import _require_test_database, drive_case
+from evaluations.consultant_comparison import drive_case
 
 
 @pytest.mark.parametrize("status", ["completed", "failed", "paused", "active"])
@@ -50,4 +52,4 @@ def test_isolated_evaluation_rejects_libpq_target_redirection(monkeypatch, redir
     else:
         monkeypatch.setenv(redirect, "redirect-not-allowed")
     with pytest.raises(ValueError, match="redirected"):
-        _require_test_database(url)
+        require_isolated_test_database(url, environment=os.environ)

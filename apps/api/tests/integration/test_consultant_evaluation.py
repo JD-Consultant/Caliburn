@@ -1,6 +1,7 @@
 """同一程序並行比較兩候選，正式 HTTP／SDK／Graph／PG 各自保存可查原件。"""
 
 import asyncio
+import json
 from dataclasses import replace
 
 import psycopg
@@ -19,7 +20,9 @@ from evaluations.consultant_comparison import (
 pytestmark = pytest.mark.postgres
 
 
-def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(database_settings):
+def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(
+    database_settings, tmp_path
+):
     left_database = database_settings
     right_database = prepare_isolated_database(database_settings.url)
     candidates = (
@@ -37,12 +40,17 @@ def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(d
     )
     settings = Settings(database=left_database, model=ModelSettings(api_key="synthetic"))
     case = EvaluationCase(name="synthetic", inputs=("職稱：前端工程師；單位：產品開發部",))
+    for candidate in candidates:
+        (tmp_path / candidate.name).mkdir()
 
     async def compare():
         return await asyncio.gather(
             *(
                 run_candidate(
-                    replace(settings, database=database), scripted_composition(candidate), case
+                    replace(settings, database=database),
+                    scripted_composition(candidate),
+                    case,
+                    output_directory=tmp_path / candidate.name,
                 )
                 for database, candidate in zip(
                     (left_database, right_database), candidates, strict=True
@@ -53,19 +61,24 @@ def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(d
     try:
         with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
             left, right = runner.run(compare())
-        assert left["job_file_id"] != right["job_file_id"]
-        for result in (left, right):
+        assert left.result["job_file_id"] != right.result["job_file_id"]
+        for outcome in (left, right):
+            assert outcome.diagnostics_available
+            result = outcome.result
             assert result["all_inputs_completed"] is True
             assert result["formal_jd"]["profile"]["profile"]["job_title"] == "前端工程師"
-            assert result["diagnostics"]
-        assert "只屬於甲候選的訪談重點" in str(left["diagnostics"])
-        assert "只屬於乙候選的訪談重點" not in str(left["diagnostics"])
-        assert "只屬於乙候選的訪談重點" in str(right["diagnostics"])
-        assert "只屬於甲候選的訪談重點" not in str(right["diagnostics"])
-        assert "乙候選工具說明" in str(right["diagnostics"])
-        assert "乙候選工具說明" not in str(left["diagnostics"])
-        for result, limit in ((left, 100), (right, 200)):
-            captured = result["diagnostics"][0]["execution"]["captured_initial_context"]
+        left_diagnostics, right_diagnostics = (
+            json.loads((tmp_path / candidate.name / "diagnostics.json").read_text(encoding="utf-8"))
+            for candidate in candidates
+        )
+        assert "只屬於甲候選的訪談重點" in str(left_diagnostics)
+        assert "只屬於乙候選的訪談重點" not in str(left_diagnostics)
+        assert "只屬於乙候選的訪談重點" in str(right_diagnostics)
+        assert "只屬於甲候選的訪談重點" not in str(right_diagnostics)
+        assert "乙候選工具說明" in str(right_diagnostics)
+        assert "乙候選工具說明" not in str(left_diagnostics)
+        for diagnostics, limit in ((left_diagnostics, 100), (right_diagnostics, 200)):
+            captured = diagnostics[0]["execution"]["captured_initial_context"]
             assert captured["tool_configuration"] == {"jd_read_max_result_characters": limit}
     finally:
         # 只移除本測試新建並持有的隨機 schema；左側由既有 fixture 管理。

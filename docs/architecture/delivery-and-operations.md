@@ -48,7 +48,7 @@ Caliburn 以本機 Web 提供訪談、JD 編輯與 PDF 匯出，後端管理模�
 
 App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景 B Graph；PostgreSQL 是獨立資料庫程序。PDF 由 App 內受控的 Chromium 子程序產生，再經既有 HTTP 連線下載，沒有獨立 PDF 服務。原生啟動使用相同程式與責任，只是不包在圖中的 App Docker 容器內。圖省略 PDF 子程序、資料 volume、健康檢查及管理連線，完整部署設定仍以 Compose 與 [App README](../../apps/api/README.md)為準。
 
-上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；基本模式不啟動 RAG，App 程序也不管理容器。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
+上圖為未啟用公版參考的最小部署。依 [公版接線](../design/rag-pipeline.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；基本模式不啟動 RAG，App 程序也不管理容器。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
 
 可原生啟動，也可用 `compose.jd-app.yaml`：一個 App 容器加一個 PostgreSQL 容器及資料 volume。兩者使用同一份程式、契約與持久資料機制，不是兩套產品。Docker 包含 PDF 瀏覽器與中文字型，主機入口只綁 loopback；既有資料不自動搬入。建置、安全與停止邊界見[交付接線 §4.2](../implementation/interface-and-delivery.md#42-docker-交付)，啟動與 DataGrip 設定見 [runbook](../runbook.md#docker-操作)。
 
@@ -72,9 +72,9 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 4. 正常關閉先停止新准入，嘗試保存已取得結果並停止在可恢復邊界；強制關閉仍依最後可靠位置恢復，不承諾完成所有在途請求。
 5. 啟動時發現正式結果已提交，就回補執行／畫面，不再生成另一份結果。
 
-**現行恢復限制：** 資料庫伺服器重啟後須重啟 App；單一 leader 的現行實作不會自動重連。Memory 最終失敗後，正式訪談再前進三輪才允許一次新批次，此政策仍待產品決策確認，且尚無真長旅程自然觸發的證據。相關限制見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)及[驗證範圍](verification.md)。
+**現行恢復限制：** 資料庫伺服器重啟後須重啟 App；單一 leader 的現行實作不會自動重連。Memory 最終失敗後，正式訪談再前進三輪才允許一次新批次，此政策仍待產品決策確認，且尚無真長旅程自然觸發的證據。相關限制見 [正式產品與選型](design-decisions.md)及[驗證範圍](verification.md)。
 
-外部 API 或資料庫不可用時，未保存的結果不能視為完成。故障分類、重試時機與執行上限由[共用執行機制](../specs/2026-09-27-shared-agent-execution-and-state-design.md)處理；產品不以預估金額攔截正常執行。
+外部 API 或資料庫不可用時，未保存的結果不能視為完成。故障分類、重試時機與執行上限由[共用執行與恢復](../implementation/agent-execution.md)處理；產品不以預估金額攔截正常執行。
 
 ## 4. 信任與權限邊界
 

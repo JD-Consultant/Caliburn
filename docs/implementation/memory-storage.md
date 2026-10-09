@@ -1,7 +1,7 @@
 # Memory 保存接線
 
 - 狀態：**現行 Memory 保存責任** 。候選、固定修訂、角色交接與背景發布依下列機制運作。最終失敗後，正式訪談再前進三輪才允許一次新批次；此解除政策仍待確認，且未在真長旅程自然觸發，見[Memory 背景調度](agent-supervision.md#5-memory-背景工作)。驗證見保存與背景工作。
-- 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-定位與權限界線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
+- 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[Memory 單向調度](agent-supervision.md)、[Memory 工具與寫入](memory-tools.md)、[Memory 選讀與來源](memory-tools.md)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 | 維護問題 | 閱讀位置 |
 |---|---|

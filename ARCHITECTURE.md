@@ -43,4 +43,4 @@ PostgreSQL               OpenAI Responses API（經授權的工作資料；store
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 構成獨立 RAG 領域，分別處理公版轉換、索引、向量與 API 契約。
 
-依 [ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，JD App 可在明示設定後透過 HTTP 查讀公版；RAG 不由 App 自動部署或啟動，也不保存員工訪談與 JD。選用公版及明確否認範圍由 App 自己保存，工具資格與跨輪規則沿原執行流程。啟停仍使用 `pnpm rag:*`，詳細分工見 [RAG 設計](docs/design/rag-pipeline.md)。
+依 [公版接線](docs/design/rag-pipeline.md)，JD App 可在明示設定後透過 HTTP 查讀公版；RAG 不由 App 自動部署或啟動，也不保存員工訪談與 JD。選用公版及明確否認範圍由 App 自己保存，工具資格與跨輪規則沿原執行流程。啟停仍使用 `pnpm rag:*`，詳細分工見 [RAG 設計](docs/design/rag-pipeline.md)。

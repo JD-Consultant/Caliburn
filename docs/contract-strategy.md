@@ -4,9 +4,15 @@
 
 ## 現行規則
 
-正式產品為 `apps/api` 與 `apps/web`，依 [ADR0079](adr/0079-target-rebuild-production-cutover.md)維護 App 自有契約。JSON Schema 是 App 跨語言傳輸格式的唯一來源；HTTP DTO 與模型工具按各自用途投影，不強制使用相同 envelope。型別與對外格式沿生成鏈維護，避免人工修改多份 shape。
+正式產品為 `apps/api` 與 `apps/web`，依 [正式產品與選型](architecture/design-decisions.md)維護 App 自有契約。JSON Schema 是 App 跨語言傳輸格式的唯一來源；HTTP DTO 與模型工具按各自用途投影，不強制使用相同 envelope。型別與對外格式沿生成鏈維護，避免人工修改多份 shape。
 
 API 的領域與用例模組不直接依賴 transport DTO；傳輸層負責 DTO 與內部型別的轉換。Python 內部 port 使用明確型別或 Protocol，不因共用而另建泛用契約套件。模型原生 Responses items 沿 SDK 接續契約保存，不套入 App 自製的訊息 schema；App schema 的額外欄位限制不應套用到原生接續 metadata。
+
+## 模型工具的共同邊界
+
+工具提供具名業務操作，模型只填分析所需參數；檔案、執行、版本、來源範圍與權限由 App 綁定。輸入 shape 合法不等於具備寫入資格，業務驗證與原子提交仍在 owner。
+
+確定拒絕須回安全原因與合法下一步，例如重新讀取目標或修正參數；結果未知時先依原操作查回，不換新識別、重套 patch 或猜測已回滾。call ID 的配對與業務冪等各有責任。格式由 [HTTP／Tool Schema](../apps/api/contracts/)維護，接線見[資料與契約](implementation/data-and-contracts.md)。
 
 ## 隔離與歷史範圍
 

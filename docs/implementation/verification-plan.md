@@ -1,7 +1,7 @@
 # 實作驗證與需求追溯
 
-- 狀態：**持續維護的驗證與需求追溯表** 。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)與產品實驗判讀。
-- 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[E01–E15](../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常驗證映射)、[JDT-01–09](../specs/2026-09-29-jd-model-tool-contract-review.md#7-行為邊界與證據層級)。實驗原件與結果由產品驗證與實驗資料路由。
+- 狀態：**持續維護的驗證與需求追溯表** 。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)及當次授權比較的條件與限制判讀。
+- 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[共用執行與恢復](agent-execution.md)、[JD 工具與保存](jd-storage.md)。實驗原件與結果由產品驗證與實驗資料路由。
 
 安排測試時先選[驗證層級](#1-分層測試不以-mock-冒充產品)，再查[V 責任對照](#2-v-驗收與責任對照)及[E／JDT 接縫](#3-執行工具-gate-不遺漏)。測例寫法、命令入口與證據要求分別見[§4](#4-行為反例的寫法)、[§5](#5-命令與證據)；已驗及未驗結果由[§6 的入口](#6-已知限制與未驗範圍)查閱。
 
@@ -138,6 +138,6 @@
 | A／B 接續、壓縮、Memory 發布及取消恢復 | [架構驗證反例矩陣](../architecture/verification.md#2-核心反例矩陣) |
 | JD 分析、來源核對、Plan 及真人使用效果 | [架構驗證與限制](../architecture/verification.md)、實驗發現 |
 | PDF、文字層及前端互動的覆蓋 | [介面與交付](interface-and-delivery.md)、產品驗證原件 |
-| 已確認的後續工作及產品政策 | [目前決策](../current-decisions.md) |
+| 已確認的後續工作及產品政策 | [架構與現行責任](../architecture/README.md) |
 
 舊證據不能代表後續版本的所有情境，A 與 B 的證據也不能互相替代；具體結論須沿原件核對。

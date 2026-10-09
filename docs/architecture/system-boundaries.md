@@ -12,7 +12,7 @@ Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處�
 
 現行產品範圍包括：多份隔離職務檔案、自然長訪談、A 的 Step 恢復／暫停／取消、候選 JD 即時預覽與完成提交、B1／B2 整理及固定 Memory 快照、可追溯來源、人工改稿可見性、JD 依據待核對、目前稿 PDF。
 
-明示配置後，顧問另可用公版職位參考查漏，保存選用公版與員工明確否認的工作範圍；B1／B2 只讀否認範圍。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，RAG 是 App 外部的可選服務，公版不是員工事實，也不自動判定 JD 完成。
+明示配置後，顧問另可用公版職位參考查漏，保存選用公版與員工明確否認的工作範圍；B1／B2 只讀否認範圍。依 [公版接線](../design/rag-pipeline.md)，RAG 是 App 外部的可選服務，公版不是員工事實，也不自動判定 JD 完成。
 
 現行範圍不含專用全稿審核 AI、原話語意搜尋與跨機還原；C 即時修補、固定雙向互審、通用規則引擎、微服務拆分與舊資料遷移不作為現行方案。全稿完整品質仍是長期產品目標，目前不能宣稱已通過全稿審核。
 
@@ -35,15 +35,15 @@ Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處�
 | 責任 | 維護的內容與界線 | 詳細說明 |
 |---|---|---|
 | Web 工作區 | 輸入、顯示及局部草稿；正式結果與操作權限由後端判定 | [互動與運作](delivery-and-operations.md) |
-| App 用例協調 | 協調准入、控制、跨領域完成及原結果查詢；不取代各業務規則 | [核心生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md) |
-| 職務檔案與訪談 | 資料隔離、原文、正式來源資格及順序；保存取消輸入不授來源資格 | [來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md) |
-| JD 業務 | 正式稿、候選、依據、差異、核對與撤回；人工及 AI 共用規則 | [JD 契約](../specs/2026-09-29-jd-model-tool-contract-review.md) |
-| Memory 業務 | 本批候選、物件與關係、固定快照及處理進度；不代替模型分析內容 | [Memory 設計](../specs/2026-09-24-caliburn-layered-architecture-map.md) |
+| App 用例協調 | 協調准入、控制、跨領域完成及原結果查詢；不取代各業務規則 | [正式採用與交易](persistence.md) |
+| 職務檔案與訪談 | 資料隔離、原文、正式來源資格及順序；保存取消輸入不授來源資格 | [Memory 選讀與來源](../implementation/memory-tools.md) |
+| JD 業務 | 正式稿、候選、依據、差異、核對與撤回；人工及 AI 共用規則 | [JD 工具與保存](../implementation/jd-storage.md) |
+| Memory 業務 | 本批候選、物件與關係、固定快照及處理進度；不代替模型分析內容 | [Memory 保存](../implementation/memory-storage.md) |
 | Plan 業務 | 同職務檔案的工作安排、候選保存及合法跨輪採用 | [長任務分工](#21-長任務的元件分工) |
-| 公版參考業務 | App 保存選用及否認範圍，獨立 RAG 提供公版查讀；B1／B2 只讀有效排除範圍 | [可選工具契約](../specs/2026-10-04-public-reference-completion-design.md) |
-| AI 執行 | 原生模型接續、Step、控制與恢復；checkpoint 不代表 JD／Memory 已正式成立 | [共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md) |
+| 公版參考業務 | App 保存選用及否認範圍，獨立 RAG 提供公版查讀；B1／B2 只讀有效排除範圍 | [公版選用與否認資格](../design/rag-pipeline.md#公版選用與明確否認的保存資格) |
+| AI 執行 | 原生模型接續、Step、控制與恢復；checkpoint 不代表 JD／Memory 已正式成立 | [共用執行與恢復](../implementation/agent-execution.md) |
 | 執行快照保存 | LangGraph checkpointer 將執行位置存入 PostgreSQL，供原工作恢復；不判定業務完成 | [Agent 執行](../implementation/agent-execution.md#1-執行圖與業務資格分開) |
-| 角色工具與模型接線 | 將模型意圖轉為授權用例，將真結果轉成模型輸出；範圍及操作身分由 App 注入 | [工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md) |
+| 角色工具與模型接線 | 將模型意圖轉為授權用例，將真結果轉成模型輸出；範圍及操作身分由 App 注入 | [模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界) |
 | 持久化接線 | 交易、約束、隔離及原結果回查；不判斷工作語意、不跨模型呼叫持有交易 | [資料與交易](persistence.md) |
 | PDF 投影 | 固定正式 JD 後產生唯讀輸出，候選與 PDF 都不能反向成為正式 JD | [交付](delivery-and-operations.md) |
 
@@ -59,9 +59,9 @@ Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處�
 
 | 元件／成果 | 責任與交換資料 | 維護及使用者 | 現行與目標 |
 |---|---|---|---|
-| 工作記憶 Memory | 依原話分析出的員工工作情境與理解，保留本人範圍、依據及不確定性；隨新資訊、更正或分析發現反覆修訂。 | B1／B2 整理與修訂，App 發布；A 讀本輪固定快照及合法原話。 | **現行。** 固定的是單次執行的讀取基準，分析內容可在後續整理中修正。分層與發布沿 [Memory 設計](../specs/2026-09-24-caliburn-layered-architecture-map.md)。 |
-| 工作計畫 Plan | 規劃訪談、拆分及調整子任務：目前聚焦什麼、哪些方向還沒深入、哪些尚未問完，以及何時回訪或收尾。 | A 讀目前計畫全文，提出安排與局部修改；App 負責候選保存、合法採用、全文接續與同份唯讀呈現。 | **現行。** 沿 ADR0081 保存與接續，依 ADR0082 以短大綱安排剩餘訪談、分析與 JD 編修。工程及品質證據見下文。 |
-| 變更檢視 Changes | 讓 Agent 看見 JD、引用及引用來源的改動與受影響範圍，據此繼續分析；改動本身不代表正確或已確認。 | App 提供變更資訊及比較；A 判斷影響，必要時核對依據、追問或修稿。 | **現行，已實作並有測試紀錄。** 人工 JD 比較與 JD 既有引用所指 Memory 來源的舊→新比較已接入 A 的按需工具；不涵蓋全部 Memory 變更。比較範圍、提示方式及驗證沿 [JD §4.3](../specs/2026-09-29-jd-model-tool-contract-review.md#43-兩類差異的按需入口)。 |
+| 工作記憶 Memory | 依原話分析出的員工工作情境與理解，保留本人範圍、依據及不確定性；隨新資訊、更正或分析發現反覆修訂。 | B1／B2 整理與修訂，App 發布；A 讀本輪固定快照及合法原話。 | **現行。** 固定的是單次執行的讀取基準，分析內容可在後續整理中修正。分層與發布沿 [Memory 保存](../implementation/memory-storage.md)。 |
+| 工作計畫 Plan | 規劃訪談、拆分及調整子任務：目前聚焦什麼、哪些方向還沒深入、哪些尚未問完，以及何時回訪或收尾。 | A 讀目前計畫全文，提出安排與局部修改；App 負責候選保存、合法採用、全文接續與同份唯讀呈現。 | **現行。** 以短大綱安排剩餘訪談、分析與 JD 編修，候選保存與跨輪採用分開處理。工程及品質證據見下文。 |
+| 變更檢視 Changes | 讓 Agent 看見 JD、引用及引用來源的改動與受影響範圍，據此繼續分析；改動本身不代表正確或已確認。 | App 提供變更資訊及比較；A 判斷影響，必要時核對依據、追問或修稿。 | **現行，已實作並有測試紀錄。** 人工 JD 比較與 JD 既有引用所指 Memory 來源的舊→新比較已接入 A 的按需工具；不涵蓋全部 Memory 變更。比較範圍、提示方式及驗證沿 [JD 工具與保存](../implementation/jd-storage.md)。 |
 | 職務說明書 JD | 依實際工作與可核對依據形成的交付成果；有正式稿及當輪候選。 | A 讀目前內容與保存結果，提出有依據的修改；人與 A 共用 JD 業務規則，App 保存。 | **現行。** 是否完整可交付仍須核內容與依據，不能由 Plan 空白、完成短句或保存成功推定。 |
 
 A 有疑問時向員工釐清，Memory 依後續訪談自行整理修正。整理錯誤屬 Memory 分析品質問題，沿既有 B1／B2 流程處理，不另設 A 提交疑點的入口。
@@ -70,7 +70,7 @@ A 透過 Changes 的按需比較及來源待核對資訊辨認變更，再依目
 
 A 也可直接依員工本輪新原話推進工作，不必等待 Memory 整理或 Changes 結果。員工釐清盤點分工後，A 可把「釐清分工」改成「依已知分工修正 JD 任務與目的」；只有任務修好、目的仍不一致時，保留剩餘修正。後續 Memory 發布延續這份理解，不等於成品工作已完成，也不要求重問同一事實。
 
-Plan 以高品質、完整且有依據的 JD 為最終成果，正文是一份可局部修改的 Markdown；受訪者看見安排是附帶效果。先掌握輪廓、再選方向深入，隨訪談調整子任務、返回未完工作的用法，由 [Plan 內容與用法](../specs/jd-work-plan.md#1-內容與格式)維護。依 [ADR0082](../adr/0082-consultant-jd-work-plan.md)擴充用途的工程已實作，並依使用者限定範圍完成各一場比較；有限比較未見可辨整體增益，不能證明穩定品質改善。證據及後續待辦見[驗證範圍](verification.md#41-jd-工作計畫後續待辦)，有效狀態沿[目前決策](../current-decisions.md)。
+Plan 以高品質、完整且有依據的 JD 為最終成果，正文是一份可局部修改的 Markdown；受訪者看見安排是附帶效果。先掌握輪廓、再選方向深入，隨訪談調整子任務、返回未完工作的用法，由 [Plan 保存與採用](persistence.md#plan-從本輪候選到後輪可採用)維護。目前已接入上述用途；有限比較尚不能證明穩定品質改善，限制見[驗證範圍](verification.md#41-jd-工作計畫後續待辦)。
 
 ## 3. AI 分析角色：共用執行機制、分別處理工作
 
@@ -96,9 +96,9 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 
 正式完成由 App 協調業務結果，Graph END 不替代提交。各操作的前置條件、交接資料與恢復效果沿原責任文件查閱：
 
-- [核心閉環與生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md)說明輸入准入、A 完成及 Memory 整理要求；[顧問 Context](../specs/2026-09-26-consultant-context-and-state-design.md)說明輪前準備、資料綁定與同輪接續。
-- [B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)說明候選、固定交接與發布；資訊不足或矛盾須如實保留，不靠回交或猜補處理。
-- [工具設計](../specs/2026-09-27-agent-tool-contract-design-research.md)、[共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md)及[資料保存](persistence.md)分別維護授權派送、控制接續與原操作核對。
+- [正式採用與交易](persistence.md)說明輸入准入、A 完成及 Memory 整理要求；[模型 Context 與接續](../implementation/agent-execution.md)說明輪前準備、資料綁定與同輪接續。
+- [Memory 單向調度](../implementation/agent-supervision.md)說明候選、固定交接與發布；資訊不足或矛盾須如實保留，不靠回交或猜補處理。
+- [模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界)、[共用執行與恢復](../implementation/agent-execution.md)及[資料保存](persistence.md)分別維護授權派送、控制接續與原操作核對。
 
 ## 4. 跨邊界只傳必要的資訊
 

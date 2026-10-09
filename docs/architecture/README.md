@@ -2,13 +2,13 @@
 
 Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據的職務說明書（JD）。本機 Web 工作區提供訪談與編輯，後端協調 AI 分析、業務規則及資料保存；背景 Memory 支援長訪談，來源關係讓人回查分析與 JD 的依據。
 
-本頁先說明產品旅程，再分成五個架構主題。需求與使用情境見[產品介紹](../product-introduction.md)。現行狀態與目標調整沿[目前決策](../current-decisions.md)核對。
+本頁先說明產品旅程，再分成五個架構主題。需求與使用情境見[產品介紹](../product-introduction.md)。本目錄說明現行責任與限制。
 
 圖面在本文中閱讀；修改時由各圖旁的「圖源」連結進入獨立 Mermaid 檔。[圖源索引](../diagrams/README.md)集中提供查找與重繪方式。
 
 ## 第一次閱讀
 
-先讀完本頁，再依序看[系統責任](system-boundaries.md)、[資料如何保存](persistence.md)及[互動與部署](delivery-and-operations.md)。這條路線先回答產品如何工作，再說明它怎麼運作；需要修改程式時，才進入[實作目錄](../implementation/README.md)。查單一功能可直接用下方索引，不必先讀歷史 ADR 或全部設計稿。
+先讀完本頁，再依序看[系統責任](system-boundaries.md)、[資料如何保存](persistence.md)及[互動與部署](delivery-and-operations.md)。這條路線先回答產品如何工作，再說明它怎麼運作；需要修改程式時，才進入[實作目錄](../implementation/README.md)。查單一功能可直接用下方索引，依問題閱讀即可。
 
 一份**職務檔案**是一組彼此隔離的訪談、JD、工作記憶及工作計畫。文中的 **A** 是與員工對話、分析並編修 JD 的顧問角色；**B1** 在背景整理具體工作情境，**B2** 再整理工作理解，兩者的成果共同形成 Memory。它們是 AI 分工名稱，不表示三個獨立服務。
 
@@ -55,14 +55,14 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 | 想先弄懂的問題 | 整體圖表 | 深入時再讀 |
 |---|---|---|
 | 誰使用產品，哪些部分在本機、哪些在外部？ | [系統情境與容器](system-boundaries.md#2-app-拆開後有哪些責任)、[部署圖](delivery-and-operations.md#2-最小部署視角) | [靜態程式依賴](../implementation/code-organization.md#2-依賴方向與可檢查限制) |
-| 一次員工回答如何成為 JD 的一部分？ | [單輪流程](../specs/2026-09-29-core-value-loop-lifecycle.md#正常閉環一則輸入如何變成可交付-jd-的一部分) | [模型與工具 Step](../implementation/agent-execution.md#46-有界多-step-接續) |
-| 暫停、取消或中斷後怎麼辦？ | [執行狀態圖](../specs/2026-09-27-shared-agent-execution-and-state-design.md#控制與故障的狀態視圖)、[提交後恢復時序](persistence.md#4-重試取消與執行恢復) | [外送重試流程](../implementation/model-requests.md#5-單一外送重試責任) |
-| 背景整理如何與下一輪訪談並行？ | [A／B1／B2 角色表](system-boundaries.md#3-ai-分析角色共用執行機制分別處理工作)、[並行時序](../specs/2026-09-29-core-value-loop-lifecycle.md#背景發布與下一輪訪談並行的代表時序) | [Memory 保存關係](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
-| Plan 的本輪安排何時能供後輪接續？ | [Plan 採用流程](persistence.md#plan-從本輪候選到後輪可採用) | [Plan 工具及保存契約](../specs/jd-work-plan.md) |
+| 一次員工回答如何成為 JD 的一部分？ | [正式採用與交易](persistence.md) | [模型與工具 Step](../implementation/agent-execution.md#46-有界多-step-接續) |
+| 暫停、取消或中斷後怎麼辦？ | [共用執行與恢復](../implementation/agent-execution.md)、[提交後恢復時序](persistence.md#4-重試取消與執行恢復) | [外送重試流程](../implementation/model-requests.md#5-單一外送重試責任) |
+| 背景整理如何與下一輪訪談並行？ | [A／B1／B2 角色表](system-boundaries.md#3-ai-分析角色共用執行機制分別處理工作)、[正式採用與交易](persistence.md) | [Memory 保存關係](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
+| Plan 的本輪安排何時能供後輪接續？ | [Plan 採用流程](persistence.md#plan-從本輪候選到後輪可採用) | [Plan 保存與採用](persistence.md#plan-從本輪候選到後輪可採用) |
 | 內容、版本及引用如何連在一起？ | [資料責任與固定修訂](persistence.md#1-業務資料與執行資料) | [訪談 ER](../implementation/interview-storage.md#1-原文正式資格與執行身分分開不複製原話)、[JD ER](../implementation/jd-storage.md#2-固定修訂與目前正式頭)、[Memory ER](../implementation/memory-storage.md#21-固定物件修訂) |
 | 如何知道畫面、模型與保存結果是否一致？ | [使用者操作表](delivery-and-operations.md#1-使用者看到的主要流程)、[診斷資料來源](delivery-and-operations.md#5-執行觀測與問題排查) | [SSE 時序](../implementation/interface-and-delivery.md#2-串流不是保存權威)、[驗證責任表](../implementation/verification-plan.md#1-分層測試不以-mock-冒充產品) |
 
-產品細節由[設計與工具契約](../specs/README.md)維護。深層設計稿可能同時保留早期討論及現行補充；先依頁首狀態與本入口指向的章節閱讀，不把早期「候選」文字當成另一套現行能力。
+產品細節由[實作與契約接線](../implementation/README.md)維護。深層設計稿可能同時保留早期討論及現行補充；先依頁首狀態與本入口指向的章節閱讀，不把早期「候選」文字當成另一套現行能力。
 
 ## 架構與實作的維護分工
 
@@ -90,6 +90,6 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 現行產品使用 React／MUI、FastAPI、PostgreSQL、LangGraph 與 OpenAI Responses API，採本機模組化單體。Memory 為單向 B1 → B2 → 發布。App 可明示啟用獨立 RAG 的公版查讀；RAG 不成為預設啟動依賴。
 
-現行輪前與輪中均採原生 compaction；輪前改用 App 文字摘要是[已確認但尚未實作的目標](../specs/2026-10-04-context-summary-and-compaction-design.md)，摘要 Prompt 待討論。Plan 工程與各一場比較已完成，尚未證明穩定品質增益；真人省時、學習負擔及部分長旅程分支仍未驗，詳見[驗證與限制](verification.md)。
+現行輪前與輪中均採原生 compaction；輪前改用 App 文字摘要是[驗證範圍與限制](verification.md)，摘要 Prompt 待討論。Plan 工程與各一場比較已完成，尚未證明穩定品質增益；真人省時、學習負擔及部分長旅程分支仍未驗，詳見[驗證與限制](verification.md)。
 
 專用全稿審核、原話語意搜尋與跨機還原尚未提供；其餘範圍及非目標由[系統責任](system-boundaries.md#1-核心閉環與範圍)維護。

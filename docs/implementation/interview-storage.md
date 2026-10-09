@@ -1,7 +1,7 @@
 # 職務檔案與訪談保存接線
 
 - 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證範圍見[實作驗證](verification-plan.md)。
-- 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
+- 語意仍由[資料保存](../architecture/persistence.md)及[Memory 選讀與來源](memory-tools.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
 
 | 維護問題 | 閱讀位置 |
@@ -136,7 +136,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 ## 9. 有界來源查詢與近期歷史投影
 
-此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#起始訪談範圍與前置語境)，是閱讀記號，不是模型須填的參數：
+此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[Memory 選讀與來源](memory-tools.md)，是閱讀記號，不是模型須填的參數：
 
 - **K**：本工作固定採用的已發布 Memory 所涵蓋的訪談上界；首次無 Memory 為 0。
 - **H**：A 開始前已成立的正式歷史上界，不含本次尚未正式編號的輸入。

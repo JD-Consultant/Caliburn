@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**現行介面、公開訊息與交付契約** 。正式產品切換依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)，上位責任：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**現行介面、公開訊息與交付契約** 。正式產品切換依 [正式產品與選型](../architecture/design-decisions.md)，上位責任：[運作與交付](../architecture/delivery-and-operations.md)、[正式採用與交易](../architecture/persistence.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 本頁維護 HTTP 命令、公開串流、來源回查、PDF 與本機交付的接線。JD 人工編輯與工作畫面的元件、草稿、收合及鍵盤操作，由 [Web 工作畫面](web-workspace.md)維護；正式保存與權限由業務模組判定。
 
@@ -28,7 +28,7 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 `sessionStorage` 僅為**本分頁尚未確認的 transport command** ，不負責判定正式檔案／交易結果。保存 command ID、檔案名稱、員工姓名；先保留才送出，儲存不可用則明示未送出。不明結果不自動重送、不解除原 payload；明確拒絕後才可改字重新提交。確認成功清除；即使清除失敗，殘留命令也只查回原結果，不把原建立時 metadata 覆蓋到最新 cache。關閉分頁／清除瀏覽器資料不保證保留此暫存；此時先查清單，不能宣稱跨裝置或永久恢復。取消建立表單不是撤銷可能已成立的後端建立。
 
-此方案沿[共同保存審查](../specs/2026-09-27-shared-agent-execution-and-state-design.md)的「先列具體保證」：避免未確認時換新命令造成重複檔案，建立流程未新增 DB 回執或 browser database。它不決定後續訪談輸入的控制／重送策略。訪談提交與公開串流見 §2；Memory 不提供使用者控制。
+此方案沿[共用執行與恢復](agent-execution.md)的「先列具體保證」：避免未確認時換新命令造成重複檔案，建立流程未新增 DB 回執或 browser database。它不決定後續訪談輸入的控制／重送策略。訪談提交與公開串流見 §2；Memory 不提供使用者控制。
 
 **列表改名已接上：** 選擇 stable file ID，只編輯顯示名稱；使用當時讀到的名稱修訂作新鮮度條件。送出前將原命令保留在該檔案的本分頁 sessionStorage；結果不明時重開／reload 沿用原命令與原基準，不能自動換最新基準重送。明確拒絕後要求重讀，使用者再決定。成功或原結果重送成功都 invalidate 清單與該檔 metadata，由 GET 更新畫面；不將原結果覆蓋成目前名稱。保存與交易由[職務檔案領域模組](interview-storage.md#10-列表改名名稱新鮮度與原操作結果)負責；暫存只為有限 transport 恢復，不另存可編輯的正式資料。窄螢幕保留名稱／受訪者／操作，隱藏次要建立時間，避免字字換行。
 
@@ -120,7 +120,7 @@ UI 沿既有暖白紙面與可收合處理紀錄呈現「推理摘要」與「�
 
 ## 3. 顯示與來源
 
-介面以「工作計畫」顯示同份唯讀 Markdown，內容為目前焦點、工作方向與剩餘安排，依 [Plan 唯讀 UI 契約](../specs/jd-work-plan.md#6-同份唯讀-ui)顯示。正式 GET 與 active／paused 的同 scope `plan_preview` 區分 `null`、刻意 `""` 與讀取不可用；終局當次 render 停候選，沿同 queryKey 取消舊 GET 並實際刷新。失敗保留上一採用版或明示未確認；標題及子項直接呈現，不解析任務狀態，也不由空值或畫面推定 JD 完成。
+介面以「工作計畫」顯示同份唯讀 Markdown，內容為目前焦點、工作方向與剩餘安排，依 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)顯示。正式 GET 與 active／paused 的同 scope `plan_preview` 區分 `null`、刻意 `""` 與讀取不可用；終局當次 render 停候選，沿同 queryKey 取消舊 GET 並實際刷新。失敗保留上一採用版或明示未確認；標題及子項直接呈現，不解析任務狀態，也不由空值或畫面推定 JD 完成。
 
 JD 顯示正式稿；A 活躍時可即時預覽該 Turn 候選，明示未完成。取消退回正式稿。PDF 永遠取已完成正式版本，與候選預覽分開；不因使用者看到 preview 就對外匯出它。
 
@@ -178,7 +178,7 @@ Python Playwright 的 Chromium revision 跟套件鎖定，瀏覽器測試用 Pla
 
 ### 4.1 同源靜態建置入口
 
-`CALIBURN_WEB_BUILD_DIRECTORY` 指向已建置 Web 的絕對目錄；未設時為純 API／Vite 開發模式，不從 repo 或工作目錄猜路徑。只可指定可信的公開建置產物，不能指向 repo、原始碼、`.env`、資料庫或上傳資料目錄。正式產品入口依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。
+`CALIBURN_WEB_BUILD_DIRECTORY` 指向已建置 Web 的絕對目錄；未設時為純 API／Vite 開發模式，不從 repo 或工作目錄猜路徑。只可指定可信的公開建置產物，不能指向 repo、原始碼、`.env`、資料庫或上傳資料目錄。正式產品入口依 [正式產品與選型](../architecture/design-decisions.md)。
 
 直接使用鎖定 FastAPI 的 [`frontend()`](https://fastapi.tiangolo.com/tutorial/frontend/)：根路徑提供實際建置檔案、不做全域 SPA fallback；只在現有 UI 的 `/job-files` 前綴啟用 HTML 導覽 fallback。一般 API 優先，未知 `/api/*` 與根 `/assets/*` 不回首頁冒充成功；未匹配的非 HTML 讀取及寫入也不靠 fallback 成功。未來增加 UI 路由前綴時，在組裝根同步這個明確範圍，不複製另一套檔案路由器。建置目錄或 `index.html` 缺失時，框架在建立 App 時拒絕。
 

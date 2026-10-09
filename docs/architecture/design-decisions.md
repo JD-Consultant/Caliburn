@@ -42,7 +42,7 @@ Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、
 
 ## 5. 模型執行：以既有框架整合產品流程
 
-現行採用 LangGraph 與 OpenAI direct Responses SDK，不採 LangChain agent／message adapter 或 OpenAI Agents SDK。Graph 負責執行控制與 checkpoint，各角色的工具連接業務模組，原生模型輸出依原契約保存與重播。執行節點、SDK 傳輸格式、取消資格與模型容量詳見[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)。
+現行採用 LangGraph 與 OpenAI direct Responses SDK，不採 LangChain agent／message adapter 或 OpenAI Agents SDK。Graph 負責執行控制與 checkpoint，各角色的工具連接業務模組，原生模型輸出依原契約保存與重播。執行節點、SDK 傳輸格式、取消資格與模型容量詳見[共用執行與恢復](../implementation/agent-execution.md)。
 
 不新增通用模型供應商抽象層、第二套工作階段引擎、每步必填的工作狀態筆記或獨立的壓縮 AI 角色。只有實測反例顯示原生接續不足，才評估需要補充哪些分析資料；不可讀的推理內容不作為 App 可讀取的工作計畫。
 
@@ -50,20 +50,20 @@ Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、
 
 驗證這項分工時，須核對 SDK 發送邊界的實際請求；僅看組裝前資料不足以排除隱含變換。這項驗證要求也不表示所有請求副本都永久保存。
 
-App 仍可明確呼叫模型的原生能力。[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)允許送入完整視窗，並採用完整的返回視窗；其中加密的 compaction item 無法由人解讀。App 控制觸發時機、範圍與安全採用條件，但不掌握供應商內部如何取捨內容。現行採 App 主動壓縮；門檻、Step 交界及回退規則只在[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)維護。
+App 仍可明確呼叫模型的原生能力。[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)允許送入完整視窗，並採用完整的返回視窗；其中加密的 compaction item 無法由人解讀。App 控制觸發時機、範圍與安全採用條件，但不掌握供應商內部如何取捨內容。現行採 App 主動壓縮；門檻、Step 交界及回退規則只在[共用執行與恢復](../implementation/agent-execution.md)維護。
 
 **已確認的目標調整，尚未實作：** 輪前使用 App 管理的文字摘要，輪中仍採全部原生 compact output；B1／B2 壓後只追加目前候選導覽。
 
-這項調整回應長訪談實測中觀察到的問題：歷次 App 資料仍留在 compact 的返回視窗，而官方不允許自行裁切該結果。摘要內容及品質仍待設計，不能宣稱文字摘要保留了加密推理。此變更不新增壓縮 AI 角色或恢復框架，完整取捨見[輪前摘要與輪中壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。
+這項調整回應長訪談實測中觀察到的問題：歷次 App 資料仍留在 compact 的返回視窗，而官方不允許自行裁切該結果。摘要內容及品質仍待設計，不能宣稱文字摘要保留了加密推理。此變更不新增壓縮 AI 角色或恢復框架，已知限制見[驗證範圍與限制](verification.md)。
 
 ## 6. 工具與格式：依內容與操作選擇
 
 長正文需要精確保留未改文字，短欄位與關係則需要明確的型別及操作意圖，因此 Memory 與 JD 不強用同一種修改格式。模型表達內容與目標，App 管理範圍、版本及保存身分；這讓格式貼近分析工作，也避免模型重建系統已知資料。
 
-命名及共同輸出沿[工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)，格式解析與錯誤處理由 [Memory 正文編輯](../implementation/memory-body-editing.md)和 [JD 接線](../implementation/jd-storage.md)維護。
+命名及共同輸出沿[模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界)，格式解析與錯誤處理由 [Memory 正文編輯](../implementation/memory-body-editing.md)和 [JD 接線](../implementation/jd-storage.md)維護。
 
 ## 7. 保持架構範圍有限
 
 現行架構處理訪談、工作資訊累積、有據改稿與可靠保存。高內聚、低耦合、可讀、可測及可診斷是工程基線，各項實作都須遵守，不以能否直接提高 JD 品質作為前提。微服務、通用規則引擎及事件重播平台目前沒有必要用途；後續技術選擇依維護、測試與運作成本比較，不將現行未採用寫成永久禁令。工程與產品品質各自驗收，依[開發規範](../implementation/development-standard.md#31-依風險配置驗證與交付粒度)維護。
 
-現行產品不承接舊架構資料，背景見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。產品範圍見[產品概念](../product-concept.md)，測試結果見[驗證章節](verification.md)。
+現行產品不承接舊架構資料。產品範圍見[產品概念](../product-concept.md)，測試結果見[驗證章節](verification.md)。

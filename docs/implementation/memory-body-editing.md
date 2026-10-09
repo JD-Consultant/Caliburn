@@ -1,11 +1,11 @@
 # Memory 正文編輯接線
 
-- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Memory 原入口保留薄相容包裝；焦點筆記重用同一解析／唯一定位／套用機制，只有 App 筆記用途允許空正文，Memory 仍拒空。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見本次切片證據及正文與工具驗證。
-- 產品契約：[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料保存責任。
+- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Memory 原入口保留薄相容包裝；焦點筆記重用同一解析／唯一定位／套用機制，只有 App 筆記用途允許空正文，Memory 仍拒空。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見本次切片證據及正文與工具驗證。
+- 產品契約：[Memory 工具與寫入](memory-tools.md)、[模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料保存責任。
 
 閱讀路徑：[採用來源](#1-重用來源與有限補強) → [語法與定位](#2-語法與唯一定位) → [套用與容量](#3-套用錯誤與容量) → [接縫驗證](#4-接縫及驗證層級)。純編輯核心處理一份正文；角色權限、工具回傳與候選交易由各自的接線文件維護。
 
-這裡的 **V4A** 是以文字上下文定位修改位置的 patch 格式。每個 **hunk** 是一段局部修改：以原文上下文或明確的檔尾（EOF）條件定位，再用 `-`／`+` 指定刪除與新增行；一份 diff 可以包含多段 hunk。先看[把「每月」改為「每週」的工具輸入例](../specs/2026-09-27-memory-object-update-tool-contract.md#3-模型輸入一個目標與有限-changes)，再讀下方解析與歧義處理規則。
+這裡的 **V4A** 是以文字上下文定位修改位置的 patch 格式。每個 **hunk** 是一段局部修改：以原文上下文或明確的檔尾（EOF）條件定位，再用 `-`／`+` 指定刪除與新增行；一份 diff 可以包含多段 hunk。先看[Memory 工具與寫入](memory-tools.md)，再讀下方解析與歧義處理規則。
 
 ## 1. 重用來源與有限補強
 

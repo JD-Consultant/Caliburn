@@ -64,7 +64,7 @@ writer.upsert(EmbeddedChunk…)                      # batched;先 ensure_collec
 ### 4.1 semantic(`search_occupations` / `search_tasks`)
 
 ```
-assert_compatible(read_manifest, embedder.signature)   # 不相容 → 409(ADR 0009)
+assert_compatible(read_manifest, embedder.signature)   # 不相容 → 409
 embedder.embed_query(q) → dense + sparse
 hybrid_search(level="profile"|"task", limit=top_k)
 ```
@@ -79,15 +79,17 @@ hybrid_search(level="profile"|"task", limit=top_k)
 | `get_occupation` | scroll 該 code 的 profile 點 → 原樣投影(表頭池原料) |
 | `get_occupation_tasks` | scroll task 點 → 聚成 `units{ocu_code → {ocu_name, urn, tasks[]}}` 樹,排序 |
 | `get_competencies` | scroll task 點 → 每 block 的 K/S/O/P 項**按 `item_urn(code,type,code)` 去重**成 bucket;每項 `sources[]` **累積**(哪個 unit/task 帶入、各自 level);A 從 profile 點取 |
-| `batch_get_tasks` | `client.retrieve(ids)` → 投影;**缺失 id 靜默略過**(刻意,ADR 0019) |
-| `matching.service.match_items` | 相似比對(ADR 0022,`POST /items:match`):不碰 Qdrant,吃呼叫端送來的池 → 清洗/NFKC 收斂 → embedder 嵌入 → 跨來源 numpy cosine → FS 分帶 → 星型分群(舊 `tasks:findSimilar` 已退役,零消費者、功能被涵蓋) |
+| `batch_get_tasks` | `client.retrieve(ids)` → 投影;**缺失 id 靜默略過**（既定行為） |
+| `matching.service.match_items` | 相似比對(`POST /items:match`):不碰 Qdrant,吃呼叫端送來的池 → 清洗/NFKC 收斂 → embedder 嵌入 → 跨來源 numpy cosine → FS 分帶 → 星型分群(舊 `tasks:findSimilar` 已退役,零消費者、功能被涵蓋) |
 
 > `get_competencies` 的 **CitableItem** 就是 api `/knowledge` 能力池的原料:同一 K/S 跨多任務出現時,
 > 去重成一項、`sources[]` 記全部出處(api 據此堆 `srcs`,web 選單顯示引用行)。
 
 ### 4.3 manifest 相容(查詢前必驗)
 
-`_manifest` 點存嵌入身分;**每個 semantic 查詢前 `assert_compatible`**——索引端與查詢端 embedder 不一致就 **409**,不會拿錯維度的向量硬查(ADR 0009)。換 provider/維度 = **建新 collection,不混用**。
+本節限既有 profile／task 索引。現行 `assert_compatible` 對缺 manifest 的舊索引放行並警告，只有 revision 不同也警告；provider、model 或 dim 不同才拒絕。職位整體 reference 索引的 ready／固定來源／模型身分檢查是另一套嚴格契約。
+
+`_manifest` 點存嵌入身分;**每個 semantic 查詢前 `assert_compatible`**——provider、model 或維度不一致就 **409**,不會拿錯維度的向量硬查。換 provider/維度 = **建新 collection,不混用**。
 
 ## 5. 不變量(code 讀不出的規則)
 
@@ -101,7 +103,7 @@ hybrid_search(level="profile"|"task", limit=top_k)
 ## 6. 指路
 
 - 面 / 端點 / payload schema:[`../README.md`](../README.md)。
-- ADR:[0003](../../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·[0009](../../../docs/adr/0009-embedding-version-manifest.md)(manifest / 相容)·[0010](../../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·[0012](../../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)。
-- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 當時的內部紀錄。
-- 下游消費(哪個端點餵哪個池):[`apps/api/README.md`](../../api/README.md) + 當時的內部紀錄。
+- 架構：[RAG 服務邊界](../../../docs/design/rag-pipeline.md)；介面：[RAG 契約](../../../packages/indexer-contract/README.md)；模型：[embedder](../../embedder/README.md)。
+- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3。
+- 現行 App 可選 HTTP 接入：[API README](../../api/README.md#公版參考工具的可選啟用)。
 - 文檔怎麼寫:[`docs/README.md`](../../../docs/README.md)、[`docs/design/README.md`](../../../docs/design/README.md)。

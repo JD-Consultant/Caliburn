@@ -58,7 +58,7 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 取消後可取回原輸入，重新送出是新工作，不自動重送。一般斷線不等於取消或失敗；結果未明先核對，已完成則提供原結果。
 
-正式完成、暫停、取消與失敗有不同處理方式。各狀態的轉換見[核心生命週期](specs/2026-09-29-core-value-loop-lifecycle.md)，保存與恢復見[資料與交易](architecture/persistence.md)，畫面呈現見[互動與運作](architecture/delivery-and-operations.md)。
+正式完成、暫停、取消與失敗有不同處理方式。各狀態的轉換見[正式採用與交易](architecture/persistence.md)，保存與恢復見[資料與交易](architecture/persistence.md)，畫面呈現見[互動與運作](architecture/delivery-and-operations.md)。
 
 ## 支援長訪談的能力
 
@@ -68,7 +68,7 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 已知部分可以保留，未知不能靠猜補；重要但暫時無法歸屬的工作線索不應沉沒。工作情境保留具體差異，工作理解保留適用範圍及有據認識，兩者都不是預先填好的 JD。線索保留與情境切分的真實品質仍須以不同職位核對，不能由資料格式合法推定。
 
-導覽、來源與差異幫助按需閱讀及重評，不代替語意分析。背景最終失敗時，顧問仍能使用已發布 Memory 與有效原話繼續訪談；舊 Memory 不會被誤標為已更新。完整流程與再整理政策見[背景生命週期](specs/2026-09-25-b1-b2-information-gap-lifecycle.md)。
+導覽、來源與差異幫助按需閱讀及重評，不代替語意分析。背景最終失敗時，顧問仍能使用已發布 Memory 與有效原話繼續訪談；舊 Memory 不會被誤標為已更新。完整流程與再整理政策見[Memory 單向調度](implementation/agent-supervision.md)。
 
 ### 上下文與分析接續
 
@@ -76,9 +76,9 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 
 現行輪前／輪中均使用原生 compaction。
 
-已確認但尚未實作的下一步設計為**輪前按需文字摘要，輪中保留原生壓縮**。B1／B2 輪中壓後只補目前候選導覽，A 不重加起始資料；安全點與資料權限不變。摘要內容與 Prompt 仍待討論，詳見[輪前摘要與輪中壓縮](specs/2026-10-04-context-summary-and-compaction-design.md)。
+已確認但尚未實作的下一步設計為**輪前按需文字摘要，輪中保留原生壓縮**。B1／B2 輪中壓後只補目前候選導覽，A 不重加起始資料；安全點與資料權限不變。摘要內容與 Prompt 仍待討論，詳見[驗證範圍與限制](architecture/verification.md)。
 
-工具的名稱、輸入及回傳也是上下文設計的一部分。App 管理已知的身分、範圍與版本，模型只填需要判斷的內容。精簡回傳仍保留定位、引用與實際操作結果，讓模型可以接著工作；token 減少只有在分析品質維持時才有意義。Context 組裝與壓縮見[顧問 Context](specs/2026-09-26-consultant-context-and-state-design.md)，Step 安全點與恢復見[共用執行](specs/2026-09-27-shared-agent-execution-and-state-design.md)。
+工具的名稱、輸入及回傳也是上下文設計的一部分。App 管理已知的身分、範圍與版本，模型只填需要判斷的內容。精簡回傳仍保留定位、引用與實際操作結果，讓模型可以接著工作；token 減少只有在分析品質維持時才有意義。Context 組裝與壓縮見[模型 Context 與接續](implementation/agent-execution.md)，Step 安全點與恢復見[共用執行與恢復](implementation/agent-execution.md)。
 
 ## 現行範圍與非目標
 
@@ -86,7 +86,7 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 - 專用全稿審核、原話關鍵字／語意搜尋與跨機還原不在現行範圍；全稿品質目標保留，不把後延能力列作已完成。
 - 不採 C 即時修補、固定雙向互審或沒有具體需求的通用規則／事件平台，不為每個 AI 角色建立獨立服務。
 - 不要求每輪整理 Memory、每輪改 JD、先完成背景整理才准改稿，或由員工代寫才能達到品質目標。
-- 不遷移舊架構資料，不接回退役程式。RAG 是獨立服務，JD App 不預設啟動或依賴它；依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，明示設定後可用公版查讀工具輔助查漏。公版只作參考，不成為員工事實或自動完成門檻。
+- 不遷移舊架構資料，不接回退役程式。RAG 是獨立服務，JD App 不預設啟動或依賴它；依 [公版接線](design/rag-pipeline.md)，明示設定後可用公版查讀工具輔助查漏。公版只作參考，不成為員工事實或自動完成門檻。
 
 ## 已知限制與成效驗證
 

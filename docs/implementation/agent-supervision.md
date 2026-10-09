@@ -4,7 +4,7 @@
 
 按問題閱讀：[啟停與 writer 接管](#1-本機-a-supervisor) → [A 暫停／取消／續作](#2-a-pausecancelresume-控制) → [最終失敗怎麼收尾](#3-最外層失敗收尾)。角色能力恢復見[公版工具接線](#4-公版工具的可選角色接線)，已成立的整理要求見 [Memory 背景調度](#5-memory-背景工作)。
 
-產品完成、取消及保留政策沿[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md)及[資料交易](../architecture/persistence.md)。本頁不另定終態；實際恢復範圍與未驗情境沿各節證據。
+產品完成、取消及保留政策沿[共用執行與恢復](agent-execution.md)及[資料交易](../architecture/persistence.md)。本頁不另定終態；實際恢復範圍與未驗情境沿各節證據。
 
 ## 1. 本機 A Supervisor
 
@@ -61,7 +61,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 
 ## 3. 最外層失敗收尾
 
-依 [核心恢復範圍](../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-恢復範圍能續作不能續作則安全退出)，`bootstrap.py` 在 A 的控制 wrapper 與 Memory batch 外共用 `workflows/execution_failures.py::run_with_failure_boundary`。它不是第二個恢復引擎；不增表、重試、模型參數或 UI 控制。
+依 [共用執行與恢復](agent-execution.md)，`bootstrap.py` 在 A 的控制 wrapper 與 Memory batch 外共用 `workflows/execution_failures.py::run_with_failure_boundary`。它不是第二個恢復引擎；不增表、重試、模型參數或 UI 控制。
 
 ```text
 既有角色執行／checkpoint 接續／有界恢復
@@ -82,11 +82,11 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 
 ## 4. 公版工具的可選角色接線
 
-公版工具的可選接線依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。
+公版工具的可選接線依 [公版接線](../design/rag-pipeline.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。
 
 `ConsultantRunner._tools` 在建立公版候選前，核對原 captured request 的工具組與寫入結果格式。公版工具缺漏、名稱重複或格式混用時拒絕；合法請求由 `occupation_reference_write_result_format` 決定 handler 的回傳模式。
 
-這個判斷使用原工具定義，不讀當前全域設定。已保存的 native output 直接接續，只有尚未完成的命令才沿原模式 execute。固定描述後綴及兩種結果格式只在[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)完整定義，回歸與獨立審查保存實際證據。
+這個判斷使用原工具定義，不讀當前全域設定。已保存的 native output 直接接續，只有尚未完成的命令才沿原模式 execute。新格式只回 `{"status":"updated"}`，舊格式回完整 state；以原工具的固定 description 後綴分派，不靠今天的設定猜格式。後綴、完整工具組核對及結果投影由[模型工具實作](../../apps/api/src/caliburn/transport/model_tools/occupation_references.py)集中維護；潤飾 description 不能移除既有識別條件。
 
 ## 5. Memory 背景工作
 

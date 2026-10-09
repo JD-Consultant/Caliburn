@@ -6,12 +6,9 @@ shapes are maintained in [references.py](src/indexer_contract/references.py); em
 completion remain outside this contract.
 
 The formal JD App can opt into the reference API over HTTP under
-[ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md). It validates the HTTP boundary
+[公版接線](../../docs/design/rag-pipeline.md). It validates the HTTP boundary
 in its own adapter and does not import this Python package. Older profile/task consumer designs
 remain historical; the optional reference integration does not restore retired consumer code.
 
 This is a pure Pydantic package, used by the producer as an editable **path dependency**
-(like `ocs-contract`). The producer keeps one typed contract, without a separate codegen or
-JSON-Schema workflow; the original design is recorded in
-當時的內部紀錄
-and [ADR0010](../../docs/adr/0010-indexer-contract-shared-package.md).
+(like `ocs-contract`). The producer keeps one typed contract without a separate codegen or JSON-Schema workflow.

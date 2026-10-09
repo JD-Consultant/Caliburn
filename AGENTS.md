@@ -7,12 +7,12 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 ## 任務與閱讀入口
 
 - 開始時確認要回答的問題、工作範圍與完成條件。研究／審查交付有依據的建議，診斷交付可驗證的原因，實作依已授權範圍完成變更與驗收。
-- 依任務讀取相關文件、程式與測試。現行程式與實測說明現況，正式權責沿已採用 ADR 與相應契約核對；發現落差時先核對適用範圍與接續決策，再提出修正。
+- 依任務讀取相關文件、程式與測試。現行程式與實測說明現況，正式權責沿公開架構、實作說明與程式契約核對；重大改向另核本次任務提供的本機決策紀錄；發現落差時先核對適用範圍與接續決策，再提出修正。
 
 | 工作 | 閱讀入口 |
 |---|---|
-| 查功能、狀態與責任 | 從[目前決策](docs/current-decisions.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
-| 討論架構或跨層變更 | 讀相關 ADR 與契約，依[決策流程](docs/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
+| 查功能、狀態與責任 | 從[架構與現行責任](docs/architecture/README.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
+| 討論架構或跨層變更 | 讀受影響的架構、介面與保存規則，依[決策流程](docs/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
 | 規劃與實作 | 依[開發規範](docs/implementation/development-standard.md)拆解交付；模組邊界看[程式組織](docs/implementation/code-organization.md)，寫法看[程式規範](docs/implementation/coding-standard.md)，API／共用格式看[契約策略](docs/contract-strategy.md)。 |
 | 設計測試或判讀結果 | 讀[驗證範圍](docs/architecture/verification.md)與相關測試；分析品質結論須核對當次授權比較的受測條件、結果與限制。 |
 | 維護文件或圖稿 | 依[文件與圖面規範](docs/implementation/documentation-standard.md)整理責任、敘述、引用與圖面；更新對應正文及入口。 |
@@ -44,4 +44,4 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 ## 指引維護
 
-根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範引用責任文件。更新時整合重複或衝突指令，移除已失效的限制及封存事項；歷史依[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/implementation/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。
+根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範引用責任文件。更新時整合重複或衝突指令，移除已失效的限制及封存事項；公開責任文件由[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/implementation/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。

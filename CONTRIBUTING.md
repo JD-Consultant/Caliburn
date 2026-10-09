@@ -1,20 +1,18 @@
 # Caliburn 開發指南
 
 Caliburn 的正式產品是本機 Web AI 職務分析與職務說明書 App。現行權責由
-[ADR0079](docs/adr/0079-target-rebuild-production-cutover.md)決定；
-開始修改前先讀[目前決策](docs/current-decisions.md)與相關設計文件，不從歷史目錄猜現況。
+[正式產品與選型](docs/architecture/design-decisions.md)決定；
+開始修改前先讀[架構與現行責任](docs/architecture/README.md)與相關設計文件，不從歷史目錄猜現況。
 
 ## 正式結構
 
 ```text
 apps/api/        Python 3.14／FastAPI／LangGraph／PostgreSQL 後端（A／B1／B2、JD、Memory、PDF）
 apps/web/        React／TypeScript／MUI 介面
-docs/            ADR、架構、契約、開發規範與 runbook
+docs/            現行架構、契約、開發規範與 runbook
 ```
 
-`experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已退役，只保留研究與沿革
-文件，不能接回 import 或啟動；退役範圍與取回方式見 ADR0079。RAG bounded context 仍保留，但與 JD
-App 隔離且只能明示啟用。
+舊關聯式 App 與獨立 Memory 套件已退役，不能接回 import 或啟動。歷史決策與研究原件只在本機保存；RAG 仍保留，與 JD App 隔離且只能明示啟用。
 
 ## 工具與安裝
 

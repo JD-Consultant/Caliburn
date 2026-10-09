@@ -1,7 +1,7 @@
 # Runbook — Caliburn JD App 本機操作
 
 正式 App 是 `apps/api` 與 `apps/web`，日常操作統一從 repository 根目錄進入；正式邊界見
-[ADR 0079](adr/0079-target-rebuild-production-cutover.md)。舊 `experiments/jd-relational-app`
+[正式產品與選型](architecture/design-decisions.md)。舊 `experiments/jd-relational-app`
 （含舊 `app:init`／`app:set-key`、OpenRouter、Windows 認證管理員）已退役，不再有對應命令。
 
 本頁負責安裝、設定、啟停、更新與診斷。首次使用從下方[快速開始](#快速開始)選擇 Docker 或原生方式；產品用途與功能見[主 README](../README.md)。
@@ -423,4 +423,4 @@ pnpm rag:dev
 pnpm rag:down
 ```
 
-依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。上列命令供獨立開發；若要 App 與 RAG 一起啟動，使用[公版 Docker 模式](#含公版參考的-docker-模式)，不用另執行 `rag:dev`。啟用及執行中請求的設定邊界見 [API README](../apps/api/README.md#公版參考工具的可選啟用)。獨立管線沿 [`design/rag-pipeline.md`](design/rag-pipeline.md)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。
+依 [公版接線](design/rag-pipeline.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。上列命令供獨立開發；若要 App 與 RAG 一起啟動，使用[公版 Docker 模式](#含公版參考的-docker-模式)，不用另執行 `rag:dev`。啟用及執行中請求的設定邊界見 [API README](../apps/api/README.md#公版參考工具的可選啟用)。獨立管線沿 [`design/rag-pipeline.md`](design/rag-pipeline.md)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。

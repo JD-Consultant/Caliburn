@@ -2,7 +2,7 @@
 
 正式後端負責訪談、背景 Memory、JD 編輯、來源回查與 PDF 匯出。它以 FastAPI 單程序運行，使用 PostgreSQL 保存資料、LangGraph 官方 saver 保存執行狀態，並直連 OpenAI Responses。服務只綁定 loopback，不對外開放。
 
-本頁說明後端配置、API 與測試。日常啟動從專案根目錄的 `pnpm` 命令進入，步驟見[操作手冊](../../docs/runbook.md#快速開始)。正式範圍由 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
+本頁說明後端配置、API 與測試。日常啟動從專案根目錄的 `pnpm` 命令進入，步驟見[操作手冊](../../docs/runbook.md#快速開始)。正式範圍由 [正式產品與選型](../../docs/architecture/design-decisions.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
 
 清單支援整份職務檔案刪除：`DELETE /api/job-files/{job_file_id}` 成功回 204，含所屬訪談、JD、Memory 與執行紀錄；有未結束工作時回 409 `job_file_busy`。不可復原，不影響其他檔案。更新既有安裝須先套用 `0025_job_file_deletion`；確認、歷史保護與 checkpoint 交易見[刪除規則](../../docs/implementation/interview-storage.md#11-整份職務檔案刪除)。
 
@@ -79,9 +79,9 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 
 ## API 與執行紀錄
 
-**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
+**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[公版選用與否認資格](../../docs/design/rag-pipeline.md#公版選用與明確否認的保存資格)。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
 
-**Memory 排除範圍讀取：**啟用後 B1／B2 只增加 `read_excluded_work({})`，只回 `excluded_work`，沿現有 `MemoryReadBinding` 固定訪談上界與 stage 資格；不需 RAG HTTP client、不複製 Memory、不給選公版或寫入能力。schema、使用方式及時序反例見[唯讀契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)。
+**Memory 排除範圍讀取：**啟用後 B1／B2 只增加 `read_excluded_work({})`，只回 `excluded_work`，沿現有 `MemoryReadBinding` 固定訪談上界與 stage 資格；不需 RAG HTTP client、不複製 Memory、不給選公版或寫入能力。schema、使用方式及時序反例見[公版選用與否認資格](../../docs/design/rag-pipeline.md#公版選用與明確否認的保存資格)。
 
 ### 公版參考工具的可選啟用
 
@@ -115,7 +115,7 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 - `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
-- `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [INTPLAN](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md)；現行內容用途見 [Plan §10](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md#10-jd-工作計畫內容與用法)；本次工程證據與已完成的有限真模型比較分開；該比較未呈現可辨整體增益，原 wire／保存／恢復保持。
+- `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [Plan 保存與採用](../../docs/architecture/persistence.md#plan-從本輪候選到後輪可採用)；現行內容用途見 [Plan 保存與採用](../../docs/architecture/persistence.md#plan-從本輪候選到後輪可採用)；本次工程證據與已完成的有限真模型比較分開；該比較未呈現可辨整體增益，原 wire／保存／恢復保持。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。
 
 ### PDF 執行依賴

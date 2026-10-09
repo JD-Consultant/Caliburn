@@ -1,13 +1,9 @@
 # RAG pipeline — PDF → OCS → indexer → embedder/Qdrant（保留、隔離的 bounded context）
 
-> **現行狀態** ：RAG 是獨立檢索範圍。正式 JD App（`apps/api`、`apps/web`）已依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)完成可選 HTTP consumer 接線，須明示設定才啟用；不是預設啟動依賴。
+> **現行狀態** ：RAG 是獨立檢索範圍。正式 JD App（`apps/api`、`apps/web`）已完成可選 HTTP consumer 接線，須明示設定才啟用；不是預設啟動依賴。
 > `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`
 > 保持獨立安裝、測試與執行；正式 App 不 import 這些 Python 套件，也不代為啟動 GPU 或 Qdrant。
 > App 的 composition root 只在有設定時建立 HTTP client，公版選用及排除範圍由 App 保存。
->
-> **沿革** ：[ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) Decision 5（Proposed，2026-08-11 修正為保留＋隔離）與
-> [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)。
-> 這些文件保留當時未接消費端的取捨；現行接入權責依 ADR0080，查詢契約依[公版參考 API 設計](../specs/2026-10-05-occupation-reference-api-design.md)。
 
 ## 1. 端到端資料流
 
@@ -20,7 +16,7 @@
 <details>
 <summary>歷史：公版消費端接入前的 profile／task 管線</summary>
 
-下圖保留當時的 908 檔 corpus。圖中的「沒有任何 consumer」描述當時狀態，不適用於 ADR0080 接線後的職位整體參考 API。
+下圖保留當時的 908 檔 corpus。圖中的「沒有任何 consumer」描述當時狀態，不適用於已接線的職位整體參考 API。
 
 ```text
 PDF corpus（apps/pdf-to-json/data/pdfs，908 檔）
@@ -60,7 +56,7 @@ BGE-reranker-v2-m3 配對評分，模型權重留在 GPU 容器，不進正式 A
 `ocs-contract`／`indexer-contract` 都以 `tool.uv.sources` path dependency（相對路徑、editable）供
 `pdf-to-json`／`ocs-indexer` 使用，不是發佈到 registry 的套件。正式 App 不直接依賴這些 Python 套件，
 由自己的 adapter 驗證公版 HTTP 邊界。舊 `jd-relational-app` 與 `packages/consultant-memory` 已退役，
-現行產品邊界見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。
+現行產品邊界見 [正式產品與選型](../architecture/design-decisions.md)。
 
 ## 3. 本機指令
 
@@ -98,7 +94,7 @@ Docker 公版模式使用 `compose.jd-app.rag.yaml`，以 `pnpm docker:rag:up` �
 ## 4. 資料落地位置
 
 下表保留原 corpus 與既有 profile／task 索引的位置及數量，不能當作本次已選版或已通過解析的統計。
-後續補齊結果見JSON 補齊紀錄。
+資料完整度須沿來源檢核，不能由檔案數推定。
 
 | 資料 | 路徑 | 數量 |
 |---|---|---|
@@ -117,7 +113,7 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 
 - **正式 JD App 不 import 或部署 RAG 程式碼：** `apps/api/src/caliburn` 與 `apps/web/src`
   不直接依賴 `jd_ocs_indexer`、`jd_pdf_to_json`、`ocs_contract`、`indexer_contract` 或 `embedder` 套件。
-  以 dependency metadata 與靜態掃描驗證；明示啟用的公版 HTTP client 依 ADR0080 管理。
+  以 dependency metadata 與靜態掃描驗證；明示啟用的公版 HTTP client 由 App composition root 管理。
 - **RAG app 之間可以互相 import 對方的 contract** ：`pdf-to-json`／`ocs-indexer` import `ocs-contract`，
   `ocs-indexer` 也 import `indexer-contract`，這是預期內的 bounded-context 內部依賴；guard 只掃 current API
   的 composition surfaces，不禁止這個方向，也不阻止 RAG app 之間或 RAG app 對自己 contract 的依賴。
@@ -128,18 +124,20 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
   公版正文不複製成 Memory／JD 工作事實；查詢正文只使用員工確認的實際工作，排除範圍另行保存與讀取。
 - **故障不能當查無資料：** 索引未 ready、模型身分不相容或連線失敗皆回明確錯誤，不以空結果代替，
   也不清除 App 的選用 state。
-- 現行 consumer 權責依 ADR0080。新增其他消費用途仍循決策流程；本檔與歷史的 [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md)
-  不提供額外施工授權。
+- 新增其他消費用途須核對資料責任、契約與驗收，不因 RAG 服務存在而自動啟用。
+
+### 公版選用與明確否認的保存資格
+
+App 分開保存選用公版及員工明確否認的工作範圍。選用值 `null` 表示尚未選擇，`[]` 表示已評估而無合適參考；選用工具替換整個集合，但保留排除範圍。搜尋故障不能當成空選擇。只有明確不做／不負責才可列入排除，未知、部分適用、未答或拒答不等於否認；員工更正時可解除原範圍。
+
+候選只在 execution completed 且有匹配正式員工 exchange 後，才取得後輪採用資格；查詢固定上界 F 內、員工序號最新的合格 state。空集合仍可覆蓋舊選擇；未用工具的中間輪次不清空 state。B1／B2 沿持久批次的 F 讀排除範圍，後輪新增或解除不回流舊批次。
+
+工具能力、格式與指引依原 captured request 接續；新設定不追補舊訪談或舊批次，已啟用的原請求缺少 client 時明確拒絕。原命令與結果沿既有 prepared／execute 及操作查回，不能因恢復而重選公版。
+
+保存接線見[公版 workflow](../../apps/api/src/caliburn/workflows/occupation_references.py)與[固定 state 讀取](../../apps/api/src/caliburn/workflows/occupation_reference_reads.py)，wire 由[工具 Schema](../../apps/api/contracts/tools/)維護。
 
 ## 6. 相關文件
 
-- [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md) — 現行可選 HTTP consumer、工具生命週期與啟用權責。
-- [公版參考 API 設計](../specs/2026-10-05-occupation-reference-api-design.md)與[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md) — 查詢、來源讀取、App state 與角色工具。
-- [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) — 歷史 Proposed 討論稿；Decision 5 記錄當時 RAG 保留＋隔離的取捨。
-- [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)
-  — 恢復範圍、隔離原則與研究來源。
-- 當時的內部紀錄
-  — 逐 task 執行計畫與驗收條件。
-- [`apps/pdf-to-json/README.md`](../../apps/pdf-to-json/README.md)、
-  [`apps/ocs-indexer/README.md`](../../apps/ocs-indexer/README.md)、
-  [`apps/embedder/README.md`](../../apps/embedder/README.md) — 各 app 內部指南。
+- [公版 API](../../apps/ocs-indexer/README.md)：查詢與固定來源讀取。
+- [App 可選啟用](../../apps/api/README.md#公版參考工具的可選啟用)：設定與角色接線。
+- [PDF 轉換](../../apps/pdf-to-json/README.md)、[模型服務](../../apps/embedder/README.md)：各 App 的操作與限制。

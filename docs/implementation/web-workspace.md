@@ -1,6 +1,6 @@
 # Web 工作畫面與 JD 編輯接線
 
-本頁維護現行 Web 工作畫面的組裝、JD 人工編輯、局部草稿與待確認命令接線。正式稿、版本與寫入資格由 [JD 保存](jd-storage.md)負責；HTTP、公開串流、來源回查與本機交付沿[介面與交付](interface-and-delivery.md)。正式產品依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)，既有行為與驗證限制隨原證據保留。
+本頁維護現行 Web 工作畫面的組裝、JD 人工編輯、局部草稿與待確認命令接線。正式稿、版本與寫入資格由 [JD 保存](jd-storage.md)負責；HTTP、公開串流、來源回查與本機交付沿[介面與交付](interface-and-delivery.md)。正式產品依 [正式產品與選型](../architecture/design-decisions.md)，既有行為與驗證限制隨原證據保留。
 
 修改欄位或保存恢復先讀[共同編輯規則](#1-基本資料編輯的讀取基底與恢復)，再選對應項目。畫面與導覽看[工作畫面組裝](#5-工作畫面組裝)，鍵盤、就地修改與元件分工看[逐欄編輯](#6-逐欄就地編輯)。視覺數值仍由程式的 theme 與 CSS 維護。
 

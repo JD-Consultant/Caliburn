@@ -44,6 +44,8 @@ Node 使用 24 LTS 系列及相容 pnpm；版本依 repo 配置與 lockfile，�
 
 工具鏈鎖定 TypeScript 6.0.3＋typescript-eslint 8.70.1，升級時須核對[相容範圍](https://typescript-eslint.io/users/dependency-versions/)並保留 strict peer 檢查。OpenAI SDK 3.20.0 的 transport 使用 httpx2，與 FastAPI 測試的 HTTPX 分開，不假定型別互換。Windows saver 的 Selector／PDF Proactor 執行邊界見[交付設計](interface-and-delivery.md#4-pdf-與程序)。驗證見工具鏈。
 
+根 pnpm workspace 管 JavaScript／TypeScript 的 lock；各 Python App 保留自己的 uv.lock 與直譯器環境。API 與 GPU 模型服務的執行環境、相依及發版界線不同，不以一份 Python workspace lock 強迫所有服務同步；套件依賴沿各自 pyproject 明示。
+
 ## 2. 有具體風險的機制，先驗再擴大
 
 資料保存使用 SQLAlchemy 2.1.1＋Alembic 1.20.0。交易與遷移命名依 [SQLAlchemy transaction](https://docs.sqlalchemy.org/en/21/orm/session_transaction.html)、[Alembic 命名](https://alembic.sqlalchemy.org/en/latest/naming.html)；接線見[訪談保存](interview-storage.md)，驗證見保存驗證。
@@ -60,7 +62,7 @@ V4A 採官方 MIT section parser 的受限抽取與 RapidFuzz 3.14.6（MIT），
 
 ## 3. 運作參數不是無限值，也不是已核准費用
 
-A／B1／B2 的輪前與輪中留量門檻、時點及回退依[執行契約 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)。產品留量不是模型 context 上限，也不保證避免所有 429。在途工作沿已固定的 request／budget，設定變更不能重置它。實際預設只從下方程式來源查閱，本頁保留調整時必須一起考慮的效果：
+A／B1／B2 的輪前與輪中留量門檻、時點及回退依[共用執行與恢復](agent-execution.md)。產品留量不是模型 context 上限，也不保證避免所有 429。在途工作沿已固定的 request／budget，設定變更不能重置它。實際預設只從下方程式來源查閱，本頁保留調整時必須一起考慮的效果：
 
 | 設定 | 調整時的責任與限制 |
 |---|---|

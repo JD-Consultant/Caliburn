@@ -20,15 +20,6 @@
 | [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選與快照 | [來源](implementation/memory-storage/) |
 | [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage/) |
 | [介面與交付](../implementation/interface-and-delivery.md) | 命令重送、串流、來源查詢 | [來源](implementation/interface-and-delivery/) |
-| [分層 Memory](../specs/2026-09-24-caliburn-layered-architecture-map.md) | 資訊關係與版本重用 | [來源](specs/2026-09-24-caliburn-layered-architecture-map/) |
-| [B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md) | 交接與發布 | [來源](specs/2026-09-25-b1-b2-information-gap-lifecycle/) |
-| [顧問上下文](../specs/2026-09-26-consultant-context-and-state-design.md) | 正常時序及 Step 恢復 | [來源](specs/2026-09-26-consultant-context-and-state-design/) |
-| [共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md) | 生命週期及控制狀態 | [來源](specs/2026-09-27-shared-agent-execution-and-state-design/) |
-| [核心生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md) | JD 採用及背景發布交錯 | [來源](specs/2026-09-29-core-value-loop-lifecycle/) |
-| [OCS PDF 轉換](../specs/2026-10-03-public-ocs-pdf-to-json-design.md) | 獨立 RAG 的轉換流程 | [來源](specs/2026-10-03-public-ocs-pdf-to-json-design/) |
-| [Context 目標](../specs/2026-10-04-context-summary-and-compaction-design.md) | 未實作的輪前摘要／輪中壓縮 | [來源](specs/2026-10-04-context-summary-and-compaction-design/) |
-| [職位參考候選](../specs/2026-10-04-occupation-overview-reference-retrieval-design.md) | 廣蒐、精搜及查閱 | [來源](specs/2026-10-04-occupation-overview-reference-retrieval-design/) |
-| [Plan 設計沿革](../specs/2026-10-06-consultant-interview-planning-and-focus-design.md) | 原未知筆記流程與接續時序；現行契約另見該頁路由 | [歷史目標來源](specs/2026-10-06-consultant-interview-planning-and-focus-design/) |
 
 ## 圖面重用
 

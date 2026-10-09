@@ -1,14 +1,14 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**現行共用執行接線** 。A／B1／B2 共用原生接續、Step 控制與恢復；產品生命週期依[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md)。驗證見[架構驗證](../architecture/verification.md)；機制接通不等於所有恢復分支或模型品質已驗。
+- 狀態：**現行共用執行接線** 。A／B1／B2 共用原生接續、Step 控制與恢復。驗證見[架構驗證](../architecture/verification.md)；機制接通不等於所有恢復分支或模型品質已驗。
 - 驗證分假模型供應端＋真實 checkpoint 保存／PostgreSQL、有界真模型及產品旅程。新驗證依當次有效授權進行，不把模型自述或推理摘要當驗收證據。
-- 已確認但未實作的調整：[輪前 App 摘要、輪中原生壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。本文仍記載現行原生接線；目標須調整輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 待討論，未改下面的現行節點、工具 wire 或驗證結論。
+- 已確認但未實作的調整：[驗證範圍與限制](../architecture/verification.md)。本文仍記載現行原生接線；目標須調整輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 待討論，未改下面的現行節點、工具 wire 或驗證結論。
 
 本頁維護原生窗口、模型與工具 Step、壓縮採用及原件補存。[模型外送、容量與費用](model-requests.md)及[程序監督、控制與背景調度](agent-supervision.md)分頁維護，原章節保留連結入口。
 
-**Graph** 是 LangGraph 的執行流程；**State** 是流程承接的進度與恢復資料；**saver／checkpointer** 是保存 checkpoint（執行快照）的框架介面。業務模組判定資料能否正式採用，Graph 保存可接續的位置；恢復時兩者共同核對，責任沿[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md#21-原生-graph-的保存交界)。
+**Graph** 是 LangGraph 的執行流程；**State** 是流程承接的進度與恢復資料；**saver／checkpointer** 是保存 checkpoint（執行快照）的框架介面。業務模組判定資料能否正式採用，Graph 保存可接續的位置；恢復時兩者共同核對。
 
-後文的 **R** 指一次完整模型回應，**W** 指完整有效接續視窗（可含先前壓縮結果），**C** 指原生壓縮返回的完整 `compacted.output`；W → C 表示壓縮前後的視窗交接。保存與採用條件沿[原生接續的恢復契約](../specs/2026-09-26-consultant-context-and-state-design.md#72-保存與恢復)，不把 C 當成單一文字摘要。
+後文的 **R** 指一次完整模型回應，**W** 指完整有效接續視窗（可含先前壓縮結果），**C** 指原生壓縮返回的完整 `compacted.output`；W → C 表示壓縮前後的視窗交接。不把 C 當成單一文字摘要。
 
 本頁各圖表達**控制順序**。膠囊形是該圖的進入／退出；矩形是處理；菱形是分支；平行四邊形標出 provider、saver 或呼叫方的資料交接；兩側雙線矩形是另處已定義的子流程，框內附章節位置。初始化使用六角形。圖中的保存動作不是資料庫實體，因此不畫成圓柱；子流程分圖也不表示程式另建 Graph／thread。分類依[圖面規範](documentation-standard.md#32-在-mermaid-中落實並核對)。
 
@@ -23,7 +23,7 @@
 
 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。各角色提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，共用模型與工具的執行迴圈。
 
-Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 [本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 及相關 evidence。
+Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 [本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 。
 
 責任切點如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -66,11 +66,11 @@ B1／B2 各自保留私有歷史；同一階段中斷後沿原 thread 接續，�
 - 同工作故障：用最新可靠位置正常 resume，不指定舊 checkpoint 做 time-travel replay；有 interrupt 才用 `Command(resume=...)`。
 - 有意回退到較早安全點：先使較晚工作資格失效，核對領域位置與 context 相容，再建立可執行分支；不能直接對舊 checkpoint invoke 並假設副作用會自動撤銷。
 - A 取消：後續新輸入從合法輪前基底與正式資料開始；重試 a 在模型眼中仍是新輸入。
-- Memory 回退：①是 B1 開始前的固定基準與候選起點，②是 B1 完成、B2 開始前的交接快照（[安全點定義](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點)）。候選與各角色窗口一起回該位置；同批保留對應已採用輪前 compact，不重做它。中途較晚 compact 不跨越回退點。
+- Memory 回退：①是 B1 開始前的固定基準與候選起點，②是 B1 完成、B2 開始前的交接快照（[Memory 單向調度](agent-supervision.md)）。候選與各角色窗口一起回該位置；同批保留對應已採用輪前 compact，不重做它。中途較晚 compact 不跨越回退點。
 
 跨工作接續與回退的驗證對應 E02／E08–E11，見[驗證對照](verification-plan.md)。調整 thread 組織仍須維持相同資格與回退保證，不增加第二套恢復引擎。
 
-顧問工作計畫的產品用途及內容沿 [Plan 現行契約](../specs/jd-work-plan.md)；本頁維護它與原生歷史的三個接縫：
+顧問工作計畫的產品用途及內容沿 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)；本頁維護它與原生歷史的三個接縫：
 
 - 共同 `FOCUS_INSTRUCTIONS` 提供訪談推進方法，Plan 專屬指引及 read／edit 工具維護同份 Markdown 的焦點、工作方向與剩餘訪談／分析／JD 整理工作。原捕捉工具能力決定 v1／v2，新輪固定原基底；舊 captured request 保留原指令與能力。
 - 輪中 native C 沿共用流程保存與核帳後，A 的私有 `plan_projection` Graph 固定精確 C 位置與一個原計畫 item，父 request 採用完整 C＋該 item。
@@ -231,7 +231,7 @@ checkpoint 與 pending writes 同時失敗時，`astream` 不保證能交出 nod
 
 外送前的計數、准入與 provider 重試由[模型外送](model-requests.md)負責；本節處理 Graph 的窗口準備、採用及原件補存。已保存完整 R 時，恢復不新增模型呼叫；工具已提交、checkpoint 尚缺結果時，先查原操作，再接回同一 call。
 
-A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮政策](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)。達中途門檻先處理 pause／cancel／final，只有將發下一請求才 compact。完整 C 採用確認前保留舊基底；採用後附既有已保存後綴，不重貼 employee input／maps，也不反覆壓縮同一個尚未增長且仍超量的窗口。
+A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處理 pause／cancel／final，只有將發下一請求才 compact。完整 C 採用確認前保留舊基底；採用後附既有已保存後綴，不重貼 employee input／maps，也不反覆壓縮同一個尚未增長且仍超量的窗口。
 
 ### 5.1 工作額度保存
 
@@ -325,7 +325,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 ### 5.9 首請求超量的近期訪談縮減
 
-產品規則見[顧問 context 規格「超量組裝」](../specs/2026-09-26-consultant-context-and-state-design.md#開始一輪)：正常仍完整預載近期訪談，只有完整資料使首個請求無法容納才例外。本節只記共用迴圈與 A 的接線，不重述規則。
+正常完整預載近期訪談；只有完整資料使首個請求無法容納時才進入下述例外。
 
 - **共用迴圈只多一條有界路由。** `check_capacity` 對超過硬上限（`allowed_input_tokens = min(max_input, context_window − max_output)`，由 `request_capacity.py` 單一計算）的精確 count 丟出 `RequestOverCapacityError`（仍是 `RequestCapacityError`）。僅當**尚無完成 Step** 、runtime 提供 `fit_first_request`，且已縮減少於 `MAX_FIRST_REQUEST_FITS`（3）次時，改走 `fit_first_request → count_input → check_capacity`；其餘情況與先前相同：B1／B2 不提供回呼、中途 Step 的原生歷史與工具結果不由 loop 縮短、160K compact 路徑不變。每次縮減換新 request ID 並重新精確 count，已縮減次數存於 State（`first_request_fits`）；耗盡仍超量就以容量受阻結束，不生成。
 - **縮減由顧問近期訪談投影的純函式處理。** `agents/job_consultant/recent_preload.py` 只讀已保存 request 與 count，不查 DB、時間或模型；同輸入得同輸出，crash 後節點重跑不需 Held 交接，也不改任何業務資料。回傳完整替換 input items，loop 不知道訪談結構。
@@ -334,7 +334,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 容量例外由 App 明示未預載範圍，請求固定 `truncation="disabled"`，不交由伺服器靜默截斷。按需回讀參考 [just-in-time context](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)；這是設計依據，不是模型必然正確回讀的保證。
 
-**限制與未驗：** 單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證見近期訪談預載。
+**限制與未驗：** 單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證範圍見[架構驗證](../architecture/verification.md)。
 
 ## 6. 本機 A Supervisor
 

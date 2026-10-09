@@ -2,7 +2,7 @@
 
 BGE-M3 embedding and BGE-reranker-v2-m3 scoring service for the independent RAG pipeline.
 It is a thin FastAPI wrapper around FlagEmbedding, run as its own **Linux GPU container**
-so torch stays outside the app processes ([ADR 0012](../../docs/adr/0012-embedding-as-a-service.md)).
+so torch stays outside the app processes.
 `ocs-indexer` calls it over HTTP: index and query use the 3c `EmbeddingService` port,
 and the occupation-reference API also uses reranking.
 
@@ -32,4 +32,4 @@ failed startup. Set `RERANKER_ENABLED=false` for an embedding-only service; rera
 then returns 503. No paid model API is required. Pure window and request tests run
 without torch: `uv run --project apps/ocs-indexer --extra api pytest apps/embedder/tests -q`.
 
-Boundary and implementation evidence: [occupation-reference API](../../docs/specs/2026-10-05-occupation-reference-api-design.md).
+Boundary and implementation evidence: [公版參考 API](../ocs-indexer/README.md).

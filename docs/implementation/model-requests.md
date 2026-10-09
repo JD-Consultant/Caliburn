@@ -17,6 +17,25 @@
 
 adapter 支援固定 request 指定的串流與非串流傳輸；A 新請求使用串流，公開投影見[介面 §2](interface-and-delivery.md#2-串流不是保存權威)。持久額度、原結果採用及 Retry-After 由後續各節負責。驗證見[直連傳輸](../history.md#source-d76bfd79f21fb146c537)與[串流](../history.md#source-caf2f3430699b78cd2b7)；SDK MockTransport 不等於遠端接受。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)。
 
+**[ADR0083](../adr/0083-execution-deadline-in-flight.md) 的在途等待政策：** execution 固定 deadline 同時限制新外送准入、重試等待及
+在途 create／count／compact 網路等待。先在既有准入交易內讀 DB 時鐘，將固定 deadline 的
+剩餘時間換成 event loop monotonic deadline；讀時鐘與提交花費的時間也計入，不拿本機
+wall clock 猜 DB 時間。只有提交確認後、交易外的 network await 使用 Python
+`asyncio.timeout_at()`。已到期不開始 HTTP；120 秒等 SDK timeout 仍是 connect／read／write／pool
+I/O 限制，read 是每個 chunk 的等待限制，不是另一個硬 120 秒總期限。
+
+本次修訂前 deadline 只在准入與重試等待核對，沒有在途硬期限保證。現在到期也不能宣稱
+provider 未執行：保留原 attempt 的結果未知狀態，不記成可重試 provider failure、不自動再送。
+若 terminal R 已到、在 stream cleanup 時才取消，先從 timeout context 取回完整原件，再沿
+原有 typed cancellation 交給 Graph 保存；timeout 不包住 checkpoint、記費、工具或整個 Graph。
+這是合作式取消的 network 等待界線，必要的取消清理可能稍後才結束，不承諾 OS 硬中止。
+
+依據鎖定 OpenAI 3.20.0／httpx2 2.13.1 原碼及
+[httpx2 timeout](https://pydantic.dev/docs/httpx2/advanced/timeouts/)、
+[Python 3.14 timeout](https://docs.python.org/3.14/library/asyncio-task.html#timeouts)。使用標準
+asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecutor`，不新增 timer registry
+或第二個 retry owner。
+
 ## 2. 固定請求、一次外送與保存後結算
 
 `workflows/model_requests.py` 協調 executions 額度、短交易與 SDK；共用 Graph 不 import features，不增加 ResponseStore 或第二套回執。此元件由角色 runner 組裝，生成前經 [計數與容量准入](#4-固定請求計數與容量准入) 計數／容量准入；多 Step、compact 與 provider 重試分見 [有界多 Step 接續](agent-execution.md#46-有界多-step-接續)、[完整 C 保存、採用與中途接續](agent-execution.md#53-完整-c-保存採用與中途接續)、[外送重試](#5-單一外送重試責任)。下圖聚焦生成成功路徑，不略過計數或故障分類。

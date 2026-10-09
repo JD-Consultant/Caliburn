@@ -126,6 +126,10 @@ async def rename_job_file(
 
 使用者點擊／送出觸發的寫入由 event handler 或其 mutation 處理，不先改一個 state，再用 Effect 監看它發命令。Effect 用於外部同步；訂閱、計時器與連線的建立／清理需對稱，能承受 setup → cleanup → setup。依賴值不靠關掉 Hooks lint 或「只跑一次」ref 隱藏；切檔、卸載及重入後，舊作用範圍的事件不得影響目前畫面。既有恢復查詢仍依其契約，不把開發模式每次 GET 都限制為一次。依據：[React 互動與 Effect](https://react.dev/learn/you-might-not-need-an-effect#sending-a-post-request)、[Effect 清理與重入](https://react.dev/learn/synchronizing-with-effects#how-to-handle-the-effect-firing-twice-in-development)。
 
+TanStack Query 的 mutation 回呼分兩層：`useMutation` 上的回呼對每次呼叫都會執行，傳給 `mutate()` 的回呼在元件已卸載時不會執行（[Mutations](https://tanstack.com/query/latest/docs/framework/react/guides/mutations)；鎖定的 5.104.0 原碼以 `hasListeners()` 判斷）。因此已知結果造成的快取失效放在 `useMutation` 層，即使畫面已離開或本地認領已變更也要執行；只有關閉畫面、導覽與元件狀態這類畫面效果才依賴仍掛載；`mutateAsync` 回傳的 promise 不受卸載影響，`await` 之後的程式仍會執行，所以這類畫面效果要自己判斷是否仍掛載。React 18 起不再警告對已卸載元件設定 state（[升級說明](https://react.dev/blog/2022/03/08/react-18-upgrade-guide)），新程式不需要為單純的 setState 加 `mounted` ref；既有只為此存在的守衛待整併，不在此規則下新增。
+
+若寫入已成功，後續 ACK 清理、快取刷新或畫面回呼失敗，不得把它改判為未知寫入。將 transport 結果與本地後續處理分開，畫面沿明確結果提供重新讀取或確認出口。需要得知 `invalidateQueries` 的重新讀取是否失敗時，使用 `{ throwOnError: true }`；預設會吸收 refetch 拒絕，不能只以 mock 的 rejected promise 驗證錯誤提示。依據：[QueryClient](https://tanstack.com/query/latest/docs/framework/react/reference/classes/QueryClient)，並核對本機鎖定版本的 `refetchQueries`。
+
 以下是**可執行的局部表單狀態示例** ，不是 A Turn／Memory 的正式狀態機：
 
 ```typescript

@@ -8,9 +8,15 @@
 
 API 的領域與用例模組不直接依賴 transport DTO；傳輸層負責 DTO 與內部型別的轉換。Python 內部 port 使用明確型別或 Protocol，不因共用而另建泛用契約套件。模型原生 Responses items 沿 SDK 接續契約保存，不套入 App 自製的訊息 schema；App schema 的額外欄位限制不應套用到原生接續 metadata。
 
+依 [ADR0084](../adr/0084-canonical-wire-admission.md)，JSON Schema 同時決定 wire 輸入的接受政策。HTTP 與模型工具先以 canonical schema 驗證原 JSON，再以生成 DTO 轉成 Python 型別；DTO 的預設 strict／coercion 行為不另訂輸入規格。JSON 數學整數包含 `1.0`，不包含布林或字串；`uuid` 採 JSON Schema 2020-12 §7.3.5 的連字號形式，容許十六進位大小寫，不接受 compact 或 URN 拼法。Web 的 Ajv 使用同一份 schema 與相同 UUID 格式政策。[JSON Schema](https://json-schema.org/draft/2020-12/json-schema-validation)
+
+現有 wire 整數都是序號、索引或計數，canonical 統一將上限明訂為 `9007199254740991`，既有較小上限仍保留。這是本案跨 Python／JavaScript 精確表示的契約政策，沿 [RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259#section-6) 的互通範圍；JSON 本身不禁止更大的數字，內部 DB 型別也不因此改變。新增不同用途的數值時須先決定其表示契約。
+
+文字是否非空沿現有領域的 Python 3.14 `str.strip()`／`str.isspace()` 語意：Unicode 分類 `Zs` 或 bidirectional class `WS/B/S` 視為空白；U+FEFF 不屬此集合。canonical pattern 明列碼點，不用各語言不同的 `\s` 推定同義；須禁止 NUL 的欄位也在同一 pattern 表達，保留原文字而不自動 trim。這是 Caliburn 的業務政策，不是所有產品通用的 Unicode 清理規則。[Python 字串規格](https://docs.python.org/3.14/library/stdtypes.html#str.isspace)
+
 ## 隔離與歷史範圍
 
-保留的 RAG 有自己的跨語言契約 `packages/ocs-contract`，以 JSON Schema 生成 Pydantic model 與 TypeScript type；生成檢查沿[該套件說明](../../packages/ocs-contract/README.md)。它不屬於正式 JD 產品的契約，App／Web 不 import 或消費它；RAG 的隔離邊界不因契約存在而改變。
+保留的 RAG 有自己的跨語言契約 `packages/ocs-contract`，以 JSON Schema 生成目前 Python 消費者使用的 Pydantic model；無消費者的 TypeScript 產物已移除，生成檢查只在暫存目錄產生並比較，不更動工作檔或 Git index。生成檢查沿[該套件說明](../../packages/ocs-contract/README.md)。它不屬於正式 JD 產品的契約，App／Web 不 import 或消費它；RAG 的隔離邊界不因契約存在而改變。
 
 `experiments/jd-relational-app`、`packages/consultant-memory` 與 `packages/job-analysis-contract` 已退役並移出工作樹，沿革由[Git 歷史](../history.md#retired-packages-20261008)取回，不作現行依賴，也不為已移除的 interview／job-authoring 接縫新增相容契約。
 

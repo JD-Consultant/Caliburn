@@ -80,14 +80,15 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 [圖源](../diagrams/standards/code-organization/python-dependencies.mmd) · [SVG](../diagrams/standards/code-organization/python-dependencies.svg)
 
-1. `models.py` 不 import FastAPI、SQLAlchemy、LangGraph、OpenAI、生成 transport DTO 或別的 feature persistence。
+1. 領域純型別模組（`models.py` 及按責任拆分的 `*_models.py`）不 import FastAPI、SQLAlchemy、LangGraph、OpenAI 或別的 feature persistence。整個 `features`／`workflows` 不依賴 `contracts` 的 wire DTO、validator 或 package；傳輸驗證由 HTTP／Tool adapter 擁有，轉成內部型別後才進入領域及用例。此規則沿[契約策略](contract-strategy.md)，不只限制生成檔的直接 import。
 2. Router／模型工具是薄入口，轉型後呼叫同一業務 service；人工與 AI 不各寫一套 JD validator。UI 不自行裁決權限、正式成功、來源版本或 Memory 發布。
 3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
 4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的私有表。需要跨域資格與排序一次完成的唯讀查詢，可由各 owner 公開具名 selectable，再由具名 workflow projection 組合；例如最新合法 Plan。查詢不取得寫入權、不新增結果權威，也不為一般呼叫建立通用查詢框架。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
 5. 真正需要替換外部 I/O 或行為元件時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。替換點由消費者需要的責任決定，不替每個 class 配 interface，也不為此建立每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
 6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](../implementation/interface-and-delivery.md#16-工作畫面組裝)。
 
-7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些以表格形式鎖在 `test_import_boundaries.py`，新增上行 import 會直接失敗。
+7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些由 `apps/api/.importlinter` 的具名契約檢查實際匯入圖；`pnpm architecture:check` 同時接入 `lint` 與 CI。純值與變換檢查間接 I/O 依賴，transport 的 SQL 限制只禁止直接 import，允許經 workflow／feature 呼叫。
+8. `diagnostics` 是正式資料的觀察者，可讀公開型別及查詢；產品執行層不反向依賴診斷投影。架構 gate 同時以合法與非法 import 測例確認規則，仍不代表動態呼叫或所有責任切分已獲證明。
 
 Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 
@@ -100,7 +101,7 @@ Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 
 以上是維護及審查判準，不表示所有可想像的變因已有設定開關。依據與取捨見[持續對照研究](../research/engineering/2026-10-08-agent-experimentability-and-observability.md)；介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[開發規範 §7–8](development-standard.md#7-分析方法prompttool-與-context-共同驗收)維護。
 
-lint import 限制與小型 AST／import 測試檢查層方向、前端 feature 隔離等規則。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。驗證見[程式組織審查](../history.md#source-e980f8e50d0556586ed2)。
+後端使用 Import Linter／Grimp，前端使用 ESLint import 限制。後端 `test_import_boundaries.py` 用真實臨時 Python package 驗證 relative import、re-export、`TYPE_CHECKING`、拆分 persistence、間接 ORM 及合法 workflow；另核對 graph 包含全部產品模組，新增 `*_models`／`*_changes`／`*_persistence` 須有對應政策。拆分 persistence 由原 feature、跨域 workflow、離線 diagnostics 及 migration 使用，其他 feature 不能直接匯入。一般 package 明確提供 `__init__.py`，避免工具漏掃巢狀 namespace。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴；静態圖不保證動態匯入或業務責任已正確。驗證見[程式組織審查](../history.md#source-e980f8e50d0556586ed2)。
 
 本案借鑑 [AWS ports／adapters](https://docs.aws.amazon.com/prescriptive-guidance/latest/hexagonal-architectures/overview.html)的業務與 I/O 分離；不聲稱上述目錄是 AWS 標準模板，也不照搬每層必須 interface 的儀式。
 

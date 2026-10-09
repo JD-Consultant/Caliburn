@@ -163,9 +163,11 @@ DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_
 |---|---|---|
 | `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選、`captured_initial_context`、目前 Memory head 及本批發布的快照 |
 | `diagnostic_model_steps` | 一份已保存的邏輯請求；可能尚無回應，不等於已外送或業務 Step 已完成 | role、request_id、response_state、response_order、request（instructions、input、tools）、response（輸出與 usage）、原請求及回應的 checkpoint／source、snapshot_at |
-| `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、對應 output、結果是否已保存 |
+| `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、可空的 operation_id、對應 output、結果是否已保存 |
 
 例如整個檔案的操作：
+
+`0029_diagnostic_tool_operations` 增加操作識別；需先沿既有更新流程套用 forward migration，再 refresh 診斷副本。投影只安全讀取原 response 的 UUID／null `operation_seed`，以既有 `uuid5(seed, call_id)` 規則計算，沒有 seed 的舊副本為 null，不按相同正文猜命令。`result_state=not_recorded` 只表示工具輸出未保存，仍可用 operation ID 查已提交的業務結果。複合 JD 命令以根 command ID 對應 `jd_operations.result_payload`；舊衍生操作依其既有修訂因果查閱。此 view 及 JSON metadata 是可重建診斷副本，不參與正式恢復或重送。
 
 ```sql
 SELECT * FROM caliburn.diagnostic_execution_history
@@ -217,6 +219,8 @@ ORDER BY o.created_at, o.command_id;
 先用 `event`、`module`、`failure_kind` 判斷負責環節，再以 `job_file_id`、`execution_id`、`request_id`、`attempt_id` 查原業務／診斷紀錄。HTTP 回應的 `X-Request-ID` 對應 `http_request_id`，由伺服器產生；不採信傳入值，也不把它當業務命令身分。`execution.runner_returned` 只表示 runner 返回，正式完成仍查業務結果。
 
 `supervisor.monitor_failed` 表示背景監督迴圈中止，`supervisor.release_failed` 表示收尾釋放失敗；用 `execution_kind`、`operation`、`failure_kind` 定位。這些事件可能發生在尚未選定工作時，因此不捏造 execution ID，也不輸出原始例外正文。正常取消不記成監督失敗。
+
+`memory.evidence_invalid` 表示某份檔案的 Memory 准入證據損毀；以 `job_file_id`、`execution_id`、`command_id` 及固定 `failure_kind` 查回原操作。execution 識別屬於該筆證據，不一律是 Memory batch，所以此事件不推測 `execution_kind`。該檔案暫不准入 Memory，其他檔案照常處理；相同證據持續異常不每秒重複記錄。重啟不會修好損毀資料。先依原件與正式關聯定位，再按資料操作授權處理；監督本身不改寫原件。證據修復後，既有唯讀探索與 claim 會重新核對，不能把這個恢復誤認為未知模型請求可以重送。完整邊界見[Memory 背景工作](../implementation/agent-supervision.md#5-memory-背景工作)。
 
 輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](../standards/coding-standard.md#72-log-的格式責任與查閱)，本輪驗證見[重構證據](../plans/evidence/full-system-review-2026-10-08.md)。
 

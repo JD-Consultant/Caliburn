@@ -120,6 +120,8 @@
 
 ### 工程接線與保存
 
+2026-10-09 的[全系統品質審查與責任重構](../plans/evidence/system-quality-audit-2026-10-09.md)另涵蓋原命令與快取競爭、Memory 集合讀寫及唯一完成交易、背景原件與網路期限、測試隔離、RAG 明示路由及 canonical 輸入契約。各責任群由另一位審查者覆核，完整命令、凍結後 gates、PG／瀏覽器結果與平台限制以總報告為準；不將工程驗收合併為模型品質結論。
+
 2026-10-05 接續完成[公版工具的可選角色接線](../experiments/engineering/README.md#角色接線)：以合成 Responses／公版 HTTP transport 與真 PostgreSQL 驗證工具資格、跨輪 state、固定 Memory 讀取範圍、寫入後中斷重播及原請求模板恢復。完整指令、結果與獨立審查修正見[驗證原件](../experiments/engineering/2026-10-05-occupation-reference-tools/agent-integration-verification.md)；沒有操作共用服務或執行真模型品質比較。
 
 工具契約的[接續驗證](../experiments/engineering/2026-10-05-occupation-reference-tools/hardening-verification.md)另覆蓋全集合替換說明、各工具錯誤指引、精簡成功回傳，以及新舊請求與已存 native output 的格式保持；完整工具組的重複／缺漏／混用在建立候選前拒絕。離線及 PostgreSQL 結果支持這些工程邊界，顧問選公版、避免重問與 JD 收尾品質仍須模型及訪談驗證。

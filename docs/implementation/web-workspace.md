@@ -17,9 +17,13 @@
 - 明確拒絕不自動改基底重送；保留畫面草稿供辨認，要求讀目前 JD 再決定。原命令成功確認後關編輯器，invalidate 並 GET 目前正式稿；舊操作回傳不直接寫入最新 cache。
 - 讀取失敗不當空白 JD；取消未送出的編輯只是放棄局部草稿，關閉結果未確認的編輯器也不是撤銷後端效果。未知欄位顯示「尚未提供」，不表示已確認沒有。人工寫入本身不等於員工事實或依據核對完成。
 
-profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features/jd-editor/usePendingCommand.ts)處理重播、blocked、儲存失敗與還原；兩者各保留一筆待確認命令及自己的儲存鍵，互不覆蓋。共用 hook 僅管理 transport command。
+profile、`WorkCommand`、建立及改名共用 [pending-command store](../../apps/web/src/shared/commands/pending-command.ts)與 [useStoredCommand](../../apps/web/src/shared/commands/use-stored-command.ts)，集中保存、條件式 ACK、單次送出與已知／未知結果分類。各命令保留原儲存鍵及 schema；profile 與 work 仍各有自己的待確認 slot，互不覆蓋。
 
-[useProfileCommand](../../apps/web/src/features/jd-editor/useProfileCommand.ts)與 [useWorkCommand](../../apps/web/src/features/jd-editor/useWorkCommand.ts)是薄 adapter，各以一個 port 提供儲存鍵、型別檢查、POST、重讀及兩句提示，差異不另長成兩套恢復流程。
+[jd-commands](../../apps/web/src/features/jd-editor/jd-commands.ts)提供 JD 的 validator、完整命令比對、POST、正式拒絕分類及畫面結果投影。共用 hook 不持有草稿或 JD 版本規則；原命令已被替換、ACK 清理不可用或刷新失敗時，保留已知後端結果並顯示相應提示，不再送新命令。持久 ACK 與刷新在卸載後仍完成，只有仍掛載且結果可供目前畫面採用時才執行完成回呼。
+
+刷新由 [workspace-refresh](../../apps/web/src/app/workspace-refresh.ts)組裝：人工 JD 修改讀回 profile、work 及來源；訪談完成另讀回正式訪談；撤回另讀回原 Turn。各 feature 提供自己的 query options／範圍，JD 編輯器與訪談完成元件接收具名刷新 callback，不知道其他 feature 的 query key。來源使用自己的 `jd-sources` key，不依附 profile prefix。[refreshQueries](../../apps/web/src/shared/api/refresh-queries.ts)集中先 cancel、再 invalidate 並傳遞讀取錯誤，避免首次尚無 data 的慢 GET 被沿用為保存後結果；建立、改名、刪除清單、串流重連與終態 Plan 也沿同一機制。Plan 仍依原 execution 合併同時的終態讀取，並明確等待新資料，沒有另造 cache。
+
+JD 的正式拒絕只採已核對原命令後的 `409` 公開碼，以及相應集合的目標不存在／知識技能仍被引用錯誤。前置 schema／`invalid_*_change` 驗證、一般 `404`／`422`、未知碼或非 JSON 都不能否定先前可能已提交的操作，仍保留原命令。回傳成功與畫面刷新成功分開：來源或 JD GET 失敗不能讓已成功 POST 變成未知，也不能自動再送一次。
 
 採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 HTTP 驗證，不新增全域表單 store 或雙寫保存服務。實測見 [T03 evidence §4](../history.md#source-75f1da860cdd0bef826e)；職責／任務見 [§2](#2-職責與任務的人工編輯)、知識／技能見 [§3](#3-共用知識技能及任務關係的人工編輯)、協作／條件見 [§4](#4-協作對象與共通條件的人工編輯)、候選與來源見 [§5](#5-工作畫面組裝) 及 [介面 §3](interface-and-delivery.md#3-顯示與來源)。
 
@@ -27,7 +31,7 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 
 [JdWorkEditor](../../apps/web/src/features/jd-editor/JdWorkEditor.tsx)組裝職責、任務及未歸屬區。[WorkDialog](../../apps/web/src/features/jd-editor/WorkDialog.tsx)負責新增任務、知識／技能、協作對象與條件的表單（[TaskFields](../../apps/web/src/features/jd-editor/TaskFields.tsx)等），以及刪除確認；新增職責使用清單末端的 [AddArea](../../apps/web/src/features/jd-editor/AddArea.tsx)就地列。
 
-既有項目沒有整項編輯表單：文字[逐欄修改](#6-逐欄就地編輯)，搬移用「移到…」選單，成果／要求用「+」新增、× 移除。[useWorkCommand](../../apps/web/src/features/jd-editor/useWorkCommand.ts)管理本檔案、本分頁的一筆待確認集合命令，恢復規則共用 [§1](#1-基本資料編輯的讀取基底與恢復)。接線沿既有 MUI、Query 與 HTTP guard，不增設 form store 或拖曳框架。
+既有項目沒有整項編輯表單：文字[逐欄修改](#6-逐欄就地編輯)，搬移用「移到…」選單，成果／要求用「+」新增、× 移除。[workCommand](../../apps/web/src/features/jd-editor/jd-commands.ts)管理本檔案、本分頁的一筆待確認集合命令，恢復規則共用 [§1](#1-基本資料編輯的讀取基底與恢復)。接線沿既有 MUI、Query 與 HTTP guard，不增設 form store 或拖曳框架。
 
 - 畫面使用[同版組合讀取](jd-storage.md#23-組合畫面使用同一修訂)，開表單或就地編輯器時固定當時內容／基底。profile 與集合修改後互相 invalidate，因為兩者共用 JD 修訂；正在重讀時不讓新表單取已失效 cache。已開啟草稿仍不被背景更新覆蓋。
 - 職責／任務名稱和內容可局部清空，但至少保留一項有意義內容。成果／要求是獨立的明細，各自一筆命令：新增（清單標籤旁的「+」，在清單末端開空的就地編輯器）、改字（就地，保留身分）、移除（每項的 ×，先確認）。搬到別的職責是任務工具列 ⇄「移到其他職責」選單的單筆 `move_task`：選單列出所有職責與「未歸屬任務」（Primer ActionMenu 單選的做法，Things 的 Move、Jira 的 Move 同類），目前所在處打勾，選了就送、放在目的職責末尾，不附帶文字調整；選目前所在處只關選單。未歸屬明確列為「未歸屬任務」，不用空白選項冒充（`area_id` 是 null）。
@@ -40,7 +44,7 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 
 ## 3. 共用知識／技能及任務關係的人工編輯
 
-[CapabilitiesSection](../../apps/web/src/features/jd-editor/CapabilitiesSection.tsx)呈現兩類共用定義、概覽排序及反向用途；[CapabilityFields](../../apps/web/src/features/jd-editor/CapabilityFields.tsx)只管新增表單的局部草稿；[TaskCapabilities](../../apps/web/src/features/jd-editor/TaskCapabilities.tsx)在每項任務管理連結、解除及關係排序。沿同一 `JdWorkEditor`、`WorkDialog` 及 `useWorkCommand`，不增加第二套命令暫存、對照表或保存服務。
+[CapabilitiesSection](../../apps/web/src/features/jd-editor/CapabilitiesSection.tsx)呈現兩類共用定義、概覽排序及反向用途；[CapabilityFields](../../apps/web/src/features/jd-editor/CapabilityFields.tsx)只管新增表單的局部草稿；[TaskCapabilities](../../apps/web/src/features/jd-editor/TaskCapabilities.tsx)在每項任務管理連結、解除及關係排序。沿同一 `JdWorkEditor`、`WorkDialog` 及 `workCommand`，不增加第二套命令暫存、對照表或保存服務。
 
 - 所有定義與關係來自同版 `/jd/work`。畫面可在任務顯示共用說明並連回定義；反向用途連回所屬任務。這是呈現，不把正文或反向列表另存一份。
 - 新增定義只填名稱、說明，至少一者有意義；修改在原處逐欄進行（[§6](#6-逐欄就地編輯)），只送變動欄位，空字串轉明確 null，沒改不送。知識／技能類別在建立時確定，不提供會改變所有用途含意的跨類切換。區塊說明列寫明「修改定義，所有使用它的任務都會顯示新版」。
@@ -63,6 +67,10 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 
 ## 5. 工作畫面組裝
 
+JD 章節導覽及知識／技能的雙向任務連結共用 `jd-navigation`：原 reveal 事件冒泡展開目標的章節、職責／未歸屬及任務祖先，以 React `flushSync` 在瀏覽器捲動／聚焦前提交 DOM。僅在使用者導覽事件使用同步提交，保留 fragment URL 與修飾鍵開頁；收合仍只改呈現，草稿保持掛載。依據：[React flushSync](https://react.dev/reference/react-dom/flushSync)。
+
+工作區在 `max-width: 899.95px` 與既有 CSS 同步採 tab／tabpanel 關聯；非活動面板隱藏但不卸載。寬版改為兩個具名稱的 region，不讓隱藏的 tab 為區域命名。依據：[APG Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)、[MUI useMediaQuery](https://mui.com/material-ui/react-use-media-query/)。
+
 證據、設計依據與已驗／未驗範圍見 [T09 UI 改版證據](../history.md#source-072687957bc7ca22325b)。本節維護畫面行為；視覺數值由 [`theme.ts`](../../apps/web/src/app/theme.ts)與 [`styles.css`](../../apps/web/src/app/styles.css)維護。
 
 ### 版面、狀態與資料呈現
@@ -72,17 +80,17 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 | 資料 | 持有位置 | 更新者 | 用途限制 |
 |---|---|---|---|
 | 服務端 Turn 狀態 | 後端業務保存 | 後端執行、控制及完成工作流 | HTTP 讀已保存狀態；SSE 呈現過程，不裁定正式完成 |
-| 工作發現提示（hint） | 按檔案隔離的 `localStorage` | `InterviewComposer` 經 turn API 寫入／清除 | 只帶命令與執行識別，不是執行狀態或訪談正文 |
+| 工作發現提示（hint） | 按檔案隔離的 `localStorage` | `useInterviewInput` 與 Composer 的恢復查詢經 turn API 寫入／清除 | 只帶命令與執行識別，不是執行狀態或訪談正文。檔案身分只有小寫 UUID 一種拼法：路由是唯一接受外來拼法（含大寫）的入口，正規化後才成為 query key、Web Lock、hint、暫存與刪除廣播的 scope（`shared/api/uuid.ts`） |
 | Turn 的查詢結果 | 本分頁 TanStack Query cache | `InterviewComposer` 查詢／輪詢；頁面只觀察 | 不用 Effect 複製進 component state；沒有資料不等於已確認閒置 |
 | JD 局部草稿與開啟基底 | 編輯器的 component state | 開啟時捕捉修訂，使用者修改草稿 | 背景 GET 不換草稿或基底；保存條件沿 [§1](#1-基本資料編輯的讀取基底與恢復) |
-| JD 待確認命令 | 本分頁、該檔案的 `sessionStorage` | `usePendingCommand` | 保留原命令供確認，不是正式 JD；重送條件沿 [§1](#1-基本資料編輯的讀取基底與恢復) |
+| JD 待確認命令 | 本分頁、該檔案的 `sessionStorage` | `useStoredCommand` | 保留原命令供確認，不是正式 JD；重送條件沿 [§1](#1-基本資料編輯的讀取基底與恢復) |
 
 [hint 訂閱](../../apps/web/src/features/interview/interview-turn-api.ts)使用 `useSyncExternalStore`，接收同分頁事件及跨分頁 `storage`；沒有 hint 時，由 `/current` 發現工作。處理區與頁面觀察同一識別；頁面以 `useCurrentTurn` 的停用 query 觀察者讀同一份 cache，供檔案列徽章與 JD 唯讀判定，不另發 GET／輪詢。啟動、恢復與輪詢只由 `InterviewComposer` 負責；回傳區分已核狀態與未知，HTTP／SSE 邊界見[介面 §2](interface-and-delivery.md#2-串流不是保存權威)。
 
 - **版面**：職務檔案頁為左訪談、右 JD 並排（`WorkspaceLayout`），各自捲動、整頁不捲動；窄螢幕（<900px）以分頁切換。切換只用 CSS，**兩區保持掛載** ，輪詢、SSE 與未送出草稿不因切換而丟失。訪談輸入與 Turn 控制固定在訪談欄底部；訊息記錄只在使用者接近底部時跟到最新，回看舊訊息不被打斷；離開底部時，輸入區上方浮出一顆「回到最新」圓鈕（AI Elements 的 scroll-to-bottom 做法），點了回到最新並恢復跟隨。[useStickToBottom](../../apps/web/src/shared/ui/use-stick-to-bottom.ts)只回報「是否離開」與「回去」兩件事，頁面把按鈕經 `aboveDock` 插槽交給輸入區，輸入區不認得捲動、按鈕不認得聊天。
 - **JD 唯讀鎖**：Turn 為 active 或 paused，或處理狀態尚未確認時，JD 顯示原因並停用人工編輯入口；已開啟的表單也保留草稿但禁止新修改，仍可核對既有待確認命令。正式內容仍可閱讀。已核終態或已確認沒有進行中工作才解除。這只改善體驗，寫入仍由後端拒絕（[介面 §1](interface-and-delivery.md#1-api-與-ui-的責任)），不把一次 GET 當長期寫入資格。
 - **候選與正式稿**：候選預覽在 JD 欄，用獨立「候選」樣式（「AI 層」）並註明尚未正式保存，可一鍵切到正式稿；兩個檢視都保持掛載，切換不重新載入正式稿。PDF 入口在 JD 欄，仍只匯出正式版本。取消後候選消失、回到正式稿。
-- **來源**：來源回查是 JD 欄右側滑出面板（列表與單筆來源切換）；JD 各項目旁的「來源 n 筆／待核對」徽章只用 `Reference.target` 身分連結（見 [JD 保存 §3.7](jd-storage.md#37-人的正式來源回查)），沒有 `target` 就不顯示徽章，絕不按標籤猜。徽章點擊只把面板篩到該項目的引用；查看不解除待核對。
+- **來源**：來源回查是 JD 欄右側滑出面板（列表與單筆來源切換）；JD 各項目旁的「來源 n 筆／待核對」徽章只用 `Reference.target` 身分連結（見 [JD 保存 §3.7](jd-storage.md#37-人的正式來源回查)），沒有 `target` 就不顯示徽章，絕不按標籤猜。徽章點擊只把面板篩到該項目的引用；查看不解除待核對。App 組裝實際開啟控制與面板，關閉時回到仍有效的來源徽章或 disclosure，控制失效則回到固定 disclosure；DOM 焦點狀態不進正式資料或 query cache。面板維持非 modal，不新增焦點陷阱。
 
 ### 長 JD 導覽與操作
 

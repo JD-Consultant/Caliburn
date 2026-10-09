@@ -21,11 +21,11 @@
 
 | 責任 | 已實作位置 |
 |---|---|
-| 純值、明確局部修改與不變量 | [models.py](../../apps/api/src/caliburn/features/job_description/models.py)；不依賴 ORM／HTTP |
+| 純值、明確局部修改與不變量 | [models.py](../../apps/api/src/caliburn/features/job_description/models.py)、[work_models.py](../../apps/api/src/caliburn/features/job_description/work_models.py)及各內容的 changes；不直接或間接依賴 ORM／HTTP／query service |
 | 原結果核對、修訂與欄位用例 | [service.py](../../apps/api/src/caliburn/features/job_description/service.py)；參與呼叫方交易，不 commit |
 | 正式頭、固定修訂、原操作 SQL | [persistence.py](../../apps/api/src/caliburn/features/job_description/persistence.py) |
 | 固定正式內容查詢 | [queries.py](../../apps/api/src/caliburn/features/job_description/queries.py)；GET 不偷偷建立資料 |
-| 共用修改範圍與原結果 | [revision_editing.py](../../apps/api/src/caliburn/features/job_description/revision_editing.py)；六種編輯共用欄位規則與固定修訂，只選擇正式或候選指標 |
+| 共用修改範圍與原結果 | [revision_editing.py](../../apps/api/src/caliburn/features/job_description/revision_editing.py)；集中檔案／候選 scope 與完整 `kind + expected_revision_id + request_payload` 意圖核對，各資料用例保留 payload 及原結果投影；選擇正式或候選指標，不混合發布責任 |
 | 候選位置、回退及採用參與者 | [candidates.py](../../apps/api/src/caliburn/features/job_description/candidates.py)、[candidate_service.py](../../apps/api/src/caliburn/features/job_description/candidate_service.py)、[candidate_persistence.py](../../apps/api/src/caliburn/features/job_description/candidate_persistence.py)；服務不自行 commit |
 
 **JD 內容集合**
@@ -45,9 +45,9 @@
 | 責任 | 已實作位置 |
 |---|---|
 | 同版 JD 集合組合讀取 | [work_queries.py](../../apps/api/src/caliburn/features/job_description/work_queries.py)、[jd_work.py](../../apps/api/src/caliburn/transport/http/jd_work.py)；職責／任務／能力及關係／協作／條件先固定 head 一次，再沿既有查詢投影，不另建資料保存模組 |
-| 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；沿既有檔案鎖與 executions，不重建鎖定系統 |
-| HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)；無業務 SQL |
-| 職責 HTTP 與共用 workflow 注入 | [jd_areas.py](../../apps/api/src/caliburn/transport/http/jd_areas.py)、[jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)；與 profile 共用准入／交易責任 |
+| 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；六個 typed 寫入入口共用單一手動交易協調：鎖檔案、查原結果、再核新寫入准入、修改；各次呼叫獨立 session／交易，沿既有 executions，不重建鎖定系統 |
+| HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)與各資源路由維護內容及不存在錯誤；無業務 SQL |
+| 人工 JD 的共同錯誤與 workflow 注入 | [jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)以 FastAPI function-scope yield dependency 統一原命令衝突、過期修訂及顧問忙碌的回應；undo／delete 保留各自錯誤代碼，不使用全域映射 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
 | A 候選准入／短交易 | [jd_candidates.py](../../apps/api/src/caliburn/workflows/jd_candidates.py)；沿既有 execution writer 與檔案鎖，不提供獨立正式完成 HTTP |
 
@@ -106,7 +106,9 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 
 ### 2.3 組合畫面使用同一修訂
 
-`GET /jd/work` 給人工編輯畫面一組固定 `revision_id`、`areas`、`tasks`、`capabilities`、`task_links`、`collaborators`、`conditions`。不能由前端分別讀取各集合的 latest 再拼接，否則另一請求可能在兩次讀取之間改歸屬、刪職責、改共用定義／關係或更正條件分類。組合讀取只捕捉 head 一次，之後都讀不可變修訂；不需要為此另存投影表、鎖住人工編輯或提高整個 App 的 isolation level。profile 仍為獨立表單及讀取，不宣稱跨 HTTP 請求同版。
+`GET /jd/work` 給人工編輯畫面一組固定 `revision_id`、`areas`、`tasks`、`capabilities`、`task_links`、`collaborators`、`conditions`。不能由前端分別讀取各集合的 latest 再拼接，否則另一請求可能在兩次讀取之間改歸屬、刪職責、改共用定義／關係或更正條件分類。純聚合用例在首 SELECT 前進入短 `REPEATABLE READ`／`READ ONLY`，只捕捉 head 一次，之後都讀該快照中的固定修訂；即使其間整檔刪除，也返回完整舊快照或一開始就不存在，不回成功的半份內容。profile 仍為獨立表單及讀取，不宣稱跨 HTTP 請求同版。
+
+一致唯讀 session 由 [database adapter](../../apps/api/src/caliburn/adapters/database.py)提供，workflow 擁有其範圍；人工各區、模型純讀、來源／差異、候選預覽與匯出依同一聚合責任使用。寫入保持原 root lock／writer fencing，不提高全 App 隔離級別。投影成純值即釋放交易，短 ID 配置、正文計算及 PDF render 在交易外；owner query 不自行 commit 或另開 session。
 
 ![現行：2.3 組合畫面使用同一修訂](../diagrams/implementation/jd-storage/revision-consistent-read.png)
 
@@ -213,7 +215,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 
 - **保存與生命週期：** migration `0023_jd_model_references` 增加 JD 專用映射，不保存第二份 JD／引用正文。資料庫產生全域遞增序號，`(job_file_id, canonical_ref)` 唯一；只在可信讀取／建立結果首次向模型提供時發配。相同身分跨讀取、Step、Turn、重啟保持同值，不按目前列表位置重排。刪除、取消或回滾不刪映射、不重用號碼；舊定位仍指舊身分，由可見修訂拒絕已不存活的目標。
 - **並行與恢復：** 沿 PostgreSQL Identity、唯一約束與 `ON CONFLICT DO NOTHING` 處理競爭，不另造計數器或鎖管理器。既有映射重讀不寫入；新增映射使用獨立短交易，不跨模型呼叫持鎖。JD 建立已提交但映射保存失敗時，錯誤交既有 Runtime；重入先承接原業務操作結果，再取得同一映射，不建立第二個物件。映射必須提交後才交給模型。
-- **相容與隔離：** 原生歷史中的舊型別＋UUID 定位仍可沿原 resolver 使用，不重寫歷史；新輸出統一短定位。跨檔案、錯類型、未知短定位均拒絕。JSON 只轉換明定定位欄位，Markdown diff 只格式化程式產生的定位，不對正文做全域字串替換。來源核對語意、Memory `target_title`、HTTP／UI UUID 不變。
+- **定位與隔離：** 模型工具入口只接受本檔案已配置的短定位，拒絕 canonical UUID passthrough；內部 prepared command 仍保存 canonical 身分並沿原 resolver 恢復。跨檔案、錯類型、未知短定位均拒絕。JSON 只轉換明定定位欄位，Markdown diff 只格式化程式產生的定位，不對正文做全域字串替換。來源核對語意、Memory `target_title`、HTTP／UI UUID 不變。
 
 驗證：[短定位](../history.md#source-098e24f247a9411844be)。程式與 migration 已有離線／真 PG 證據；示範服務是否已升級需依[目前決策](../current-decisions.md)核對。短定位不等於 Luna 的來源選擇或核對品質已改善。
 
@@ -228,7 +230,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 - 新 JD 修訂沿 [source inheritance](../../apps/api/src/caliburn/features/job_description/source_inheritance.py)保留仍存在目標的原引用；刪目標只從新修訂移除其引用，歷史不變。排序／移動不等於文字改寫。共用能力正文變化會使其任務使用關係的內容基底不再相符。
 - [read_jd](../../apps/api/src/caliburn/transport/model_tools/jd_reads.py)沿固定候選位置完成十一種 view：map 精簡 JSON、full 成品 Markdown、局部／區域完整 JSON。正式／候選不混版，來源改名列歷史名稱，移除不改指同名新物件；只在必要時回 `needs_recheck`。大結果明確拒絕，不偷偷截斷。
 - [profile write](../../apps/api/src/caliburn/workflows/jd_profile_writes.py)與 [task write](../../apps/api/src/caliburn/workflows/jd_task_writes.py)先解析固定意圖及來源，再交 JD 的 [compound service](../../apps/api/src/caliburn/features/job_description/compound_service.py)共同計算內容、關係與直接來源。一次操作至多建立一份最終修訂及一筆 `compound_edit` 原結果；未變內容重用固定修訂，不再為每個來源或明細中間步驟複製整份選用。後段失敗整體回滾；`created`／`updated` 只是候選效果。
-- 複合操作的重入先核對同一命令、完整意圖與候選範圍，再回原 `revision_id`、效果與新項目，不把目前候選倒退。升級前已保存的 prepared command 維持原 wire；[legacy 讀取](../../apps/api/src/caliburn/features/job_description/compound_legacy.py)依舊生成規則有界核對完整衍生操作集合、順序及終點，不能只核對此次傳入的前綴。省略來源／關係尾段（含 no-op）、改換首操作或缺少必要舊結果均明示拒絕；合法原命令仍回原結果及原核對基底。新操作不再寫舊子操作，沒有雙寫或新回執表。
+- 複合操作的重入先核對同一命令、完整意圖與候選範圍，再回原 `revision_id`、效果與新項目，不把目前候選倒退。現行只讀寫 typed compound 操作；旧子操作集合的相容讀取與推導分支已退役。當前新工作的 prepare／commit／output 中斷仍須承接原結果及原核對基底，不重新套用變更。
 - Graph 保存 prepared command 使用 [JSON checkpoint adapter](../../apps/api/src/caliburn/transport/model_tools/jd_write_checkpoint.py)：Pydantic TypeAdapter 序列化／嚴格還原具型別意圖，官方 saver 只保存 JSON 值，不靠允許任意 Python constructor／pickle 恢復工具命令。完整 tool request 與配對仍由共用執行機制管理。
 
 來源與修訂的最小關係如下；完整欄位仍以 migration 為準，不手抄第二份 schema：
@@ -246,6 +248,8 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 `create_jd_item` 由 [建立 workflow](../../apps/api/src/caliburn/workflows/jd_item_creation.py) 接回JD 領域模組的職責／能力／協作／條件用例；`revise_jd_item` 由 [修訂 workflow](../../apps/api/src/caliburn/workflows/jd_item_revision.py) 協調同項目文字、直屬明細、能力關係與直接依據；`delete_jd_item` 由 [刪除 workflow](../../apps/api/src/caliburn/workflows/jd_item_deletion.py) 沿既有刪除規則處理。不另存模型版 JD，也不把正式人工端點借給 A。
 
 各入口先將模型選擇解析為含原操作身分、候選位置與固定來源的 prepared value；Graph 保存型別化 JSON 後才執行。profile、任務、一般項目建立／修訂由 [compound edits](../../apps/api/src/caliburn/features/job_description/compound_edits.py)的四類意圖及 `JdCompoundEditResult` 表達；JD owner 重用既有純編輯與來源規則，一次保存最終結果。workflow 負責跨域來源解析、檔案／writer 准入及外層交易，內層不 commit；新項目身分直接由領域結果提供，不由 workflow 比較前後集合猜測。刪除等既有單一操作仍沿其具體用例。
+
+workflow 的結果保留型別：刪除回原結果修訂與解除歸屬的任務數，移動回原結果修訂、效果及是否解除歸屬。prepared value 保存恢復所需 facts，不保存供程式解析的中文回覆。[工具 renderer](../../apps/api/src/caliburn/transport/model_tools/jd_write_rendering.py)唯一負責短 ID 配置與模型文字，文案變動不改變去重／恢復規則；配置短 ID 失敗後可沿已提交原結果重新呈現。
 
 重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。`0028` 的資料與回復相容驗證見[本輪重構證據](../plans/evidence/full-system-review-2026-10-08.md)。
 

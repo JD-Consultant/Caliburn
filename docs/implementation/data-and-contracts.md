@@ -67,13 +67,18 @@ JD 以 profile、職責、任務、成果、要求、知識、技能及關係建
 |---|---|
 | Python DTO | `apps/api/src/caliburn/contracts/generated/`；工具型別位於其 `tools/` 子目錄 |
 | TypeScript 型別 | `apps/web/src/shared/api/generated/`；工具型別位於其 `tools/` 子目錄 |
-| 工具 schema 資源 | `apps/api/src/caliburn/contracts/generated/tools/*.schema.json`；供安裝後的工具定義讀取 |
+| Canonical schema 資源 | `apps/api/src/caliburn/contracts/generated/{http,tools}/*.schema.json`；保留原相對參照，供安裝後的 runtime guard 與工具定義讀取 |
+| DTO／資源索引 | `apps/api/src/caliburn/contracts/generated/schema-manifest.json`；生成的 root DTO 全名對應 canonical 資源路徑 |
 
 Web 使用同一份 HTTP schema 驗證回傳，再放入查詢快取，不手寫第二份資料 shape。
 
+依 [ADR0084](../adr/0084-canonical-wire-admission.md)，HTTP request body 經 FastAPI 的 `Annotated[DTO, canonical_body(DTO)]` 接縫；Tool JSON 經 `contracts.validation.parse_contract(DTO, arguments)`。兩者由 `Draft202012Validator` 與 `FormatChecker` 對 canonical 原始值先驗證，通過後才呼叫 `model_validate(..., strict=False)`。因此 `StrictInt` 生成欄位可轉換 schema 合法的 `1.0`，布林、字串與額外欄位仍由 schema 拒絕；不手改 DTO 或逐欄新增 validator。HTTP 的型別／OpenAPI 仍沿原 DTO，領域規則與角色 scope 仍留在原責任模組。
+
+runtime guard 由 `importlib.resources` 讀取包資源，官方 `referencing.Registry` 只登錄包內 schema，未配置任何外部 retriever。`jsonschema[format-nongpl]` 是鎖版正式相依；所有 canonical format 都必須有已安裝 checker，缺少時失敗，不靜默略過。驗證錯誤只保留安全種類與 schema 路徑，不轉送 validator 的輸入正文、message 或 cause；Tool 繼續回原本的可行修正指引。schema 已接受、DTO 卻無法表示時屬內部契約錯誤，以安全 `RuntimeError` 中止，不能冒充使用者參數錯誤。Python 用 `FormatChecker.checks`、Web 在唯一 `shared/api/schema-policy.ts` factory 用 Ajv `addFormat` 接上標準 UUID 表示檢查，排除套件額外容許的 URN 或多餘連字號。各 feature 仍擁有其 schema 與編譯後 guard，不各自重建接受政策，也不讓 shared 反向依賴 feature。
+
 模型 schema 與 HTTP 不強求相同：HTTP 需要保存／預覽狀態，tool 只回推理下一步所需資訊。模型 strict wire 是薄編譯邊界：有限 variants、required／additionalProperties 按 provider 子集，語意上未列 change 仍是保留，不把 null 當清空。生成後以真 SDK payload 驗，而非只測 Python class 建得出來。
 
-生成器亦將 tools 原 schema 複製為安裝包內唯讀資源，`--check` 驗 byte 一致；provider definitions 使用這份生成副本，不從 DTO 再生另一個 shape。離線 SDK payload 不等於遠端 strict 接受；實測範圍依 [Memory 工具接線](memory-tools.md)。
+生成器亦將 HTTP／tools 原 schema 與索引寫為安裝包內唯讀資源，`--check` 驗 byte 一致；provider definitions 使用 tools 的同一份生成副本，不從 DTO 再生另一個 shape。離線 SDK payload 不等於遠端 strict 接受；實測範圍依 [Memory 工具接線](memory-tools.md)。
 
 原始 Responses items 不塞進自製 message schema；按官方 SDK output→input 轉換後保留必要 metadata、opaque bytes 與順序，兩種方向各有 round-trip 測例。生成檔不手改；CI 再生成比 diff。實際 wire 以 schema、生成物與對應驗證為準。
 

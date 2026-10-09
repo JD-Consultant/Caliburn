@@ -1,6 +1,6 @@
 # Memory 正文編輯接線
 
-- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Memory 原入口保留薄相容包裝；焦點筆記重用同一解析／唯一定位／套用機制，只有 App 筆記用途允許空正文，Memory 仍拒空。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見[本次切片證據](../plans/evidence/interview-plan-2026-10-07/t1-tools.md)及[正文與工具驗證](../history.md#source-99a88a33a07b25e8aa86)。
+- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Plan 重用同一解析／唯一定位／套用機制。2026-10-09 移除 Memory 的純 matcher 轉送入口，caller 直接使用共同核心；`work_memory/body_edits.py` 保留 Memory 非空正文政策，App 筆記用途則允許空正文。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見[原切片證據](../plans/evidence/interview-plan-2026-10-07/t1-tools.md)、[責任重構](../plans/evidence/system-quality-domain-2026-10-09.md)及[正文與工具驗證](../history.md#source-99a88a33a07b25e8aa86)。
 - 產品契約：[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料保存責任。
 
 閱讀路徑：[採用來源](#1-重用來源與有限補強) → [語法與定位](#2-語法與唯一定位) → [套用與容量](#3-套用錯誤與容量) → [接縫驗證](#4-接縫及驗證層級)。純編輯核心處理一份正文；角色權限、工具回傳與候選交易由各自的接線文件維護。
@@ -25,11 +25,13 @@ App 已綁定的一份候選正文 + body diff
 
 前四步是純運算；無 DB、filesystem、網路、scope 推測或自行重試。最後的候選採用及原結果恢復沿 [Memory 保存](memory-storage.md)，不是編輯器再造一套收據。
 
+Memory 的 patch 準備及 preview diff 由 `MemoryWritePreparation` 在關閉讀取 session 後，借用 App 的有界 `MemoryCpu`；純 matcher 不管理 thread、容量或資源。取消與關閉依 [Memory 保存](memory-storage.md#3-交易與讀取邊界)，不把 `to_thread` 呼叫返回視為同步工作已停止。
+
 ## 2. 語法與唯一定位
 
 `adapters/v4a_parser.py` 抽取舊側 context 與相對 edit chunks，返回不可變型別。允許 `@@`、原文 anchor／stacked anchors、多 hunk、可選終端 `*** End Patch`／`*** End of File`；第一段亦可直接以增刪／context 開始。以換行分隔完整來源行，不接受數字 unified header、Markdown fence、檔案路徑或 create/delete/move envelope。所有輸入必須被消耗，不能修改前段後忽略非法後段。
 
-`adapters/body_matching.py` 的唯一規則（Memory 原路徑轉出同一型別）：
+`adapters/body_matching.py` 的共同唯一定位規則：
 
 - 在完整原文、目前順序游標以後枚舉同列數的整行窗口；context 包含未改行與刪除行，新增行不參與定位。
 - 比對視圖只去每行首尾空白。相同文字合格；非相同的行，雙方至少 10 字元且 Levenshtein normalized similarity ≥0.90 才合格。**每行** 都須合格，不讓大量相同背景掩蓋短標題／短事實不符。

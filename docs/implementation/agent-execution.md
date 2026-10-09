@@ -80,6 +80,10 @@ B1／B2 各自保留私有歷史；同一階段中斷後沿原 thread 接續，�
 
 `features/executions/history.py` 管理**是否可採用** ；`workflows/context_history.py` 的 `RoleContextHistory` 將資格接到既有準備／模型 Graph；完整原生窗口仍只由官方 saver 保存。每份職務檔案、每個角色各有一個已採用位置，每次 execution 綁定一次原基底，不能因重開而改選目前最新 checkpoint。
 
+角色初次擷取的業務資料由 `ConsultantContextWorkflow` 與 `MemoryAnalysisContextWorkflow` 提供具型別的固定讀取結果。前者在原檔案鎖與 writer 交易內綁定 Memory／訪談、建立 JD 及可選 Plan 候選；後者讀取原 Memory stage 的 K／F、地圖與 B1 必要訪談。Agent 將資料投影為模型輸入，保存及恢復原 captured request；workflow 不依賴模型 JSON 或原生 checkpoint 格式。Plan 壓縮所需的讀取能力由 runner 明確注入，`RoleContextHistory` 不作跨領域資料存取入口。
+
+Memory stage thread 的固定格式由 `features/executions/history_models.py` 的 builder／parser 維護。producer、完成核對、history 及 diagnostics 共用格式，各層保留自身的角色、檔案及完成資格檢查；history 要求 canonical 身分，diagnostics 保留原本較寬的合法語法識別。解析成功本身不授予採用資格。
+
 | 保存責任 | 實際資料 | 不負責 |
 |---|---|---|
 | `context_history_heads` | 職務檔案＋角色目前可採用的 thread／checkpoint／窗口種類 | 原生正文、模型回應、Graph 路由 |

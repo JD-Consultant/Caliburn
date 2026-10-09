@@ -67,6 +67,9 @@ Migration `0011_memory_object_revisions` 與 `revision_persistence.py` 維護下
 
 - `revisions.py` 定義不依賴 ORM 的固定修訂值；`revision_service.py` 接收完整內部編輯結果及明確的原修訂，不是新增整文覆寫 tool。工具／候選服務仍須先綁定當前位置、目標 ID、角色與原操作。
 - 同正文的標題、描述或引用調整重用 `body_id`；內容與固定來源完全未變則沿用原修訂。正文改動後又改回，仍是新的修訂與正文列，不以相同文字冒充舊版本。未做跨歷史或跨物件內容去重。
+- 集合讀取由 `revision_service.read_fixed_headers` 回傳封存標頭與訪談／情境引用；`read_fixed_revisions` 只為指定修訂集合載入正文。缺少、跨檔案或未封存的任一指定修訂皆整組拒絕，不因 JOIN 少一列而回部分結果。交接先比對固定位置及標頭，只為變動情境取得 diff 正文；零變動不取正文。
+- `rebind_understanding_sources` 專責來源調整：輸入每個理解只選一個原修訂；先集合核對全部理解與來源資格，再以原 `body_id` 建立必要修訂，無須讀取或複製正文。候選刪除決定移除哪些入邊，發布決定來源應固定在哪個選用修訂；兩者政策各留在自己的 owner，資料合法性共用同一修訂入口。`insert_revisions` 以 SQLAlchemy `add_all` 集合組裝標頭、來源、封存三個 flush 階段，不逐修訂來回 flush。查詢次數有界，資料列及真正改動的寫入量仍隨集合大小增加。
+- 訪談來源的身分／序號／speaker 驗證沿 `interviews.read_interview_source_headers`；Memory 不查訪談私表。來源集合必須全部屬於同檔案、正式且在固定 F 內；驗證及差異的引用序號不載訪談正文。供模型分析的完整原文仍走原有正式訪談讀取入口。
 - 情境只能引用正式訪談；理解只能引用同檔案情境的固定修訂。同一理解修訂對同一情境身分至多一個來源修訂；零來源合法。Service 沿固定來源驗 `≤F`，SQL 以 FK／層別限制拒絕未正式化、跨檔案、錯層或不存在的來源。
 - 保存於呼叫方的同一短交易：建立修訂標頭 → 寫齊來源 → 封存 `is_sealed=true`。DB 在交易完成時確認新修訂已封存；封存後正文、欄位、引用均不可改寫，也不能追加來源。讀取只返回完整封存修訂。**封存只是固定儲存完整性，不是 Memory 發布、B2 分析完成或候選可見性。**
 - 不增加自己的 commit、候選 head 或原操作回執。外層失敗時新增物件／正文／修訂／來源一起撤回；這個 primitive 不能單獨承諾工具重入冪等。A／JD 的正式快照入口與 B1／B2 權限由 §2.2 的 service 接入，不直接暴露此歷史讀取函式給模型。
@@ -88,7 +91,10 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 | 交接、回復與發布 | `candidate_lifecycle.py` | 交接只允許 B1 → B2，不允許 B2 回交；恢復只採本批可證明的原位置，換 generation／stage 阻擋遲到寫入。發布固定化理解來源並保存完整快照。 |
 | 可見資料投影 | `candidate_queries.py` | 候選捕捉當前位置後解析身分綁定；正式入口要求 snapshot，沿其固定修訂。map 不讀正文。 |
 | SQL 與保存約束 | `position_persistence.py`、`batch_persistence.py` | 同檔案 FK、每身分一修訂、位置封存、同層精確 title 唯一及引用來源存在。快照要求精確來源 pair 與訪談上界；固定位置、快照與操作結果不可改寫。 |
-| 跨領域短交易 | `workflows/memory_candidates.py` | 鎖檔案、驗既有 writer、呼叫領域操作；發布與 execution 完成共同提交。adapter／領域不自行 commit。 |
+| 候選短交易 | `workflows/memory_candidates.py` | 鎖檔案、驗既有 writer、協調候選操作；不提供獨立發布完成捷徑。adapter／領域不自行 commit。 |
+| 正式完成交易 | `workflows/memory_batch.py` | 父流程核對 B1／B2 完成結果，在同一交易發布 snapshot、採用兩角色 context history 並完成 execution。任何必要 history 缺失皆回滾該次發布。 |
+
+`0032_memory_typed_evidence` 將 `memory_operations` 的整理意圖與失敗紀錄改成 typed 欄位：intent 以 `(job_file_id, execution_id, intent_source_id)` FK 對應原 accepted input；failure 保存非空 reason 與非負正式 frontier。CHECK 強制這兩類與其他 JSON 操作互斥，仍共用原 `(job_file_id, command_id)` 主鍵，沒有第二個命令空間或 runtime 相容 parser。專用 recorder 核對同命令及原 frontier；工具文案到 transport 才渲染。遷移對舊有效 JSON 一次嚴格轉換，無效資料整筆回滾，不提供 legacy downgrade。
 
 每次內容修改只新增必要修訂與輕量選用列。位置沿 parent 保存可恢復路徑；回復必須在本批 base 到目前位置的路徑內，且完整階段座標曾由真實原結果提供，不能只拿一個存在的 position ID 偽造 B2 資格。候選讀取使用目前 stage，會看到該 stage 內後續成功操作；新修改則須符合精確目前位置。這兩種檢查不同，不把模型歷史文字改成 latest。
 
@@ -96,9 +102,13 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 
 Memory 領域模組不保存原生模型 request，也不提供全歷史模型入口。原操作摘要只能核對同一意圖，不能重建遺失的工具參數；完整 native request 的可靠保存、工具配對及 Graph 接續由[共用執行](agent-execution.md)承接。
 
+測試的 `tests/fixtures/memory_owner.py` 可直接組裝 snapshot 及終止合成 writer，限驗證 Memory／JD 資料規則；它不保存 B1／B2 原生 context，也不是正式完成證據。正式完成、缺少 preparation 的原子回滾及 ACK 恢復，皆由 `MemoryBatchWorkflow` 的整合測試驗證。
+
 ## 3. 交易與讀取邊界
 
 沿現有檔案隔離、Memory execution 資格、短鎖與呼叫方 transaction，不建第二套跨 Agent 鎖／UnitOfWork。候選操作原意圖、採用位置及原結果共同提交；模型、patch 大額純計算或重試等待不持有 SQL transaction。讀固定位置後計算、提交前再核位置／資格，不能把最新稿偷偷代入原命令。
+
+B1 → B2 的差異同樣先讀固定 snapshot 純值，再關閉 session，交 `features/work_memory/stage_changes.py` 計算；patch 準備與預覽共用 bootstrap 擁有的 `MemoryCpu`。單一 AnyIO 准入 lane 取得容量後再檢查取消，透過標準庫 `ThreadPoolExecutor.submit` 同步交接到單一 worker；交接前取消不派工，交接後取消則等實體 Future 完成，放棄晚到結果後才釋容量。關閉先拒新工作並排空，thread 沒有硬取消或 CPU 平行保證；合法大正文的受測成本與限制見[本輪研究](../research/engineering/2026-10-09-system-quality-repair-design.md#4-非同步工作取消與關閉)。
 
 保存與讀取維持下列不變式；資料庫測試不證明模型語意品質：
 

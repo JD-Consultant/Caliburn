@@ -12,6 +12,8 @@ Web 採 React Router 管頁面定位，TanStack Query 管正式／候選資料 c
 
 正式入口由 `app/query-client.ts` 建立同一份 QueryClient 政策。本機 HTTP 的 query／mutation 採 `networkMode: always`，依實際連線結果處理；瀏覽器 offline 訊號不把操作暫停、留到連網時才突然送出。關閉隱含 retry 及 reconnect refetch，由既有明示重讀／確認流程處理。依據：[TanStack Network Mode](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode)。
 
+路由入口先驗 UUID，非法檔案識別不掛載資料查詢。後端確認整份檔案刪除後，App 組合各 feature 的清理入口，取消／移除該檔案 query、清除 rename、訪談 hint 與 JD profile／work 待確認命令，卸載已刪檔案的工作畫面。清單頁以必要的 `onDeleted` callback 交由 App 統一清理、通知、警告及一次清單刷新，頁面只收束對話框及恢復焦點，不另作局部清理或刷新。`BroadcastChannel` 只通知事件種類及檔案 ID；其他開啟分頁清理自己的 sessionStorage。同檔案進行中的清理共用完成 Promise，成功後去重；儲存或清單刷新失敗則允許後續通知／確認重試本地清理，不再次 DELETE 或轉播。警告按檔案保留，恢復一份檔案不清除另一份的錯誤。漏接通知的頁面由 metadata GET 的 `job_file_not_found` 補救，其他 404 不作刪除證據。儲存、通知或清單刷新失敗仍明示後端已刪除及未完成的本機步驟；不能改判刪除失敗或宣稱已清除未開啟分頁。依據：[HTML BroadcastChannel](https://html.spec.whatwg.org/multipage/web-messaging.html#broadcasting-to-other-browsing-contexts)。
+
 UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修改由後端拒絕，前端禁用按鈕只是讓限制更清楚。第二筆輸入返回既定在途狀態，不排入無界隊列；不同檔案可並行使用，不需要每個檔案一個程序。
 
 元件按 feature 組織：interview 負責訊息與 A 控制；jd-editor 負責關聯式欄位及候選預覽；source-viewer 負責依據、待核對與詳細差異。不讓共用 UI component import database／provider 或決定來源版本。頁面組裝、版面與視覺 token 在 `app/`，見[工作畫面組裝](web-workspace.md#5-工作畫面組裝)。
@@ -27,6 +29,12 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 [圖源](../diagrams/implementation/interface-and-delivery/create-command-recovery.mmd) · [SVG](../diagrams/implementation/interface-and-delivery/create-command-recovery.svg)
 
 `sessionStorage` 僅為**本分頁尚未確認的 transport command** ，不負責判定正式檔案／交易結果。保存 command ID、檔案名稱、員工姓名；先保留才送出，儲存不可用則明示未送出。不明結果不自動重送、不解除原 payload；明確拒絕後才可改字重新提交。確認成功清除；即使清除失敗，殘留命令也只查回原結果，不把原建立時 metadata 覆蓋到最新 cache。關閉分頁／清除瀏覽器資料不保證保留此暫存；此時先查清單，不能宣稱跨裝置或永久恢復。取消建立表單不是撤銷可能已成立的後端建立。
+
+建立與改名的 ACK 清理只作用於仍與原命令識別及 payload 相符的本分頁紀錄；晚到成功或明確拒絕不能刪除較新的命令。離開／卸載後仍可整理相符的原紀錄，但不更新舊畫面、回呼或導頁。目前畫面收到已知成功／拒絕、原紀錄卻已不存在或變更時，明示該結果及返回清單核對的出口，停止再次確認，不改判為未知或自動另送。確定刪檔的全量清理另由 App 組裝。這是同一 sessionStorage 作用域的同步核對，不新增跨分頁鎖；訪談的共用 hint 仍依自己的 Web Locks 協定。
+
+建立、改名及 JD 人工命令共用 `shared/commands` 的 store／mutation 流程；feature 提供原命令 schema、比對、端點與正式拒絕判斷。建立以 `409 creation_command_conflict` 或 `410 creation_result_deleted` 退休原命令；410 表示原檔案已刪除，不導向舊檔案、不建立新命令，清理相符暫存並重讀清單。拒絕種類由 feature 回 typed reason，共用 mutation 不解析業務文字。改名只以 `409 rename_command_conflict`／`stale_job_file_name` 退休遭拒的原命令；這些碼均由原命令核對後產生。一般 status、前置驗證、未知錯誤碼與 HTML 回覆仍屬結果未確認。跨 feature 正式刷新在 App 組裝，先取消舊 GET，再失效並重讀。伺服器已接受但重新讀取失敗時，顯示已成功及讀取失敗，不重送原 POST 或換新命令；詳細接線見 [Web 工作畫面](web-workspace.md#1-基本資料編輯的讀取基底與恢復)。
+
+共用 HTTP 邊界維持 15 秒期限與 caller AbortSignal，將網路、期限、取消、非 JSON、契約錯誤與 HTTP 失敗分成受控種類；只保留長度最多64、ASCII snake_case 形狀的不可信分類碼、status 及合法 UUID 格式的 `X-Request-ID`；公開業務碼是否可判定原結果由 feature 決定，HTTP 不手寫跨 feature 業務枚舉。人工命令與訪談 POST 帶本機診斷用的檔案／命令／execution 身分，不將這些額外欄位傳入 fetch。`shared/diagnostics` 是本機 console 的安全出口，只輸出事件種類、故障分類、status 與通過 UUID 檢查的關聯識別；不輸出 URL、body、原始 Error／stack、表單或模型正文。正常取消不記為故障，sink 失敗不改變業務結果。SSE 只記受控的中斷／資料拒收分類及訂閱身分，由原生 EventSource 處理 CONNECTING，CLOSED 則由同一 hook 依 Query 確認狀態並有限恢復，不另建遙測服務。依據：[OWASP Logging](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)、[TanStack Query cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)。
 
 此方案沿[共同保存審查](../specs/2026-09-27-shared-agent-execution-and-state-design.md)的「先列具體保證」：避免未確認時換新命令造成重複檔案，建立流程未新增 DB 回執或 browser database。它不決定後續訪談輸入的控制／重送策略。訪談提交與公開串流見 §2；Memory 不提供使用者控制。
 
@@ -74,9 +82,15 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 **完成後接著輸入：** 原 Turn 經狀態查詢確認為 `completed` 後，直接顯示空白輸入框，不要求再點「開始下一次訪談」。顯示表單不啟動模型、不重送原話；使用者按送出時才建立新 command。原完成識別保留到送出時再替換，若已被另一頁換成不同的待確認識別，不得覆蓋。送出事件將原文交給待確認請求並清空下一則草稿；結果不明時保留原 command 與文字供核對，明確未受理則還原為可編輯草稿。即使由另一頁查明同一請求已完成，也不得再把原請求當成下一則輸入。狀態重查不清空使用者正在寫的下一則草稿。取消或失敗仍由使用者選「取回原文編輯／開始下一次訪談」後重查 current；暫停、活動中及未知狀態不開放另送。完成提示用低強調文字，錯誤與待確認仍明示。此規則不改後端准入及保存契約，驗證見[視覺改版證據 §15](../history.md#source-a75c36d876a672e0f607)。
 
+訪談 hint 的保留、execution ID 回填與清除統一經過以檔案 ID 命名的 Web Lock。鎖內重新讀取儲存並核對 command；晚到 ACK／查詢不能覆寫另一命令或重建已清除 hint。等待鎖最多五秒，送出防重入在等待前設定；同一 mutation pending 從保留 hint 起停用輸入及送出，保護事件捕捉的原文。鎖內只操作儲存，釋放後再核取消、掛載及刪除狀態才送 HTTP。鎖或儲存失敗保留文字並明示未送出，解除忙碌後可繼續編輯；HTTP 結果未知及已知受理的 ACK 保存失敗仍依各自的恢復語意處理。不支援 Web Locks 時保留查詢，阻止新訪談送出。確認刪除會先同步取消本分頁排隊中的保留操作，再清理儲存，避免 React 卸載前的舊提交重建 hint。這是瀏覽器的短期協調，正式受理與冪等仍由後端判定。依據：[W3C Web Locks](https://www.w3.org/TR/web-locks/)。
+
 **送出鍵：** 輸入框內 Enter 送出、Shift＋Enter 換行（Vercel AI Elements PromptInput；[MDN keydown](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event)）。Enter 等同按下送出鈕：鈕不可用時不動作，空白草稿與按鈕一樣提示填寫，不另開送出路徑，保存、重送與確認規則同上。輸入法組字中的 Enter（`isComposing`，或 Safari 先結束組字後只剩 keyCode 229）不送出；判斷集中在 `send-key.ts`，其 `keyCode` 是 `no-deprecated` 的唯一例外。
 
+`useInterviewInput` 集中訪談送出、原請求重試、提示及局部草稿的清除／還原；它沿 keyed Composer 的生命週期，沒有共享草稿 store。Composer 保留 current／by-command／Turn 查詢、准入判斷與呈現。訪談只保存識別、使用跨分頁鎖的協議與人工編修不同，因此留在 interview feature，不以模式旗標套入人工命令 hook。
+
 完整公開 commentary 從原生 checkpoint／pending writes 投影；status polling 呈現候選與控制，歷史回答透過原 execution 定位按需回看。即時文字沿 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI；沒有訊息時明示空，不編造進度。驗證：[provider 串流](../history.md#source-caf2f3430699b78cd2b7)、[傳輸](../history.md#source-8c70f5667c1a6cb7f93f)、[UI](../history.md#source-bfa2c9aaeee3741277e2)。
+
+`useConsultantActivityStream` 擁有 source、計時器與自己發起的恢復 GET。CLOSED 先查原 Turn；只有 active 才重建串流，paused／終態／404 停止並刷新保存摘要，未知錯誤不得當成完成。初次確認後最多三次恢復動作，間隔 1／2／4 秒；短暫 OPEN 不重設額度，連續 OPEN 十秒或新 scope 才重設。卸載、換檔及刪除會中止自己的 GET 並釋放資源，不取消其他 caller 已開始的 Query。達上限保留斷線提示，既有狀態查詢繼續提供正式结果，不送新的 POST。EventSource error 不提供 status，不能直接分辨 503／204，須沿受控 GET 確認。
 
 使用 HTTP commands＋同源 SSE 公開事件，無需 WebSocket 雙向協議。瀏覽器收到 event 只更新呈現，正式狀態仍可 GET 重取。SSE 的 event ID／重連不是完整產品恢復的唯一依據，斷線後先查當前 Turn 狀態、已保存公開內容與 JD 正式／候選位置，不因事件遺失就重新送員工原話。事件傳送使用標準 SSE framing／框架支援，不自製流式 JSON 切割協議。[WHATWG SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html)
 
@@ -106,7 +120,7 @@ SSE 可丟的暫態進度與必須保留的公開歷史分開，**不為每個�
 
 顧問 A 的新模型請求設定 `reasoning.summary=auto`，與 `context=all_turns`、`include=[reasoning.encrypted_content]` 並存。摘要是供人閱讀的解釋，不是完整內部推理；`encrypted_content` 才是不可讀的接續資料，兩者不能互相替代。B1／B2 不因此啟用或公開摘要。輪前歷史準備的 count／compact 契約不變；摘要選項只加入新的 Turn 生成模板，已保存的 Turn request 仍原樣恢復。
 
-`GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 在**同一條 SSE** 送 `commentary` 與 `reasoning_summary`。前端只訂閱此入口；舊 `/commentary-stream` 保留相容，不同時訂閱兩條。摘要事件只有 `response_id`、`item_id`、`output_index`、`summary_index`、`text`，其 schema 位於 [`reasoning-summary.schema.json`](../../apps/api/contracts/http/reasoning-summary.schema.json)。`text` 為該段累積文字，依 response／item／summary index 替換，不 append 每個事件；commentary 仍用原契約。
+`GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 在**同一條 SSE** 送 `commentary` 與 `reasoning_summary`。這是正式 App 唯一公開活動入口；2026-10-09 移除沒有正式消費者的舊 `/commentary-stream`、獨立 hub 與雙重 publish，不保留相容路由。摘要事件只有 `response_id`、`item_id`、`output_index`、`summary_index`、`text`，其 schema 位於 [`reasoning-summary.schema.json`](../../apps/api/contracts/http/reasoning-summary.schema.json)。`text` 為該段累積文字，依 response／item／summary index 替換，不 append 每個事件；commentary 仍用原契約。此交付面清理不改持久 request／checkpoint 或歷史讀取格式。
 
 `GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/reasoning-summaries` 按序回傳已保存完整 Response 中的摘要。沒有摘要回 `[]`，缺少保存機制則回 unavailable，不編造摘要。它與 commentary 共用既有 checkpoint 原件讀取、去重與排序；不另建摘要表。歷史 GET 不需模型金鑰、不重跑模型；包括被取消 Turn 的已保存過程，也只能供回看，不能取得正式訪談序號或 JD／Memory 引用資格。未完成 Response 的串流片段不承諾永久恢復。
 
@@ -200,6 +214,8 @@ Windows 的明確初始化入口為 [`setup-docker.ps1`](../../scripts/setup-doc
 
 API 依 `apps/ocs-indexer/uv.lock` 安裝自身與兩個本地契約套件，採非 editable 安裝，不帶 torch、來源目錄或 OpenAI key。App 透過 `http://ocs-indexer:8000` 查詢，不使用主機 localhost。原 App、PostgreSQL、project name 及 PG volume 都不變。
 
+API、indexer、PDF 轉換器及兩個 Python 契約套件使用同一個 uv build backend。各專案根的 `build-system` 與 uv build constraints 固定 backend 版本和發布 artifact hashes；path dependency 的 build 設定不能替代 consumer 根的限制。封裝驗收以隔離 PEP 517 建置、wheel 資源逐檔比對、安裝後契約與 migration 載入為準。embedder 另有自己的 `pyproject.toml`／`uv.lock`、Python 版本及 CUDA wheel index，Docker 固定基底／uv digest，以 `--no-build` 拒絕未鎖建置環境的 runtime source build；具體操作由 [embedder README](../../apps/embedder/README.md)維護。
+
 查詢 API 等待 Qdrant 與模型通過健康檢查；App 的啟動相依仍只有 PostgreSQL。`--wait` 與 `/healthz` 不檢查公版索引是否就緒，首次使用仍須選版、建索引並實際搜尋。索引與模型身分由既有查詢流程核對，不另加啟動驗證器。RAG 服務持續運行，工具按需使用；不掛 Docker socket，也不在第一次查詢時才啟動容器。配置不自動選版或遷移資料。操作見 [公版 Docker 模式](../operations/rag.md#含公版參考的-docker-模式)，本次驗證見[工程紀錄](../experiments/engineering/2026-10-06-docker-rag-startup.md)。
 
 依據：[uv Docker](https://docs.astral.sh/uv/guides/integration/docker/)、[Playwright Docker](https://playwright.dev/python/docs/docker)、[Compose 啟動相依](https://docs.docker.com/compose/how-tos/startup-order/)、[服務配置重用](https://docs.docker.com/compose/how-tos/multiple-compose-files/extends/)、[Compose 覆寫規則](https://docs.docker.com/reference/compose-file/merge/)、[PostgreSQL 官方映像](https://hub.docker.com/_/postgres)。版本沿用專案 lockfile，App 與查詢 API 映像基底及字型來源固定 digest／checksum；GPU 配置沿既有 RAG Dockerfile。操作由 [runbook](../operations/README.md#docker-操作)維護，實測與限制見 [Docker 交付驗證](../experiments/product-validation/2026-10-03-docker-delivery.md)。
@@ -207,6 +223,8 @@ API 依 `apps/ocs-indexer/uv.lock` 安裝自身與兩個本地契約套件，採
 ## 5. 安全與操作邊界
 
 預設 bind loopback，精確 Host／Origin allowlist；有副作用路由驗證同源／必要防 CSRF 機制，不開 wildcard CORS。密鑰只留後端配置，啟動輸出遮罩，Web bundle、錯誤、log 不含密鑰／原話。檔案識別不等於授權，可見性仍由後端 scope 驗證。
+
+正式 HTTP middleware 對 HTML 附加 `Content-Security-Policy: frame-ancestors 'none'`，與既有 CSP 共同生效；Vite 透過 `server.headers` 使用同一 framing 政策。阻止 App 被別的頁面嵌入，不新增 frame-busting JavaScript 或鬆綁 Host／Origin。
 
 開發 proxy 必須保留瀏覽器原 Origin／Fetch Metadata，不用改寫成受信任值來通過檢查。隔離前端使用不同埠時，由該後端啟動配置明確增加一個精確 loopback Origin；不接受 wildcard、任意 local port 或從請求推導新增信任。配置、ASGI 與真 Vite 回歸見 [T15 HTTP 證據](../history.md#source-0e25c675694e9744582f)。
 

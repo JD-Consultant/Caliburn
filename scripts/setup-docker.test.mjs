@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, copyFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, copyFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -10,6 +10,18 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const shells = process.platform === "win32" ? ["powershell", "pwsh"] : ["pwsh"];
 const availableShells = shells.filter((shell) => spawnSync(shell, ["-NoProfile", "-Command", "exit 0"]).status === 0);
 assert.ok(availableShells.length, "Setup tests require Windows PowerShell or PowerShell 7.");
+
+function assertCallsUseDirectory(calls, directory) {
+  // Windows short names and other aliases can identify the same directory.
+  // Compare filesystem identities while the fixture still exists, not spelling.
+  const expected = statSync(directory, { bigint: true });
+  for (const [index, call] of calls.entries()) {
+    const actual = statSync(call.directory, { bigint: true });
+    const message = `Docker call ${index + 1}: expected directory ${directory}, received ${call.directory}.`;
+    assert.ok(actual.isDirectory(), message);
+    assert.deepEqual([actual.dev, actual.ino], [expected.dev, expected.ino], message);
+  }
+}
 
 // Replace Docker's external boundary only; execute the actual setup script and
 // filesystem changes in a fresh repository fixture with no host credentials.
@@ -84,12 +96,11 @@ exit $LASTEXITCODE
     assert.ifError(execution.error);
     const callsFile = path.join(directory, "calls.jsonl");
     const calls = existsSync(callsFile) ? readFileSync(callsFile, "utf8").replace(/^\uFEFF/u, "").trim().split(/\r?\n/u).map((line) => JSON.parse(line)) : [];
+    assertCallsUseDirectory(calls, directory);
     return {
       status: execution.status,
       output: execution.stdout + execution.stderr,
       env: existsSync(path.join(directory, ".env")) ? readFileSync(path.join(directory, ".env"), "utf8") : undefined,
-      calls,
-      directory,
       operations: calls.map((call) => call.arguments.join(" ")).filter((command) => / (build|up|run) /u.test(command)),
     };
   } finally {
@@ -100,6 +111,19 @@ exit $LASTEXITCODE
 const existingEnv = "# Preserve my settings\r\nCALIBURN_POSTGRES_PASSWORD=existing-db-secret\r\nCALIBURN_APP_PORT=18765\r\nCUSTOM_SETTING=leave-me-alone\r\n";
 const operationSuffixes = ["build app", "up -d --wait postgres", "run --rm app alembic -c /opt/caliburn/alembic.ini upgrade head", "up -d --wait app"];
 
+test("working-directory checks accept aliases and reject any call from another directory", (t) => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "caliburn-setup-directory-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const otherDirectory = path.join(directory, "other");
+  mkdirSync(otherDirectory);
+  const alias = process.platform === "win32" ? path.toNamespacedPath(directory) : `${directory}/.`;
+
+  assertCallsUseDirectory([{ directory: alias }], directory);
+  for (const calls of [[{ directory: otherDirectory }], [{ directory: alias }, { directory: otherDirectory }]]) {
+    assert.throws(() => assertCallsUseDirectory(calls, directory), { code: "ERR_ASSERTION" });
+  }
+});
+
 for (const shell of availableShells) {
   test(`${shell}: first setup saves a random password and starts only after migration`, () => {
     const result = runSetup(shell);
@@ -107,7 +131,6 @@ for (const shell of availableShells) {
     assert.match(result.env, /^CALIBURN_POSTGRES_PASSWORD=[a-f0-9]{64}$/mu);
     assert.equal(result.operations.length, 4);
     result.operations.forEach((command, index) => assert.ok(command.endsWith(operationSuffixes[index]), command));
-    assert.ok(result.calls.every((call) => path.resolve(call.directory) === path.resolve(result.directory)));
     assert.match(result.output, /http:\/\/127\.0\.0\.1:18765/u);
     assert.doesNotMatch(result.output, /synthetic-secret|host-key/u);
     assert.doesNotMatch(result.env, /host-key|OPENAI_API_KEY=/u);

@@ -1,3 +1,1 @@
-# 實驗與驗證原件保留位元組，不轉換換行，以便核對既有 SHA-256。
-docs/experiments/** -text
-docs/plans/evidence/** -text
+* text=auto eol=lf

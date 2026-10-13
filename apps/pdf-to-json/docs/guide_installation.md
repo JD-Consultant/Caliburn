@@ -142,5 +142,5 @@ uv run pytest tests/ -v
 ## Next Steps
 
 1. Read [Usage Guide](guide_usage.md) to learn how to convert PDFs
-2. Check [Architecture Guide](../ARCHITECTURE.md) for project structure
+2. Check the [Codemap](../README.md#codemap) for project structure
 3. Review [Data Schema](../README.md) for JSON format details

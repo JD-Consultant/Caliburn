@@ -6,12 +6,11 @@ from pathlib import Path
 
 import pdfplumber
 
-from jd_pdf_to_json.parsers.base import BasePDFParser
 from jd_pdf_to_json.parsers.models import PDFDocument, PDFPage, PDFTable
 from jd_pdf_to_json.utils.exceptions import PDFParsingError
 
 
-class PDFPlumberParser(BasePDFParser):
+class PDFPlumberParser:
     def parse(self, pdf_path: Path) -> PDFDocument:
         try:
             source = pdf_path.read_bytes()

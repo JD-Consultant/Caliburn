@@ -6,10 +6,9 @@ from pathlib import Path
 
 from jd_pdf_to_json.core.models import OCSDocument
 from jd_pdf_to_json.utils.logger import logger
-from jd_pdf_to_json.writers.base import BaseWriter
 
 
-class JSONWriter(BaseWriter):
+class JSONWriter:
     """Write OCS model to JSON file."""
 
     def write(self, model: OCSDocument, output_path: Path) -> None:

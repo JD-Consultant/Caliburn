@@ -53,11 +53,11 @@ def test_mixed_batch_counts_each_source_once_and_preserves_rejected_target(tmp_p
     assert all(len(entry["source_sha256"]) == 64 for entry in report["files"])
 
 
-def test_no_validate_cannot_allow_empty_content(tmp_path):
+def test_convert_rejects_empty_content(tmp_path):
     source = tmp_path / "blank.pdf"
     blank_pdf(source)
     output = tmp_path / "blank.json"
-    result = CliRunner().invoke(app, ["convert", str(source), "-o", str(output), "--no-validate"])
+    result = CliRunner().invoke(app, ["convert", str(source), "-o", str(output)])
     assert result.exit_code == 1
     assert not output.exists()
     assert (tmp_path / "blank.diagnostics" / "report.json").exists()

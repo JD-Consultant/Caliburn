@@ -31,12 +31,6 @@ def convert(
     output_path: Annotated[
         Path | None, typer.Option("--output", "-o", help="Output JSON file")
     ] = None,
-    validate: Annotated[
-        bool,
-        typer.Option(
-            "--validate/--no-validate", help="Compatibility flag; required checks always apply"
-        ),
-    ] = True,
 ) -> None:
     """Convert one PDF, preserving the target when conversion is rejected."""
     output_path = output_path or pdf_path.with_suffix(".json")
@@ -53,12 +47,6 @@ def convert(
 def batch(
     input_dir: Annotated[Path, typer.Argument(help="Directory with PDFs", exists=True)],
     output_dir: Annotated[Path, typer.Option("--output", "-o", help="Output directory")],
-    validate: Annotated[
-        bool,
-        typer.Option(
-            "--validate/--no-validate", help="Compatibility flag; required checks always apply"
-        ),
-    ] = True,
     exclude_historical: Annotated[
         bool, typer.Option("--exclude-historical", help="Exclude filenames containing 歷史資料")
     ] = False,

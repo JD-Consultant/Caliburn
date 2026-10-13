@@ -47,7 +47,8 @@ uv run python -m jd_pdf_to_json.cli convert <pdf_path> -o <output_path>
 
 - `pdf_path`：輸入 PDF 檔案路徑。
 - `-o, --output`：輸出 JSON 路徑（不指定時，預設與 PDF 同名）。
-- `--validate/--no-validate`：保留舊 CLI 相容參數；生成模型、必要內容與來源檢核始終執行，不能略過缺漏而輸出。
+
+生成模型、必要內容與來源檢核始終執行，不能略過缺漏而輸出。
 
 ### batch
 
@@ -61,7 +62,6 @@ uv run python -m jd_pdf_to_json.cli batch <input_dir> -o <output_dir>
 
 - `input_dir`：PDF 來源資料夾。
 - `-o, --output`：JSON 輸出資料夾。
-- `--validate/--no-validate`：相容參數，必要檢核始終執行。
 - `--exclude-historical`：排除檔名含「歷史資料」的文件；不據此判定其餘文件為官方最新版。
 
 批次先固定檔名與 SHA-256 清單，再逐檔轉換。每份結果恰為 `converted`、`rejected` 或 `excluded`；
@@ -513,4 +513,4 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 - 系統範圍：根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)；公版資料流見 [RAG 管線](../../docs/architecture/rag-pipeline.md)，本工具採 Pipes-and-Filters，程式位置見本頁 Codemap。
 - 來源欄位語意：[§6 Field Contract](#6-field-contract)；結構與生成規則：[ocs-contract](../../packages/ocs-contract/README.md)。
 - 下游：[ocs-indexer](../ocs-indexer/README.md)(索引消費本輸出)；機器契約見 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)，不是 JD 著作契約。
-- 設計分工：[ARCHITECTURE.md](ARCHITECTURE.md)；實際命令與支援範圍以本頁為準。
+- 設計分工見本頁 Codemap；修改解析或輸出前讀[擴充與修改](docs/guide_extending.md)。

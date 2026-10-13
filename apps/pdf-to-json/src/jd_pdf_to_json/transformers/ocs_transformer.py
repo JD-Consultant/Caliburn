@@ -6,7 +6,6 @@ helpers live in ``support/``. See the Phase 3b decomposition plan.
 
 from jd_pdf_to_json.core.models import OCSDocument
 from jd_pdf_to_json.parsers.models import PDFDocument
-from jd_pdf_to_json.transformers.base import BaseOCSTransformer
 from jd_pdf_to_json.transformers.sections import (
     attitude_extractor,
     content_extractor,
@@ -18,7 +17,7 @@ from jd_pdf_to_json.utils.exceptions import TransformationError
 from jd_pdf_to_json.utils.logger import logger
 
 
-class OCSTransformer(BaseOCSTransformer):
+class OCSTransformer:
     """Transform PDF raw data into an OCSDocument by orchestrating section extractors."""
 
     def __init__(self):

@@ -71,17 +71,17 @@ class QdrantWriter:
                 ),
             )
 
-    def ensure_payload_indexes(self, indexes=None) -> None:
-        for field_name, field_schema in (indexes if indexes is not None else PAYLOAD_INDEXES):
-            try:
-                self.client.create_payload_index(
-                    collection_name=self.collection,
-                    field_name=field_name,
-                    field_schema=field_schema,
-                )
-            except Exception:
-                # idempotent: index may already exist
-                continue
+    def ensure_payload_indexes(
+        self, indexes: Iterable[tuple[str, models.PayloadSchemaType]] | None = None
+    ) -> None:
+        for field_name, field_schema in (
+            indexes if indexes is not None else PAYLOAD_INDEXES
+        ):
+            self.client.create_payload_index(
+                collection_name=self.collection,
+                field_name=field_name,
+                field_schema=field_schema,
+            )
 
     # ---- upsert ----
 
@@ -127,7 +127,7 @@ class QdrantWriter:
                     raise
                 last_exc = exc
                 self._retries += 1
-                delay = self.retry_base_delay * (2 ** attempt)
+                delay = self.retry_base_delay * (2**attempt)
                 time.sleep(delay)
         # unreachable — loop either returns or raises
         assert last_exc is not None

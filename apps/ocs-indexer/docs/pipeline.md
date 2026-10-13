@@ -42,6 +42,8 @@ writer.upsert(EmbeddedChunk…)                      # batched;先 ensure_collec
 非空 run 收尾:write_manifest(embedder.signature)   # 蓋上「誰建的索引」
 ```
 
+collection 與 payload index 在讀取來源前建立；建立失敗直接中止，不寫入資料點或 manifest。相同欄位索引由 Qdrant 接受重建，不以吞掉例外模擬冪等。`run_index` 使用 `ExitStack` 關閉本次建立的 HTTP／Qdrant client；借入的 client 由呼叫端管理。
+
 ### 3.1 `normalizer`:lockstep pairs(**防 code↔name 漂移**,最重要)
 
 `normalize` 把 tolerant 的來源模型攤平成 builder 不必再判空的 `NormalizedOCS`。關鍵手法:

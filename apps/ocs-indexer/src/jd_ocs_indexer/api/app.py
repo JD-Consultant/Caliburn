@@ -50,7 +50,7 @@ def create_app(
             else:
                 from jd_ocs_indexer.embeddings.factory import make_embedder
 
-                app.state.embedder = make_embedder(s, batch_size=1)
+                app.state.embedder = make_embedder(s)
                 resources.callback(app.state.embedder.close)
             if client is not None:
                 app.state.client = client

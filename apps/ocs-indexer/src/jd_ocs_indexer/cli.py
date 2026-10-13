@@ -257,7 +257,7 @@ def query(
     from jd_ocs_indexer.embeddings.factory import make_embedder
     from jd_ocs_indexer.store.manifest import read_manifest
 
-    embedder = make_embedder(settings, batch_size=1)
+    embedder = make_embedder(settings)
     assert_compatible(read_manifest(client, coll), embedder.signature)
     vec = embedder.embed_query(text)
 

@@ -3,7 +3,7 @@
  * the employee's original input, and the consultant's work. The composer renders this only before
  * completion; completed work is read through its formal historical reply.
  */
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { isTerminalTurn } from './interview-turn-api';
 import { PublicTurnMessages, StreamingPublicTurnMessages } from './PublicTurnMessages';
 import { ReasoningSummaries } from './ReasoningSummaries';

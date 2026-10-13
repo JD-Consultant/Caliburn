@@ -16,7 +16,7 @@
 
 ### 1.1 共用領導資格與准入
 
-`workflows/consultant_supervisor.py` 借入 `runner.run` 與 session factory，擁有
+`workflows/consultant_turns/supervisor.py` 借入 `runner.run` 與 session factory，擁有
 `adapters/process_lock.py` 及所有 asyncio task：`start()` 先取鎖再掃描、`notify(scope=None)`
 只喚醒持久查詢、`close()` 先取消並等待本機 runner 退出，最後關閉鎖。HTTP／lifespan
 組裝由 bootstrap 負責，不把 HTTP BackgroundTasks 當隊列；未配置模型不啟動。
@@ -57,7 +57,7 @@ bootstrap 以一個 owned cleanup task 持有完整資源 stack；lifespan 即�
 
 ### 1.3 程序內原件的保存與釋放
 
-runner 退出時透過 executions owner 重讀正式結果；確認 COMPLETED／CANCELLED／FAILED 才釋放該次已無接續資格的原件，仍保留 `_attempted` 防止通知重跑。
+runner 真正退出效果與保存後，透過 executions owner 重讀正式結果；確認 COMPLETED／CANCELLED／FAILED 才釋放該次已無接續資格的原件與 `_attempted`。正式終態不能再被派送；普通返回、active／paused、未知結果與讀取失敗都不授予重新執行資格。
 
 若讀取失敗，保留 typed 原件與停止原因，不推測已提交或取得再送資格。
 
@@ -94,7 +94,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
   正式受理由執行資格模組設為 ACTIVE 並清除 pause intent；不新增控制表、State 或模型參數。
 - bootstrap 將 `runner.run` 經 `run_consultant_with_controls` 及 [最外層失敗收尾](#3-最外層失敗收尾) 的唯一失敗收尾注入 supervisor。
   wrapper 從原 execution＋原 Graph 重讀已授權的 interrupt，因此 resume COMMIT 後、喚醒前
-  中斷仍可接續。只由受控 resume 清除 `_attempted`，普通 notify 不授權重送或復活取消工作。
+  中斷仍可接續。未終止工作只由受控 resume 清除 `_attempted`；終態在 invocation 退出後釋放，普通 notify 不授權重送或復活取消工作。
 - final 離開 Graph 後才收到 pause，若完成交易被 A 完成工作流拒絕，wrapper 僅在原 writer 仍有效、
   pending pause、完整 final Graph 已確認時，重入一次既有純控制交界；不重送模型。不攔截
   response-save recovery handoff、不加外送 retry，不重建 pinned context／budget。
@@ -108,7 +108,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 
 ## 3. 最外層失敗收尾
 
-依 [共用執行與恢復](agent-execution.md)，`bootstrap.py` 在 A 的控制 wrapper 與 Memory batch 外共用 `workflows/execution_failures.py::run_with_failure_boundary`。它不是第二個恢復引擎；不增表、重試、模型參數或 UI 控制。
+依 [共用執行與恢復](agent-execution.md)，`bootstrap.py` 在 A 的控制 wrapper 與 Memory batch 外共用 `workflows/executions/failure_boundary.py::run_with_failure_boundary`。它不是第二個恢復引擎；不增表、重試、模型參數或 UI 控制。
 
 | 原執行的出口 | 邊界如何處理 |
 |---|---|
@@ -119,6 +119,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 | 收尾提交未確認 | 向 supervisor 回報錯誤，不偽造終態 |
 
 - A 沿 `ConsultantCompletionWorkflow.stop(FAILED)`；Memory 經 `MemoryBatchWorkflow.settle_failure` 保留既有 provider／分析結果／容量等原因分類，再沿 `MemoryConsolidationWorkflow.fail` 收尾；未分類錯誤只用安全代碼 `execution_interrupted`。候選丟棄與終態仍是原有短交易，正式完成競爭由原 job lock／writer fence 決定，不以 Python 例外推翻成功。
+- 可核對原操作的純 DB 入口先完成[有限交易恢復](model-requests.md#21-純資料庫操作的有限恢復)，用盡或遇到永久錯誤才到本邊界。這不包整個 runner／Graph，也不讓 supervisor 自動重送模型。
 - 原生已存資料照常接續；仍握有的原回應先走既有有界補存。最終離開原恢復流程後，本邊界可結束該次工作，不再為同一未明外送增加新的恢復平台或盲目重送。既有低層 typed recovery API 保留，但不宣稱所有原件都要永久救回。
 - `except Exception` 不攔 `asyncio.CancelledError`；正常關閉、控制取消及失鎖清理仍走原生命週期。原件補存的 cancellation subclass 同樣傳遞。
 - 日誌僅記 execution identity、kind、exception type，不記原錯誤訊息、provider body、原文或 reasoning。收尾自身失敗向上傳遞，不能顯示假 failed；DB 全面故障時仍需恢復服務，不承諾離線提交。
@@ -127,7 +128,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 
 ## 4. 公版工具的可選角色接線
 
-公版工具的可選接線依 [公版明示接線](../architecture/rag-pipeline.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。
+公版工具的可選接線依 [公版明示接線](../architecture/rag-pipeline.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。A 先從原 capture 還原模板，B 從原 preparation checkpoint 還原；工具權限沿原請求，同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。
 
 `ConsultantRunner._tools` 在建立公版候選前，核對原 captured request 的完整工具組。公版工具缺漏或名稱重複時拒絕；兩個寫入工具統一回 status 契約，description 不再作執行協定。
 
@@ -161,7 +162,7 @@ claim 中的專用 `MemoryEvidenceError` 先讓原交易回滾，supervisor 才�
 
 領導鎖、SQL／連線／交易、掃描期限及未分類程式錯誤仍依原生命週期停止全域監督。唯讀探索會重新核對資料；證據有效後沿原 claim 路徑恢復，監督不修改損毀原件、不建立新持久隔離表，也不因此清除 `_attempted`／runner failure 中的未知外送保護。
 
-相同異常只在新出現時記安全事件；容量已滿尚未重驗 claim 時，不把先前 claim 異常當成已修復。診斷方式見[操作手冊](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+相同異常只在新出現時記安全事件；容量已滿尚未重驗 claim 時，不把先前 claim 異常當成已修復。診斷方式見[操作手冊](../operations/README.md#查閱-ai-執行原件)。
 
 ### 5.3 整理要求、角色交接與發布
 

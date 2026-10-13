@@ -1,8 +1,9 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider, QueryObserver } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
+import type { CreateJobFileRequest } from '../../shared/api/generated/http/types.gen';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
 import { pendingCreation } from './job-file-commands';
 
@@ -43,8 +44,7 @@ beforeEach(() => sessionStorage.clear());
 
 test('a deleted original result is terminal, refreshes the list and never announces creation', async () => {
   pendingCreation.retain(command);
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi
       .fn()
       .mockResolvedValue(
@@ -68,7 +68,7 @@ test('不明結果重開表單後仍送同一個原命令，確認成功才清�
     .fn<(path: string, options?: RequestInit) => Promise<Response>>()
     .mockRejectedValueOnce(new TypeError('lost response'));
   fetch.mockResolvedValue(Response.json(result));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderDialog();
   await fillCreation();
   await userEvent.click(screen.getByRole('button', { name: '建立' }));
@@ -92,7 +92,7 @@ test('已確認後再主動建立，是新的命令而非舊檔案重送', async
   const fetch = vi
     .fn<(path: string, options?: RequestInit) => Promise<Response>>()
     .mockImplementation(() => Promise.resolve(Response.json(result)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderDialog();
   await fillCreation();
   await userEvent.click(screen.getByRole('button', { name: '建立' }));
@@ -113,7 +113,7 @@ test('未送出前先保留命令；進行中不重複送出或用 Escape 關閉
     finishRequest = resolve;
   });
   const fetch = vi.fn(() => request);
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { onClose } = renderDialog();
   await fillCreation();
   await userEvent.click(screen.getByRole('button', { name: '建立' }));
@@ -131,7 +131,7 @@ test('未送出前先保留命令；進行中不重複送出或用 Escape 關閉
 
 test('空白名稱與無法保存命令都不得送出 POST', async () => {
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderDialog();
   await userEvent.type(screen.getByLabelText(/職務檔案名稱/), '   ');
   await userEvent.type(screen.getByLabelText(/受訪員工姓名/), command.employee_name);
@@ -157,7 +157,7 @@ test('已知拒絕可重新編輯，非成功格式仍保留原命令', async ()
       Response.json({ detail: { code: 'creation_command_conflict' } }, { status: 409 }),
     );
   fetch.mockResolvedValue(Response.json({ job_file_id: 'invalid' }));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { onCreated } = renderDialog();
   await userEvent.click(screen.getByRole('button', { name: '重新確認建立結果' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('未被接受');
@@ -172,7 +172,7 @@ test('已知拒絕可重新編輯，非成功格式仍保留原命令', async ()
 test('建立受理後真實 Query observer 重讀失敗，仍顯示已成功且不重送', async () => {
   pendingCreation.retain(command);
   const fetch = vi.fn(() => Promise.resolve(Response.json(result)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const view = renderDialog();
   const queryKey = ['job-files'];
   view.client.setQueryData(queryKey, { job_files: [] });
@@ -208,7 +208,7 @@ test.each(['success', 'rejected', 'unknown'] as const)(
     const request = new Promise<Response>((resolve) => {
       finish = resolve;
     });
-    vi.stubGlobal('fetch', () => request);
+    stubHttp(() => request);
     const view = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認建立結果' }));
     view.unmount();
@@ -239,7 +239,7 @@ test.each(['success', 'rejected'] as const)(
   'ACK 儲存清理失敗時 %s 仍保留原識別與既有成功／拒絕效果',
   async (outcome) => {
     pendingCreation.retain(command);
-    vi.stubGlobal('fetch', () =>
+    stubHttp(() =>
       Promise.resolve(
         outcome === 'success'
           ? Response.json(result)
@@ -274,7 +274,7 @@ test.each(['success', 'rejected'] as const)(
     const request = new Promise<Response>((resolve) => {
       finish = resolve;
     });
-    vi.stubGlobal('fetch', () => request);
+    stubHttp(() => request);
     const view = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認建立結果' }));
     view.unmount();
@@ -311,7 +311,7 @@ test.each([
       finishSecond = resolve;
     });
     const fetch = vi.fn().mockReturnValueOnce(firstRequest).mockReturnValueOnce(secondRequest);
-    vi.stubGlobal('fetch', fetch);
+    stubHttp(fetch);
     const first = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認建立結果' }));
     first.unmount();

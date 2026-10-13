@@ -115,7 +115,7 @@ export interface MemoryTextAppliedChange {
 export interface MemoryBodyAppliedChange {
   field: 'body';
   /**
-   * Observed difference formed from actual before/after body content, including the applied location and necessary context. Not an unconditional echo of requested hunks or another command.
+   * Observed difference formed from actual before/after body content, including the applied location and necessary context. This display diff is not executable V4A input and cannot be directly submitted as the next update; it is not an echo of requested hunks.
    */
   diff: string;
 }

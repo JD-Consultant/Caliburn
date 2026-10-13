@@ -11,7 +11,6 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.context_compaction import CompactionRuntime
-from caliburn.agent_execution.tool_steps import run_response_loop
 from caliburn.features.executions import history, service
 from caliburn.features.executions.history_models import AgentRole, HistoryConflictError
 from caliburn.features.executions.models import (
@@ -21,7 +20,8 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.context_history import RoleContextHistory
+from caliburn.workflows.executions.context_history import RoleContextHistory
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import synthetic_capacity_limits
 from tests.fixtures.response_loop import LoopProbe, initial_request, response_at
 from tests.integration.test_compaction_accounting import file_id as file_id

@@ -79,7 +79,6 @@ async def start_candidate(
         base_snapshot_id=head.snapshot_id if head is not None else None,
         base_position_id=base_position_id,
         current_position_id=base_position_id,
-        generation_id=uuid4(),
         stage_id=uuid4(),
         phase=MemoryLayer.WORK_SITUATION.value,
         status="open",
@@ -133,16 +132,12 @@ async def edit_candidate(session: AsyncSession, command: MemoryEdit) -> MemoryEd
         payload,
     )
     if original is not None:
-        # Recovery may revisit an old position, but never a discarded generation.
+        # Recovery may revisit an old position while the batch remains open.
         current = await batch_persistence.read_batch(
             session, command.position.job_file_id, command.position.execution_id
         )
-        if (
-            current is None
-            or current.status != "open"
-            or current.generation_id != command.position.generation_id
-        ):
-            raise MemoryCandidateStateError("The original operation belongs to a discarded branch")
+        if current is None or current.status != "open":
+            raise MemoryCandidateStateError("The original operation belongs to a closed batch")
         return MemoryEditResult(
             operations.result_position(original), operations.stored_uuid(original, "object_id")
         )

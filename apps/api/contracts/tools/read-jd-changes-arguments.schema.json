@@ -3,55 +3,36 @@
   "title": "ReadJdChangesArguments",
   "type": "object",
   "additionalProperties": false,
-  "properties": {"query": {"anyOf": [
-    {"$ref": "#/$defs/ManualQuery"}, {"$ref": "#/$defs/SourceQuery"}
-  ]}},
-  "required": ["query"],
-  "$defs": {
-    "ManualQuery": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "kind": {"type": "string", "const": "manual"},
-        "scope": {"anyOf": [
-          {"$ref": "#/$defs/AllScope"}, {"$ref": "#/$defs/AreaScope"},
-          {"$ref": "#/$defs/ItemScope"}, {"$ref": "#/$defs/ProfileFieldScope"}
-        ]}
-      }, "required": ["kind", "scope"]
-    },
-    "SourceQuery": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "kind": {"type": "string", "const": "source"},
-        "citation_ref": {"type": "string", "minLength": 1}
-      }, "required": ["kind", "citation_ref"]
-    },
-    "AllScope": {
-      "type": "object", "additionalProperties": false,
-      "properties": {"kind": {"type": "string", "const": "all"}}, "required": ["kind"]
-    },
-    "AreaScope": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "kind": {"type": "string", "const": "area"},
-        "view": {"type": "string", "enum": [
-          "profile", "responsibility_areas", "unassigned_work_tasks", "required_knowledge",
-          "required_skills", "main_collaborators", "job_wide_conditions"
-        ]}
-      }, "required": ["kind", "view"]
-    },
-    "ItemScope": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "kind": {"type": "string", "const": "item"},
-        "read_ref": {"type": "string", "minLength": 1}
-      }, "required": ["kind", "read_ref"]
-    },
-    "ProfileFieldScope": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "kind": {"type": "string", "const": "profile_field"},
-        "field": {"type": "string", "enum": ["job_title", "organization_unit", "reports_to", "purpose"]}
-      }, "required": ["kind", "field"]
+  "properties": {
+    "query": {
+      "$ref": "#/$defs/SourceQuery"
     }
-  }
+  },
+  "required": [
+    "query"
+  ],
+  "$defs": {
+    "SourceQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "source",
+          "description": "固定填 source，表示查所選引用的 Memory 來源差異，不是人工 JD 修改差異。"
+        },
+        "citation_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "原樣複製目前 read_jd 局部 supporting_sources 中 kind=work_situation 或 work_understanding 的 citation_ref；它定位既有引用，不是來源標題、JD read_ref、版本 ID 或人工差異中已刪引用的歷史定位。kind=interview 的引用不適用此工具。"
+        }
+      },
+      "required": [
+        "kind",
+        "citation_ref"
+      ],
+      "description": "唯一支援的查詢為 kind=source 加 citation_ref，比較該 JD Memory 引用所固定的舊來源與本輪固定版本的同一物件。"
+    }
+  },
+  "description": "只提交 query，指定目前 JD 中一筆引用的來源差異；不接受職務、版本或舊正文選取參數。"
 }

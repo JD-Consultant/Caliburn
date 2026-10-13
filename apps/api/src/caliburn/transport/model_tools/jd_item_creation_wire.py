@@ -6,14 +6,13 @@ from caliburn.features.job_description.areas import CreateArea
 from caliburn.features.job_description.capabilities import CapabilityKind, CreateCapability
 from caliburn.features.job_description.collaborators import CreateCollaborator
 from caliburn.features.job_description.conditions import ConditionKind, CreateCondition
-from caliburn.features.job_description.sources import MemorySourceLayer
-from caliburn.workflows.jd_item_creation import CreateItemInput, ItemCreation
-from caliburn.workflows.jd_sources import (
-    CurrentInputSourceSelection,
+from caliburn.features.job_description.source_intents import (
     InterviewSourceSelection,
     JdSourceSelection,
     MemorySourceSelection,
 )
+from caliburn.features.job_description.sources import MemorySourceLayer
+from caliburn.workflows.job_description.item_creation import CreateItemInput, ItemCreation
 
 
 def parse_item_creation(arguments: str) -> CreateItemInput:
@@ -33,10 +32,8 @@ def parse_item_creation(arguments: str) -> CreateItemInput:
 
 
 def _source_selection(
-    source: wire.CurrentInputSource | wire.InterviewSource | wire.MemorySource,
+    source: wire.InterviewSource | wire.MemorySource,
 ) -> JdSourceSelection:
-    if isinstance(source, wire.CurrentInputSource):
-        return CurrentInputSourceSelection()
     if isinstance(source, wire.InterviewSource):
         return InterviewSourceSelection(source.interview_sequence)
     return MemorySourceSelection(MemorySourceLayer(source.kind.value), source.target_title)

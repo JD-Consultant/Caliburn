@@ -18,7 +18,12 @@ def transact[T](client: TestClient, operation: Callable[[AsyncSession], Awaitabl
     return client.portal.call(run)
 
 
-def start_consultant_turn(client: TestClient) -> ExecutionWriter:
+MANUAL_PURPOSE = "冷重啟保留完整人工使命"
+
+
+def start_consultant_turn(
+    client: TestClient, *, initial_purpose: str | None = None
+) -> ExecutionWriter:
     file_id = UUID(
         client.post(
             "/api/job-files",
@@ -29,6 +34,18 @@ def start_consultant_turn(client: TestClient) -> ExecutionWriter:
             },
         ).json()["job_file_id"]
     )
+    if initial_purpose is not None:
+        url = f"/api/job-files/{file_id}/jd/profile"
+        before = client.get(url).json()
+        edited = client.post(
+            url,
+            json={
+                "command_id": str(uuid4()),
+                "expected_revision_id": before["revision_id"],
+                "changes": [{"action": "set_field", "field": "purpose", "value": initial_purpose}],
+            },
+        )
+        assert edited.status_code == 200, edited.text
     accepted = client.post(
         f"/api/job-files/{file_id}/inputs",
         json={"command_id": str(uuid4()), "text": "我負責網站前端開發。"},

@@ -20,6 +20,10 @@ from caliburn.agents.job_consultant.context_binding import TurnContext
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
 from caliburn.agents.memory_analysis.runner import MemoryAnalysisRunner
+from caliburn.agents.memory_analysis.tools import (
+    MemoryAnalysisTools,
+    memory_analysis_tool_definitions,
+)
 from caliburn.agents.work_situation_analyst import runner as situation_runner_module
 from caliburn.agents.work_understanding_analyst import runner as understanding_runner_module
 from caliburn.features.executions.models import (
@@ -33,22 +37,27 @@ from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import ModelSettings
 from caliburn.transport.model_tools.excluded_work_reads import ExcludedWorkReadTools
-from caliburn.transport.model_tools.memory_analysis import (
-    MemoryAnalysisTools,
-    memory_analysis_tool_definitions,
-)
 from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
     occupation_reference_definitions,
 )
-from caliburn.workflows.memory_reads import CandidateMemoryRead, PublishedMemoryRead
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead, PublishedMemoryRead
 from tests.contracts.test_tool_schema_strictness import SchemaWalk
+from tests.fixtures.native_tools import ensure_active, invoke_tool
 
 
 def handler(names=()):
     result = Mock()
     result.names = names
-    result.definitions.return_value = [{"name": name} for name in names]
+    result.definitions.return_value = [
+        {
+            "type": "function",
+            "name": name,
+            "description": "合成工具",
+            "parameters": {"type": "object", "properties": {}},
+        }
+        for name in names
+    ]
     result.invoke = AsyncMock(return_value="read result")
     result.prepare = AsyncMock(return_value={"kind": "occupation_reference_state_change"})
     result.execute = AsyncMock(return_value="write result")
@@ -116,34 +125,35 @@ def test_enabled_tool_templates_use_the_existing_closed_strict_schema_rules():
 async def test_consultant_reference_reads_return_observation_without_preparing_write(name):
     refs = reference_handler()
     tools = ConsultantTools(*(handler() for _ in range(6)), occupation_references=refs)
-    operation_id = uuid4()
-    assert await tools.prepare(call(name, '{"query":"介面"}'), operation_id) == "read result"
+    output, _, _ = await invoke_tool(
+        tools.standard_tools(ensure_active), call(name, '{"query":"介面"}')
+    )
+    assert output == "read result"
     refs.invoke.assert_awaited_once_with(name, '{"query":"介面"}')
     refs.prepare.assert_not_awaited()
     refs.execute.assert_not_awaited()
-    assert tuple(item["name"] for item in tools.definitions()) == tools.names
+    assert (
+        tuple(item.name for item in tools.standard_tools(ensure_active))
+        == OccupationReferenceTools.names
+    )
 
 
 @pytest.mark.parametrize("name", OccupationReferenceTools.write_names)
 async def test_consultant_reference_writes_preserve_saved_json_command_and_operation_id(name):
     refs = reference_handler()
     tools = ConsultantTools(*(handler() for _ in range(6)), occupation_references=refs)
-    operation_id = uuid4()
-    prepared = await tools.prepare(call(name, '{"add":["部署"],"remove":[]}'), operation_id)
+    output, prepared, operation_id = await invoke_tool(
+        tools.standard_tools(ensure_active), call(name, '{"add":["部署"],"remove":[]}')
+    )
     refs.prepare.assert_awaited_once_with(name, '{"add":["部署"],"remove":[]}', operation_id)
-    refs.execute.assert_not_awaited()
-    restored = json.loads(json.dumps(prepared))
-    assert await tools.execute(restored) == "write result"
-    refs.execute.assert_awaited_once_with(restored)
+    assert output == "write result"
+    refs.execute.assert_awaited_once_with(json.loads(json.dumps(prepared)))
 
 
 async def test_disabled_consultant_does_not_dispatch_reference_call_or_saved_command():
     jd_writes = handler()
     tools = ConsultantTools(handler(), handler(), jd_writes, handler(), handler(), handler())
-    output = await tools.prepare(call("update_excluded_work"), uuid4())
-    assert json.loads(output)["code"] == "scope_not_allowed"
-    with pytest.raises(ValueError):
-        await tools.execute({"kind": "occupation_reference_state_change"})
+    assert "update_excluded_work" not in {tool.name for tool in tools.standard_tools(ensure_active)}
     jd_writes.execute.assert_not_awaited()
 
 
@@ -152,14 +162,14 @@ async def test_analyst_exclusion_tool_is_read_only_and_preserves_write_path():
     writes = handler(("create_work_situation",))
     excluded = handler(ExcludedWorkReadTools.names)
     tools = MemoryAnalysisTools(read, writes, excluded_work=excluded)
-    assert await tools.prepare(call("read_excluded_work"), uuid4()) == "read result"
+    standard = tools.standard_tools(ensure_active)
+    output, _, _ = await invoke_tool(standard, call("read_excluded_work"))
+    assert output == "read result"
     excluded.invoke.assert_awaited_once_with("read_excluded_work", "{}")
     excluded.prepare.assert_not_awaited()
     writes.prepare.assert_not_awaited()
-    assert tuple(item["name"] for item in tools.definitions()) == tools.names
-    for name in OccupationReferenceTools.names:
-        result = await tools.prepare(call(name), uuid4())
-        assert json.loads(result)["code"] == "scope_not_allowed"
+    assert {tool.name for tool in standard} == set(read.names + writes.names + excluded.names)
+    assert not set(OccupationReferenceTools.names) & {tool.name for tool in standard}
 
 
 def request(definitions):
@@ -181,8 +191,9 @@ def consultant_context(enabled):
     context = TurnContext(
         request(consultant_tool_definitions(occupation_references_enabled=enabled)),
         PublishedMemoryRead(writer.scope, None, 0),
-        JdCandidatePosition(JdCandidateScope(writer.scope.execution_id, uuid4()), uuid4(), uuid4()),
+        JdCandidatePosition(JdCandidateScope(writer.scope.execution_id), uuid4(), uuid4()),
         uuid4(),
+        reset_history=True,
     )
     return writer, context
 
@@ -203,7 +214,9 @@ async def test_old_consultant_request_never_initializes_references_when_configur
         occupation_references=Mock() if configured else None,
     )
     tools = await runner._tools(writer, context, Mock())
-    assert set(OccupationReferenceTools.names).isdisjoint(tools.names)
+    assert set(OccupationReferenceTools.names).isdisjoint(
+        tool.name for tool in tools.standard_tools(ensure_active)
+    )
     workflow_factory.assert_not_called()
 
 
@@ -225,7 +238,9 @@ async def test_reference_enabled_saved_request_starts_candidate_before_exposing_
     tools = await runner._tools(writer, context, Mock())
     workflow_factory.assert_called_once_with(runner.sessions, reference_client)
     workflow.start.assert_awaited_once_with(writer)
-    assert set(OccupationReferenceTools.names) <= set(tools.names)
+    assert set(OccupationReferenceTools.names) <= {
+        tool.name for tool in tools.standard_tools(ensure_active)
+    }
 
 
 async def test_write_handler_preserves_the_captured_request(
@@ -302,14 +317,17 @@ async def test_saved_reference_request_with_missing_client_fails_before_history_
     monkeypatch.setattr(consultant_runner_module, "RoleContextHistory", Mock(return_value=history))
     monkeypatch.setattr(consultant_runner_module, "fix_execution_policy", AsyncMock())
     monkeypatch.setattr(ConsultantRunner, "_recover_completed", AsyncMock(return_value=None))
+    captured_template = AsyncMock(return_value=context.request)
+    monkeypatch.setattr(consultant_runner_module, "read_captured_turn_template", captured_template)
     model = Mock()
     model.executor.count_input = AsyncMock()
     model.executor.request_model = AsyncMock()
     monkeypatch.setattr(consultant_runner_module, "bind_model_runtime", Mock(return_value=model))
     runner = ConsultantRunner(Mock(), InMemorySaver(), Mock(), ModelSettings(api_key="synthetic"))
-    with pytest.raises(ExecutionStateError):
+    with pytest.raises(ExecutionStateError, match="requires its occupation reference client"):
         await runner.run(writer)
-    history.resolve_template.assert_awaited_once()
+    captured_template.assert_awaited_once()
+    history.resolve_template.assert_not_awaited()
     history.prepare_history.assert_not_awaited()
     model.executor.count_input.assert_not_awaited()
     model.executor.request_model.assert_not_awaited()
@@ -370,7 +388,6 @@ def test_memory_handlers_follow_saved_request_instead_of_today_enable_flag(
         writer.scope.job_file_id,
         writer.scope.execution_id,
         uuid4(),
-        uuid4(),
         MemoryLayer.WORK_SITUATION,
         uuid4(),
     )
@@ -390,8 +407,12 @@ def test_memory_handlers_follow_saved_request_instead_of_today_enable_flag(
         cpu=MemoryCpu(),
     )
     tools = runner._tools(writer, binding, saved_request)
-    assert ("read_excluded_work" in tools.names) is saved_enabled
-    assert set(OccupationReferenceTools.names).isdisjoint(tools.names)
+    assert (
+        "read_excluded_work" in {tool.name for tool in tools.standard_tools(ensure_active)}
+    ) is saved_enabled
+    assert set(OccupationReferenceTools.names).isdisjoint(
+        tool.name for tool in tools.standard_tools(ensure_active)
+    )
 
 
 @pytest.mark.parametrize("layer", list(MemoryLayer))
@@ -423,7 +444,6 @@ async def test_public_memory_runner_forwards_explicit_enablement_to_shared_runne
     stage = MemoryBatchPosition(
         writer.scope.job_file_id,
         writer.scope.execution_id,
-        uuid4(),
         uuid4(),
         layer,
         uuid4(),

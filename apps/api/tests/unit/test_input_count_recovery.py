@@ -5,12 +5,12 @@ from dataclasses import replace
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
-from caliburn.agent_execution.tool_steps import (
+from caliburn.agent_execution.response_runtime import (
     InputCountSaveError,
     PausedResponseLoop,
     ResponseLoopControls,
-    run_response_loop,
 )
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 
 
@@ -19,12 +19,10 @@ class InputCountSaveFault(InMemorySaver):
     fail_after_commit = False
     fail_pending_writes = True
     fail_control_confirmation = False
+    control_read = False
 
     async def aput(self, config, checkpoint, metadata, new_versions):
-        if (
-            self.fail_control_confirmation
-            and checkpoint["channel_values"].get("control_action") == "continue"
-        ):
+        if self.fail_control_confirmation and self.control_read:
             self.fail_control_confirmation = False
             await super().aput(config, checkpoint, metadata, new_versions)
             raise ConnectionError("synthetic saved control acknowledgement lost")
@@ -150,6 +148,7 @@ async def test_repeated_count_handoff_does_not_bypass_new_pause_at_completed_ste
     requested = False
 
     async def read_pause():
+        saver.control_read = True
         return requested
 
     async def mark_paused():

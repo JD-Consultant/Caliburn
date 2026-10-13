@@ -36,7 +36,7 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.model_requests import (
+from caliburn.workflows.executions.model_requests import (
     ModelRequestAccounting,
     ModelRequestExecutor,
     ModelUsageUnavailableError,

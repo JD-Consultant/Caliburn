@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from caliburn.transport.model_tools.jd_changes import jd_changes_definitions
 from caliburn.transport.model_tools.jd_changes_wire import parse_jd_changes
-from caliburn.workflows.jd_changes import ManualChangeQuery, SourceChangeQuery
+from caliburn.workflows.job_description.source_changes import SourceChangeQuery
 
 
 def test_definition_sends_authoritative_schema_without_ref_sibling_keywords() -> None:
@@ -68,8 +68,9 @@ def test_canonical_variants_are_strict_and_definitions_need_no_binding() -> None
     ]
     for scope in manual:
         payload = {"query": {"kind": "manual", "scope": scope}}
-        validator.validate(payload)
-        assert isinstance(parse_jd_changes(json.dumps(payload)), ManualChangeQuery)
+        assert list(validator.iter_errors(payload))
+        with pytest.raises(ValidationError):
+            parse_jd_changes(json.dumps(payload))
     payload = {"query": {"kind": "source", "citation_ref": "citation_known"}}
     validator.validate(payload)
     assert parse_jd_changes(json.dumps(payload)) == SourceChangeQuery("citation_known")
@@ -96,9 +97,6 @@ def test_cross_variant_null_unknown_and_version_arguments_never_fall_back_to_all
     for payload in invalid:
         with pytest.raises(ValidationError):
             parse_jd_changes(json.dumps(payload))
-    for query in (
-        {"kind": "source", "citation_ref": " "},
-        {"kind": "manual", "scope": {"kind": "item", "read_ref": " "}},
-    ):
+    for query in ({"kind": "source", "citation_ref": " "},):
         with pytest.raises(ValueError):
             parse_jd_changes(json.dumps({"query": query}))

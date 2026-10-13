@@ -49,7 +49,6 @@ def test_canonical_source_variants_reach_parser_and_definition_without_private_c
     changes = [
         {"action": "add_source", **target, "source": source}
         for source in (
-            {"kind": "current_input"},
             {"kind": "interview", "interview_sequence": 2},
             {"kind": "work_situation", "target_title": "盤點"},
             {"kind": "work_understanding", "target_title": "庫存管理"},

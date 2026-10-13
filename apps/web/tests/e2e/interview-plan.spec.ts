@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import type { ConsultantTurn } from '../../src/shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../src/shared/api/generated/http/types.gen';
 import { isJobFile } from '../../src/shared/api/validation';
 
 // Files and the idle read use the real isolated App. Controlled status/plan responses below

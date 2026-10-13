@@ -59,12 +59,9 @@ class JdSourceReferenceRecord(Base):
         CheckConstraint(
             "(target_kind = 'profile_field' AND target_field IS NOT NULL "
             "AND target_field IN ('job_title', 'organization_unit', 'reports_to', 'purpose') "
-            "AND target_item_id IS NULL AND target_task_id IS NULL) OR "
+            "AND target_item_id IS NULL) OR "
             "(target_kind IN ('area', 'task', 'capability', 'collaborator', 'condition') "
-            "AND target_field IS NULL AND target_item_id IS NOT NULL "
-            "AND target_task_id IS NULL) OR "
-            "(target_kind IN ('detail', 'task_capability') AND target_field IS NULL "
-            "AND target_item_id IS NOT NULL AND target_task_id IS NOT NULL)",
+            "AND target_field IS NULL AND target_item_id IS NOT NULL)",
             name="target_shape",
         ),
         CheckConstraint(
@@ -89,7 +86,6 @@ class JdSourceReferenceRecord(Base):
             "target_kind",
             "target_field",
             "target_item_id",
-            "target_task_id",
             "source_kind",
             "interview_source_id",
             "memory_layer",
@@ -105,7 +101,6 @@ class JdSourceReferenceRecord(Base):
     target_kind: Mapped[str] = mapped_column(Text)
     target_field: Mapped[str | None] = mapped_column(Text)
     target_item_id: Mapped[UUID | None]
-    target_task_id: Mapped[UUID | None]
     source_kind: Mapped[str] = mapped_column(Text)
     interview_source_id: Mapped[UUID | None]
     memory_layer: Mapped[str | None] = mapped_column(Text)
@@ -156,7 +151,6 @@ async def insert_source_references(
                 target_kind=reference.target.kind,
                 target_field=reference.target.field,
                 target_item_id=reference.target.item_id,
-                target_task_id=reference.target.task_id,
                 source_kind="interview" if interview is not None else "memory",
                 interview_source_id=interview.source_id if interview is not None else None,
                 memory_layer=memory.layer if memory is not None else None,
@@ -197,7 +191,6 @@ def _reference(record: JdSourceReferenceRecord) -> JdSourceReference:
             kind=SourceTargetKind(record.target_kind),
             field=ProfileField(record.target_field) if record.target_field is not None else None,
             item_id=record.target_item_id,
-            task_id=record.target_task_id,
         ),
         source=source,
         needs_review=record.needs_review,

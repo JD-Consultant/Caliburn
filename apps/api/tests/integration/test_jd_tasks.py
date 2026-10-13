@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import task_service
+from caliburn.features.job_description import revision_editing
 from caliburn.features.job_description.tasks import EditJdTasks
 
 pytestmark = pytest.mark.postgres
@@ -538,7 +538,7 @@ def test_injected_failure_rolls_back_content_details_head_and_operation(
     database_connection: psycopg.Connection,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    original_edit = task_service.edit_tasks
+    original_edit = revision_editing.apply_content_edit
 
     async def fail_after_write(session: AsyncSession, file_id: UUID, command: EditJdTasks) -> None:
         await original_edit(session, file_id, command)
@@ -548,7 +548,7 @@ def test_injected_failure_rolls_back_content_details_head_and_operation(
     original = client.get(url).json()
     request = create_command(original["revision_id"])
     with monkeypatch.context() as patch:
-        patch.setattr(task_service, "edit_tasks", fail_after_write)
+        patch.setattr(revision_editing, "apply_content_edit", fail_after_write)
         with pytest.raises(RuntimeError, match="Injected"):
             client.post(url, json=request)
     assert client.get(url).json() == original

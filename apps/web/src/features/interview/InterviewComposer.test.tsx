@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -27,7 +28,7 @@ function renderComposer() {
   // These command-recovery fixtures predate discovery. They have no other in-flight Turn;
   // discovery-specific and shared-page behavior is exercised in the adjacent discovery suite.
   const commandFetch = globalThis.fetch;
-  vi.stubGlobal('fetch', (path: RequestInfo | URL, options?: RequestInit) =>
+  stubHttp((path: RequestInfo | URL, options?: RequestInit) =>
     path === `/api/job-files/${fileId}/consultant-turns/current`
       ? Promise.resolve(Response.json({ turn: null }))
       : commandFetch(path, options),
@@ -73,7 +74,7 @@ async function holdFileLock(): Promise<() => Promise<void>> {
 test('waiting for the file lock protects the first input until exactly one POST', async () => {
   const release = await holdFileLock();
   const posts: { command_id: string; text: string }[] = [];
-  vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+  stubHttp((_path: string, options?: RequestInit) => {
     if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
     if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
     const command = JSON.parse(options.body) as { command_id: string; text: string };
@@ -110,7 +111,7 @@ test('waiting for the file lock protects the first input until exactly one POST'
 test('lock acquisition timeout sends nothing and unlocks the original draft for editing', async () => {
   const release = await holdFileLock();
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
   const textbox = screen.getByRole('textbox', { name: '訪談內容' });
   await userEvent.type(textbox, input);
@@ -145,7 +146,7 @@ test('lock acquisition timeout sends nothing and unlocks the original draft for 
 test('unmount aborts a queued reservation so releasing the lock cannot send a late POST', async () => {
   const release = await holdFileLock();
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { unmount } = renderComposer();
   await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
   await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -158,7 +159,7 @@ test('unmount aborts a queued reservation so releasing the lock cannot send a la
 test('unmount after reservation storage succeeds prevents the post-lock POST', async () => {
   const release = await holdFileLock();
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { unmount } = renderComposer();
   await userEvent.type(screen.getByRole('textbox', { name: '訪談內容' }), input);
   await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -179,7 +180,7 @@ test('without Web Locks discovery remains readable but input cannot be submitted
   const locks = navigator.locks;
   Object.defineProperty(navigator, 'locks', { configurable: true, value: undefined });
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   try {
     const { client } = renderComposer();
     await waitFor(() =>
@@ -199,7 +200,7 @@ test('without Web Locks discovery remains readable but input cannot be submitted
 });
 
 test('an accepted POST whose execution hint cannot be saved remains known accepted', async () => {
-  vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+  stubHttp((_path: string, options?: RequestInit) => {
     if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('storage unavailable');
@@ -246,7 +247,7 @@ test('uncertain acceptance preserves text and retries the same persisted command
         }),
       );
     });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
   await userEvent.type(screen.getByLabelText('訪談內容'), input);
   await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -273,7 +274,7 @@ test('reload verifies the saved execution and follows it to completion without r
         }),
       ),
     );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
   expect(await screen.findByText(input)).toBeVisible();
   expect(await screen.findByText('這次訪談已完成並保存。', {}, { timeout: 3_000 })).toBeVisible();
@@ -284,7 +285,7 @@ test.each(['failed', 'cancelled'] as const)(
   '%s input stays explicitly nonformal',
   async (status) => {
     await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...active, status })));
+    stubHttp(vi.fn().mockResolvedValue(Response.json({ ...active, status })));
     renderComposer();
     expect(await screen.findByText(/未列入正式訪談/)).toBeVisible();
     if (status === 'cancelled') await userEvent.click(screen.getByText('查看原輸入'));
@@ -301,7 +302,7 @@ test.each(['failed', 'cancelled'] as const)(
 
 test('storage failure prevents a POST and keeps the draft', async () => {
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
   await userEvent.type(screen.getByLabelText('訪談內容'), input);
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
@@ -318,9 +319,9 @@ test('storage failure prevents a POST and keeps the draft', async () => {
 test('wrong-file status is rejected without exposing its original input or opening a new turn', async () => {
   await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const fetch = vi.fn().mockResolvedValue(Response.json({ ...active, job_file_id: sourceId }));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
-  expect(await screen.findByText(/處理狀態不屬於這次訪談/)).toBeVisible();
+  expect(await screen.findByText(/資料格式不符，尚未採用這份結果/)).toBeVisible();
   expect(screen.queryByText(input)).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '送出訪談' })).not.toBeInTheDocument();
 });
@@ -332,7 +333,7 @@ test('reload after lost POST acknowledgement recovers by the same command withou
       if (options?.method === 'POST') return Promise.reject(new TypeError('lost acknowledgement'));
       return Promise.resolve(Response.json(active));
     });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderComposer();
   await userEvent.type(screen.getByLabelText('訪談內容'), input);
   await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -364,7 +365,7 @@ test('unresolved command lookup keeps the identity and allows read-only retry', 
       Response.json({ detail: { code: 'consultant_turn_not_found' } }, { status: 404 }),
     )
     .mockImplementation(() => Promise.resolve(Response.json(active)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderComposer();
   expect(await screen.findByText(/尚未查到原請求的受理結果/)).toBeVisible();
   expect(readTurnHint(fileId)).toEqual({ command_id: commandId, execution_id: null });
@@ -378,8 +379,7 @@ test('saved commentary is safe nonformal text and leaves the composer on complet
   await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const publicText = '<script>not executable</script> 正在核對職責';
   let reads = 0;
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(
         Response.json({
@@ -411,7 +411,7 @@ test.each([
     const fetch = vi.fn(() =>
       Promise.resolve(Response.json({ detail: { code, debug: 'private data' } }, { status })),
     );
-    vi.stubGlobal('fetch', fetch);
+    stubHttp(fetch);
     const first = renderComposer();
     await userEvent.type(screen.getByLabelText('訪談內容'), input);
     await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -430,10 +430,7 @@ test.each([
 test.each([503, 404])(
   'an unrecognized %s response must retain the uncertain command',
   async (status) => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve(Response.json({ detail: 'private data' }, { status }))),
-    );
+    stubHttp(vi.fn(() => Promise.resolve(Response.json({ detail: 'private data' }, { status }))));
     renderComposer();
     await userEvent.type(screen.getByLabelText('訪談內容'), input);
     await userEvent.click(screen.getByRole('button', { name: '送出訪談' }));
@@ -445,8 +442,7 @@ test.each([503, 404])(
 );
 
 test('a pre-admission rejection on retry does not erase an earlier uncertain acceptance', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi
       .fn()
       .mockRejectedValueOnce(new TypeError('lost acknowledgement'))
@@ -471,7 +467,7 @@ test.each(['timeout', 'abort', 'non-json'] as const)(
   'an uncertain %s response keeps the original pending command and text',
   async (failure) => {
     const writes: string[] = [];
-    vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+    stubHttp((_path: string, options?: RequestInit) => {
       if (options?.method !== 'POST') return Promise.resolve(Response.json(active));
       writes.push(typeof options.body === 'string' ? options.body : '');
       if (failure === 'non-json')
@@ -512,7 +508,7 @@ test.each(['delete-first', 'submit-first'] as const)(
     await Promise.resolve();
     await Promise.resolve();
     const posts: string[] = [];
-    vi.stubGlobal('fetch', (_path: string, options?: RequestInit) => {
+    stubHttp((_path: string, options?: RequestInit) => {
       if (options?.method === 'POST')
         posts.push(typeof options.body === 'string' ? options.body : '');
       return Promise.resolve(Response.json(active));

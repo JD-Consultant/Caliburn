@@ -1,9 +1,10 @@
+import { stubHttp } from '../../test-http';
 /** A late refresh may update only its file cache, never confirm a different observed Turn. */
 import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { interviewPlanQuery } from './interview-plan-api';
 import {
   consultantTurnQuery,
@@ -59,7 +60,7 @@ test('terminal render stops the candidate while adopted GET is pending, and an o
   });
   await observe(client, turn(fileId, executionId, 'active'));
   const calls: { resolve: (value: Response) => void }[] = [];
-  vi.stubGlobal('fetch', () => new Promise<Response>((resolve) => calls.push({ resolve })));
+  stubHttp(() => new Promise<Response>((resolve) => calls.push({ resolve })));
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );
@@ -106,10 +107,7 @@ test('switching files during terminal GET never exposes or confirms the earlier 
   await observe(client, turn(fileId, executionId, 'cancelled'));
   await observe(client, turn(otherFileId, nextId, 'failed'));
   const calls: { path: string; resolve: (value: Response) => void }[] = [];
-  vi.stubGlobal(
-    'fetch',
-    (path: string) => new Promise<Response>((resolve) => calls.push({ path, resolve })),
-  );
+  stubHttp((path: string) => new Promise<Response>((resolve) => calls.push({ path, resolve })));
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );

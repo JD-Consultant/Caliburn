@@ -36,7 +36,7 @@ def rows(output):
 
 
 def test_actual_handler_keeps_failure_identity_without_exception_or_unapproved_text(output):
-    log = logging.getLogger("caliburn.workflows.execution_failures")
+    log = logging.getLogger("caliburn.workflows.executions.failure_boundary")
     try:
         raise ValueError("private prompt https://secret.invalid/?token=secret")
     except ValueError:
@@ -54,7 +54,7 @@ def test_actual_handler_keeps_failure_identity_without_exception_or_unapproved_t
 
     [value] = rows(output)
     assert value["event"] == "execution.failure"
-    assert value["module"] == "caliburn.workflows.execution_failures"
+    assert value["module"] == "caliburn.workflows.executions.failure_boundary"
     assert value["execution_id"] == "execution-1"
     assert value["failure_kind"] == "ValueError"
     assert datetime.fromisoformat(value["timestamp"]).utcoffset().total_seconds() == 0
@@ -116,6 +116,37 @@ def test_untrusted_metadata_is_bounded_and_cannot_forge_a_line(output):
     assert len(value["failure_kind"]) <= 256
     assert value["truncated_fields"] == ["failure_kind"]
     assert "duration_ms" not in value
+
+
+@pytest.mark.parametrize("response_id", ["resp_original", "resp_\n\x00" + "x" * 1000])
+def test_stream_cleanup_json_retains_bounded_response_identity_without_payload(
+    logging_module, output, response_id
+):
+    with logging_module.bind_log_context(execution_id="execution-1"):
+        try:
+            raise OSError("PRIVATE_EXCEPTION_BODY")
+        except OSError:
+            logging.getLogger("caliburn.adapters.response_streaming").warning(
+                "response.stream_cleanup_failed",
+                extra={
+                    "response_id": response_id,
+                    "failure_kind": "OSError",
+                    "prompt": "PRIVATE_PROMPT",
+                    "response_snapshot": "PRIVATE_RESPONSE",
+                },
+                exc_info=True,
+            )
+    [value] = rows(output)
+    assert value["event"] == "response.stream_cleanup_failed"
+    assert value["execution_id"] == "execution-1"
+    assert value["failure_kind"] == "OSError"
+    assert value["response_id"] == (
+        response_id[:255] + "…" if len(response_id) > 256 else response_id
+    )
+    assert len(value["response_id"]) <= 256
+    if len(response_id) > 256:
+        assert value["truncated_fields"] == ["response_id"]
+    assert "PRIVATE" not in json.dumps(value)
 
 
 def test_broken_sink_does_not_raise_or_print_original_record(logging_module, monkeypatch, capsys):

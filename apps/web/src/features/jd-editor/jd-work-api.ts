@@ -1,21 +1,26 @@
 /** Related collections share one observed revision, not independently refreshed heads. */
 import { queryOptions } from '@tanstack/react-query';
-import type { EditJdAreasRequest } from '../../shared/api/generated/edit-jd-areas-request';
-import type { EditJdTasksRequest } from '../../shared/api/generated/edit-jd-tasks-request';
-import type { EditJdCapabilitiesRequest } from '../../shared/api/generated/edit-jd-capabilities-request';
-import type { EditJdCollaboratorsRequest } from '../../shared/api/generated/edit-jd-collaborators-request';
-import type { EditJdConditionsRequest } from '../../shared/api/generated/edit-jd-conditions-request';
-import { requestJson } from '../../shared/api/http';
+import type {
+  EditJdAreasRequest,
+  EditJdTasksRequest,
+  EditJdCapabilitiesRequest,
+  EditJdCollaboratorsRequest,
+  EditJdConditionsRequest,
+} from '../../shared/api/generated/http/types.gen';
+
+import '../../shared/api/http';
 import {
-  isJdAreasView,
-  isJdTasksView,
-  isJdWorkView,
+  readJdWork,
+  editJdAreas,
+  editJdTasks,
+  editJdCapabilities,
+  editJdCollaborators,
+  editJdConditions,
+} from '../../shared/api/generated/http/sdk.gen';
+import {
   isEditJdAreasRequest,
   isEditJdTasksRequest,
-  isJdCapabilitiesView,
   isEditJdCapabilitiesRequest,
-  isJdCollaboratorsView,
-  isJdConditionsView,
   isEditJdCollaboratorsRequest,
   isEditJdConditionsRequest,
 } from '../../shared/api/validation';
@@ -48,35 +53,33 @@ export function jdWorkQuery(jobFileId: string) {
   return queryOptions({
     queryKey: ['jd-work', jobFileId, 'formal'],
     queryFn: ({ signal }) =>
-      requestJson(`/api/job-files/${encodeURIComponent(jobFileId)}/jd/work`, isJdWorkView, {
-        signal,
-      }),
+      readJdWork({ path: { job_file_id: jobFileId }, signal, throwOnError: true }).then(
+        ({ data }) => data,
+      ),
   });
 }
 
 export async function editJdWork(jobFileId: string, command: WorkCommand): Promise<void> {
   const options = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(command.request),
-    correlation: { jobFileId, commandId: command.request.command_id },
+    path: { job_file_id: jobFileId },
+    throwOnError: true as const,
+    meta: { correlation: { jobFileId, commandId: command.request.command_id } },
   };
-  const url = `/api/job-files/${encodeURIComponent(jobFileId)}/jd/${command.collection}`;
   switch (command.collection) {
     case 'areas':
-      await requestJson(url, isJdAreasView, options);
+      await editJdAreas({ ...options, body: command.request });
       break;
     case 'tasks':
-      await requestJson(url, isJdTasksView, options);
+      await editJdTasks({ ...options, body: command.request });
       break;
     case 'capabilities':
-      await requestJson(url, isJdCapabilitiesView, options);
+      await editJdCapabilities({ ...options, body: command.request });
       break;
     case 'collaborators':
-      await requestJson(url, isJdCollaboratorsView, options);
+      await editJdCollaborators({ ...options, body: command.request });
       break;
     case 'conditions':
-      await requestJson(url, isJdConditionsView, options);
+      await editJdConditions({ ...options, body: command.request });
       break;
   }
 }

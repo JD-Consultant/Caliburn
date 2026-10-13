@@ -5,7 +5,6 @@ from uuid import UUID, uuid4
 
 import pytest
 from openai.types.responses import ResponseFunctionToolCall
-from pydantic import ValidationError
 
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agents.job_consultant.interview_plan_context import has_interview_plan_tools
@@ -16,6 +15,10 @@ from caliburn.agents.job_consultant.tools import (
 )
 from caliburn.features.executions.models import ExecutionStateError
 from caliburn.features.job_description.candidates import JdCandidateScope
+from caliburn.features.job_description.compound_edits import (
+    CreateTaskWithSources,
+    ReviseProfileWithSources,
+)
 from caliburn.features.job_description.models import ProfileField, SetProfileField
 from caliburn.features.job_description.tasks import CreateTask
 from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
@@ -26,8 +29,8 @@ from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_writes import JdWriteTools, PreparedJdWrite
 from caliburn.transport.model_tools.memory_consolidation import MemoryConsolidationTools
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
-from caliburn.workflows.jd_profile_writes import PreparedProfileWrite
-from caliburn.workflows.jd_task_writes import PreparedTaskWrite
+from caliburn.workflows.job_description.compound_writes import PreparedJdEdit
+from tests.fixtures.native_tools import ensure_active, invoke_tool
 
 
 class FakeMemoryReadTools(MemoryReadTools):
@@ -72,24 +75,23 @@ class FakeJdWriteTools(JdWriteTools):
         self.calls.append((name, arguments, command_id))
         if self.rejection is not None:
             return self.rejection
-        candidate = JdCandidateScope(uuid4(), uuid4())
+        candidate = JdCandidateScope(uuid4())
         if name == "revise_jd_profile":
-            prepared: PreparedJdWrite = PreparedProfileWrite(
-                command_id,
+            prepared: PreparedJdWrite = PreparedJdEdit(
                 candidate,
-                uuid4(),
-                (SetProfileField(ProfileField.JOB_TITLE, "前端工程師"),),
-                (),
+                ReviseProfileWithSources(
+                    command_id,
+                    uuid4(),
+                    (SetProfileField(ProfileField.JOB_TITLE, "前端工程師"),),
+                    (),
+                ),
             )
         else:
-            prepared = PreparedTaskWrite(
-                command_id,
+            prepared = PreparedJdEdit(
                 candidate,
-                uuid4(),
-                CreateTask(None, "盤點", None, (), ()),
-                (),
-                (),
-                (),
+                CreateTaskWithSources(
+                    command_id, uuid4(), CreateTask(None, "盤點", None, (), ()), (), ()
+                ),
             )
         self.commands.append(prepared)
         return prepared
@@ -98,7 +100,7 @@ class FakeJdWriteTools(JdWriteTools):
         self.executed.append(prepared)
         return (
             "updated"
-            if isinstance(prepared, PreparedProfileWrite)
+            if isinstance(prepared.command, ReviseProfileWithSources)
             else "created · read_ref: task_x"
         )
 
@@ -173,7 +175,10 @@ def test_definitions_can_be_built_before_binding_and_match_the_bound_handlers(
         "request_context_compaction",
     )
     tools, _, _, _ = handlers
-    assert definitions == tools.definitions()
+    registered = tools.standard_tools(ensure_active)
+    assert [(tool.name, tool.args_schema) for tool in registered] == [
+        (definition["name"], definition["parameters"]) for definition in definitions
+    ]
 
 
 def test_new_consultant_template_advertises_minimal_plan_read_and_edit_tools() -> None:
@@ -282,7 +287,7 @@ def test_saved_plan_schema_rejects_additional_assertions_that_change_tool_argume
         has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot))
 
 
-def test_advertises_existing_definitions_and_names_without_rewriting(handlers: Handlers) -> None:
+def test_advertises_existing_definitions_without_rewriting(handlers: Handlers) -> None:
     tools, memory, reads, writes = handlers
     expected = [
         *memory.definitions(),
@@ -292,16 +297,9 @@ def test_advertises_existing_definitions_and_names_without_rewriting(handlers: H
         *tools.consolidation.definitions(),
         *tools.compaction.definitions(),
     ]
-    assert tools.definitions() == expected
-    assert tools.names == (
-        *memory.names,
-        *reads.names,
-        *tools.jd_changes.names,
-        *writes.names,
-        *tools.consolidation.names,
-        *tools.compaction.names,
-    )
-    assert tuple(definition["name"] for definition in tools.definitions()) == tools.names
+    assert [(tool.name, tool.args_schema) for tool in tools.standard_tools(ensure_active)] == [
+        (item["name"], item["parameters"]) for item in expected
+    ]
 
 
 @pytest.mark.parametrize(
@@ -315,12 +313,10 @@ def test_advertises_existing_definitions_and_names_without_rewriting(handlers: H
         "read_jd",
     ],
 )
-async def test_read_returns_the_selected_handlers_observation_without_preparing_a_write(
-    handlers: Handlers, name: str
-) -> None:
+async def test_standard_read_preserves_original_arguments_and_observation(handlers, name):
     tools, memory, reads, writes = handlers
     call = native_call(name, '{"selection":"原參數"}')
-    output = await tools.prepare(call, uuid4())
+    output, _, _ = await invoke_tool(tools.standard_tools(ensure_active), call)
     if name == "read_jd":
         assert output == "# JD\n原樣保留完整讀取結果。"
         assert reads.calls == [(name, call.arguments)]
@@ -332,20 +328,23 @@ async def test_read_returns_the_selected_handlers_observation_without_preparing_
     assert writes.calls == writes.executed == []
 
 
-async def test_diff_is_a_read_observation_not_a_write_or_alignment(handlers: Handlers) -> None:
+async def test_diff_is_a_read_observation_not_a_write_or_alignment(handlers):
     tools, memory, reads, writes = handlers
-    assert await tools.prepare(native_call("read_jd_changes", "{}"), uuid4()) == (
-        "# JD 差異\n尚未核對。"
+    output, _, _ = await invoke_tool(
+        tools.standard_tools(ensure_active), native_call("read_jd_changes")
     )
+    assert output == "# JD 差異\n尚未核對。"
     assert memory.calls == reads.calls == writes.calls == writes.executed == []
 
 
-async def test_notification_is_saved_before_dispatch_without_entering_jd_writer(handlers):
+async def test_notification_uses_standard_prepared_child_without_jd_writer(handlers):
     tools, memory, reads, writes = handlers
-    prepared = await tools.prepare(native_call("request_memory_consolidation"), uuid4())
-    assert isinstance(prepared, dict)
-    assert prepared["kind"] == "memory_consolidation"
-    assert await tools.execute(prepared) == "request recorded"
+    output, prepared, operation_id = await invoke_tool(
+        tools.standard_tools(ensure_active),
+        native_call("request_memory_consolidation"),
+    )
+    assert prepared == {"kind": "memory_consolidation", "command_id": str(operation_id)}
+    assert output == "request recorded"
     assert memory.calls == reads.calls == writes.calls == writes.executed == []
 
 
@@ -356,45 +355,35 @@ async def test_notification_is_saved_before_dispatch_without_entering_jd_writer(
         ("create_jd_task", "task", "created · read_ref: task_x"),
     ],
 )
-async def test_write_uses_app_operation_identity_and_waits_for_saved_command_execution(
-    handlers: Handlers, name: str, kind: str, result: str
-) -> None:
+async def test_write_preserves_original_args_operation_identity_and_command_codec(
+    handlers, name, kind, result
+):
     tools, memory, reads, writes = handlers
     call = native_call(name, '{"intent":"unchanged wire"}')
-    operation_id = uuid4()
-    saved = await tools.prepare(call, operation_id)
-    assert isinstance(saved, dict)
+    output, saved, operation_id = await invoke_tool(tools.standard_tools(ensure_active), call)
     assert saved["kind"] == kind
     assert isinstance(saved["payload"], str)
-    assert json.loads(saved["payload"])["command_id"] == str(operation_id)
+    assert json.loads(saved["payload"])["command"]["command_id"] == str(operation_id)
     assert writes.calls == [(name, call.arguments, operation_id)]
-    assert writes.executed == []
     assert memory.calls == reads.calls == []
     assert call.call_id == "call_provider_identity"
-    assert await tools.execute(json.loads(json.dumps(saved))) == result
+    assert output == result
     assert writes.executed == writes.commands
 
 
-async def test_write_rejection_is_a_direct_observation_not_an_executable_command(
-    handlers: Handlers,
-) -> None:
+async def test_write_rejection_is_a_direct_observation_not_an_executable_command(handlers):
     tools, _, _, writes = handlers
     writes.rejection = reject_tool_call("invalid_arguments", "無效選取", "修正原參數")
-    assert await tools.prepare(native_call("revise_jd_profile"), uuid4()) == writes.rejection
+    output, prepared, _ = await invoke_tool(
+        tools.standard_tools(ensure_active),
+        native_call("revise_jd_profile"),
+    )
+    assert output == prepared == writes.rejection
     assert writes.executed == []
 
 
-async def test_unknown_tool_is_rejected_without_dispatching_any_handler(handlers: Handlers) -> None:
-    tools, memory, reads, writes = handlers
-    result = await tools.prepare(native_call("request_background_analysis"), uuid4())
-    assert isinstance(result, str)
-    rejected = json.loads(result)
-    assert rejected["status"] == "rejected" and rejected["code"] == "scope_not_allowed"
-    assert memory.calls == reads.calls == writes.calls == writes.executed == []
-
-
 class FakePlanTools(InterviewPlanTools):
-    def __init__(self) -> None:
+    def __init__(self):
         self.calls = []
         self.executed = []
 
@@ -415,41 +404,16 @@ async def test_plan_capability_dispatches_read_and_prepared_edit_without_jd_writ
     tools, memory, reads, writes = handlers
     plans = FakePlanTools()
     tools.interview_plans = plans
-    assert await tools.prepare(native_call("read_interview_plan"), uuid4()) == '{"plan":null}'
-    operation_id = uuid4()
+    output, _, _ = await invoke_tool(
+        tools.standard_tools(ensure_active), native_call("read_interview_plan")
+    )
+    assert output == '{"plan":null}'
     call = native_call("edit_interview_plan", '{"diff":"original"}')
-    prepared = await tools.prepare(call, operation_id)
+    output, prepared, operation_id = await invoke_tool(tools.standard_tools(ensure_active), call)
     assert plans.calls == [
         ("read_interview_plan", "{}"),
         ("edit_interview_plan", call.arguments, operation_id),
     ]
-    assert plans.executed == []
-    assert await tools.execute(prepared) == '{"status":"unchanged"}'
+    assert output == '{"status":"unchanged"}'
     assert plans.executed == [prepared]
     assert memory.calls == reads.calls == writes.calls == writes.executed == []
-
-
-async def test_legacy_capability_cannot_execute_a_new_plan_command(handlers):
-    tools, _, _, writes = handlers
-    with pytest.raises(ValueError, match="does not permit interview plan edits"):
-        await tools.execute({"kind": "interview_plan_edit", "change": {}})
-    assert writes.executed == []
-
-
-@pytest.mark.parametrize(
-    "malformed",
-    [
-        None,
-        "updated",
-        {"kind": "unknown", "payload": "{}"},
-        {"kind": "profile", "payload": '{"command_id":"not-a-uuid"}'},
-        {"kind": "task", "payload": "{}", "extra": True},
-    ],
-)
-async def test_malformed_checkpoint_is_rejected_before_write_dispatch(
-    handlers: Handlers, malformed: object
-) -> None:
-    tools, _, _, writes = handlers
-    with pytest.raises(ValidationError):
-        await tools.execute(malformed)
-    assert writes.executed == []

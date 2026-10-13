@@ -27,7 +27,6 @@ def batch_position(record: batch_persistence.MemoryBatchRecord) -> MemoryBatchPo
     return MemoryBatchPosition(
         record.job_file_id,
         record.execution_id,
-        record.generation_id,
         record.stage_id,
         MemoryLayer(record.phase),
         record.current_position_id,
@@ -63,8 +62,7 @@ async def require_stage(
         raise MemoryCandidateStateError("No open Memory candidate in this execution")
     current = batch_position(record)
     if (
-        current.generation_id != expected.generation_id
-        or current.stage_id != expected.stage_id
+        current.stage_id != expected.stage_id
         or current.phase != expected.phase
         or (exact_position and current.position_id != expected.position_id)
     ):

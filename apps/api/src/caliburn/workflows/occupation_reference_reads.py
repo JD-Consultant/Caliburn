@@ -8,7 +8,7 @@ from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import InterviewReadScope
 from caliburn.features.occupation_references import queries as references
 from caliburn.features.occupation_references.models import OccupationReferenceState
-from caliburn.workflows.memory_reads import MemoryReadBinding, resolve_interview_scope
+from caliburn.workflows.work_memory.reads import MemoryReadBinding, resolve_interview_scope
 
 
 class ExcludedWorkReadWorkflow:
@@ -35,7 +35,7 @@ async def read_formal_reference_state(
     heads = references.candidate_heads_projection(scope.job_file_id).subquery("reference_heads")
     row = (
         await session.execute(
-            select(heads.c.execution_id, heads.c.generation_id, heads.c.current_revision_id)
+            select(heads.c.execution_id, heads.c.current_revision_id)
             .select_from(formal)
             .join(completed, completed.c.execution_id == formal.c.execution_id)
             .join(heads, heads.c.execution_id == formal.c.execution_id)

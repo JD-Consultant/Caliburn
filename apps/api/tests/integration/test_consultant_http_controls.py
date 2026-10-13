@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.adapters.process_lock import PostgresProcessLock
-from caliburn.agent_execution.tool_steps import PausedResponseLoop, run_response_loop
+from caliburn.agent_execution.response_runtime import PausedResponseLoop
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
     AgentRole,
@@ -20,12 +20,13 @@ from caliburn.features.executions.history_models import (
 )
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.interviews.models import SubmitInterviewInput
-from caliburn.workflows.consultant_controls import (
+from caliburn.workflows.consultant_turns.controls import (
     ConsultantControlWorkflow,
     run_consultant_with_controls,
 )
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.execution_controls import ConsultantExecutionControls
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.executions.controls import ConsultantExecutionControls
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 from tests.integration.test_consultant_completion import complete, start_turn
 
@@ -150,11 +151,16 @@ def test_http_resume_consumes_only_original_native_interrupt(client: TestClient)
 
     async def native_run(writer, *, resume_interrupt_id=None, request=None):
         control = ConsultantExecutionControls(sessions, writer)
+
+        async def ensure_active():
+            async with sessions.begin() as session:
+                await executions.lock_active_writer(session, writer)
+
         result = await run_response_loop(
             saver,
             thread_id=thread_id,
             request=request,
-            runtime=replace(provider.runtime(), ensure_active=control.ensure_active),
+            runtime=replace(provider.runtime(), ensure_active=ensure_active),
             max_tool_calls=2,
             max_model_steps=3,
             controls=control.loop_controls(),

@@ -6,6 +6,7 @@ from uuid import uuid4
 import pytest
 
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
+from caliburn.agents.memory_analysis.tools import memory_analysis_tool_definitions
 from caliburn.features.executions.models import (
     ExecutionKind,
     ExecutionNotFoundError,
@@ -27,8 +28,7 @@ from caliburn.transport.model_tools.excluded_work_reads import (
     ExcludedWorkReadTools,
     excluded_work_read_definitions,
 )
-from caliburn.transport.model_tools.memory_analysis import memory_analysis_tool_definitions
-from caliburn.workflows.memory_reads import CandidateMemoryRead, PublishedMemoryRead
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead, PublishedMemoryRead
 
 
 class RecordingReader:
@@ -53,7 +53,6 @@ def binding(kind):
     stage = MemoryBatchPosition(
         job_file_id,
         execution_id,
-        uuid4(),
         uuid4(),
         MemoryLayer(kind),
         uuid4(),

@@ -10,8 +10,13 @@ from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.request_capacity import RequestCapacityError, RequestOverflow
 from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
 
-HISTORY = [{"role": "user", "content": "先前輪次的原生歷史"}]
-CURRENT_INPUT = {"role": "user", "content": "本輪員工原話：另一個也一樣。"}
+CURRENT_INPUT = {
+    "role": "user",
+    "content": json.dumps(
+        {"interview_sequence": 14, "speaker": "employee", "text": "另一個也一樣。"},
+        ensure_ascii=False,
+    ),
+}
 
 
 def interview(
@@ -51,7 +56,6 @@ def preload_request(
     }
     return request_with(
         [
-            *HISTORY,
             {"role": "user", "content": json.dumps(app_data, ensure_ascii=False)},
             CURRENT_INPUT,
         ]
@@ -82,7 +86,7 @@ def overflow_for(
 
 
 def fitted_app_data(items: list[dict[str, Any]]) -> dict[str, Any]:
-    return json.loads(items[-2]["content"])
+    return json.loads(items[0]["content"])
 
 
 def kept_sequences(items: list[dict[str, Any]]) -> list[int]:
@@ -111,16 +115,44 @@ def test_declares_the_range_that_is_not_preloaded() -> None:
     assert boundary["preloaded"] == {"from_sequence": first_kept, "through_sequence": 13}
 
 
-def test_covered_messages_are_not_reported_as_unread_recent_interviews() -> None:
-    # Memory covers through 7; message 7 only rides along as the question before 8.
-    request = preload_request(interview(7, 13), covered=7, context_sequences=(7,))
+def test_only_uncovered_messages_are_reported_as_unread() -> None:
+    request = preload_request(interview(9, 13), covered=8)
     items = fit_recent_interview_preload(request, overflow_for(request, allowed_share=0.5))
     boundary = fitted_app_data(items)["interview_read_boundary"]
     first_kept = kept_sequences(items)[0]
     assert first_kept > 8
-    assert boundary["covered_through_sequence"] == 7
-    assert boundary["not_preloaded"] == [{"from_sequence": 8, "through_sequence": first_kept - 1}]
+    assert boundary["covered_through_sequence"] == 8
+    assert boundary["not_preloaded"] == [{"from_sequence": 9, "through_sequence": first_kept - 1}]
     assert boundary["context_sequences"] == []
+
+
+def test_repeated_fits_preserve_the_entire_unread_prefix_with_a_plan() -> None:
+    original = preload_request(interview(1, 13))
+    items = original.create_payload()["input"]
+    plan = {
+        "role": "user",
+        "content": json.dumps(
+            {"data_kind": "consultant_interview_plan", "plan": "Continue the interview"}
+        ),
+    }
+    request = request_with([*items[:-1], plan, items[-1]])
+    first = fit_recent_interview_preload(request, overflow_for(request, allowed_share=0.9))
+    second_request = request_with(first)
+    second = fit_recent_interview_preload(
+        second_request, overflow_for(second_request, allowed_share=0.5, attempt=2)
+    )
+    data = json.loads(second[0]["content"])
+    first_kept = data["historical_interview"]["messages"][0]["interview_sequence"]
+    assert (
+        first_kept
+        > json.loads(first[0]["content"])["historical_interview"]["messages"][0][
+            "interview_sequence"
+        ]
+    )
+    assert data["interview_read_boundary"]["not_preloaded"] == [
+        {"from_sequence": 1, "through_sequence": first_kept - 1}
+    ]
+    assert second[-2:] == [plan, CURRENT_INPUT]
 
 
 @pytest.mark.parametrize("allowed_share", [0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 0.99])
@@ -175,10 +207,10 @@ def test_other_input_and_the_original_request_are_untouched() -> None:
     before = deepcopy(request.create_payload())
     items = fit_recent_interview_preload(request, overflow_for(request, allowed_share=0.4))
     assert request.create_payload() == before
-    assert items[:-2] == HISTORY
+    assert items[1:] == before["input"][1:]
     assert items[-1] == CURRENT_INPUT
     data = fitted_app_data(items)
-    original = json.loads(before["input"][-2]["content"])
+    original = json.loads(before["input"][0]["content"])
     for key in ("data_kind", "work_situation_map", "work_understanding_map"):
         assert data[key] == original[key]
     assert data["historical_interview"]["data_kind"] == "historical_interview"

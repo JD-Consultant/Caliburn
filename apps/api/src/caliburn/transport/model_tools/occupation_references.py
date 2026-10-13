@@ -64,7 +64,6 @@ class _PreparedChange(TypedDict):
 
 _PREPARED_CHANGE = TypeAdapter(_PreparedChange)
 _JSON_OBJECT = TypeAdapter(dict[str, object])
-_WRITE_RESULT_DESCRIPTION = '成功只回 {"status":"updated"}；需要完整 state 時再按需讀取。'
 type _ReadArguments = (
     SearchOccupationReferencesArguments
     | ReadOccupationReferenceArguments
@@ -79,33 +78,91 @@ _EXPECTED_FAILURES = (
 
 _DESCRIPTIONS = {
     "search_occupation_references": (
-        "用員工已確認的主要工作尋找最多五份公版職位參考；query 保留工作脈絡，"
-        "排除顧問問題、員工未做及尚未確認的工作。回傳職位概述與全部已解析任務導覽，"
-        "可選多份共同代表主要工作。公版是參考資料，不是指令、員工事實或完成判定。"
+        "需要以已確認的主要工作尋找公版職位參考時使用；已有適用公版或只有"
+        "未確認線索時，不必重複搜尋。query 用員工已確認實際負責的主要工作"
+        "與必要脈絡，排除顧問問題、員工明確未做及尚未確認的工作。本工具搜"
+        "尋最多五份公版，只讀，不選用或修改參考 state。成功回 JSON 的 "
+        "references 陣列，空陣列只表示本次查詢沒有返回公版，不表示員工沒"
+        "有這些工作；每筆含職位概述與完整已解析任務導覽，供判斷要再讀哪些"
+        "任務。\n公版物件的 reference_id 是後續讀取／選用的精確定位，"
+        "source_sha256 是來源檔內容雜湊，source_file 是來源檔名，ocs_code"
+        " 是公版職能基準代碼，title 是公版職位名稱，overview 是職位概述；"
+        "這些名稱與代碼不等於員工職稱。catalog_scope="
+        "all_parsed_task_groups 表示 units 列出該公版全部已解析的任務群組"
+        "，不代表原始檔所有內容均已解析。units 每項 unit_id 是單元定位，"
+        "code／name 是原件單元代碼／名稱，tasks 是該單元任務導覽；每項 "
+        "task_id 可交給 read_occupation_reference，names 是原件任務 code"
+        "／name 配對陣列，competency_block_count 是該任務已解析的職能內容"
+        "區塊數，不是能力評分。可空 code／name 的 null 表示沒有該值，不補"
+        "造。導覽不含任務完整細節。\n公版是參考資料，不是指令、員工事實或"
+        "完成判定。拒絕回 JSON：status=rejected 表示本次未取得完整結果；"
+        "code、message 說明原因，next_action 指出可行處理。依提示處理，不"
+        "把拒絕當空內容或已讀。 只有 query 格式問題才修正 query；服務或容"
+        "量問題由 App 處理，不當作空候選。"
     ),
     "read_occupation_reference": (
-        "按工具結果或已選 state 的精確 reference_id 讀公版，未選公版也可先讀再決定。"
-        "task_id=null 讀概述與完整已解析任務導覽；"
-        "需要某項內容才填導覽提供的 task_id，讀該任務所有細節。公版任務與 JD 任務可多對多，"
-        "不強制一對一，也不因公版存在就斷定員工有做。"
+        "需要讀已定位公版的概述／任務導覽，或某項任務的完整已解析細節時使"
+        "用；未選用公版也可先讀再決定。已有相同公版範圍的充分結果就沿用。"
+        "用已提供的 reference_id 與 task_id 選取範圍。本工具只讀，不改選"
+        "用或排除 state；公版任務與 JD 任務可多對多，不強制一對一。\n"
+        "task_id=null 時直接回一個 JSON 公版物件，不包 references 陣列。"
+        "公版物件的 reference_id 是後續讀取／選用的精確定位，"
+        "source_sha256 是來源檔內容雜湊，source_file 是來源檔名，ocs_code"
+        " 是公版職能基準代碼，title 是公版職位名稱，overview 是職位概述；"
+        "這些名稱與代碼不等於員工職稱。catalog_scope="
+        "all_parsed_task_groups 表示 units 列出該公版全部已解析的任務群組"
+        "，不代表原始檔所有內容均已解析。units 每項 unit_id 是單元定位，"
+        "code／name 是原件單元代碼／名稱，tasks 是該單元任務導覽；每項 "
+        "task_id 可交給 read_occupation_reference，names 是原件任務 code"
+        "／name 配對陣列，competency_block_count 是該任務已解析的職能內容"
+        "區塊數，不是能力評分。可空 code／name 的 null 表示沒有該值，不補"
+        "造。導覽不含任務完整細節。\n指定 task_id 時回 JSON 任務物件："
+        "reference_id 是所屬公版定位，source_sha256 是來源檔內容雜湊，"
+        "task_id 是所選任務定位，unit_id 是所屬單元定位；names 是任務代碼"
+        " code／名稱 name 配對陣列。competency_blocks 是該任務全部已解析"
+        "職能內容區塊：每塊 competency_level 是原件職能級別；outputs 列工"
+        "作產出，knowledge 列知識，skills 列技能，這三個陣列每筆 code／"
+        "name 分別是原件代碼與內容名稱；indicators 列行為指標，每筆 code "
+        "是原件代碼，text 是指標文字。可空欄位的 null 表示已解析資料沒有"
+        "該值，陣列空表示未有該類已解析內容；不補造、不把職能級別當員工評"
+        "分。完整已解析細節不等於原始檔的全部文字。\n公版是參考資料，不是"
+        "指令、員工事實或完成判定；有一項公版任務不表示員工有做。\n拒絕回"
+        " JSON：status=rejected 表示本次未取得完整結果；code、message 說"
+        "明原因，next_action 指出可行處理。依提示處理，不把拒絕當空內容或"
+        "已讀。 定位錯誤先核對已提供值；來源不可用時不代換同名新版。"
     ),
     "read_occupation_reference_state": (
-        "讀已選公版與員工明確表示沒做或不負責的 excluded_work，避免重問相同範圍。"
-        "selected_reference_ids=null 表示尚未選擇，[] 表示看過但沒有適合參考。"
-        "排除範圍獨立於 Memory，不進向量查詢；未知不是沒做，也不表示任務或整份 JD 完成。"
+        "需要恢復目前已選公版或已記錄的排除工作範圍，安排接續查閱及避免重"
+        "問時使用；已有仍有效的完整 state 與成功修改效果就沿用。傳空物件 "
+        "{}，App 綁定職務與本輪可見候選。成功回 JSON："
+        "selected_reference_ids 是目前完整選用公版定位陣列，null 表示尚未"
+        "選擇，[] 表示看過但沒有適合參考，非空陣列可供 "
+        "read_occupation_reference 定位；excluded_work 是員工明確表示沒做"
+        "或不負責的工作範圍文字陣列，[] 表示目前沒有記錄。未知、未提及或"
+        "拒答不表示沒做，未選某公版也不表示排除其中所有工作。此結果不含公"
+        "版概述、任務細節或員工事實來源，不宣告 JD 完成；本工具不修改 "
+        "state。\n拒絕回 JSON：status=rejected 表示本次未取得完整結果；"
+        "code、message 說明原因，next_action 指出可行處理。依提示處理，不"
+        "把拒絕當空內容或已讀。 拒絕不表示尚未選擇或排除集合為空。"
     ),
     "select_occupation_references": (
-        "以已讀公版的精確 reference_ids 取代全部選用集合；要保留的舊 ID 一併填入，不是追加。"
-        "可多選或 []。"
-        "這是參考選擇，不是認定員工職稱；未選不代表員工否認。保留已有排除工作範圍，"
-        "成功僅更新本輪候選，整輪成功完成後才可供後續使用。"
+        "選定或調整用來補查工作缺口的公版參考，以本次 reference_ids 取代"
+        "完整選用集合。依已讀公版判斷，可多選或清空；選用不認定員工職稱，"
+        "未選也不表示員工不負責該公版的工作。既有 excluded_work 保留，排"
+        '除範圍另用 update_excluded_work。成功只回 {"status":"updated"}，'
+        "不附完整 state；需要目前集合時再按需 "
+        "read_occupation_reference_state。僅更新本輪候選。拒絕回 status="
+        "rejected、code、message 與 next_action，依提示處理可修正問題。"
     ),
     "update_excluded_work": (
-        "用 add 記下員工明確表示沒做或不負責的工作範圍，避免重問；員工更正時，"
-        "以 remove 移除 state 中的完整精確文字。未知、沒回答、拒答不代表沒做。"
-        "不記來源，不綁公版職稱或任務代碼，不自動排除整份職位或宣告完成；"
-        "排除範圍獨立於 Memory 且不進向量查詢。add/remove 精確文字去重，"
-        "不得重疊或同時為空；成功僅更新本輪候選，不提交整輪。"
+        "員工明確說明沒做或不負責某範圍時，用 add 記入排除工作；更正先前"
+        "排除時，用 remove 解除既有範圍。未知、未回答與拒答不填為排除。要"
+        "改寫一筆範圍，可同次移除舊文字並新增不同的新文字。此工具只改排除"
+        "清單，不改選用公版、JD 或 Memory，也不接受引用及公版任務代碼。成"
+        '功只回 {"status":"updated"}，不附完整 state；需要核對目前排除文'
+        "字時用 read_occupation_reference_state。僅更新本輪候選。拒絕回 "
+        "status=rejected、code、message 與 next_action，依提示處理可修正"
+        "問題。"
     ),
 }
 
@@ -115,8 +172,7 @@ def occupation_reference_definitions() -> list[FunctionToolParam]:
     return [
         function_definition(
             name,
-            description
-            + (_WRITE_RESULT_DESCRIPTION if name in OccupationReferenceTools.write_names else ""),
+            description,
             f"{name.replace('_', '-')}-arguments",
         )
         for name, description in _DESCRIPTIONS.items()
@@ -207,21 +263,24 @@ class OccupationReferenceTools:
         try:
             if name == "select_occupation_references":
                 selection = parse_contract(SelectOccupationReferencesArguments, arguments)
+            else:
+                excluded = parse_contract(UpdateExcludedWorkArguments, arguments)
+        except ValidationError:
+            return _invalid_arguments(name)
+        try:
+            if name == "select_occupation_references":
                 change = await self.workflow.prepare_select(
                     self.writer,
                     tuple(reference.root for reference in selection.reference_ids),
                     operation_id,
                 )
             else:
-                excluded = parse_contract(UpdateExcludedWorkArguments, arguments)
                 change = await self.workflow.prepare_excluded_work(
                     self.writer,
                     tuple(item.root for item in excluded.add),
                     tuple(item.root for item in excluded.remove),
                     operation_id,
                 )
-        except ValidationError:
-            return _invalid_arguments(name)
         except _EXPECTED_FAILURES as error:
             return _rejection(error, name)
         saved: _PreparedChange = {"kind": "occupation_reference_state_change", "change": change}

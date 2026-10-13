@@ -9,7 +9,7 @@ from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.interview_plans import service as interview_plans
 from caliburn.features.interview_plans.models import PlanEdit
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
 from caliburn.workflows.interview_plans import InterviewPlanWorkflow
 from tests.integration.test_consultant_completion import start_turn, transact
 
@@ -48,9 +48,15 @@ def test_saved_preview_is_same_nullable_body_and_is_adopted_only_after_completio
     snapshot = transact(
         client,
         lambda session: interview_plans.start_candidate(
-            session, scope.job_file_id, scope.execution_id, body
+            session, scope.job_file_id, scope.execution_id, None
         ),
     )
+    if body is not None:
+        snapshot = client.portal.call(
+            InterviewPlanWorkflow(client.app.state.database.sessions).apply,
+            turn.writer,
+            PlanEdit(uuid4(), snapshot.position, "@@\n+建立計畫", body, "updated"),
+        ).snapshot
     plan_path = f"/api/job-files/{scope.job_file_id}/interview-plan"
     turn_path = f"/api/job-files/{scope.job_file_id}/consultant-turns/{scope.execution_id}"
     current_path = f"/api/job-files/{scope.job_file_id}/consultant-turns/current"
@@ -96,9 +102,14 @@ def test_terminal_candidate_does_not_replace_the_previous_adopted_plan(
     original_plan = transact(
         client,
         lambda session: interview_plans.start_candidate(
-            session, file_id, original.writer.scope.execution_id, "上一採用版"
+            session, file_id, original.writer.scope.execution_id, None
         ),
     )
+    original_plan = client.portal.call(
+        InterviewPlanWorkflow(client.app.state.database.sessions).apply,
+        original.writer,
+        PlanEdit(uuid4(), original_plan.position, "@@\n+上一採用版", "上一採用版", "updated"),
+    ).snapshot
     assert original.candidate is not None
     completion = ConsultantCompletionWorkflow(client.app.state.database.sessions)
     client.portal.call(
@@ -113,7 +124,7 @@ def test_terminal_candidate_does_not_replace_the_previous_adopted_plan(
     base = transact(
         client,
         lambda session: interview_plans.start_candidate(
-            session, file_id, abandoned.writer.scope.execution_id, "上一採用版"
+            session, file_id, abandoned.writer.scope.execution_id, original_plan.position
         ),
     )
     client.portal.call(

@@ -6,16 +6,16 @@
  * so only `canonicalUuid` accepts input from outside (the route); everything it returns, and
  * every value this app stores or broadcasts, is compared and used as a scope key as-is.
  */
-const CANONICAL_UUID = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
+export const CANONICAL_UUID_PATTERN = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
 /** True only for the canonical (lower-case) spelling; the guard for values this app owns. */
 export function isCanonicalUuid(value: unknown): value is string {
-  return typeof value === 'string' && CANONICAL_UUID.test(value);
+  return typeof value === 'string' && CANONICAL_UUID_PATTERN.test(value);
 }
 
 /** The single place an outside spelling becomes an identity; null when it is not a UUID. */
 export function canonicalUuid(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const canonical = value.toLowerCase();
-  return CANONICAL_UUID.test(canonical) ? canonical : null;
+  return CANONICAL_UUID_PATTERN.test(canonical) ? canonical : null;
 }

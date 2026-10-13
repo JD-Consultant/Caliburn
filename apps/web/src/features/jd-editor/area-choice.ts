@@ -1,5 +1,5 @@
 /** Where a task can belong: one of the responsibilities, or none. Shared by the create form and the move menu. */
-import type { Area } from '../../shared/api/generated/jd-work-view';
+import type { Area } from '../../shared/api/generated/http/types.gen';
 
 /** The value that stands for "no responsibility"; it is never sent, `area_id` is null instead. */
 export const UNASSIGNED = 'unassigned';

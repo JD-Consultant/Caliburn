@@ -20,7 +20,7 @@ import {
 import { describeReadError } from '../../shared/api/http';
 import { IconAction } from '../../shared/ui/IconAction';
 import { AddIcon, CloseIcon, EditIcon } from '../../shared/ui/icons';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type { JobFile } from '../../shared/api/generated/http/types.gen';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
 import { DeleteJobFileDialog } from './DeleteJobFileDialog';
 import { RenameJobFileDialog } from './RenameJobFileDialog';

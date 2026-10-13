@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import { Paper, Stack, Typography } from '@mui/material';
-import type { Area } from '../../shared/api/generated/jd-work-view';
+import type { Area } from '../../shared/api/generated/http/types.gen';
 import { IconAction } from '../../shared/ui/IconAction';
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
 import { FoldToggle } from './FoldToggle';

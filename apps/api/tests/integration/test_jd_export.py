@@ -10,8 +10,8 @@ from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.transport.http.jd_export import router
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_export import JdExportWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.export import JdExportWorkflow
 
 pytestmark = pytest.mark.postgres
 

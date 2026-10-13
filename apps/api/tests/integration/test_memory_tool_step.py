@@ -15,10 +15,7 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    _build_response_step,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.work_memory.candidates import (
@@ -34,11 +31,13 @@ from caliburn.features.work_memory.models import (
 )
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
-from caliburn.transport.model_tools.memory_writes import MemoryWriteTools, PreparedMemoryToolCall
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
-from caliburn.workflows.memory_writes import MemoryWritePreparation
-from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
+from caliburn.transport.model_tools.memory_write_checkpoint import PreparedMemoryToolCall
+from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead, MemoryReadWorkflow
+from caliburn.workflows.work_memory.write_preparation import MemoryWritePreparation
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
 
@@ -179,31 +178,29 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                 model="gpt-6-luna",
                 instructions="synthetic",
                 input_items=[],
-                tools=[],
+                tools=tools.definitions(),
                 reasoning_effort="low",
                 max_output_tokens=512,
             )
             async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
                 await saver.setup()
-                graph = _build_response_step(saver, max_tool_calls=16)
                 with pytest.raises(ConnectionError, match="after business commit"):
-                    await graph.ainvoke(
-                        {
-                            "request_snapshot": model_request.create_payload(),
-                            "model_step_limit": None,
-                            "tool_call_limit": 16,
-                            "capacity_limits": synthetic_capacity_limits(),
-                            "request_id": uuid4(),
-                        },
-                        config,
-                        context=runtime,
-                        durability="sync",
+                    await run_response_step(
+                        saver,
+                        thread_id=(config)["configurable"]["thread_id"],
+                        request=ResponseRequest.from_snapshot(model_request.create_payload()),
+                        runtime=runtime,
+                        max_tool_calls=16,
                     )
-                assert (await graph.aget_state(config)).next == ("execute_tool",)
+                assert set((await read_response_state(saver, config)).next) == {"tools"}
                 assert len(await candidates.read_map(scope, stage=stage, layer=stage.phase)) == 1
             async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
-                result = await _build_response_step(saver, max_tool_calls=16).ainvoke(
-                    None, config, context=runtime, durability="sync"
+                result = await run_response_step(
+                    saver,
+                    thread_id=(config)["configurable"]["thread_id"],
+                    request=None,
+                    runtime=runtime,
+                    max_tool_calls=16,
                 )
                 assert [item["call_id"] for item in result["tool_results"]] == ["create", "update"]
             assert calls == [

@@ -1,18 +1,20 @@
 /** Formal JD profile query/command; a recovered command result is not the latest view. */
 import { queryOptions } from '@tanstack/react-query';
-import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
-import type { ReviseJdProfileRequest } from '../../shared/api/generated/revise-jd-profile-request';
-import { requestJson } from '../../shared/api/http';
-import { isJdProfileView } from '../../shared/api/validation';
+import type {
+  JdProfileView,
+  ReviseJdProfileRequest,
+} from '../../shared/api/generated/http/types.gen';
 
-function profileUrl(jobFileId: string): string {
-  return `/api/job-files/${encodeURIComponent(jobFileId)}/jd/profile`;
-}
+import '../../shared/api/http';
+import { readJdProfile, reviseJdProfile as revise } from '../../shared/api/generated/http/sdk.gen';
 
 export function jdProfileQuery(jobFileId: string) {
   return queryOptions({
     queryKey: ['jd-profile', jobFileId, 'formal'],
-    queryFn: ({ signal }) => requestJson(profileUrl(jobFileId), isJdProfileView, { signal }),
+    queryFn: ({ signal }) =>
+      readJdProfile({ path: { job_file_id: jobFileId }, signal, throwOnError: true }).then(
+        ({ data }) => data,
+      ),
   });
 }
 
@@ -20,10 +22,10 @@ export function reviseJdProfile(
   jobFileId: string,
   command: ReviseJdProfileRequest,
 ): Promise<JdProfileView> {
-  return requestJson(profileUrl(jobFileId), isJdProfileView, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(command),
-    correlation: { jobFileId, commandId: command.command_id },
-  });
+  return revise({
+    path: { job_file_id: jobFileId },
+    body: command,
+    throwOnError: true,
+    meta: { correlation: { jobFileId, commandId: command.command_id } },
+  }).then(({ data }) => data);
 }

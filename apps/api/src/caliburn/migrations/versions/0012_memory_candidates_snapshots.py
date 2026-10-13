@@ -61,7 +61,6 @@ def upgrade() -> None:
         sa.Column("base_snapshot_id", sa.Uuid(), nullable=True),
         sa.Column("base_position_id", sa.Uuid(), nullable=False),
         sa.Column("current_position_id", sa.Uuid(), nullable=False),
-        sa.Column("generation_id", sa.Uuid(), nullable=False),
         sa.Column("stage_id", sa.Uuid(), nullable=False),
         sa.Column("phase", sa.Text(), nullable=False),
         sa.Column("status", sa.Text(), nullable=False),

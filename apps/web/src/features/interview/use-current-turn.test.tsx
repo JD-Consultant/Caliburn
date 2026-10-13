@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** The page reads the Turn of the stored hint from the shared query cache; it never copies it. */
 import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -39,7 +40,7 @@ afterEach(() => {
 test('observes the composer cache without fetching and follows the hint being cleared', async () => {
   await retainTurnHint(fileId, hint);
   const fetch = vi.fn().mockResolvedValue(Response.json(turn));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
   expect(result.current).toEqual({ turn: null, isVerified: false });
   expect(fetch).not.toHaveBeenCalled();
@@ -61,7 +62,7 @@ test('observes the composer cache without fetching and follows the hint being cl
 test('a hint still waiting for its execution id has nothing to verify and sends no request', async () => {
   await retainTurnHint(fileId, { command_id: hint.command_id, execution_id: null });
   const fetch = vi.fn();
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
   expect(result.current).toEqual({ turn: null, isVerified: false });
   expect(fetch).not.toHaveBeenCalled();
@@ -70,7 +71,7 @@ test('a hint still waiting for its execution id has nothing to verify and sends 
 test('an unreadable status is not reported as a Turn', async () => {
   await retainTurnHint(fileId, hint);
   const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 503 }));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
   const client = clients[0];
   if (!client) throw new Error('Expected query client');

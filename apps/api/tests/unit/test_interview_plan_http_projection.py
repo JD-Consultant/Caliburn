@@ -7,7 +7,7 @@ import pytest
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.interview_plans.models import PlanPosition, PlanSnapshot
 from caliburn.transport.http.consultant_turns import turn_view
-from caliburn.workflows.consultant_status import ConsultantTurnStatus
+from caliburn.workflows.consultant_turns.status import ConsultantTurnStatus
 
 
 def test_legacy_turn_has_explicit_unavailable_plan_preview() -> None:

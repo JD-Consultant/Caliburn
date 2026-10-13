@@ -1,7 +1,7 @@
 /** Page composition: metadata gate, then the workspace. Features never import each other. */
 import type { ReactNode } from 'react';
 import type { UseQueryResult } from '@tanstack/react-query';
-import type { JobFile } from '../shared/api/generated/job-file-list';
+import type { JobFile } from '../shared/api/generated/http/types.gen';
 import { useContext, useEffect } from 'react';
 import { DeletedJobFilesContext } from './deleted-job-files-context';
 import { canonicalUuid } from '../shared/api/uuid';

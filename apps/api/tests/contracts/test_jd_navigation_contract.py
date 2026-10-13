@@ -14,7 +14,9 @@ from caliburn.transport.model_tools.jd_navigation import project_jd_map
 
 def test_map_serialization_keeps_empty_collections_without_unused_preview_nulls() -> None:
     work = JdWorkRevision(UUID(int=1), (), (), (), (), (), ())
-    output = project_jd_map(JdProfile(), work).model_dump_json(exclude_unset=True)
+    output = project_jd_map(JdProfile(), work, pending_targets=frozenset()).model_dump_json(
+        exclude_unset=True
+    )
     payload = json.loads(output)
     source = Path(__file__).parents[2] / "contracts/tools/jd-map.schema.json"
     schema = json.loads(source.read_text(encoding="utf-8"))

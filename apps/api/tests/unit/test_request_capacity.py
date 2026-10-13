@@ -6,9 +6,7 @@ import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.agent_execution.request_capacity import RequestCapacityError, RequestOverflow
-from caliburn.agent_execution.tool_steps import (
-    run_response_loop,
-)
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 
 
@@ -205,7 +203,7 @@ async def test_first_request_over_capacity_is_recounted_after_the_owner_shrinks_
     assert probe.count_requests[0][0] != probe.count_requests[1][0]
     assert [payload["input"] for payload in probe.model_requests] == [reduced("reduced 1")]
     assert probe.model_input_tokens == [500]
-    assert result["input_items"][0] == reduced("reduced 1")[0]
+    assert result["request_snapshot"]["input"][0] == reduced("reduced 1")[0]
     assert result["next_action"] == "deliver_answer"
 
 

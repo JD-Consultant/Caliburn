@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** The page can drive the source sheet, e.g. a badge on a JD item opens it for that item only. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
@@ -17,6 +18,7 @@ const sources = {
     {
       citation_id: first,
       target_label: '任務：處理例外',
+      target: { kind: 'task', field: null, item_id: '50000000-0000-4000-8000-000000000005' },
       source_kind: 'interview',
       source_label: '訪談序號 2 · 員工',
       needs_recheck: false,
@@ -26,6 +28,7 @@ const sources = {
     {
       citation_id: second,
       target_label: '任務：處理例外',
+      target: { kind: 'task', field: null, item_id: '50000000-0000-4000-8000-000000000005' },
       source_kind: 'interview',
       source_label: '訪談序號 4 · 員工',
       needs_recheck: false,
@@ -35,6 +38,7 @@ const sources = {
     {
       citation_id: third,
       target_label: '任務：另一項',
+      target: { kind: 'task', field: null, item_id: '50000000-0000-4000-8000-000000000005' },
       source_kind: 'interview',
       source_label: '訪談序號 6 · 員工',
       needs_recheck: false,
@@ -63,7 +67,7 @@ function serve() {
       );
     throw new Error(`Unexpected request: ${path}`);
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return fetch;
 }
 

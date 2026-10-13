@@ -1,6 +1,7 @@
+import { stubHttp } from '../../test-http';
 /** The sheet is a list you drill into (Fluent drawer / Material side sheet): one view at a time, a Back control, focus kept. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, test, vi } from 'vitest';
 import { SourceViewer } from './SourceViewer';
@@ -12,6 +13,7 @@ const second = '30000000-0000-4000-8000-000000000004';
 const basePath = `/api/job-files/${fileId}/jd/sources`;
 const reference = {
   target_label: '任務：處理例外',
+  target: { kind: 'task', field: null, item_id: '50000000-0000-4000-8000-000000000005' },
   source_kind: 'interview',
   needs_recheck: false,
   jd_changed: false,
@@ -51,12 +53,14 @@ function serve() {
           revision_id: revisionId,
           citation_id: second,
           jd_markdown: 'JD 差異正文',
+          source_version: null,
+          comparison_version: null,
           source_markdown: null,
         }),
       );
     throw new Error(`Unexpected request: ${path}`);
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return fetch;
 }
 
@@ -89,6 +93,52 @@ test('opening a source replaces the list with that source; Back returns to the l
   expect(screen.queryByRole('button', { name: '返回來源列表' })).not.toBeInTheDocument();
   expect(row).toHaveFocus();
 });
+
+test.each([revisionId, '20000000-0000-4000-8000-000000000099'])(
+  'a refreshed list (%s) clears child selection even when the citation identity survives',
+  async (nextRevision) => {
+    const only = { ...sources.references[1], needs_recheck: false };
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+    });
+    clients.push(client);
+    client.setQueryData(['jd-sources', fileId], { revision_id: revisionId, references: [only] });
+    stubHttp((path: string) => {
+      const next = path.includes(nextRevision);
+      const child = path.includes('source_ref=');
+      return Promise.resolve(
+        Response.json({
+          revision_id: next ? nextRevision : revisionId,
+          citation_id: second,
+          content: {
+            kind: 'work_situation',
+            title: child ? '子來源' : next ? '新固定根來源' : '舊固定根來源',
+            description: '',
+            body: child ? '子來源正文' : '根來源正文',
+            references: child
+              ? []
+              : [{ source_ref: 'situation_old', kind: 'work_situation', label: '讀子來源' }],
+          },
+        }),
+      );
+    });
+    render(
+      <QueryClientProvider client={client}>
+        <SourceViewer jobFileId={fileId} open onlyCitationIds={[second]} />
+      </QueryClientProvider>,
+    );
+    await userEvent.click(await screen.findByRole('button', { name: '讀子來源' }));
+    expect(await screen.findByText('子來源正文')).toBeVisible();
+    await act(() =>
+      client.setQueryData(['jd-sources', fileId], {
+        revision_id: nextRevision,
+        references: [only],
+      }),
+    );
+    expect(await screen.findByText('新固定根來源')).toBeVisible();
+    expect(screen.queryByText('子來源正文')).not.toBeInTheDocument();
+  },
+);
 
 test('the detail says which JD item the source supports', async () => {
   serve();

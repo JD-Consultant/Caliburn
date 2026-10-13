@@ -25,8 +25,8 @@ from caliburn.transport.http import (
     jd_undo,
     job_files,
 )
-from caliburn.workflows.jd_editing import JdEditingWorkflow
-from caliburn.workflows.jd_undo import JdUndoWorkflow
+from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
+from caliburn.workflows.job_description.undo import JdUndoWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
 
 RESOURCES = (

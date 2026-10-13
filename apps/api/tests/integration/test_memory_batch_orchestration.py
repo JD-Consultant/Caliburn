@@ -31,8 +31,10 @@ from caliburn.features.work_memory.candidates import CreateMemoryObject, MemoryB
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.interview_completion import record_formal_interview
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 
 pytestmark = pytest.mark.postgres
 
@@ -97,7 +99,7 @@ async def role_context(
             )
     root = context_thread_id(writer.scope, role, HistoryWindowKind.COMPLETED_WORK)
     return ContextPosition(
-        f"{root}:stage:{stage.generation_id}:{stage.stage_id}",
+        f"{root}:stage:{stage.stage_id}",
         "completed",
         HistoryWindowKind.COMPLETED_WORK,
     )
@@ -107,7 +109,7 @@ def test_intent_requires_success_and_frontier_is_employee_not_reply(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         cancelled = await start_turn(database)
@@ -142,12 +144,9 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_analysis.results import (
-            AnalysisComplete,
-            MemoryAnalysisResult,
-        )
-        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+        from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.results import AnalysisComplete, MemoryAnalysisResult
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)
@@ -213,7 +212,7 @@ def test_final_failure_blocks_until_the_interview_has_advanced(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)
@@ -279,12 +278,9 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_analysis.results import (
-            AnalysisComplete,
-            MemoryAnalysisResult,
-        )
-        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+        from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.results import AnalysisComplete, MemoryAnalysisResult
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)
@@ -334,12 +330,9 @@ def test_b2_can_publish_understanding_with_explicit_unknown_without_rework(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_analysis.results import (
-            AnalysisComplete,
-            MemoryAnalysisResult,
-        )
-        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+        from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+        from caliburn.workflows.work_memory.results import AnalysisComplete, MemoryAnalysisResult
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)

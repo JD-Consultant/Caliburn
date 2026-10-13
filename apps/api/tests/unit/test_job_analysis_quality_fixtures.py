@@ -111,3 +111,71 @@ def test_background_cases_separate_shared_known_scope_from_unconfirmed_identity(
     assert "正式職稱與歸屬單位還沒有確認" in unknown["formal_interview"][1]["text"]
     assert "仍未確認" in unknown["current_input"]
     assert "unknown_scope_stays_unknown" in cases
+
+
+def test_journey_inputs_and_private_oracles_have_matching_ids_and_stage_basis() -> None:
+    """Catch missing stages, leaked grading data and expectations citing future material."""
+    public_path = FIXTURES / "journeys.json"
+    private_path = FIXTURES / "journey-oracles.json"
+    assert public_path.is_file() and private_path.is_file()
+    public = json.loads(public_path.read_text(encoding="utf-8"))
+    private = json.loads(private_path.read_text(encoding="utf-8"))
+    assert public.keys() == {"data_origin", "model_input_policy", "journeys"}
+    assert private.keys() == {"audience", "status", "journeys"}
+    assert public["data_origin"] == "fully_synthetic"
+    assert private["audience"] == "reviewer_only_never_model_input"
+    journeys = {journey["id"]: journey for journey in public["journeys"]}
+    assert len(journeys) == len(public["journeys"]) == 4
+    assert (
+        journeys.keys()
+        == private["journeys"].keys()
+        == {
+            "memory_correction_consolidation",
+            "unanchored_background_and_shared_ks",
+            "manual_cross_section_changes",
+            "answered_but_not_drafted",
+        }
+    )
+    allowed_keys = {
+        "employee_input": {"id", "kind", "text"},
+        "manual_jd_edit": {"id", "kind", "edits"},
+        "memory_publication_observation": {"id", "kind", "through_input_stage", "label"},
+    }
+    for journey_id, journey in journeys.items():
+        assert journey.keys() == {"id", "stages"}
+        stages = {stage["id"]: stage for stage in journey["stages"]}
+        assert len(stages) == len(journey["stages"])
+        positions = {stage_id: index for index, stage_id in enumerate(stages)}
+        for stage_id, stage in stages.items():
+            assert stage.keys() == allowed_keys[stage["kind"]]
+            if stage["kind"] == "employee_input":
+                assert isinstance(stage["text"], str) and stage["text"].strip()
+            elif stage["kind"] == "manual_jd_edit":
+                assert stage["edits"]
+                for edit in stage["edits"]:
+                    assert edit.keys() == {"section", "target_cue", "content"}
+                    assert all(isinstance(value, str) and value.strip() for value in edit.values())
+            else:
+                preceding = stage["through_input_stage"]
+                assert stages[preceding]["kind"] == "employee_input"
+                assert positions[preceding] < positions[stage_id]
+                assert stage["label"].strip()
+        oracle = private["journeys"][journey_id]
+        assert oracle["expectations"] and oracle["hard_failures"]
+        assert oracle["acceptable_variation"].strip()
+        for expectation in oracle["expectations"]:
+            observed = expectation["after_stage"]
+            assert observed in stages
+            assert expectation["basis"]
+            for reference in expectation["basis"]:
+                source_stage, *path = reference.split(".")
+                assert positions[source_stage] <= positions[observed]
+                assert path and path[0] in {"text", "edits"}
+                material = stages[source_stage]
+                for part in path:
+                    material = material[int(part)] if isinstance(material, list) else material[part]
+                assert isinstance(material, str) and material.strip()
+            assert expectation["whole_jd"].strip() and expectation["plan"].strip()
+            assert expectation["memory"].keys() == {"B1", "B2"}
+            assert all(text.strip() for text in expectation["memory"].values())
+            assert expectation["not_observed"]

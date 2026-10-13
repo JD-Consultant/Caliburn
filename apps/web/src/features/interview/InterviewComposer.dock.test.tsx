@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -12,10 +13,7 @@ afterEach(() => {
 });
 
 test('what the page puts above the dock is rendered inside the dock, which the page cannot otherwise reach', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json({ turn: null }))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json({ turn: null }))));
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
   render(

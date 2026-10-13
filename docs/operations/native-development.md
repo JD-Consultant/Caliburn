@@ -45,7 +45,7 @@ Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `apps/api/uv.loc
 
 ## 資料庫設定
 
-1. 建立一個空的專用 PostgreSQL database。首次安裝不搬移其他產品的資料；更新目前 App 時則沿用原資料庫。
+1. 建立一個空的專用 PostgreSQL database 或選擇空的 App schema。首次安裝不搬移其他產品的資料；保存格式不相容時沿[更新流程](#更新已有安裝)選擇新 namespace。
 2. 以環境變數明示連線，密碼由本機秘密管理注入，不貼在命令列歷史、文件或 Git：
 
 ```powershell
@@ -119,7 +119,9 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 
 ## 更新已有安裝
 
-先讓工作停在安全點，正常停止自己啟動的 App，依[備份操作](README.md#資料庫與備份)備份原資料庫。沒有未提交修改且分支沒有分歧時，從專案根目錄執行：
+先完成或取消工作，正常停止自己啟動的 App，依[備份操作](README.md#資料庫與備份)保存原資料庫。`0034_jd_task_sources` 不相容較早的保存格式，首次切入本版時將 `CALIBURN_DATABASE_SCHEMA` 設為新的空 schema（例如 `caliburn_v2`）；不搬移舊資料或中斷工作。原 schema 不會自動刪除，新版自己的中斷恢復仍沿已保存原件處理。相同新版 schema 後續更新沿原 namespace。
+
+沒有未提交修改且分支沒有分歧時，從專案根目錄執行：
 
 ```powershell
 & {
@@ -129,7 +131,7 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
     if ($LASTEXITCODE -ne 0) { throw 'Node 依賴安裝失敗，停止更新。' }
     uv sync --project apps/api --locked
     if ($LASTEXITCODE -ne 0) { throw 'Python 依賴安裝失敗，停止更新。' }
-    # 本終端須已提供原 CALIBURN_DATABASE_URL／schema 與所需 PDF 設定。
+    # 本終端須已提供明示的 CALIBURN_DATABASE_URL／schema 與所需 PDF 設定。
     pnpm app:migrate
     if ($LASTEXITCODE -ne 0) { throw '資料庫升級失敗，停止更新。' }
     pnpm build

@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** The file list: one link per row, a compact local timestamp, and the rename action beside it. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
@@ -15,8 +16,7 @@ afterEach(() => {
 test('each row has a single link, a 24-hour minute-precision date and a rename button', async () => {
   // Built from local parts, so the expectation does not depend on the machine's time zone.
   const created = new Date(2026, 8, 29, 18, 5, 59);
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(
         Response.json({

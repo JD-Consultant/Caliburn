@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { APIRequestContext, Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { isEditJdTasksRequest, isJdWorkView, isJobFile } from '../../src/shared/api/validation';
-import type { JdWorkView } from '../../src/shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../src/shared/api/generated/http/types.gen';
 
 async function createFile(request: APIRequestContext): Promise<string> {
   const response = await request.post('/api/job-files', {

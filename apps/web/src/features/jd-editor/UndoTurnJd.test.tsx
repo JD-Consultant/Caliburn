@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -39,7 +40,7 @@ test('conflict never overwrites the current JD or automatically submits another 
       ),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client, onUndone } = renderUndo();
   const later = { ...originalResult, profile: { ...originalResult.profile, job_title: '後來稿' } };
   client.setQueryData(['jd-profile', fileId, 'formal'], later);
@@ -65,7 +66,7 @@ test('uncertain undo blocks in-flight duplicates and retries only the same Turn 
     .fn<(url: string, options?: RequestInit) => Promise<Response>>()
     .mockImplementationOnce(() => pending)
     .mockImplementation(() => Promise.resolve(Response.json(originalResult)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { onUndone } = renderUndo();
   await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));
   await userEvent.dblClick(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
@@ -90,10 +91,7 @@ test('uncertain undo blocks in-flight duplicates and retries only the same Turn 
 });
 
 test('an invalid successful response cannot claim the undo is confirmed', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json({ profile: {} }))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json({ profile: {} }))));
   const { onUndone } = renderUndo();
   await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));
   await userEvent.click(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
@@ -107,7 +105,7 @@ test('confirmed undo refreshes remaining observers after its dialog unmounts', a
   const pending = new Promise<Response>((done) => {
     resolve = done;
   });
-  vi.stubGlobal('fetch', vi.fn().mockReturnValue(pending));
+  stubHttp(vi.fn().mockReturnValue(pending));
   const { unmount, onUndone } = renderUndo();
   await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));
   await userEvent.click(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
@@ -121,7 +119,7 @@ test('confirmed undo refreshes remaining observers after its dialog unmounts', a
 
 test('a failed refresh keeps known undo success and cannot resend the operation', async () => {
   const fetcher = vi.fn().mockResolvedValue(Response.json(originalResult));
-  vi.stubGlobal('fetch', fetcher);
+  stubHttp(fetcher);
   const { onUndone } = renderUndo();
   onUndone.mockRejectedValue(new Error('synthetic read failure'));
   await userEvent.click(screen.getByRole('button', { name: '撤回這輪 JD' }));

@@ -133,6 +133,15 @@ test("reference services do not publish ports or receive the App credential", ()
   assert.equal(config.services.embedder.gpus[0].count, -1);
 });
 
+test("an explicit fresh App schema uses the same database volume", () => {
+  const basic = resolveCompose();
+  const isolated = resolveCompose({ overrides: { CALIBURN_DATABASE_SCHEMA: "caliburn_fresh" } });
+  assert.equal(basic.services.app.environment.CALIBURN_DATABASE_SCHEMA, "caliburn");
+  assert.equal(isolated.services.app.environment.CALIBURN_DATABASE_SCHEMA, "caliburn_fresh");
+  assert.deepEqual(isolated.services.postgres, basic.services.postgres);
+  assert.deepEqual(isolated.volumes, basic.volumes);
+});
+
 test("standalone RAG publishes only explicit loopback ports", () => {
   const config = JSON.parse(execFileSync("docker", [
     "compose", "--env-file", ".env.jd-app.example", "-f", "docker-compose.yml",

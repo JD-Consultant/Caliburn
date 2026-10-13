@@ -8,8 +8,8 @@ import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from caliburn.adapters.logging import SafeJsonFormatter
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
 
 class Leader:
@@ -53,7 +53,11 @@ def make_supervisor(kind):
 
 
 def logged_failures(caplog):
-    records = [record for record in caplog.records if record.name.endswith("_supervisor")]
+    records = [
+        record
+        for record in caplog.records
+        if record.name in {ConsultantSupervisor.__module__, MemorySupervisor.__module__}
+    ]
     assert all(record.exc_info is None for record in records)
     assert "private" not in str([record.__dict__ for record in records])
     return [json.loads(SafeJsonFormatter().format(record)) for record in records]

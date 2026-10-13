@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { JdWorkEditor } from './JdWorkEditor';
 import { jdWorkQuery } from './jd-work-api';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const revision = '20000000-0000-4000-8000-000000000002';
@@ -81,7 +82,7 @@ function stubServer(answer?: Answer, view: JdWorkView = jd) {
     attempt += 1;
     return answer ? answer(attempt, path) : Promise.resolve(accepted(path, view));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const posts = () => fetch.mock.calls.filter(([, options]) => options?.method === 'POST');
   return {
     writes: () =>
@@ -424,7 +425,7 @@ test('a failed background refresh keeps the work draft, shows the error and bloc
       );
     return Promise.resolve(readFails ? Response.json({}, { status: 503 }) : Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = renderEditor();
   await userEvent.click(await screen.findByText('原工作內容'));
   const field = await screen.findByRole('textbox', { name: '工作內容' });

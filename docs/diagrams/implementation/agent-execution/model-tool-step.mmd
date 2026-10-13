@@ -16,6 +16,6 @@ flowchart TD
   CMD --> EXEC[[原業務核資格並執行或查回<br/>memory-tools §4／JD 工具契約]]
   EXEC --> RESULT
   RESULT --> POSITION
-  MORE -->|無| BUILD[核資格並組裝完整窗口<br/>步數加一；按原 R 分類 next_action]
-  BUILD --> STEP[/saver 保存完整 Step/]
+  MORE -->|無| BUILD[核資格與完整配對<br/>步數加一；按原 R 分類 next_action]
+  BUILD --> STEP[/saver 保存 Step 完成標記<br/>保留 request、R 與工具原件/]
   STEP --> END([返回 Step 結果<br/>尚未正式提交產品資料])

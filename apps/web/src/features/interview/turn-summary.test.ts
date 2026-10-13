@@ -1,6 +1,6 @@
 /** Summaries only present a server-verified status; the JD lock follows active and paused only. */
 import { expect, test } from 'vitest';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { describeTurnBadge, isJdReadOnlyDuring } from './turn-summary';
 
 function turn(status: ConsultantTurn['status'], pauseRequested = false): ConsultantTurn {

@@ -3,7 +3,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { ReactNode, SubmitEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, InputBase } from '@mui/material';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { ApiError, describeReadError } from '../../shared/api/http';
 import { ArrowUpIcon } from '../../shared/ui/icons';
 import {

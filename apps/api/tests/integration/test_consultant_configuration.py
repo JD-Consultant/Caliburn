@@ -4,7 +4,6 @@ from dataclasses import replace
 
 import pytest
 
-from caliburn.agents.job_consultant import runner as runner_module
 from caliburn.agents.job_consultant.configuration import (
     ConsultantConfiguration,
     ConsultantPrompts,
@@ -12,11 +11,12 @@ from caliburn.agents.job_consultant.configuration import (
 )
 from caliburn.agents.job_consultant.context_binding import read_saved_turn_context
 from caliburn.agents.job_consultant.runner import ConsultantRunner
-from caliburn.agents.job_consultant.tools import ConsultantTools
 from caliburn.features.executions import history
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.settings import ModelSettings
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.transport.model_tools.jd_reads import JdReadTools
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.executions.context_history import RoleContextHistory
 from tests.integration.test_occupation_reference_runners import (
     ReferenceTransport,
     ScriptedModel,
@@ -38,7 +38,7 @@ def test_saved_turn_keeps_original_configuration_after_candidate_change(
     )
     old = ConsultantConfiguration(
         jd_read_max_result_characters=1,
-        prompts=replace(ConsultantPrompts(), focus="原候選：先核對真實事件。"),
+        prompts=replace(ConsultantPrompts(), professional_method="原候選：先核對真實事件。"),
         tool_descriptions=(
             ToolDescriptionOverride("read_jd", "原候選的讀取說明"),
             *(
@@ -51,7 +51,7 @@ def test_saved_turn_keeps_original_configuration_after_candidate_change(
     changed = replace(
         old,
         jd_read_max_result_characters=1_000_000,
-        prompts=replace(old.prompts, focus="新候選：改問另一個重點。"),
+        prompts=replace(old.prompts, professional_method="新候選：改問另一個重點。"),
         tool_descriptions=(
             ToolDescriptionOverride("read_jd", "新候選的讀取說明"),
             *old.tool_descriptions[1:],
@@ -72,8 +72,16 @@ def test_saved_turn_keeps_original_configuration_after_candidate_change(
                 _provider,
             ):
                 runner = ConsultantRunner(sessions, saver, sdk, ModelSettings(api_key="synthetic"))
+                prepare = RoleContextHistory.prepare_history
+
+                async def interrupt_after_preparation(*args, **kwargs):
+                    await prepare(*args, **kwargs)
+                    await interrupt()
+
                 with monkeypatch.context() as crash:
-                    crash.setattr(runner_module, "capture_turn_context", interrupt)
+                    crash.setattr(
+                        RoleContextHistory, "prepare_history", interrupt_after_preparation
+                    )
                     with pytest.raises(RuntimeError, match="saved boundary"):
                         await runner.run(cancelled_writer)
                 await ConsultantCompletionWorkflow(sessions).stop(
@@ -102,7 +110,7 @@ def test_saved_turn_keeps_original_configuration_after_candidate_change(
                 if boundary == "preparation":
                     crash.setattr(history, "adopt_prepared_context", interrupt)
                 else:
-                    crash.setattr(ConsultantTools, "prepare", interrupt)
+                    crash.setattr(JdReadTools, "invoke", interrupt)
                 with pytest.raises(RuntimeError, match="saved boundary"):
                     await runner.run(writer)
             await replace(
@@ -120,10 +128,9 @@ def test_saved_turn_keeps_original_configuration_after_candidate_change(
                 assert tools["read_jd"]["description"] == "原候選的讀取說明"
                 assert ("edit_interview_plan" in tools) == original_plans
             assert captured.request.create_payload()["tools"] == script.sent[0]["tools"]
-            # Tool 的執行政策固定於首次 initial capture；歷史準備本身不執行工具。
-            expected_limit = 1_000_000 if boundary == "preparation" else 1
-            assert captured.jd_read_max_result_characters == expected_limit
+            # Initial capture now fixes tool policy before history preparation can suspend.
+            assert captured.jd_read_max_result_characters == 1
             tool_output = script.sent[1]["input"][-1]["output"]
-            assert ("read_limit_exceeded" in tool_output) == (expected_limit == 1)
+            assert "read_limit_exceeded" in tool_output
 
     client.portal.call(scenario)

@@ -118,22 +118,6 @@ class OccupationReferenceWorkflow:
             )
             return _project(result.state)
 
-    async def restore(
-        self,
-        writer: ExecutionWriter,
-        position: ReferenceStatePosition,
-        target_revision_id: UUID,
-        operation_id: UUID,
-    ) -> ReferenceStatePosition:
-        _require_consultant(writer)
-        if position.execution_id != writer.scope.execution_id:
-            raise ReferenceStateError("Reference position belongs to another Turn")
-        async with self.sessions.begin() as session:
-            await _lock_writer(session, writer)
-            return await service.restore_candidate(
-                session, writer.scope.job_file_id, position, target_revision_id, operation_id
-            )
-
 
 def _require_consultant(writer: ExecutionWriter) -> None:
     if writer.scope.kind != ExecutionKind.CONSULTANT_TURN:

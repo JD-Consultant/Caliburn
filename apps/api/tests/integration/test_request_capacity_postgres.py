@@ -17,16 +17,16 @@ from psycopg.conninfo import make_conninfo
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
-from caliburn.agent_execution.tool_steps import (
-    InputCountSaveError,
-    ResponseStepRuntime,
-    run_response_step,
-)
+from caliburn.agent_execution.response_runtime import InputCountSaveError
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import ExecutionBudget
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
-from caliburn.workflows.model_requests import ModelRequestAccounting, ModelRequestExecutor
-from tests.fixtures.response_capacity import synthetic_capacity_limits
+from caliburn.workflows.executions.model_requests import (
+    ModelRequestAccounting,
+    ModelRequestExecutor,
+)
+from tests.fixtures.native_response_runtime import run_response_step
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_capacity_limits
 
 pytestmark = pytest.mark.postgres
 
@@ -126,13 +126,13 @@ def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound
                     raise ConnectionError("synthetic before generation admission")
 
                 runtime = ResponseStepRuntime(
-                    fail_before_generation,
-                    tool,
-                    tool,
-                    guard,
-                    executor.account_response,
-                    executor.count_input,
-                    {**synthetic_capacity_limits(), "context_window_tokens": 1000},
+                    request_model=fail_before_generation,
+                    prepare_tool=tool,
+                    execute_tool=tool,
+                    ensure_active=guard,
+                    account_response=executor.account_response,
+                    count_input=executor.count_input,
+                    capacity_limits={**synthetic_capacity_limits(), "context_window_tokens": 1000},
                 )
                 request = ResponseRequest(
                     model="gpt-6-luna",

@@ -15,9 +15,9 @@ from caliburn.features.occupation_references import service as references
 from caliburn.features.occupation_references.models import OccupationReferenceState
 from caliburn.features.work_memory import consolidation_requests
 from caliburn.features.work_memory.consolidation_models import MemoryEvidenceError
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.memory_consolidation_queries import read_blocks, read_failure_reason
 from caliburn.workflows.occupation_reference_reads import read_formal_reference_state
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.consolidation_queries import read_blocks, read_failure_reason
 from tests.integration.test_memory_batch_orchestration import complete_turn, execute, start_turn
 from tests.integration.test_memory_evidence_isolation import add_damaged_intent
 
@@ -223,7 +223,7 @@ def test_obsolete_reference_json_does_not_load_and_latest_invalid_state_is_rejec
 
     async def scenario(database):
         first = await start_turn(database)
-        generation_id, revision_id = uuid4(), uuid4()
+        revision_id = uuid4()
         async with database.sessions.begin() as session:
             session.add(
                 persistence.ReferenceOperationRecord(
@@ -231,10 +231,7 @@ def test_obsolete_reference_json_does_not_load_and_latest_invalid_state_is_rejec
                     execution_id=first.scope.execution_id,
                     operation_id=uuid4(),
                     kind="start",
-                    generation_id=generation_id,
-                    result_generation_id=generation_id,
                     expected_revision_id=None,
-                    parent_revision_id=None,
                     revision_id=revision_id,
                     state={"selected_reference_ids": [99], "excluded_work": []},
                 )
@@ -244,8 +241,6 @@ def test_obsolete_reference_json_does_not_load_and_latest_invalid_state_is_rejec
                 persistence.ReferenceCandidateRecord(
                     job_file_id=first.scope.job_file_id,
                     execution_id=first.scope.execution_id,
-                    generation_id=generation_id,
-                    base_revision_id=revision_id,
                     current_revision_id=revision_id,
                 )
             )

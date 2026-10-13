@@ -1,4 +1,4 @@
-"""Evidence stays precise and pending until explicit alignment, even after a text revert."""
+"""Manual changes await review; consultant analysis updates only changed JD support."""
 
 from dataclasses import replace
 from uuid import UUID
@@ -7,9 +7,14 @@ import pytest
 
 from caliburn.features.job_description.capabilities import (
     Capability,
+    CapabilityField,
+    CapabilityFieldChange,
     CapabilityKind,
+    ReviseCapability,
     TaskCapabilityLink,
 )
+from caliburn.features.job_description.compound_changes import apply_compound_changes
+from caliburn.features.job_description.compound_edits import ReviseItemWithSources
 from caliburn.features.job_description.models import JdProfile, ProfileField
 from caliburn.features.job_description.source_targets import source_target_contents
 from caliburn.features.job_description.sources import (
@@ -40,22 +45,15 @@ def test_text_changes_remain_pending_after_revert_until_explicit_alignment() -> 
     assert align_source_reference(reverted[0], original.source) == original
 
 
-def test_detail_and_relation_evidence_is_not_inherited_or_moved_to_parent() -> None:
+def test_deleted_task_evidence_does_not_move_to_another_task() -> None:
     task = JdSourceTarget(SourceTargetKind.TASK, item_id=UUID(int=1))
-    detail = JdSourceTarget(SourceTargetKind.DETAIL, item_id=UUID(int=2), task_id=UUID(int=1))
-    relation = JdSourceTarget(
-        SourceTargetKind.TASK_CAPABILITY, item_id=UUID(int=3), task_id=UUID(int=1)
-    )
+    other = JdSourceTarget(SourceTargetKind.TASK, item_id=UUID(int=2))
     source = InterviewSource(UUID(int=7))
     task_ref = JdSourceReference(UUID(int=10), task, source)
-    detail_ref = JdSourceReference(UUID(int=11), detail, source)
-    relation_ref = JdSourceReference(UUID(int=12), relation, source)
-    before = {task: ("前端",), detail: ("可以驗收",), relation: ("介面知識",)}
-    after = {task: ("前端",), relation: ("介面知識",)}
-    assert carry_source_references((task_ref, detail_ref, relation_ref), before, after) == (
-        task_ref,
-        relation_ref,
-    )
+    other_ref = JdSourceReference(UUID(int=11), other, source)
+    before = {task: ("前端",), other: ("後端",)}
+    after = {other: ("後端",)}
+    assert carry_source_references((task_ref, other_ref), before, after) == (other_ref,)
 
 
 def test_adding_existing_memory_source_does_not_refresh_old_basis() -> None:
@@ -90,14 +88,14 @@ def test_unrelated_target_fields_and_missing_existing_owner_are_rejected() -> No
     with pytest.raises(InvalidJdSourceError):
         JdSourceTarget(SourceTargetKind.PROFILE_FIELD, item_id=UUID(int=1))
     with pytest.raises(InvalidJdSourceError):
-        JdSourceTarget(SourceTargetKind.DETAIL, item_id=UUID(int=1))
+        JdSourceTarget(SourceTargetKind.TASK, field=ProfileField.PURPOSE)
     target = JdSourceTarget(SourceTargetKind.TASK, item_id=UUID(int=1))
     citation = JdSourceReference(UUID(int=2), target, InterviewSource(UUID(int=3)))
     with pytest.raises(InvalidJdSourceError):
         carry_source_references((citation,), {}, {target: ("名稱",)})
 
 
-def test_projection_separates_task_detail_definition_and_relation_meanings() -> None:
+def _task_support_work() -> JdWorkRevision:
     task = WorkTask(
         UUID(int=1),
         UUID(int=2),
@@ -107,7 +105,7 @@ def test_projection_separates_task_detail_definition_and_relation_meanings() -> 
         (TaskDetail(UUID(int=3), DetailKind.OUTCOME, "可驗收頁面"),),
     )
     capability = Capability(UUID(int=4), UUID(int=5), CapabilityKind.SKILL, "頁面實作", "元件化")
-    work = JdWorkRevision(
+    return JdWorkRevision(
         UUID(int=6),
         (),
         (task,),
@@ -116,18 +114,158 @@ def test_projection_separates_task_detail_definition_and_relation_meanings() -> 
         (),
         (),
     )
-    before = source_target_contents(JdProfile(), work)
-    changed = replace(task, details=(replace(task.details[0], text="經驗收頁面"),))
-    after = source_target_contents(JdProfile(), replace(work, tasks=(changed,)))
-    task_target = JdSourceTarget(SourceTargetKind.TASK, task.task_id)
-    detail_target = JdSourceTarget(SourceTargetKind.DETAIL, UUID(int=3), task_id=task.task_id)
-    relation_target = JdSourceTarget(
-        SourceTargetKind.TASK_CAPABILITY, capability.capability_id, task_id=task.task_id
+
+
+def test_task_support_includes_details_and_linked_capability_content() -> None:
+    work = _task_support_work()
+    task, capability = work.tasks[0], work.capabilities[0]
+    target = JdSourceTarget(SourceTargetKind.TASK, task.task_id)
+    before = source_target_contents(JdProfile(), work)[target]
+    for changed in (
+        replace(
+            work,
+            tasks=(
+                replace(
+                    task,
+                    details=(
+                        *task.details,
+                        TaskDetail(UUID(int=8), DetailKind.REQUIREMENT, "三日內交付"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            work, tasks=(replace(task, details=(replace(task.details[0], text="經驗收頁面"),)),)
+        ),
+        replace(work, tasks=(replace(task, details=()),)),
+        replace(work, task_links=()),
+        replace(
+            work,
+            capabilities=(*work.capabilities, replace(capability, capability_id=UUID(int=9))),
+            task_links=(*work.task_links, TaskCapabilityLink(task.task_id, UUID(int=9))),
+        ),
+        replace(work, capabilities=(replace(capability, description="後端實作"),)),
+    ):
+        assert source_target_contents(JdProfile(), changed)[target] != before
+
+
+def test_task_support_ignores_order_and_area() -> None:
+    work = _task_support_work()
+    task, capability = work.tasks[0], work.capabilities[0]
+    second_detail = TaskDetail(UUID(int=8), DetailKind.REQUIREMENT, "三日內交付")
+    second_capability = replace(capability, capability_id=UUID(int=9), name="測試")
+    work = replace(
+        work,
+        tasks=(replace(task, details=(*task.details, second_detail)),),
+        capabilities=(capability, second_capability),
+        task_links=(
+            *work.task_links,
+            TaskCapabilityLink(task.task_id, second_capability.capability_id),
+        ),
     )
-    assert before[task_target] == after[task_target] == ("網站交付", "前端部分")
-    assert before[detail_target] != after[detail_target]
-    assert before[relation_target] == after[relation_target]
-    capability_changed = source_target_contents(
-        JdProfile(), replace(work, capabilities=(replace(capability, description="後端實作"),))
+    task = work.tasks[0]
+    changed = replace(
+        work,
+        revision_id=UUID(int=100),
+        tasks=(
+            replace(
+                task,
+                area_id=UUID(int=10),
+                content_revision_id=UUID(int=11),
+                details=task.details[::-1],
+            ),
+        ),
+        task_links=work.task_links[::-1],
+        capabilities=tuple(
+            replace(c, content_revision_id=UUID(int=12)) for c in work.capabilities[::-1]
+        ),
     )
-    assert capability_changed[relation_target] != before[relation_target]
+    target = JdSourceTarget(SourceTargetKind.TASK, task.task_id)
+    assert (
+        source_target_contents(JdProfile(), changed)[target]
+        == source_target_contents(JdProfile(), work)[target]
+    )
+
+
+def test_shared_capability_change_rechecks_only_its_uses() -> None:
+    work = _task_support_work()
+    task, capability = work.tasks[0], work.capabilities[0]
+    other = replace(task, task_id=UUID(int=20), details=())
+    unrelated = replace(task, task_id=UUID(int=21), details=())
+    work = replace(
+        work,
+        tasks=(task, other, unrelated),
+        task_links=(*work.task_links, TaskCapabilityLink(other.task_id, capability.capability_id)),
+    )
+    changed = replace(work, capabilities=(replace(capability, description="新定義"),))
+    targets = tuple(JdSourceTarget(SourceTargetKind.TASK, t.task_id) for t in work.tasks)
+    refs = tuple(
+        JdSourceReference(UUID(int=30 + i), t, InterviewSource(UUID(int=40)))
+        for i, t in enumerate(targets)
+    )
+    pending = carry_source_references(
+        refs,
+        source_target_contents(JdProfile(), work),
+        source_target_contents(JdProfile(), changed),
+    )
+    assert tuple(r.needs_review for r in pending) == (True, True, False)
+    assert align_source_reference(pending[0], pending[0].source).needs_review is False
+    assert pending[1].needs_review is True
+
+
+@pytest.mark.parametrize("pending", [False, True])
+@pytest.mark.parametrize("kind", [CapabilityKind.KNOWLEDGE, CapabilityKind.SKILL])
+def test_consultant_capability_revision_reviews_affected_support_only(
+    pending: bool, kind: CapabilityKind
+) -> None:
+    work = _task_support_work()
+    task, capability = work.tasks[0], work.capabilities[0]
+    capability = replace(capability, kind=kind)
+    work = replace(work, capabilities=(capability,))
+    other = replace(task, task_id=UUID(int=20), details=())
+    unrelated = replace(task, task_id=UUID(int=21), details=())
+    work = replace(
+        work,
+        tasks=(task, other, unrelated),
+        task_links=(*work.task_links, TaskCapabilityLink(other.task_id, capability.capability_id)),
+    )
+    source = MemorySource(
+        MemorySourceLayer.WORK_SITUATION, UUID(int=70), UUID(int=71), UUID(int=72)
+    )
+    targets = (
+        *(JdSourceTarget(SourceTargetKind.TASK, t.task_id) for t in work.tasks),
+        JdSourceTarget(SourceTargetKind.CAPABILITY, capability.capability_id),
+    )
+    references = tuple(
+        JdSourceReference(
+            UUID(int=30 + i),
+            target,
+            source,
+            needs_review=pending,
+            reviewed_revision_id=UUID(int=50),
+        )
+        for i, target in enumerate(targets)
+    )
+    command = ReviseItemWithSources(
+        UUID(int=80),
+        work.revision_id,
+        ReviseCapability(
+            capability.capability_id,
+            (CapabilityFieldChange(CapabilityField.DESCRIPTION, "新定義"),),
+        ),
+        (),
+        (),
+    )
+    changed = apply_compound_changes(JdProfile(), work, references, command)
+    assert tuple(r.needs_review for r in changed.references) == (False, False, pending, False)
+    assert tuple(r.reviewed_revision_id for r in changed.references) == (
+        None,
+        None,
+        UUID(int=50),
+        None,
+    )
+    assert all(r.source == source for r in changed.references)
+    assert changed.references[2] == references[2]
+    # A repeated value cannot review pre-existing pending evidence.
+    unchanged = apply_compound_changes(JdProfile(), changed.work, references, command)
+    assert unchanged.references == references

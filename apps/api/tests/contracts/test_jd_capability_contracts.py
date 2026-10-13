@@ -1,25 +1,15 @@
 """Shared definition and task-use contracts preserve bounded, typed intentions."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.edit_jd_capabilities_request import EditJdCapabilitiesRequest
-from caliburn.contracts.generated.jd_capabilities_view import JdCapabilitiesView
 from caliburn.features.job_description.capability_changes import capability_change_payload
 from caliburn.transport.http.jd_capabilities import _change_from_wire
-
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
-
-
-def validator_for(filename: str) -> Draft202012Validator:
-    schema = json.loads((SCHEMAS / filename).read_text(encoding="utf-8"))
-    Draft202012Validator.check_schema(schema)
-    return Draft202012Validator(schema, format_checker=FormatChecker())
+from caliburn.transport.http.models.jd_capabilities_edits import EditJdCapabilitiesRequest
+from caliburn.transport.http.models.jd_views import JdCapabilitiesView
+from tests.fixtures.http_contracts import http_validator
 
 
 @pytest.mark.parametrize(
@@ -78,7 +68,7 @@ def validator_for(filename: str) -> Draft202012Validator:
     ],
 )
 def test_edit_schema_generated_dto_and_domain_round_trip(change: dict) -> None:
-    validator = validator_for("edit-jd-capabilities-request.schema.json")
+    validator = http_validator(EditJdCapabilitiesRequest)
     payload = {"command_id": str(uuid4()), "expected_revision_id": str(uuid4()), "change": change}
     validator.validate(payload)
     dto = EditJdCapabilitiesRequest.model_validate(payload)
@@ -121,7 +111,7 @@ def test_schema_and_dto_reject_invalid_definition(fields: dict) -> None:
             **fields,
         },
     }
-    assert not validator_for("edit-jd-capabilities-request.schema.json").is_valid(payload)
+    assert not http_validator(EditJdCapabilitiesRequest).is_valid(payload)
     with pytest.raises(ValidationError):
         EditJdCapabilitiesRequest.model_validate(payload)
 
@@ -140,7 +130,7 @@ def test_view_exposes_shared_content_once_with_ordered_identity_links() -> None:
         ],
         "task_links": [{"task_id": str(uuid4()), "capability_id": capability_id} for _ in range(2)],
     }
-    validator = validator_for("jd-capabilities-view.schema.json")
+    validator = http_validator(JdCapabilitiesView)
     validator.validate(payload)
     assert JdCapabilitiesView.model_validate(payload).model_dump(mode="json") == payload
     payload["capabilities"][0]["content_revision_id"] = str(uuid4())

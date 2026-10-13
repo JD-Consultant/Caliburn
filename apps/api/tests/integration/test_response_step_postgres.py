@@ -13,14 +13,11 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    ResponseStepSaveError,
-    _build_response_step,
-    run_response_step,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse, ResponseStepSaveError
+from caliburn.agent_execution.tool_steps import read_completed_response_history
 from caliburn.settings import DatabaseSettings
-from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
 
@@ -180,27 +177,28 @@ def test_saved_step_reopens_without_repeating_window_items(
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
-            result = await _build_response_step(saver, max_tool_calls=16).ainvoke(
-                {
-                    "request_snapshot": make_request(
-                        [{"role": "user", "content": "synthetic"}]
-                    ).create_payload(),
-                    "request_id": uuid4(),
-                    "model_step_limit": None,
-                    "tool_call_limit": 16,
-                    "capacity_limits": synthetic_capacity_limits(),
-                },
-                config,
-                context=runtime,
-                durability="sync",
+            result = await run_response_step(
+                saver,
+                thread_id=(config)["configurable"]["thread_id"],
+                request=ResponseRequest.from_snapshot(
+                    make_request([{"role": "user", "content": "synthetic"}]).create_payload()
+                ),
+                runtime=runtime,
+                max_tool_calls=16,
             )
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
-            restored = await _build_response_step(saver, max_tool_calls=16).ainvoke(
-                None, config, context=runtime, durability="sync"
+            restored = await run_response_step(
+                saver,
+                thread_id=(config)["configurable"]["thread_id"],
+                request=None,
+                runtime=runtime,
+                max_tool_calls=16,
             )
             assert restored == result
             assert restored["next_action"] == "deliver_answer"
-            assert len(restored["input_items"]) == 3
+            assert "input_items" not in restored
+            window = await read_completed_response_history(saver, thread_id="completed-step")
+            assert len(window.items) == 3
             assert requests == 1
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
@@ -257,8 +255,8 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
             assert calls == ["model"]
 
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
-            graph = _build_response_step(saver, max_tool_calls=16)
-            saved = await graph.aget_state(config)
+            pass
+            saved = await read_response_state(saver, config)
             assert "response_snapshot" not in saved.values
             result = await run_response_step(
                 saver,

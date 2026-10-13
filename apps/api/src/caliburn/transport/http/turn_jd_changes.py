@@ -5,11 +5,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from caliburn.contracts.generated.turn_jd_changes import TurnJdChanges
 from caliburn.features.executions.models import ExecutionNotFoundError, ExecutionStateError
 from caliburn.features.job_description.change_queries import JdChangeHistoryUnavailableError
-from caliburn.transport.turn_jd_markdown import project_turn_jd_changes
-from caliburn.workflows.turn_jd_changes import TurnJdChangesWorkflow
+from caliburn.transport.http.models.consultant import TurnJdChanges
+from caliburn.transport.jd_changes_markdown import project_turn_jd_changes
+from caliburn.workflows.job_description.turn_changes import TurnJdChangesWorkflow
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/consultant-turns", tags=["job-description"])
 
@@ -22,7 +22,9 @@ def get_turn_jd_changes(request: Request, response: Response) -> TurnJdChangesWo
     return workflow
 
 
-@router.get("/{execution_id}/jd-changes", response_model=TurnJdChanges)
+@router.get(
+    "/{execution_id}/jd-changes", response_model=TurnJdChanges, operation_id="read_turn_jd_changes"
+)
 async def read_turn_jd_changes(
     job_file_id: UUID,
     execution_id: UUID,

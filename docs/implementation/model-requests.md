@@ -24,6 +24,7 @@
 - Create 明確使用 `store=False`、`all_turns`、`truncation="disabled"`、輸出上限及同步非 background 回應；不帶 `previous_response_id`／server-side compaction。保留 `include=["reasoning.encrypted_content"]` 作明確相容設定；當前官方說明 `store=false` 已預設附帶，不把它說成唯一取得方法。
 - Count 和 compact 也只外送一次，不降級成猜測計數／本地摘要；compact 返回完整 SDK C，沒有在 adapter 自行採用。鎖定 SDK 的 standalone compact **沒有 `max_output_tokens`** ，不能用 create 的輸出上限當其費用上界。
 - `adapters/openai_failures.py` 區分遠端結果不明、暫時服務問題、權限／額度阻塞、容量、請求與回應協定問題；不複製可能含原話／秘密的 error body 到 State 或 UI。分類不等於已准許重試，更不代表該次免費。
+- 串流已收到完整 terminal R 後，普通 close 故障只記安全 warning，原 R 照常保存、結算及驗證內容；`failed`／`incomplete` 不因此成為成功。真正取消仍攜帶已取得原件向上交接；沒有 terminal 的讀取／收尾故障仍失敗，不以公開文字代替原件。
 
 adapter 支援固定 request 指定的串流與非串流傳輸；A 新請求使用串流，公開投影見[介面 §2](interface-and-delivery.md#2-串流不是保存權威)。持久額度、原結果採用及 Retry-After 由後續各節負責。驗證見直連傳輸與串流；SDK MockTransport 不等於遠端接受。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)。
 
@@ -47,7 +48,7 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 
 ## 2. 固定請求、一次外送與保存後結算
 
-`workflows/model_requests.py` 由角色 runner 組裝，協調 executions 額度、短交易與 SDK；共用 Graph 不 import features，不增加 ResponseStore 或第二套回執。生成前須通過[計數與容量准入](#4-固定請求計數與容量准入)。多 Step、compact 與 provider 重試分見[有界多 Step 接續](agent-execution.md#44-有界多-step-接續)、[完整 C 保存、採用與中途接續](agent-execution.md#51-完整-c-保存採用與中途接續)、[外送重試](#5-單一外送重試責任)。下圖聚焦生成成功路徑，不略過計數或故障分類。
+`workflows/executions/model_requests.py` 由角色 runner 組裝，協調 executions 額度、短交易與 SDK；共用 Graph 不 import features，不增加 ResponseStore 或第二套回執。生成前須通過[計數與容量准入](#4-固定請求計數與容量准入)。多 Step、compact 與 provider 重試分見[有界多 Step 接續](agent-execution.md#44-有界多-step-接續)、[完整 C 保存、採用與中途接續](agent-execution.md#51-完整-c-保存採用與中途接續)、[外送重試](#5-單一外送重試責任)。下圖聚焦生成成功路徑，不略過計數或故障分類。
 
 ![現行：2. 固定請求、一次外送與保存後結算](../diagrams/implementation/model-requests/request-generation-settlement.png)
 
@@ -60,15 +61,27 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 ### 固定請求與原件交接
 
 - 每個新 Step 的初始 checkpoint 固定 App 產生的 `request_id` 與 **實際 create payload** ，包括 model、instructions、tools、input、reasoning、輸出上限與串流設定。沒有另存初始 input 副本；`input_items` 僅在完成 Step 時形成後續窗口。`ResponseRequest.from_snapshot` 還原同一請求，拒絕不符固定直連政策的快照，不能用目前角色設定代替當時設定。這是恢復資料，不宣告永久保存所有請求。
-- `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 有尚未核明的 attempt 時停止讓外層核對，不換 UUID 假裝首次呼叫；只有 [外送重試](#5-單一外送重試責任) 已確認的可重試故障才可新准入。已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
+- `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 有其他尚未核明的 attempt 時停止讓外層核對，不換 UUID 假裝首次呼叫；當前尚未外送的准入以原鍵完成 [DB 恢復](#21-純資料庫操作的有限恢復)。新的傳輸 attempt 只由[外送重試](#5-單一外送重試責任)准入。已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
 - SDK 返回後，立即交出 `ReceivedModelResponse(response, attempt_id)`；其間沒有可能失敗的記費 SQL 或費用推算。Graph 保存原 R／attempt 後，才進 `account_response`。結算解析或提交失敗時，原 R 已在既有 saver，下一次只重入同一結算，不重呼模型。這借鑑官方耐久節點交界，不將整輪鎖成一個 DB transaction。
 
 ### 結算與採用
 
-- `ModelRequestAccounting` 使用與原 budget 相同的 `cost_basis`、預留及觀察成本計算；`workflows/model_runtime.py` 從固定模型配置組裝。費率見 [費率與 usage 估算](#6-固定費率與-usage-成本估算)，產品與付費評測的未知 usage 處理見 [產品與評測金額界線](#7-產品與付費驗證的金額界線)；成本估算不等於帳單驗證。
-- 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在 `aupdate_state` 補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
+- `ModelRequestAccounting` 使用與原 budget 相同的 `cost_basis`、預留及觀察成本計算；`workflows/executions/model_runtime.py` 從固定模型配置組裝。費率見 [費率與 usage 估算](#6-固定費率與-usage-成本估算)，產品與付費評測的未知 usage 處理見 [產品與評測金額界線](#7-產品與付費驗證的金額界線)；成本估算不等於帳單驗證。
+- 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在原件補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
 
 驗證：固定請求與保存後計量。依據：[LangGraph sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[OpenAI 原件接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)；此安全交界不承諾 provider 與 PostgreSQL 共同原子提交。
+
+### 2.1 純資料庫操作的有限恢復
+
+`adapters/database.py::retry_database_operation` 用既有 Tenacity 執行明確標示的完整 DB 操作，每次建立新 session，最多 3 次嘗試（含首次）。等待採 full jitter：從 0 到遞增上限隨機取值，首次上限 0.25 秒、封頂 1 秒。SQLAlchemy 只解開直接 `orig`，共用既有 Psycopg 故障分類；永久錯誤與取消直接傳遞。不重試單條 SQL、不在交易內等網路，也不包整個 Graph、runner 或工具準備流程。
+
+重入仍由各 owner 核對原結果：准入保留當次尚未外送的 attempt；記帳沿同一 R／C 與成本；provider failure 保留已形成的原 `retry_at`。JD／Plan／Memory 修改使用已準備命令及既有 operation receipt；A 完成、Memory 階段交接／發布先查原完成結果。A capture 在同次 DB 恢復中保留已完整形成的 capture，不因 COMMIT 確認不明而改選 Memory／來源資料；尚未形成 capture 的讀取交易失敗則重做完整操作。
+
+這些是原用例入口的有限恢復，沒有新增表、持久狀態或第二套冪等鍵；不與原件補存重試巢狀相乘。未接此入口的讀取、耗盡及永久故障仍向原責任傳遞，原監督程序的失鎖／全面 DB 故障政策不變。次數有界不代表 DB I/O 具有相同秒數的硬期限。
+
+Tenacity `before_sleep` 沿既有本機日誌記 `database.operation_retry`：操作名稱、剛失敗的 DB 嘗試序號（含首次）、直接 driver 錯誤型別及現有工作關聯。只在仍准許重試時記錄，不記 SQL、參數、DSN 或例外文字；它表示將重試，不代表原交易未提交或已恢復成功。
+
+依據：[SQLAlchemy 交易重試](https://docs.sqlalchemy.org/en/21/faq/connections.html#how-do-i-retry-a-statement-execution-automatically)與[PostgreSQL 完整交易恢復](https://www.postgresql.org/docs/current/mvcc-serialization-failure-handling.html)。本案操作身分及核對規則由各 owner 維護，框架不代替業務裁決。
 
 ## 3. 工作額度保存
 
@@ -88,7 +101,7 @@ B1／B2 使用同一 Memory batch scope，不各領一份可重置的預算。
 
 - 新模型 Step、compact、count 使用 App 產生的 logical request 身分與 exact payload SHA-256；傳輸重試保留同 request、另給 attempt。新模型修參數則是新 request。模型步數與壓縮數按不同 request 計，所有實際准入 attempt 均計入總次數與成本。
 - 新 attempt 在既有 execution 短行鎖下重查有效 writer、固定 deadline、各次數與成本，再預留；deadline 用取得鎖後的 DB 時間，不能用等待鎖前的時間判斷。交易內沒有網路等待。
-- **只有新准入且提交確認後才可外送一次。** 同 attempt 重入回原紀錄、`created=False`，不是可重送的票。COMMIT 確認不明先查回，不能因看到原紀錄便再發送；確需重新推論時要新 attempt，仍占同一工作限額。外送 workflow 依此判斷是否可傳送。
+- **准入提交確認後才可外送一次。** 當前呼叫在 HTTP 前固定自己的 attempt；准入遇到暫時 DB 故障時，以同鍵查回、核對原 payload 與預留，再完成這一次尚未開始的外送。`created=False` 本身不是重送許可；冷恢復讀到舊 attempt，不能據此重送未知的生成／壓縮。需要重新推論時仍須新 attempt，受原工作限制。
 - 啟用金額上限時，聚合 `reported_cost_usd ?? reserved_cost_usd` 作金額准入占用；timeout、崩潰或沒有 usage 均保留原預留，不歸零。已知 usage 依固定計價規則得出成本後只記一次；相同重入可承接、不同值拒絕。已知成本高於預留也如實記入，啟用金額上限時使後續准入受限，不以拒絕記帳隱藏超支。它不是 provider 帳單保證。
 - 取消／writer 更換只停止新的准入與採用，不刪已發生的記帳。晚到結果仍可結算原 attempt，但記帳函式不恢復執行、不採用 R／C、不准派工具。沒有新外送時，讀原結果不受已耗盡額度阻擋。
 - SQL 禁止改寫／刪除固定 budget，禁止清除／改寫 attempt 身分與已知成本；不存另一份可失同步的計數器。FK 及 scope 查詢維持檔案隔離，成本採固定精度 Decimal，不用 float。
@@ -101,14 +114,14 @@ B1／B2 使用同一 Memory batch scope，不各領一份可重置的預算。
 
 計數不產生模型回應、不計入模型迭代數，但計入 API 外送次數與延遲。未變動的同一 payload 可沿用本次執行已保存的計數；本機 tokenizer 不保證 opaque items 的精確大小，字元數或上一 usage 也不能代替實際請求計數。輸出上限包含 reasoning 與可見輸出，預留不重複計算；計數失敗保留恢復位置，依有界政策處理。
 
-每個新 request 先走 `count_input → request_model`，沿現有 StateGraph 的 sync 保存，不增永久計數 cache、資料表或另一份模型窗口。`ResponseStepRuntime` 必填計數 callback 與模型容量；測試替身明確提供合成容量，不在 production 類別內設繞過開關。
+每個新 request 先經容量子圖計數、同步保存及准入，再進標準 Agent 的 model 節點，不增永久計數 cache、資料表或另一份模型窗口。`ResponseStepRuntime` 必填計數 callback 與模型容量；測試替身明確提供合成容量，不在 production 類別內設繞過開關。
 
 - 初始 checkpoint 保存 `ModelCapacityLimits`（模型、最大輸入、context window、最大輸出），恢復不能換較寬設定。已知模型不符／輸出超限於 count 外送前拒絕；實際容量仍須與當前官方模型契約校準，不把 fixture 數值當真實容量。
 - 計數取得同一固定 `ResponseRequest.count_payload()`，含 instructions、tools、reasoning 設定與完整原生 input。計數 logical ID 由本次 request 身分派生，`TOKEN_COUNT` 原 attempt 由 executions 執行資格模組管理；換新 Step 才清除舊計數，不能把前一 request 的數字套到已增長窗口。
 - count 返回的 `input_tokens` 與原 attempt 保存在 checkpoint，之後才檢查非負整數、input 上限及 `input + max_output_tokens ≤ context window`；reasoning 已在 output 預留中，不另加一次。計數失敗／不合法即停止，不降成零、不裁歷史、不自動換模型。
-- 模型／後續節點失敗時承接已保存的 count；計數本身若已有 attempt 但原結果不可得，`PriorInputCountAttemptError` 交回核對，不盲目重送。
+- 模型／後續節點失敗時承接已保存的 count；計數結果未保存且程序也未持有時，可沿同一 request ID 與固定 payload 重新計數。新 count 必須取得新的 attempt，原未知 attempt 與行政預留保留；不把未知偽裝成可重試 failure，也不換身分或延長 deadline。永久錯誤、已保存 Retry-After、writer／取消、原期限、每請求與全工作次數及適用費用限制仍先核對。此規則共用於輪前 history 與實際請求 capacity 計數，不適用於生成／壓縮原件遺失。
 
-  `InputCountSaveError.recovery` 承接補存：checkpoint／pending writes 保存失敗且完整 count 仍在程序內時，保留原 request、count 與 attempt。原邊界補存後才走容量檢查，既有保存優先，不倒轉後續 R／工具／完成位置；取消或 writer 失效不准採用。這是 process-local handoff，不是持久 cache。程序也遺失原件時，仍依[最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾)由 A／Memory 完成工作流核對並安全收尾，不宣稱能遠端找回。
+  `InputCountSaveError.recovery` 承接補存：checkpoint／pending writes 保存失敗且完整 count 仍在程序內時，保留原 request、count 與 attempt。原邊界補存後才走容量檢查，既有保存優先，不倒轉後續 R／工具／完成位置；取消或 writer 失效不准採用。這是 process-local handoff，不是持久 cache。程序也遺失 count 時，下一次接續才依上述准入重新計數；沒有遠端找回原結果的保證。
 - 遠端 count 也須先在原工作額度預留，短交易提交確認後才 HTTP；不增加模型 Step 數。不配置正數 `token_count_reservation_usd` 就拒絕 count。計數回應沒有計費 usage，故目前保留未知預留、不假定免費；該行政預留不是 provider 的硬帳單上限。沒有第二份計數器／收據。
 - 完成至少一個 Step 後的下一請求達 160K，進 [完整 C 保存、採用與中途接續](agent-execution.md#51-完整-c-保存採用與中途接續) 的明確 compact 接縫；尚未配置接縫則回報 `CompactionRequiredError`，保留原窗口、不發生成。首請求不受此中途門檻誤擋；合法 final／步數已耗盡不額外發 count。輪前 128K、pause 與取消相容基底分由 [跨工作的合法歷史選用](agent-execution.md#31-跨工作的合法歷史選用)、[完整 Step 暫停與原生續作](agent-execution.md#45-完整-step-暫停與原生續作)、[輪前歷史準備元件](agent-execution.md#52-輪前歷史準備元件)、[A 控制協調](agent-supervision.md#2-a-pausecancelresume-控制) 承接。
 
@@ -126,12 +139,12 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 
 [圖源](../diagrams/implementation/model-requests/outbound-retry.mmd) · [SVG](../diagrams/implementation/model-requests/outbound-retry.svg)
 
-圖為現行產品接線的外送重試流程；形狀及控制箭頭沿[讀圖約定](../diagrams/README.md#讀圖約定)。只要存在不可重試故障就停止；其餘 attempts 仍有結果未核明時交回核對。全部故障已可靠保存、分類允許且仍有工作資格，才准入下一次外送。圖省略准入交易失敗的錯誤出口，沒有表示底層未接入的再推論接口。
+圖為已知 provider 故障的外送重試流程；形狀及控制箭頭沿[讀圖約定](../diagrams/README.md#讀圖約定)。只要存在不可重試故障就停止；生成／壓縮 attempts 仍有結果未核明時交回核對。全部故障已可靠保存、分類允許且仍有工作資格，才准入下一次外送。圖省略准入交易失敗的錯誤出口及 count 遺失的重新計數例外；後者沿[固定請求計數](#4-固定請求計數與容量准入)與以下准入規則處理。
 
 ### 重試資格與故障保存
 
 - **原結果優先：** Graph 已保存的 R／C／count 直接接續；仍握有原件則走既有補存。此迴圈只 catch SDK 外送的 `APIError`，不包整個 Graph、不把保存／結算／工具錯誤當成 provider retry。成功收到完整結果後、交給 Graph 之前仍沒有 DB 操作。
-- **允許重試的證據：** 原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端結果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。程序崩潰、准入 COMMIT 確認不明，或原失敗尚未可靠保存時仍維持 `Prior*AttemptError`，不靠不存在的遠端備份／時間到自動放行。
+- **允許重試的證據：** 原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端結果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。生成／壓縮冷恢復時，若原 attempt 沒有可靠結果或失敗紀錄，仍以 `Prior*AttemptError` 停止，不靠不存在的遠端備份／時間到自動放行。同次呼叫尚未 HTTP 的准入確認，沿[純 DB 恢復](#21-純資料庫操作的有限恢復)核原鍵。count 原件遺失則可依[固定請求計數](#4-固定請求計數與容量准入)取得新准入。
 - **串流錯誤分類：** HTTP 200 後的錯誤事件沿同一分類器處理。`rate_limit_exceeded`／`slow_down` 歸 `rate_limited`；`server_error`、`server_is_overloaded`、`service_unavailable` 歸暫時服務問題。沒有明確可重試代碼則停止，不猜測。沒有 header 的串流錯誤使用對應的 capped backoff。驗證見串流錯誤與限流等待。
 - migration `0015_outbound_failures` 只在既有 attempt 增加 `failure_code`、`retry_not_before`。不保存 error body、prompt、token、模型輸出或另造 Graph cursor。故障原件不可覆寫／清除，重入相同結果冪等；晚到故障可記錄，但不恢復被取消的工作。報告成本仍獨立，不因失敗釋放未知預留。
 - **錯誤出口也須安全：** 停止重試時拋 `ModelRequestFailedError`，只攜帶安全分類、可取得的 HTTP status 與白名單 provider code，不把 SDK 原始 error 傳給 Graph 持久保存。保存失敗／取消仍保留本地錯誤型別、停止外送，抑制供應商例外鏈進入標準 traceback；取消不能被吞掉或當成 provider retry。這不宣稱任意第三方 tracing 的 frame locals 安全；不得啟用未經遮罩的原文／憑證紀錄。
@@ -144,19 +157,13 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 - **尊重服務端等待：** 支援 `retry-after-ms`、秒數及 HTTP-date；有效長等待不截短到本機 backoff 上限。無有效 header 才作 capped exponential backoff，普通暫時故障預設 2 秒起、30 秒封頂，再乘 0.75–1 的 jitter；非限流 attempts 每請求預設最多 8 次。實際工作限制從原 budget 讀取；不可表示的超大等待明確停止，不退回短等待。
 - **限流採等待政策：** HTTP 429 或串流的 `rate_limit_exceeded`／`slow_down` 分為 `rate_limited`，保存最早重試時間。有 `Retry-After` 就照做，沒有則預設 10 秒起、60 秒封頂，再乘 0.75–1 的 jitter。限流 attempt 不占每請求的非限流次數上限，仍占工作外送總數並受 deadline 限制；預設總數 512、工作時限 1,800 秒，以[ModelSettings](../../apps/api/src/caliburn/settings.py)為準。等待中持續核對 writer、取消與時限，完整 Step 的暫停規則不變。
 - 最早重試時間用 DB clock 計算並保存；重開不重新抽 jitter／縮短舊等待。等待在交易外，每至多一秒重核 writer、取消與 deadline。等待前沿 executions 原准入規則核成本與總次數，已耗盡就立即停止；共用 `check_outbound_capacity()` 只檢查、不產生外送許可，等待結束仍須新 attempt 確認提交。Retry-After 已超過工作期限直接停止，額度不足不擴費。同 request 指紋不可換；新 attempt 不增加模型邏輯 Step／compact 次數，但外送次數及成本逐次計。
-- 現行產品接線在行鎖下確認**所有** prior attempts 都已有可重試故障，再准入新 attempt。任一先前結果尚未核明就停止，因此兩個 retry runner 不能因同一故障各發一次。新 attempt 的提交確認遺失不授權再次傳送；失敗紀錄的提交確認遺失則重讀原紀錄後判斷。
+- 生成／壓縮在行鎖下確認**所有** prior attempts 都已有可重試故障，再准入新 attempt；任一先前結果尚未核明就停止，因此兩個 retry runner 不能因同一故障各發一次。count 允許未知 prior attempt，但同樣先拒絕任何永久錯誤並尊重所有已保存等待。同一有效 writer 的並行入口可能各取得一次 count 准入，接受這種有界重複；attempt 行鎖與共同額度仍限制總數，不宣稱 count exactly-once。當前准入的 DB 恢復沿同一尚未外送的 attempt；冷恢復已失去這項程序內證據時，count 須另取得新 attempt，生成／壓縮則停止。失敗紀錄的提交確認遺失依原紀錄重讀判斷。
 
-依據：[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
+依據：[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。provider 重試未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
 
 ### 5.1 程序遺失原件時的界線
 
-**現行產品限制：** 沒有可靠失敗紀錄的 attempt 不具備重送資格。程序原件遺失時，由 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的 A／Memory 完成工作流核對正式結果並安全收尾，不自動再推論；手上仍有原件才走 [原件補存的有限自動恢復](agent-execution.md#53-原件補存的有限自動恢復) 的有限補存。驗證見外送重試。
-
-底層 `ModelRequestExecutor` 另保留 App 專用的 `reconcile_prior_attempts` 接口；`bind_model_runtime()` 目前沒有注入，不能據此宣稱產品已有自動再推論。
-
-只有可信呼叫方確認原生保存／pending writes／程序內原件皆不可得，且原產出者不可能再返回時，才可回報 `LOCAL_ORIGINAL_UNRECOVERABLE`。
-
-重新准入仍綁定同一組已核對 attempts、原 request 與工作額度；單靠空 checkpoint、writer 接管或取得程序鎖都不足。此接口的隔離驗證見[未知 attempt 再准入測試](../../apps/api/tests/integration/test_unknown_attempt_readmission.py)。
+**現行產品限制：** 生成／壓縮沒有可靠失敗紀錄的 attempt 不具備重送資格。這些原件隨程序遺失時，由 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的 A／Memory 完成工作流核對正式結果並安全收尾，不自動再推論。count 未保存則可在原工作仍有效時以同一 payload 重新計數；已保存的 count 直接沿用，手上仍有完整原件則優先走 [原件補存的有限自動恢復](agent-execution.md#53-原件補存的有限自動恢復)。重算不保證免費，也不恢復已結束的工作。驗證見外送重試及 [A 跨程序恢復](../../apps/api/tests/integration/test_consultant_process_recovery.py)。
 
 ## 6. 固定費率與 usage 成本估算
 

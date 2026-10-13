@@ -20,9 +20,9 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.logging import SafeJsonFormatter
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
 from caliburn.agent_execution.response_retries import ResponseRetryPolicy
-from caliburn.agent_execution.tool_steps import _build_response_step, run_response_step
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import (
+    BudgetConflictError,
     BudgetExceededError,
     BudgetLimit,
     ExecutionBudget,
@@ -33,13 +33,15 @@ from caliburn.features.executions.models import (
     ExecutionStateError,
     ExecutionStatus,
 )
-from caliburn.workflows import model_requests
-from caliburn.workflows.model_requests import (
+from caliburn.workflows.executions import model_requests
+from caliburn.workflows.executions.model_requests import (
     ModelRequestAccounting,
     ModelRequestExecutor,
     ModelRequestFailedError,
+    PriorInputCountAttemptError,
     PriorModelAttemptError,
 )
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
 from tests.fixtures.response_capacity import synthetic_response_runtime
 from tests.fixtures.response_transport import response_http_reply
 
@@ -550,7 +552,11 @@ def test_provider_body_does_not_escape_into_graph_error_or_traceback(
                 pytest.fail("A rejected model request cannot produce tool work")
 
             runtime = synthetic_response_runtime(
-                executor.request_model, no_tool, no_tool, ensure_active, executor.account_response
+                request_model=executor.request_model,
+                prepare_tool=no_tool,
+                execute_tool=no_tool,
+                ensure_active=ensure_active,
+                account_response=executor.account_response,
             )
             dsn = make_conninfo(
                 database_settings.url, options=f"-c search_path={database_settings.schema}"
@@ -569,7 +575,7 @@ def test_provider_body_does_not_escape_into_graph_error_or_traceback(
                         runtime=runtime,
                         max_tool_calls=16,
                     )
-                saved = await _build_response_step(saver, max_tool_calls=16).aget_state(config)
+                saved = await read_response_state(saver, config)
                 assert any(task.error for task in saved.tasks)
                 assert "sensitive synthetic detail" not in repr(saved.tasks)
                 assert "sensitive synthetic detail" not in "".join(
@@ -664,6 +670,224 @@ def test_two_retry_runners_cannot_both_send_after_one_recorded_failure(
             async with executor.sessions.begin() as session:
                 usage = await budgets.read_budget_usage(session, executor.writer.scope)
             assert usage.outbound_attempts == 2
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+@pytest.mark.parametrize(
+    "guard,expected_error,expected_limit",
+    [
+        ("payload", BudgetConflictError, None),
+        ("writer", ExecutionStateError, None),
+        ("cancel", ExecutionStateError, None),
+        ("deadline", BudgetExceededError, BudgetLimit.DEADLINE),
+        ("request_attempts", BudgetExceededError, BudgetLimit.REQUEST_ATTEMPTS),
+        ("outbound_attempts", BudgetExceededError, BudgetLimit.OUTBOUND_ATTEMPTS),
+        ("cost", BudgetExceededError, BudgetLimit.COST),
+    ],
+)
+def test_unknown_count_reentry_keeps_original_eligibility_and_limits(
+    database_settings, retry_file_id, guard, expected_error, expected_limit
+):
+    calls = []
+
+    def respond(request):
+        calls.append(json.loads(request.content))
+        return httpx2.Response(200, json={"object": "response.input_tokens", "input_tokens": 123})
+
+    async def scenario():
+        async with retry_executor(
+            database_settings,
+            retry_file_id,
+            respond,
+            attempts=1 if guard == "request_attempts" else 3,
+            outbound_attempts=1 if guard == "outbound_attempts" else 32,
+            cost="0.001" if guard == "cost" else "1",
+            deadline_seconds=1 if guard == "deadline" else 60,
+        ) as executor:
+            request, request_id = request_fixture(), uuid4()
+            # 外送端沒有 Graph 的保存權威；遺失結果仍保留原 attempt 和未知預留。
+            await executor.count_input(request, request_id)
+            async with executor.sessions.begin() as session:
+                before = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+                if guard == "writer":
+                    await service.claim_writer(
+                        session,
+                        executor.writer.scope,
+                        writer_id=uuid4(),
+                        replaces_writer_id=executor.writer.writer_id,
+                    )
+                elif guard == "cancel":
+                    await service.finish_execution(
+                        session, executor.writer, ExecutionStatus.CANCELLED
+                    )
+                elif guard == "deadline":
+                    policy = await budgets.read_execution_budget(session, executor.writer.scope)
+                    now = await budgets.read_execution_time(session, executor.writer.scope)
+                    remaining = (policy.deadline_at - now).total_seconds()
+            if guard == "payload":
+                changed = request.create_payload()
+                changed["instructions"] = "different synthetic role"
+                request = ResponseRequest.from_snapshot(changed)
+            elif guard == "deadline":
+                await asyncio.sleep(max(0, remaining))
+            with pytest.raises(expected_error) as caught:
+                await replace(executor).count_input(request, request_id)
+            if expected_limit is not None:
+                assert caught.value.limit == expected_limit
+            async with executor.sessions.begin() as session:
+                after = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+                usage = await budgets.read_budget_usage(session, executor.writer.scope)
+            assert before == after
+            assert before[0].failure is None
+            assert before[0].reported_cost_usd is None
+            assert usage.accounted_cost_usd == Decimal("0.001")
+            assert usage.outbound_attempts == len(calls) == 1
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+@pytest.mark.parametrize(
+    "status,code",
+    [(401, "invalid_api_key"), (403, "permission_denied"), (400, "invalid_request_error")],
+)
+def test_unknown_count_does_not_bypass_a_later_terminal_failure(
+    database_settings, retry_file_id, status, code
+):
+    calls = []
+
+    def respond(request):
+        calls.append(json.loads(request.content))
+        if len(calls) == 1:
+            return httpx2.Response(
+                200, json={"object": "response.input_tokens", "input_tokens": 123}
+            )
+        return rejection(status, code)
+
+    async def scenario():
+        async with retry_executor(database_settings, retry_file_id, respond) as executor:
+            request, request_id = request_fixture(), uuid4()
+            await executor.count_input(request, request_id)
+            with pytest.raises(ModelRequestFailedError):
+                await executor.count_input(request, request_id)
+            with pytest.raises(PriorInputCountAttemptError):
+                await replace(executor).count_input(request, request_id)
+            async with executor.sessions.begin() as session:
+                attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+                usage = await budgets.read_budget_usage(session, executor.writer.scope)
+            assert len(attempts) == len(calls) == 2
+            assert sum(attempt.failure is None for attempt in attempts) == 1
+            assert all(
+                attempt.failure is None or attempt.failure.retry_not_before is None
+                for attempt in attempts
+            )
+            assert usage.accounted_cost_usd == Decimal("0.002")
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_unknown_count_keeps_a_saved_retry_after_when_reopened(
+    database_settings, retry_file_id, monkeypatch
+):
+    calls = []
+
+    async def scenario():
+        async def respond(request):
+            calls.append(json.loads(request.content))
+            if len(calls) == 2:
+                return rejection(delay="0.15")
+            if len(calls) == 3:
+                async with executor.sessions() as session:
+                    now = await budgets.read_execution_time(session, executor.writer.scope)
+                assert now >= failure.retry_not_before
+            return httpx2.Response(
+                200, json={"object": "response.input_tokens", "input_tokens": 123}
+            )
+
+        async def interrupt_wait(seconds):
+            raise ConnectionError("synthetic restart during count retry delay")
+
+        async with retry_executor(database_settings, retry_file_id, respond) as executor:
+            request, request_id = request_fixture(), uuid4()
+            await executor.count_input(request, request_id)
+            with monkeypatch.context() as patch:
+                patch.setattr(model_requests, "sleep", interrupt_wait)
+                with pytest.raises(ConnectionError, match="synthetic restart"):
+                    await executor.count_input(request, request_id)
+            async with executor.sessions() as session:
+                before = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+            failure = next(attempt.failure for attempt in before if attempt.failure is not None)
+            resumed = replace(
+                executor, retry_policy=ResponseRetryPolicy(0.0001, 0.0001, 0.0001, 0.0001)
+            )
+            received = await resumed.count_input(request, request_id)
+            assert received["input_tokens"] == 123
+            async with executor.sessions() as session:
+                after = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+                usage = await budgets.read_budget_usage(session, executor.writer.scope)
+            assert all(attempt in after for attempt in before)
+            assert len(after) == len(calls) == 3
+            assert calls == [request.count_payload()] * 3
+            assert usage.accounted_cost_usd == Decimal("0.003")
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_concurrent_unknown_counts_share_the_original_total_attempt_limit(
+    database_settings, retry_file_id
+):
+    async def scenario():
+        calls = []
+        both_entered, release = asyncio.Event(), asyncio.Event()
+
+        async def respond(request):
+            calls.append(json.loads(request.content))
+            if len(calls) == 2:
+                both_entered.set()
+            await release.wait()
+            return httpx2.Response(
+                200, json={"object": "response.input_tokens", "input_tokens": 123}
+            )
+
+        async with retry_executor(
+            database_settings, retry_file_id, respond, outbound_attempts=2
+        ) as executor:
+            request, request_id = request_fixture(), uuid4()
+            async with asyncio.timeout(5), asyncio.TaskGroup() as group:
+                first = group.create_task(executor.count_input(request, request_id))
+                second = group.create_task(replace(executor).count_input(request, request_id))
+                await both_entered.wait()
+                try:
+                    with pytest.raises(BudgetExceededError) as caught:
+                        await replace(executor).count_input(request, request_id)
+                    assert caught.value.limit == BudgetLimit.OUTBOUND_ATTEMPTS
+                finally:
+                    release.set()
+            assert first.result()["attempt_id"] != second.result()["attempt_id"]
+            async with executor.sessions() as session:
+                attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+                usage = await budgets.read_budget_usage(session, executor.writer.scope)
+            assert calls == [request.count_payload()] * 2
+            assert len(attempts) == usage.outbound_attempts == 2
+            assert all(attempt.failure is None for attempt in attempts)
+            assert all(attempt.reported_cost_usd is None for attempt in attempts)
+            assert usage.accounted_cost_usd == Decimal("0.002")
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

@@ -28,7 +28,6 @@ class MemoryCommandConflictError(ValueError):
 class MemoryBatchPosition:
     job_file_id: UUID
     execution_id: UUID
-    generation_id: UUID
     stage_id: UUID
     phase: MemoryLayer
     position_id: UUID

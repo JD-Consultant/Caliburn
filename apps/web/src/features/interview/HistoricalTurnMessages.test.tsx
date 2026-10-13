@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -42,9 +43,48 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+test('completed history lazily opens saved tools and distinguishes absent output from no calls', async () => {
+  const fetch = vi.fn((path: string, options?: RequestInit) => {
+    expect(options?.method).not.toBe('POST');
+    return Promise.resolve(
+      Response.json(
+        path.endsWith('/reasoning-summaries')
+          ? []
+          : path.endsWith('/tools')
+            ? {
+                execution_id: executionId,
+                calls: [
+                  {
+                    request_id: '30000000-0000-4000-8000-000000000003',
+                    response_id: 'response-1',
+                    call_id: 'call-1',
+                    name: 'read_work_memory',
+                    arguments: '{"query":"<script>原參數</script>"}',
+                    result_state: 'not_recorded',
+                    output: null,
+                  },
+                ],
+              }
+            : saved,
+      ),
+    );
+  });
+  stubHttp(fetch);
+  renderHistoryTurn();
+  await userEvent.click(screen.getByRole('button', { name: '處理紀錄' }));
+  const tools = await screen.findByRole('button', { name: '查看這輪工具紀錄' });
+  expect(fetch.mock.calls.some(([path]) => path.endsWith('/tools'))).toBe(false);
+  await userEvent.click(tools);
+  const dialog = screen.getByRole('dialog', { name: '這輪工具紀錄' });
+  await userEvent.click(await within(dialog).findByText('read_work_memory'));
+  expect(within(dialog).getByText(/尚未保存回傳/)).toBeVisible();
+  expect(within(dialog).getByText(/<script>原參數<\/script>/)).toBeVisible();
+  expect(within(dialog).queryByText('這輪沒有已保存的工具呼叫。')).not.toBeInTheDocument();
+  expect(document.querySelector('script')).toBeNull();
+});
+
 test('historical summary and commentary expand independently while JD actions remain separate', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string, options?: RequestInit) => {
       expect(options?.method).not.toBe('POST');
       return Promise.resolve(
@@ -93,7 +133,7 @@ test('history reads its original turn only on expansion and displays public comm
     expect(options?.method).not.toBe('POST');
     return Promise.resolve(Response.json(saved));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderHistoryTurn();
   expect(fetch).not.toHaveBeenCalled();
   const toggle = screen.getByRole('button', { name: '處理紀錄' });
@@ -113,8 +153,7 @@ test('history reads its original turn only on expansion and displays public comm
 });
 
 test('a failed history read remains an error until an explicit read retry finds an empty history', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi
       .fn()
       .mockResolvedValueOnce(Response.json({ detail: { code: 'unavailable' } }, { status: 503 }))
@@ -130,10 +169,7 @@ test('a failed history read remains an error until an explicit read retry finds 
 });
 
 test('unconfigured public reader is not presented as an empty history', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json({ ...saved, commentary: null }))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json({ ...saved, commentary: null }))));
   renderHistoryTurn();
   await userEvent.click(screen.getByRole('button', { name: '處理紀錄' }));
   await userEvent.click(await screen.findByText('處理過程'));
@@ -142,8 +178,7 @@ test('unconfigured public reader is not presented as an empty history', async ()
 });
 
 test('foreign-file commentary is rejected rather than attached to this historical reply', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(
         Response.json({
@@ -155,13 +190,12 @@ test('foreign-file commentary is rejected rather than attached to this historica
   );
   renderHistoryTurn();
   await userEvent.click(screen.getByRole('button', { name: '處理紀錄' }));
-  expect(await screen.findByText(/處理狀態不屬於這次訪談/)).toBeVisible();
+  expect(await screen.findByText(/資料格式不符，尚未採用這份結果/)).toBeVisible();
   expect(screen.queryByText('先核對既有職責。')).not.toBeInTheDocument();
 });
 
 test('unexpected private response fields fail the public contract without rendering their values', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(
         Response.json({

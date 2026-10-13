@@ -1,32 +1,23 @@
 """JD 複合用例在呼叫者交易內只保存最終修訂；重播直接承接原結果。"""
 
 from typing import cast
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.job_description import (
-    area_persistence,
-    capability_persistence,
-    collaborator_persistence,
-    condition_persistence,
     persistence,
     revision_editing,
     source_persistence,
-    task_persistence,
     work_queries,
 )
-from caliburn.features.job_description.areas import ResponsibilityArea
 from caliburn.features.job_description.candidates import JdCandidateScope
-from caliburn.features.job_description.capabilities import Capability
-from caliburn.features.job_description.collaborators import Collaborator
 from caliburn.features.job_description.compound_changes import (
     apply_compound_changes,
     compound_effect,
 )
 from caliburn.features.job_description.compound_edits import (
-    CompoundItem,
     CompoundJdEdit,
     CreateItemWithSources,
     CreateTaskWithSources,
@@ -34,31 +25,13 @@ from caliburn.features.job_description.compound_edits import (
     JdEditEffect,
     ReviseProfileWithSources,
 )
-from caliburn.features.job_description.conditions import JobCondition
 from caliburn.features.job_description.models import (
-    JdProfileRevision,
     StaleJdRevisionError,
 )
 from caliburn.features.job_description.navigation import jd_read_ref, resolve_jd_read_ref
-from caliburn.features.job_description.tasks import TaskDetail, WorkTask
+from caliburn.features.job_description.tasks import TaskDetail
 
 _COMMAND: TypeAdapter[CompoundJdEdit] = TypeAdapter(CompoundJdEdit)
-
-
-async def _insert_content(
-    session: AsyncSession, job_file_id: UUID, item: CompoundItem | None
-) -> None:
-    match item:
-        case ResponsibilityArea():
-            await area_persistence.insert_area_content(session, job_file_id, item)
-        case WorkTask():
-            await task_persistence.insert_task_content(session, job_file_id, item)
-        case Capability():
-            await capability_persistence.insert_capability_content(session, job_file_id, item)
-        case Collaborator():
-            await collaborator_persistence.insert_collaborator_content(session, job_file_id, item)
-        case JobCondition():
-            await condition_persistence.insert_condition_content(session, job_file_id, item)
 
 
 async def apply_compound_edit(
@@ -123,38 +96,19 @@ async def apply_compound_edit(
     work = await work_queries.read_work_at(session, job_file_id, current)
     references = await source_persistence.read_source_references(session, job_file_id, current)
     changes = apply_compound_changes(profile.profile, work, references, command)
-    changed = (
-        changes.profile != profile.profile
-        or changes.work != work
-        or changes.references != references
-    )
-    revision = current
-    if changed:
-        revision = uuid4()
-        await _insert_content(session, job_file_id, changes.changed_content)
-        await persistence.insert_revision(
-            session,
-            job_file_id,
-            JdProfileRevision(revision, changes.profile),
-            parent_revision_id=current,
-            areas=changes.work.areas,
-            tasks=changes.work.tasks,
-            capabilities=changes.work.capabilities,
-            task_links=changes.work.task_links,
-            collaborators=changes.work.collaborators,
-            conditions=changes.work.conditions,
-        )
+    changed = changes.differs_from(profile.profile, work, references)
     effect = compound_effect(command, changed=changed)
-    await revision_editing.record_edit(
+    revision = await revision_editing.persist_edit(
         session,
         job_file_id,
+        profile.profile,
+        work,
+        references,
+        changes,
         command_id=command.command_id,
         kind="compound_edit",
-        expected_revision_id=current,
-        result_revision_id=revision,
         request_payload=payload,
         candidate=candidate,
-        source_references=changes.references,
         result_payload={
             "effect": effect,
             "created_ref": jd_read_ref(changes.created_item)

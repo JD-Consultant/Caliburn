@@ -1,5 +1,36 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { requestJson } from './http';
+import './http';
+import { client } from './generated/http/client.gen';
+import { deleteJobFile } from './generated/http/sdk.gen';
+import type { DiagnosticScope } from '../diagnostics';
+
+// Synthetic operation fixtures exercise the real SDK policy without a business endpoint.
+async function requestJson<T>(
+  path: string,
+  validate: (value: unknown) => value is T,
+  options: {
+    method?: 'GET' | 'POST';
+    body?: string;
+    signal?: AbortSignal;
+    correlation?: DiagnosticScope;
+  } = {},
+): Promise<T> {
+  const { correlation, ...request } = options;
+  const operation = {
+    url: path,
+    method: 'GET' as const,
+    ...request,
+    throwOnError: true as const,
+    parseAs: 'json' as const,
+    responseValidator: (value: unknown) => {
+      if (!validate(value)) throw new Error('Invalid response');
+      return Promise.resolve(value);
+    },
+    meta: correlation ? { correlation } : {},
+  };
+  const { data } = await client.request<{ 200: T }, unknown, true>(operation);
+  return data;
+}
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -9,9 +40,7 @@ afterEach(() => {
 test('a bodyless deletion validates undefined without attempting JSON parsing', async () => {
   vi.stubGlobal('fetch', () => Promise.resolve(new Response(null, { status: 204 })));
   await expect(
-    requestJson('/api/job-files/example', (value): value is undefined => value === undefined, {
-      method: 'DELETE',
-    }),
+    deleteJobFile({ path: { job_file_id: 'example' }, throwOnError: true }).then(() => undefined),
   ).resolves.toBeUndefined();
 });
 
@@ -68,10 +97,11 @@ test('HTTP read preserves caller cancellation when combining the timeout signal'
   let observed: AbortSignal | null | undefined;
   vi.stubGlobal(
     'fetch',
-    (_path: string, options?: RequestInit) =>
+    (request: Request) =>
       new Promise<Response>((_resolve, reject) => {
-        observed = options?.signal;
-        options?.signal?.addEventListener(
+        observed = request.signal;
+        request.signal.throwIfAborted();
+        request.signal.addEventListener(
           'abort',
           () => reject(new DOMException('synthetic abort', 'AbortError')),
           { once: true },
@@ -121,7 +151,7 @@ test('safe diagnostics connect failure to IDs without retaining response, URL or
     commandId,
   });
   expect(JSON.stringify(diagnostic.mock.calls)).not.toContain('private');
-  expect(vi.mocked(fetch).mock.calls[0]?.[1]).not.toHaveProperty('correlation');
+  expect(vi.mocked(fetch).mock.calls[0]?.[0]).not.toHaveProperty('correlation');
 });
 
 test.each([
@@ -180,7 +210,7 @@ test('cancellation while reading an error body remains a quiet cancellation', as
   const diagnostic = vi.spyOn(console, 'warn').mockImplementation(() => {});
   const response = new Response(null, { status: 409 });
   let rejectBody: (reason: Error) => void = () => {};
-  vi.spyOn(response, 'json').mockReturnValue(
+  vi.spyOn(response, 'text').mockReturnValue(
     new Promise((_resolve, reject) => {
       rejectBody = reject;
     }),
@@ -199,9 +229,10 @@ test('HTTP request applies the 15 second timeout without turning it into an admi
   const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(controller.signal);
   vi.stubGlobal(
     'fetch',
-    (_path: string, options?: RequestInit) =>
+    (request: Request) =>
       new Promise<Response>((_resolve, reject) => {
-        options?.signal?.addEventListener(
+        request.signal.throwIfAborted();
+        request.signal.addEventListener(
           'abort',
           () => reject(new DOMException('synthetic timeout', 'TimeoutError')),
           {

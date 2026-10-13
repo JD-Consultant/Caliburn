@@ -15,6 +15,8 @@
 
 用例回傳有型別的實際結果，HTTP 將它投影為 DTO，模型工具則投影為精簡文字。模型可見的 `updated` 是成功確認；恢復時仍查原業務結果，不能把這段文字當成資料庫保存的唯一憑據。
 
+HTTP 的同形內部 dataclass 直接用 Pydantic `model_validate(..., from_attributes=True)` 讀取 DTO 宣告的屬性，避免先以 `asdict()` 遞迴複製；需加欄位或組合資料的投影仍明示轉換。這只用於已實體化的內部結果，不讀 ORM lazy attributes，也不代替外部 JSON 的入站驗證。內部額外屬性不外送，DTO 欄位與巢狀型別仍須通過驗證。依據：[Pydantic attribute validation](https://pydantic.dev/docs/validation/latest/concepts/models/#arbitrary-class-instances)。
+
 三種識別各有用途：
 
 - client command ID 辨認瀏覽器重送的同一命令。
@@ -72,7 +74,7 @@ JD 以 profile、職責、任務、成果、要求、知識、技能及關係建
 
 `read_ref`、`target_title`、`citation_ref` 各自解析不同責任所擁有的資料，不能靠同名猜測身分。跨層呼叫傳入固定基準，資料解析及合法性仍由各領域判斷。
 
-A 的完成交易由 [ConsultantCompletionWorkflow](../../apps/api/src/caliburn/workflows/consultant_completion.py)開啟，在同一短交易內協調[架構交易表](../architecture/persistence.md#3-交易邊界)所列參與者。Plan 以 `validate_final` 核對原位置，其後輪資格依共同完成結果成立，不另提交一份 Plan 正式 head。
+A 的完成交易由 [ConsultantCompletionWorkflow](../../apps/api/src/caliburn/workflows/consultant_turns/completion.py)開啟，在同一短交易內協調[架構交易表](../architecture/persistence.md#3-交易邊界)所列參與者。Plan 以 `validate_final` 核對原位置，其後輪資格依共同完成結果成立，不另提交一份 Plan 正式 head。
 
 序號在檔案內分配並受交易保護，不直接依賴會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
 
@@ -82,37 +84,30 @@ A 的完成交易由 [ConsultantCompletionWorkflow](../../apps/api/src/caliburn/
 
 ### 來源及生成物
 
-`apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。
+HTTP 以 [Pydantic models](../../apps/api/src/caliburn/transport/http/models/) 為唯一可修改來源。路由宣告 request／response 型別及固定 operation_id，FastAPI 導出 OpenAPI；工具以 [JSON Schema](../../apps/api/contracts/tools/) 為唯一來源。領域／workflow 不依賴 HTTP 型別，HTTP 共用 JD 查閱值及工具的 InterviewPlan 值，避免候選預覽另複製 shape。
 
-鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。責任與接受政策見[契約策略](../standards/contract-strategy.md)。
-
-[`generate_contracts.py`](../../apps/api/scripts/generate_contracts.py)維護下列生成物；執行及檢查命令見 [API README](../../apps/api/README.md)。
+[`generate_contracts.py`](../../apps/api/scripts/generate_contracts.py) 是唯一生成與 readonly check 入口；命令見 [API README](../../apps/api/README.md)。
 
 | 生成物 | 位置與用途 |
 |---|---|
-| Python DTO | `apps/api/src/caliburn/contracts/generated/`；工具型別位於其 `tools/` 子目錄 |
-| TypeScript 型別 | `apps/web/src/shared/api/generated/`；工具型別位於其 `tools/` 子目錄 |
-| Canonical schema 資源 | `apps/api/src/caliburn/contracts/generated/{http,tools}/*.schema.json`；保留原相對參照，供安裝後的 runtime guard 與工具定義讀取 |
-| DTO／資源索引 | `apps/api/src/caliburn/contracts/generated/schema-manifest.json`；生成的 root DTO 全名對應 canonical 資源路徑 |
+| HTTP SDK／TypeScript | `apps/web/src/shared/api/generated/http/`；Hey API 按 OpenAPI 生成具名 SDK、型別及 fetch client |
+| HTTP Web 驗證函式 | 同目錄的 `validators.js`／`validators.d.ts`；Ajv standalone 從同一 OpenAPI 生成 |
+| 工具 Python／TypeScript | `apps/api/src/caliburn/contracts/generated/tools/` 與 `apps/web/src/shared/api/generated/tools/`；沿既有 datamodel-code-generator／json-schema-to-typescript |
+| 工具 Schema 資源／索引 | Python generated 的 `tools/*.schema.json` 與 `schema-manifest.json`；安裝後准入及 provider 工具定義共用 |
 
-生成器同時寫入 DTO、原始 Schema 副本及索引；`--check` 核對位元組一致，CI 再生成比對差異。Web 使用同一份 HTTP schema 驗證回傳，再放入查詢快取，不手寫第二份資料 shape。
+HTTP 匯出不啟動 lifespan、資料庫或模型；Node [生成器](../../apps/web/scripts/generate-http-contracts.mjs)只接本機解析後的 OpenAPI object，不向 Registry 傳送規格。Hey API 接手 endpoint／method／body 組裝；Ajv 官方 standalone 產碼經 Vite 打包為自包含 ESM，瀏覽器不編譯 Schema。生成碼不手修、不另存手寫 HTTP Schema。
+
+`--check` 在暫存目錄生成並比對全部產物，不修改正式檔案；`--schema` 只限定工具 DTO，HTTP 每次全量生成。工具原 Schema、索引與生成物保持一致，過時產物須移除。依據：[FastAPI body／OpenAPI](https://fastapi.tiangolo.com/tutorial/body/)、[Hey API SDK](https://heyapi.dev/docs/openapi/typescript/plugins/sdk)、[Ajv standalone](https://ajv.js.org/standalone.html)。
 
 ### 執行時驗證與安全錯誤
 
-依 [canonical 契約政策](../standards/contract-strategy.md)，兩種入口各有自己的接縫：
+HTTP body 直接由 Pydantic 驗證，共用 wire 值型別明定數學整數、標準連字號 UUID 及 Unicode 文字政策，再導出 OpenAPI。新增限制須核 Python 與 Web 的接受集合；詳見[契約策略](../standards/contract-strategy.md)。輸入失敗由共用 RequestValidationError handler 回固定安全422，禁止回顯 input、未知欄位 loc、message 或 cause；回應型別失配屬內部錯誤，不冒充使用者錯誤。
 
-- HTTP request body 經 FastAPI 的 `Annotated[DTO, canonical_body(DTO)]`。
-- Tool JSON 經 `contracts.validation.parse_contract(DTO, arguments)`。
+Web [HTTP policy](../../apps/web/src/shared/api/http.ts)接官方 client hooks，管理 timeout、caller abort、安全錯誤及 request correlation。SDK 返回前先跑 OpenAPI 驗證，再核具名 scope predicate；成功但檔案／execution／command 不符的回應不得進入 query cache。TanStack Query 仍負責既有 cache keys、失效與 polling，SDK 不接管業務命令恢復。PDF、204與原生 EventSource 沿各自媒體／生命週期處理。
 
-兩者由 `Draft202012Validator` 與 `FormatChecker` 對 canonical 原始值先驗證，通過後才呼叫 `model_validate(..., strict=False)`。因此 `StrictInt` 生成欄位可轉換 schema 合法的 `1.0`，布林、字串與額外欄位仍由 schema 拒絕；不手改 DTO 或逐欄新增 validator。
+工具 JSON 經 `contracts.validation.parse_contract(DTO, arguments)`：官方 Draft202012Validator 先核 canonical 原始值，再呼叫 `model_validate(..., strict=False)` 做已驗值的表示轉換。工具 Schema 目前無 format 關鍵字，不保留 HTTP 專用的 runtime format 接線；新增此類限制時須同時引入對應驗證及反例。
 
-HTTP 的型別／OpenAPI 仍沿原 DTO，領域規則與角色 scope 仍留在原責任模組。
-
-runtime guard 由 `importlib.resources` 讀取包資源，官方 `referencing.Registry` 只登錄包內 schema，未配置任何外部 retriever。`jsonschema[format-nongpl]` 是鎖版正式相依；所有 canonical format 都必須有已安裝 checker，缺少時失敗，不靜默略過。
-
-驗證錯誤只保留安全種類與 schema 路徑，不轉送 validator 的輸入正文、message 或 cause；Tool 繼續回原本的可行修正指引。schema 已接受、DTO 卻無法表示時屬內部契約錯誤，以安全 `RuntimeError` 中止，不能冒充使用者參數錯誤。
-
-Python 用 `FormatChecker.checks`、Web 在唯一 `shared/api/schema-policy.ts` factory 用 Ajv `addFormat` 接上標準 UUID 表示檢查，排除套件額外容許的 URN 或多餘連字號。各 feature 仍擁有其 schema 與編譯後 guard，不各自重建接受政策，也不讓 shared 反向依賴 feature。
+工具 guard 由 importlib.resources 讀包內資源，官方 referencing.Registry 只登錄這些資源，不配置外部 retriever。拒絕時只保留安全種類與 Schema 路徑，保留既有可行修正指引。Schema 接受而 DTO 無法表示時屬內部契約錯誤，以安全 RuntimeError 中止。原件、writer、版本及角色資格仍由業務 owner 判定。
 
 ### 模型 wire 與原生 items
 
@@ -126,7 +121,7 @@ provider definitions 使用 tools 的同一份生成副本，不從 DTO 再生�
 
 ### 遷移與啟動檢查
 
-新產品使用新的 PostgreSQL database／schema namespace 與 fresh migrations，沒有舊資料 ETL。Alembic autogenerate 是候選 migration，需人工／Agent 審閱及真 PG 空庫升級測試；它不自動理解所有 rename 或 data change。[Alembic](https://alembic.sqlalchemy.org/en/latest/autogenerate.html)
+現行 `0034_jd_task_sources` 以空 PostgreSQL database／schema namespace 初始化，拒絕含子項來源 owner／`target_task_id` 的舊 layout，沒有舊資料 ETL 或雙讀。Alembic autogenerate 是候選 migration，需人工／Agent 審閱及真 PG 空庫升級測試；它不自動理解所有 rename 或 data change。[Alembic](https://alembic.sqlalchemy.org/en/latest/autogenerate.html)
 
 目前不自動清理候選／checkpoint，也不提供備份產品；保留邊界仍需可測。migration 與 App 啟動檢查 DB 版本及配置；schema 不相容不得帶著半套表啟動。框架 saver schema 用官方 setup／upgrade 路徑，不在業務 Alembic 中手抄其結構。
 

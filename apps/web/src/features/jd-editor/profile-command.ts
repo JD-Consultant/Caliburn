@@ -2,7 +2,7 @@
 import type {
   ProfileField,
   ReviseJdProfileRequest,
-} from '../../shared/api/generated/revise-jd-profile-request';
+} from '../../shared/api/generated/http/types.gen';
 
 export const profileLabels: Record<ProfileField, string> = {
   job_title: '職務名稱',

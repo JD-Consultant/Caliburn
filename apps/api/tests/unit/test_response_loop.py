@@ -6,10 +6,10 @@ from dataclasses import replace
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
-from caliburn.agent_execution.tool_steps import (
-    ModelStepLimitError,
-    ResponseStepSaveError,
-    _build_response_step,
+from caliburn.agent_execution.response_runtime import ModelStepLimitError, ResponseStepSaveError
+from caliburn.agent_execution.tool_steps import _completed_step_items
+from tests.fixtures.native_response_runtime import (
+    read_response_state,
     run_response_loop,
     run_response_step,
 )
@@ -36,7 +36,21 @@ async def test_loop_preserves_native_history_and_orders_calls_until_final() -> N
     assert probe.accounted == ["response_1", "response_2", "response_3"]
     assert result["next_action"] == "deliver_answer"
     assert result["completed_steps"] == 3
-    assert len(result["input_items"]) == 12
+    assert "input_items" not in result
+    assert all(
+        [
+            "input_items" not in saved.checkpoint["channel_values"]
+            async for saved in saver.alist({"configurable": {"thread_id": "three-steps"}})
+        ]
+    )
+    assert (
+        len(
+            _completed_step_items(
+                result["request_snapshot"], result["response_snapshot"], result["tool_results"]
+            )
+        )
+        == 12
+    )
     assert [item["type"] for item in probe.requests[1]["input"][2:]] == [
         "reasoning",
         "message",
@@ -73,12 +87,19 @@ async def test_exhausted_loop_keeps_last_step_and_cannot_reset_limits_on_resume(
     for request in (initial_request(), None):
         with pytest.raises(ModelStepLimitError):
             await run_response_loop(saver, request=request, **options)
-    saved = await _build_response_step(saver, max_tool_calls=4, max_model_steps=2).aget_state(
-        {"configurable": {"thread_id": "bounded"}}
-    )
+    saved = await read_response_state(saver, {"configurable": {"thread_id": "bounded"}})
     assert saved.values["completed_steps"] == 2
-    assert saved.next == ("prepare_next_request",)
-    assert len(saved.values["input_items"]) == 8
+    assert saved.next == ("model",)
+    assert (
+        len(
+            _completed_step_items(
+                saved.values["request_snapshot"],
+                saved.values["response_snapshot"],
+                saved.values["tool_results"],
+            )
+        )
+        == 8
+    )
     assert len(probe.requests) == 2
     assert probe.effects == ["call_1_0"]
     for changed in ({"max_model_steps": 3}, {"max_tool_calls": 8}):
@@ -130,7 +151,14 @@ async def test_second_step_tool_failure_resumes_only_pending_tool_then_continues
     assert result["completed_steps"] == 3
     assert len(probe.requests) == 3
     assert probe.effects == ["call_1_0", "call_2_0", "call_2_1"]
-    assert len(result["input_items"]) == 14
+    assert (
+        len(
+            _completed_step_items(
+                result["request_snapshot"], result["response_snapshot"], result["tool_results"]
+            )
+        )
+        == 14
+    )
 
 
 class SecondResponseSaveFault(InMemorySaver):
@@ -217,10 +245,8 @@ async def test_initial_input_checkpoint_resumes_without_resetting_saved_limits()
     }
     with pytest.raises(ConnectionError):
         await run_response_loop(saver, request=initial_request(), **options)
-    saved = await _build_response_step(saver, max_tool_calls=4, max_model_steps=2).aget_state(
-        {"configurable": {"thread_id": "initial-input"}}
-    )
-    assert not saved.values
+    saved = await read_response_state(saver, {"configurable": {"thread_id": "initial-input"}})
+    assert "request_id" not in saved.values
     assert saved.next == ("__start__",)
     assert not probe.requests
     saver.fail = False
@@ -250,16 +276,27 @@ async def test_next_request_is_saved_before_http_and_restored_without_duplicate_
         await run_response_loop(saver, request=initial_request(), **options)
     assert len(probe.requests) == 1
     assert probe.effects == ["call_1_0"]
-    saved = await _build_response_step(saver, max_tool_calls=4, max_model_steps=2).aget_state(
-        {"configurable": {"thread_id": "next-request"}}
-    )
-    original_id = saved.values["request_id"]
+    saved = await read_response_state(saver, {"configurable": {"thread_id": "next-request"}})
+    original_id = probe.request_ids[0]
+    if not fail_after_commit:
+        from uuid import uuid5
+
+        original_id = uuid5(original_id, "next")
+    else:
+        original_id = saved.values["request_id"]
     saver.fail = False
     result = await run_response_loop(saver, request=None, **options)
     assert probe.request_ids[1] == original_id
     assert len(probe.requests) == 2
     assert probe.effects == ["call_1_0"]
-    assert len(result["input_items"]) == 8
+    assert (
+        len(
+            _completed_step_items(
+                result["request_snapshot"], result["response_snapshot"], result["tool_results"]
+            )
+        )
+        == 8
+    )
 
 
 @pytest.mark.asyncio

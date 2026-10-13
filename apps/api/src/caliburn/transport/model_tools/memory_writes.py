@@ -1,6 +1,5 @@
 """Memory writes split preflight from effects so Runtime can save the exact command first."""
 
-from dataclasses import dataclass
 from uuid import UUID
 
 from openai.types.responses import FunctionToolParam
@@ -19,7 +18,6 @@ from caliburn.features.interviews.models import (
 )
 from caliburn.features.work_memory.candidates import (
     MemoryCandidateStateError,
-    MemoryEdit,
     MemoryPermissionError,
 )
 from caliburn.features.work_memory.models import (
@@ -30,21 +28,14 @@ from caliburn.features.work_memory.models import (
 )
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
+from caliburn.transport.model_tools.memory_write_checkpoint import PreparedMemoryToolCall
 from caliburn.transport.model_tools.memory_write_wire import (
     parse_write_intent,
     render_write_preview,
 )
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import CandidateMemoryRead
-from caliburn.workflows.memory_writes import MemoryWritePreparation
-
-
-@dataclass(frozen=True, slots=True)
-class PreparedMemoryToolCall:
-    """App-only checkpoint payload, not another editable candidate or a committed receipt."""
-
-    command: MemoryEdit
-    success_output: str
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead
+from caliburn.workflows.work_memory.write_preparation import MemoryWritePreparation
 
 
 def memory_write_names(layer: MemoryLayer) -> tuple[str, ...]:
@@ -59,14 +50,23 @@ def memory_write_definitions(layer: MemoryLayer) -> list[FunctionToolParam]:
         if layer == MemoryLayer.WORK_SITUATION
         else "work_situation_references 的目前情境標題"
     )
+    content_guidance = (
+        "完整承接相關有效片段與已知背景、規則／方法／工具、精確數值期限及更正；尚無任務不丟已知內容。"
+        if layer == MemoryLayer.WORK_SITUATION
+        else "提煉可用的工作理解，保留必要適用範圍、責任、規則與精確數值期限，"
+        "不按每件情境強造一項。"
+    )
     descriptions = (
         f"建立本批一項{subject}候選。提供完整 title、description、Markdown body"
         f" 與{references}；"
-        "可無來源，但不能猜事實。來源不放正文。同層標題不得重複，成功不代表發布。",
+        "來源須實際支持本項內容；可無來源，但不能猜事實。來源不放正文。"
+        "同層標題不得重複，成功不代表發布。" + content_guidance,
         f"修訂本批一項{subject}候選。target_title 精確選修改前物件；changes 只列要改的欄位，"
         "每欄一次。title／description 給完整新值；body 給真實上下文的 V4A diff。"
-        f"{references}按需 add／remove，未列保留。全欄、全 hunk 通過才採用；"
-        "歧義拒絕，依回饋重讀／補上下文，不原樣盲重送。",
+        f"{references}依修改後內容的實際支持關係按需 add／remove，未列保留。"
+        "局部更正保留未受影響的有效內容。" + content_guidance + "全欄、全 hunk 通過才採用；"
+        "歧義拒絕，依回饋核對目前正文／補上下文，不原樣盲重送。"
+        "成功回傳的展示 diff 描述實際前後差異，不是下一次可直接提交的 V4A。",
         f"刪除本批一項{subject}候選，精確指定 target_title；不刪歷史快照或發布新版。"
         + (
             "同時解除指向它的候選理解關係，不刪理解。"
@@ -212,8 +212,21 @@ def _patch_rejection(error: BodyEditError) -> str:
         message = f"Hunk {error.hunk_number}: {message}"
     for candidate in error.candidates:
         message += f"\n候選行 {candidate.start_line}–{candidate.end_line}:\n{candidate.excerpt}"
+    guidance = {
+        "invalid_patch": (
+            "語法不合法時，依最小合法替換範例修正格式：\n@@\n-原有完整行\n+修改後完整行\n"
+            "已有目前正文不必為格式重讀。若 message 指明修改結果為空白，保留有效正文；"
+            "確需移除整個物件時用既有 delete 工具。"
+        ),
+        "patch_context_not_found": (
+            "先核對已持有的目前完整 body 與來源行；不足或版本不確定時重讀。"
+            "使用實際完整來源行及必要上下文，以真正換行為界，不把同一行拆成句子替換。"
+        ),
+        "ambiguous_patch_context": "依既有候選片段補足能唯一定位的真實上下文，不自動選取匹配。",
+        "patch_limit_exceeded": "縮小修改範圍，依既有內容限制修正。",
+    }
     return reject_tool_call(
         error.code,
         message + "\n本次所有欄位均未改。",
-        "重新讀目前正文，使用完整真實行與能辨識的上下文；多處匹配不會自動選取，超量請縮小修改。",
+        guidance[error.code],
     )

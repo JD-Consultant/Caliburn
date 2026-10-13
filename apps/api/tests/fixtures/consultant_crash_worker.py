@@ -25,8 +25,9 @@ from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import DatabaseSettings, ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
-from caliburn.workflows.consultant_controls import run_consultant_with_controls
+from caliburn.transport.model_tools.memory_write_checkpoint import MEMORY_CHECKPOINT_TYPES
+from caliburn.workflows.consultant_turns.controls import run_consultant_with_controls
+from tests.fixtures.consultant_turn import MANUAL_PURPOSE
 from tests.fixtures.response_loop import response_at
 
 ORIGINAL_REPLY = "已記下職務名稱。最近一個頁面你親自做到哪裡？"
@@ -54,7 +55,11 @@ def require_original_tool_exchange(items: list[dict[str, Any]]) -> None:
     assert json.loads(call["arguments"]) == {
         "changes": [
             {"action": "set_field", "field": "job_title", "value": "前端工程師"},
-            {"action": "add_source", "field": "job_title", "source": {"kind": "current_input"}},
+            {
+                "action": "add_source",
+                "field": "job_title",
+                "source": {"kind": "interview", "interview_sequence": 2},
+            },
         ]
     }
     assert result["output"] == "updated"
@@ -76,7 +81,7 @@ class CrashSaver(AsyncPostgresSaver):
         new_versions: ChannelVersions,
     ) -> RunnableConfig:
         values = checkpoint["channel_values"]
-        if self.boundary == "tool_committed" and values.get("tool_results"):
+        if self.boundary == "tool_committed" and "output" in values:
             # Never let the full checkpoint race ahead of the killed task-write.
             await asyncio.Event().wait()
         saved = await super().aput(config, checkpoint, metadata, new_versions)
@@ -97,9 +102,9 @@ class CrashSaver(AsyncPostgresSaver):
         task_path: str = "",
     ) -> None:
         if self.boundary == "tool_committed" and any(
-            channel == "tool_results" and value for channel, value in writes
+            channel == "output" for channel, value in writes
         ):
-            # execute_tool has returned only after the actual JD transaction committed.
+            # execute 子圖已返回，JD 交易已 commit，結果尚未保存。
             # Kill before persisting that observation: restart must reconcile the command.
             stop_process(self.boundary)
         await super().aput_writes(config, writes, task_id, task_path)
@@ -124,8 +129,17 @@ async def run(boundary: str, schema: str, job_file: str, execution: str, writer:
                     "event": "request",
                     "kind": "count" if counting else "model",
                     "step": 2 if after_tool else 1,
+                    "manual_net": any(
+                        isinstance(item.get("content"), str)
+                        and MANUAL_PURPOSE in item["content"]
+                        and "人工最終差異" in item["content"]
+                        for item in payload["input"]
+                    ),
                     "input_hash": sha256(
                         json.dumps(payload["input"], sort_keys=True).encode()
+                    ).hexdigest(),
+                    "payload_hash": sha256(
+                        json.dumps(payload, sort_keys=True).encode()
                     ).hexdigest(),
                 }
             ),
@@ -152,7 +166,7 @@ async def run(boundary: str, schema: str, job_file: str, execution: str, writer:
                             {
                                 "action": "add_source",
                                 "field": "job_title",
-                                "source": {"kind": "current_input"},
+                                "source": {"kind": "interview", "interview_sequence": 2},
                             },
                         ]
                     }
@@ -160,10 +174,19 @@ async def run(boundary: str, schema: str, job_file: str, execution: str, writer:
             )
         return httpx2.Response(200, json=raw)
 
+    async def interrupt_after_headers(response: httpx2.Response) -> None:
+        if boundary == "count_unsaved" and response.request.url.path.endswith("/input_tokens"):
+            assert response.status_code == 200
+            # Headers 已到，但 SDK 尚未交回 count，程序也沒有可補存的原件。
+            stop_process(boundary)
+
     sdk = create_responses_client(
         api_key="synthetic-not-a-real-key",
         timeout_seconds=5,
-        http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
+        http_client=httpx2.AsyncClient(
+            transport=httpx2.MockTransport(respond),
+            event_hooks={"response": [interrupt_after_headers]},
+        ),
     )
     try:
         dsn = make_conninfo(settings.url, options=f"-c search_path={schema}")

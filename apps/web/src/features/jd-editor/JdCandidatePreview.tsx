@@ -4,7 +4,7 @@ import type {
   CandidateJdPreview,
   Condition,
   WorkTask,
-} from '../../shared/api/generated/consultant-turn';
+} from '../../shared/api/generated/http/types.gen';
 
 const conditionLabels: Record<Condition['kind'], string> = {
   work_environment: '工作環境',

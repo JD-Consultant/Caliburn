@@ -1,6 +1,6 @@
 /** Job-wide collaborators use the same revision and command boundary as other JD collections. */
 import { Box, Button, Stack, Typography } from '@mui/material';
-import type { Collaborator, JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { Collaborator, JdWorkView } from '../../shared/api/generated/http/types.gen';
 import type { WorkIntent } from './jd-work-api';
 import type { WorkDialogContent } from './WorkDialog';
 import { FoldableSection } from './FoldableSection';

@@ -2,7 +2,6 @@
 
 import asyncio
 from collections.abc import AsyncIterator
-from dataclasses import asdict
 from typing import Annotated
 from uuid import UUID
 
@@ -10,14 +9,16 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
-from caliburn.contracts.generated.commentary_update import CommentaryUpdate
-from caliburn.contracts.generated.reasoning_summary import ReasoningSummary
 from caliburn.features.executions.models import ExecutionNotFoundError, ExecutionStatus
 from caliburn.features.interviews.models import InterviewInputNotFoundError
 from caliburn.transport.http.consultant_turns import ConsultantStatus
-from caliburn.workflows.consultant_activity import ConsultantActivityHub, PublicActivityUpdate
-from caliburn.workflows.consultant_status import ConsultantTurnUnavailableError
-from caliburn.workflows.public_text_stream import PublicStreamCapacityError
+from caliburn.transport.http.models.consultant import CommentaryUpdate, ReasoningSummary
+from caliburn.workflows.consultant_turns.activity import (
+    ConsultantActivityHub,
+    PublicActivityUpdate,
+    PublicStreamCapacityError,
+)
+from caliburn.workflows.consultant_turns.status import ConsultantTurnUnavailableError
 
 router = APIRouter(prefix="/api/job-files", tags=["interviews"])
 
@@ -25,6 +26,7 @@ router = APIRouter(prefix="/api/job-files", tags=["interviews"])
 @router.get(
     "/{job_file_id}/consultant-turns/{execution_id}/reasoning-summaries",
     response_model=list[ReasoningSummary],
+    operation_id="read_reasoning_summaries",
 )
 async def read_reasoning_summaries(
     job_file_id: UUID,
@@ -39,7 +41,7 @@ async def read_reasoning_summaries(
         raise HTTPException(404, detail={"code": "consultant_turn_not_found"}) from error
     except ConsultantTurnUnavailableError as error:
         raise HTTPException(503, detail={"code": "consultant_result_unavailable"}) from error
-    return [ReasoningSummary.model_validate(asdict(summary)) for summary in summaries]
+    return [ReasoningSummary.model_validate(summary, from_attributes=True) for summary in summaries]
 
 
 async def subscribe_consultant_activity(
@@ -82,6 +84,14 @@ ActivitySubscription = Annotated[
 @router.get(
     "/{job_file_id}/consultant-turns/{execution_id}/activity-stream",
     response_class=EventSourceResponse,
+    operation_id="stream_consultant_activity",
+    responses={
+        200: {
+            "model": ReasoningSummary | CommentaryUpdate,
+            "description": "Public activity events",
+        },
+        204: {"description": "The turn has ended; no event stream"},
+    },
 )
 async def stream_consultant_activity(
     subscription: ActivitySubscription,
@@ -92,9 +102,11 @@ async def stream_consultant_activity(
         update = await subscription.get()
         if isinstance(update, PublicReasoningSummary):
             yield ServerSentEvent(
-                event="reasoning_summary", data=ReasoningSummary.model_validate(asdict(update))
+                event="reasoning_summary",
+                data=ReasoningSummary.model_validate(update, from_attributes=True),
             )
         else:
             yield ServerSentEvent(
-                event="commentary", data=CommentaryUpdate.model_validate(asdict(update))
+                event="commentary",
+                data=CommentaryUpdate.model_validate(update, from_attributes=True),
             )

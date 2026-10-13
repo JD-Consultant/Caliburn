@@ -2,46 +2,50 @@
 
 import json
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
 import httpx2
 import pytest
 
 from caliburn.adapters.openai_responses import create_responses_client
+from caliburn.agents.memory_analysis import tools as analysis_tools
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.transport.model_tools import memory_analysis as analysis_tools
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
-from caliburn.workflows.memory_reads import CandidateMemoryRead
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead
 from scripts import probe_consultant_tool_schema as schema_probe
 
 
 @pytest.mark.parametrize("layer", list(MemoryLayer))
 def test_unbound_definitions_equal_runtime_tools_and_keep_role_permissions(layer) -> None:
     scope = ExecutionScope(uuid4(), uuid4(), ExecutionKind.MEMORY_BATCH)
-    stage = MemoryBatchPosition(
-        scope.job_file_id, scope.execution_id, uuid4(), uuid4(), layer, uuid4()
-    )
+    stage = MemoryBatchPosition(scope.job_file_id, scope.execution_id, uuid4(), layer, uuid4())
     binding = CandidateMemoryRead(scope, stage)
     runtime = analysis_tools.MemoryAnalysisTools(
         MemoryReadTools(Mock(), binding),
         MemoryWriteTools(Mock(), Mock(), binding, ExecutionWriter(scope, uuid4())),
     )
     definitions = analysis_tools.memory_analysis_tool_definitions(layer)
-    assert definitions == runtime.definitions()
-    assert tuple(item["name"] for item in definitions) == runtime.names
+    ensure_active = AsyncMock()
+    registered = runtime.standard_tools(ensure_active)
+    assert [(item["name"], item["description"], item["parameters"]) for item in definitions] == [
+        (tool.name, tool.description, tool.args_schema) for tool in registered
+    ]
+    runtime_names = tuple(tool.name for tool in registered)
+    assert tuple(item["name"] for item in definitions) == runtime_names
     reads = ["read_work_situation_map", "read_work_situation"]
     if layer == MemoryLayer.WORK_UNDERSTANDING:
         reads += ["read_work_understanding_map", "read_work_understanding"]
-    assert runtime.names == (
+    assert runtime_names == (
         *reads,
         "read_interview",
         *(f"{action}_{layer.value}" for action in ("create", "update", "delete")),
     )
     assert all(item["strict"] is True for item in definitions)
+    ensure_active.assert_not_awaited()
 
 
 @pytest.mark.parametrize("role", ["work_situation_analyst", "work_understanding_analyst"])

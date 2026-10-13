@@ -3,14 +3,13 @@
  * removed there. A "+" beside the list's label adds an item at the end, as Linear's sub-issues header does.
  */
 import { Box, Typography } from '@mui/material';
-import type { Detail } from '../../shared/api/generated/jd-work-view';
+import type { Detail } from '../../shared/api/generated/http/types.gen';
 import { IconAction } from '../../shared/ui/IconAction';
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
 import { InlineEditor } from './InlineEditor';
 import { InlineText } from './InlineText';
 import { useInlineEdit } from './inline-edit-context';
 import { detailTextField, newDetailField } from './inline-fields';
-import { detailTarget, useSourceBadge } from './source-badge-context';
 import { useFocusReturn } from './use-focus-return';
 
 type DetailKind = 'outcome' | 'requirement';
@@ -34,7 +33,6 @@ export function TaskDetails({
   onRemove,
 }: TaskDetailsProps) {
   const edit = useInlineEdit();
-  const badge = useSourceBadge();
   const label = labels[kind];
   const addField = newDetailField(taskId, kind, `${label} ${String(details.length + 1)}`);
   const adding = edit?.activeKey === addField.key;
@@ -78,7 +76,6 @@ export function TaskDetails({
                   {detail.text}
                 </Typography>
               </InlineText>
-              {badge(detailTarget(taskId, detail.detail_id))}
               <span className="item-actions">
                 <IconAction
                   label={`上移${label} ${String(index + 1)}`}

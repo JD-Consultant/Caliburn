@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision = "0023_jd_model_references"
-down_revision = "0022_execution_diagnostics"
+down_revision = "0021_rate_limited_failures"
 branch_labels = None
 depends_on = None
 

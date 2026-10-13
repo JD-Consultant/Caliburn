@@ -1,7 +1,8 @@
 """Turn-local plan preservation, original results and formal adoption on PostgreSQL."""
 
-from collections.abc import Mapping
+from collections.abc import AsyncIterator, Mapping
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
 from dataclasses import replace
 from threading import Barrier
 from uuid import UUID, uuid4
@@ -43,8 +44,10 @@ from caliburn.features.interviews.models import (
     InterviewCompletionConflictError,
     InterviewReadScope,
 )
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.interview_completion import record_formal_interview
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
 from caliburn.workflows.interview_plans import (
     InterviewPlanReadWorkflow,
     InterviewPlanWorkflow,
@@ -77,6 +80,52 @@ def test_saved_plan_has_owned_candidate_and_immutable_full_operation_tables(
     assert found == {"interview_plan_candidates", "interview_plan_operations"}
 
 
+def test_unchanged_and_next_turn_share_body_but_keep_each_operation(
+    client: TestClient,
+    database_connection: psycopg.Connection,
+) -> None:
+    first = start_turn(client)
+    initial = start_plan(client, first)
+    workflow = plan_workflow(client)
+    changed = client.portal.call(workflow.apply, first.writer, edit_at(initial, "固定計畫正文"))
+    command = edit_at(changed.snapshot, "固定計畫正文", unchanged=True)
+    unchanged = client.portal.call(workflow.apply, first.writer, command)
+    assert unchanged.snapshot.position != changed.snapshot.position
+    settle(client, first, unchanged.snapshot)
+    second = start_turn(client, file_id=first.writer.scope.job_file_id)
+    scope = second.writer.scope
+    inherited = transact(
+        client,
+        lambda s: start_interview_plan(s, second.writer, InterviewReadScope(scope.job_file_id, 3)),
+    )
+    assert inherited.body == "固定計畫正文"
+    found = database_connection.execute(
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
+        "WHERE table_schema=current_schema() AND table_name='interview_plan_bodies')"
+    ).fetchone()
+    assert found == (True,), "Plan bodies must be shared independently of per-operation receipts"
+    saved = database_connection.execute(
+        "SELECT revision_id,body_id FROM interview_plan_operations WHERE job_file_id=%s",
+        (scope.job_file_id,),
+    ).fetchall()
+    bodies = dict(saved)
+    assert len(saved) == 4
+    assert bodies[initial.position.revision_id] is None
+    assert (
+        bodies[changed.snapshot.position.revision_id]
+        == bodies[unchanged.snapshot.position.revision_id]
+        == bodies[inherited.position.revision_id]
+    )
+    assert database_connection.execute(
+        "SELECT count(*) FROM interview_plan_bodies WHERE job_file_id=%s", (scope.job_file_id,)
+    ).fetchone() == (1,)
+    assert client.portal.call(workflow.apply, first.writer, command) == unchanged
+    assert current(client, second) == inherited
+    assert database_connection.execute(
+        "SELECT count(*) FROM interview_plan_operations WHERE job_file_id=%s", (scope.job_file_id,)
+    ).fetchone() == (4,)
+
+
 def test_start_saves_nullable_full_body_and_reentry_keeps_original_base(client: TestClient) -> None:
     turn = start_turn(client)
     scope = turn.writer.scope
@@ -90,9 +139,28 @@ def test_start_saves_nullable_full_body_and_reentry_keeps_original_base(client: 
     assert current is not None and current.body is None
     reentered = transact(
         client,
-        lambda s: service.start_candidate(s, scope.job_file_id, scope.execution_id, "新基底"),
+        lambda s: service.start_candidate(
+            s, scope.job_file_id, scope.execution_id, replace(initial.position, revision_id=uuid4())
+        ),
     )
     assert reentered == initial
+
+
+def test_read_at_keeps_original_nullable_and_empty_bodies_after_head_advances(
+    client: TestClient,
+) -> None:
+    turn = start_turn(client)
+    initial = start_plan(client, turn)
+    workflow = plan_workflow(client)
+    first = client.portal.call(workflow.apply, turn.writer, edit_at(initial, "固定歷史正文"))
+    cleared = client.portal.call(workflow.apply, turn.writer, edit_at(first.snapshot, ""))
+    reader = getattr(service, "read_at", None)
+    assert callable(reader), "Historical Plan reads require a public same-session owner API"
+    for snapshot in (initial, first.snapshot, cleared.snapshot):
+        assert (
+            transact(client, lambda s, snapshot=snapshot: reader(s, snapshot.position)) == snapshot
+        )
+    assert current(client, turn) == cleared.snapshot
 
 
 def test_complete_cannot_skip_an_existing_plan_candidate(client: TestClient) -> None:
@@ -107,9 +175,14 @@ def test_complete_cannot_skip_an_existing_plan_candidate(client: TestClient) -> 
 
 def start_plan(client: TestClient, turn: Turn, body: str | None = None) -> PlanSnapshot:
     scope = turn.writer.scope
-    return transact(
-        client, lambda s: service.start_candidate(s, scope.job_file_id, scope.execution_id, body)
+    initial = transact(
+        client, lambda s: service.start_candidate(s, scope.job_file_id, scope.execution_id, None)
     )
+    if body is None:
+        return initial
+    return client.portal.call(
+        plan_workflow(client).apply, turn.writer, edit_at(initial, body)
+    ).snapshot
 
 
 def plan_workflow(client: TestClient) -> InterviewPlanWorkflow:
@@ -158,6 +231,8 @@ def test_unchanged_still_saves_result_and_advances_revision(
 ) -> None:
     turn = start_turn(client)
     initial = start_plan(client, turn, body)
+    scope = turn.writer.scope
+    base = transact(client, lambda s: service.read_base(s, scope.job_file_id, scope.execution_id))
     command = edit_at(initial, body, unchanged=True)
     result = client.portal.call(plan_workflow(client).apply, turn.writer, command)
     assert result.snapshot.body == body
@@ -167,14 +242,16 @@ def test_unchanged_still_saves_result_and_advances_revision(
     scope = turn.writer.scope
     assert (
         transact(client, lambda s: service.read_base(s, scope.job_file_id, scope.execution_id))
-        == initial
+        == base
     )
     assert (
         transact(
             client,
-            lambda s: service.start_candidate(s, scope.job_file_id, scope.execution_id, "較新"),
+            lambda s: service.start_candidate(
+                s, scope.job_file_id, scope.execution_id, result.snapshot.position
+            ),
         )
-        == initial
+        == base
     )
 
 
@@ -237,21 +314,47 @@ def test_earlier_unchanged_replay_is_retained_after_new_effect(client: TestClien
 
 def test_apply_commit_confirmation_loss_recovers_from_original_operation(
     client: TestClient,
+    database_connection: psycopg.Connection,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     turn = start_turn(client)
     initial = start_plan(client, turn)
     command = edit_at(initial, "可靠正文")
     workflow = plan_workflow(client)
 
-    def lose_ack() -> None:
-        client.portal.call(workflow.apply, turn.writer, command)
-        raise ConnectionError("injected lost commit confirmation")
+    real_begin = workflow.sessions.begin
 
-    with pytest.raises(ConnectionError, match="lost commit confirmation"):
-        lose_ack()
+    @asynccontextmanager
+    async def lose_ack() -> AsyncIterator[AsyncSession]:
+        async with real_begin() as session:
+            yield session
+        raise ConnectionError("lost confirmation after database commit")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(workflow.sessions, "begin", lose_ack)
+        with pytest.raises(ConnectionError, match="after database commit"):
+            client.portal.call(workflow.apply, turn.writer, command)
+    saved = current(client, turn)
+    assert saved is not None
+    later = client.portal.call(workflow.apply, turn.writer, edit_at(saved, "後續正文"))
+    scope = turn.writer.scope
+    before = database_connection.execute(
+        "SELECT (SELECT count(*) FROM interview_plan_bodies WHERE job_file_id=%s),"
+        "(SELECT count(*) FROM interview_plan_operations WHERE job_file_id=%s)",
+        (scope.job_file_id, scope.job_file_id),
+    ).fetchone()
     recovered = client.portal.call(plan_workflow(client).apply, turn.writer, command)
-    assert recovered.snapshot == current(client, turn)
+    assert recovered.snapshot == saved
     assert recovered.snapshot.body == "可靠正文"
+    assert current(client, turn) == later.snapshot
+    assert (
+        database_connection.execute(
+            "SELECT (SELECT count(*) FROM interview_plan_bodies WHERE job_file_id=%s),"
+            "(SELECT count(*) FROM interview_plan_operations WHERE job_file_id=%s)",
+            (scope.job_file_id, scope.job_file_id),
+        ).fetchone()
+        == before
+    )
     assert recovered.result_text == command.result_text
 
 
@@ -490,8 +593,10 @@ def test_operation_guard_scope_foreign_keys_and_whole_file_cascade(
     other_plan = start_plan(client, other, "別案正文")
     scope = turn.writer.scope
     for statement in (
-        "UPDATE interview_plan_operations SET body='被改寫' WHERE job_file_id=%s",
+        "UPDATE interview_plan_operations SET result_text='被改寫' WHERE job_file_id=%s",
         "DELETE FROM interview_plan_operations WHERE job_file_id=%s",
+        "UPDATE interview_plan_bodies SET body='被改寫' WHERE job_file_id=%s",
+        "DELETE FROM interview_plan_bodies WHERE job_file_id=%s",
     ):
         with pytest.raises(psycopg.errors.CheckViolation):
             database_connection.execute(statement, (scope.job_file_id,))
@@ -501,9 +606,32 @@ def test_operation_guard_scope_foreign_keys_and_whole_file_cascade(
             "WHERE job_file_id=%s AND execution_id=%s",
             (other_plan.position.revision_id, scope.job_file_id, scope.execution_id),
         )
+    other_body_id = database_connection.execute(
+        "SELECT body_id FROM interview_plan_operations WHERE job_file_id=%s AND revision_id=%s",
+        (other.writer.scope.job_file_id, other_plan.position.revision_id),
+    ).fetchone()[0]
+    with pytest.raises(psycopg.errors.ForeignKeyViolation):
+        database_connection.execute(
+            "INSERT INTO interview_plan_operations "
+            "(job_file_id,execution_id,operation_id,kind,expected_revision_id,revision_id,"
+            "body_id,intent_digest,result_text) VALUES (%s,%s,%s,'apply',%s,%s,%s,%s,'result')",
+            (
+                scope.job_file_id,
+                scope.execution_id,
+                uuid4(),
+                result.snapshot.position.revision_id,
+                uuid4(),
+                other_body_id,
+                "f" * 64,
+            ),
+        )
     settle(client, turn, result.snapshot)
     assert client.delete(f"/api/job-files/{scope.job_file_id}").status_code == 204
-    for table in ("interview_plan_operations", "interview_plan_candidates"):
+    for table in (
+        "interview_plan_operations",
+        "interview_plan_candidates",
+        "interview_plan_bodies",
+    ):
         assert database_connection.execute(
             sql.SQL("SELECT count(*) FROM {} WHERE job_file_id=%s").format(sql.Identifier(table)),
             (scope.job_file_id,),

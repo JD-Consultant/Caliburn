@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** Display only: the consultant's reply is formatted, every other speaker stays verbatim. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
@@ -29,8 +30,7 @@ function message(
 test('consultant Markdown is formatted; employee and App text stay exactly as stored', async () => {
   const employee = '員工打的 **不是** 標記\n- 第二行';
   const app = '開場 <b>原樣</b>';
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(
         Response.json({
@@ -72,8 +72,7 @@ test('consultant Markdown is formatted; employee and App text stay exactly as st
 });
 
 test('each message is headed by its speaker only; the formal sequence number is not shown', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(Response.json({ messages: [message(7, 'consultant', '請說明工作。')] })),
     ),

@@ -8,12 +8,13 @@ import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 from openai.types.responses import Response
 
-from caliburn.agent_execution.tool_steps import (
+from caliburn.agent_execution.response_runtime import (
     PausedResponseLoop,
     ReceivedModelResponse,
     ResponseLoopControls,
-    run_response_loop,
 )
+from caliburn.agent_execution.tool_steps import _completed_step_items
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 
 
@@ -54,6 +55,8 @@ async def test_pause_precedes_next_count_compaction_and_final_delivery(final):
     paused = await run_response_loop(saver, request=request_fixture(), **options)
     assert isinstance(paused, PausedResponseLoop)
     assert paused.state["completed_steps"] == 1
+    assert "control_action" not in paused.state
+    assert "request_admission" not in paused.state
     assert len(provider.model_requests) == len(provider.count_requests) == 1
     assert compact_calls == []
     assert control.paused == 1
@@ -69,7 +72,15 @@ async def test_pause_precedes_next_count_compaction_and_final_delivery(final):
     assert not isinstance(result, PausedResponseLoop)
     assert result["next_action"] == "deliver_answer"
     assert len(provider.model_requests) == (1 if final else 2)
-    assert result["input_items"][: len(paused.state["input_items"])] == paused.state["input_items"]
+    paused_items = _completed_step_items(
+        paused.state["request_snapshot"],
+        paused.state["response_snapshot"],
+        paused.state["tool_results"],
+    )
+    result_items = _completed_step_items(
+        result["request_snapshot"], result["response_snapshot"], result["tool_results"]
+    )
+    assert result_items[: len(paused_items)] == paused_items
 
 
 @pytest.mark.asyncio
@@ -144,9 +155,10 @@ class InterruptSaveFault(InMemorySaver):
 class ContinueAcknowledgementFault(InMemorySaver):
     fail = True
     before_save = False
+    control_read = False
 
     async def aput(self, config, checkpoint, metadata, new_versions):
-        if self.fail and checkpoint["channel_values"].get("control_action") == "continue":
+        if self.fail and self.control_read:
             self.fail = False
             if self.before_save:
                 raise ConnectionError("synthetic control checkpoint unavailable")
@@ -185,8 +197,13 @@ async def test_pending_step_result_is_not_overwritten_by_recovery_control_refres
     paused = await run_response_loop(saver, request=None, **options)
     assert isinstance(paused, PausedResponseLoop)
     assert paused.state["completed_steps"] == 1
-    assert paused.state["input_items"][:1] == request_fixture().create_payload()["input"]
-    assert len(paused.state["input_items"]) > 1
+    paused_items = _completed_step_items(
+        paused.state["request_snapshot"],
+        paused.state["response_snapshot"],
+        paused.state["tool_results"],
+    )
+    assert paused_items[:1] == request_fixture().create_payload()["input"]
+    assert len(paused_items) > 1
     assert len(provider.model_requests) == len(provider.count_requests) == 1
 
 
@@ -199,12 +216,17 @@ async def test_recovery_rechecks_pause_after_saved_continue_decision(final, befo
     control.requested = False
     saver = ContinueAcknowledgementFault()
     saver.before_save = before_save
+
+    async def read_pause():
+        saver.control_read = True
+        return await control.read_request()
+
     options = dict(
         thread_id="stale-continue",
         runtime=provider.runtime(),
         max_tool_calls=2,
         max_model_steps=2,
-        controls=control.controls(),
+        controls=ResponseLoopControls(read_pause, control.mark_paused),
     )
     with pytest.raises(ConnectionError):
         await run_response_loop(saver, request=request_fixture(), **options)

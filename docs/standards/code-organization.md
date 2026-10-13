@@ -22,7 +22,7 @@
 apps/
   api/
     pyproject.toml / uv.lock
-    contracts/                  # JSON Schema 唯一來源，依 http、tools 分用途
+    contracts/tools/            # 模型工具 JSON Schema；HTTP 由 transport/http/models 定義
     src/caliburn/
       migrations/               # 隨套件交付的唯一 Alembic 歷史；不手改框架 checkpoint 表
       bootstrap.py              # 唯一組裝根：settings、DB、clients、services、graphs
@@ -36,15 +36,20 @@ apps/
         interview_plans/        # 剩餘訪談／分析／JD 編修安排；不取代 Memory 或 Changes
         executions/             # 持久執行資格、取消／完成勝負與費用限制
       workflows/
-        consultant_turn.py      # 跨模組 A 接受、完成、取消的協調
-        memory_batch.py         # 背景領取、階段交接、發布協調
+        consultant_turns/       # A 接受、活動串流、控制與共同完成
+        job_description/        # JD 候選用例、跨領域來源解析與執行資格
+        work_memory/            # 背景領取、階段交接、發布與查讀
+        executions/             # 把持久資格接到 native 外送、控制與失敗邊界
+        job_files.py            # 檔案跨 owner 清理
+        interview_plans.py      # Plan 用例與合法跨輪查詢
+        occupation_references.py # 公版選用／否認及外部查讀
       agents/
         job_consultant/         # A：prompt、允許工具與起始投影
         work_situation_analyst/ # B1：只處理情境
         work_understanding_analyst/ # B2：依情境分析理解，不回交 B1
         memory_analysis/        # B1／B2 共用組裝（runner、起始 context、角色分派）；不是第三個角色
-      agent_execution/          # 共用 node loop、原生 context、Step／恢復／compact
-      diagnostics/              # 按需讀原生 checkpoint、重建本機診斷副本；不接產品執行路徑
+      agent_execution/          # 共用標準 Agent 轉接、原生 context、Step／恢復／compact
+      diagnostics/              # 同一唯讀快照組裝原件與歷史版本；不接產品執行路徑
       adapters/
         database.py             # engine／session／短交易機制
         database_settings.py    # 資料庫位置與 namespace 配置；由 adapter 擁有，settings 只負責組合
@@ -64,7 +69,7 @@ apps/
     src/
       app/                      # 路由、啟動、providers、theme、工作畫面組裝（WorkspaceLayout、各 Pane）
       features/
-        job-files/ interview/ jd-editor/ source-viewer/
+        job-files/ interview/ jd-editor/ source-viewer/ memory/
       shared/api/               # generated 型別、HTTP／串流 transport
       shared/ui/                # 多處使用：icons、IconAction、SafeMarkdown／ChatMarkdown（共用 inert-markdown 規則）、對話捲動 hook；非業務元件大倉庫
     tests/e2e/
@@ -83,6 +88,13 @@ apps/
 
 模組變大時，再依業務責任拆分，例如 `citations.py`、`snapshots.py`；不為一個函式包 class。測試依受測責任命名，不做一份幾千行的全產品測試。
 
+JD 的 `item_revision.py`、`item_movement.py`、`item_deletion.py` 擁有純選取與準備規則，
+`source_intents.py` 描述引用意圖，`model_references.py` 管理 JD 自有 alias；相應 workflow
+只組合候選讀取、execution 資格、來源解析與保存。Memory 的固定 B1→B2 交接查詢由
+`features/work_memory/handoff_queries.py` 提供。四組 workflow package 按用例責任分組，
+其中 `workflows/executions` 協調外送與控制，`features/executions` 裁決持久資格及預算。
+package 入口不轉送舊路徑或重新匯出其他 owner 的型別。
+
 ### 1.3 資料、交易與交付資源
 
 業務表的 SQL 留在各 feature 的 persistence，不塞進全域 database.py；交易與連線機制才共用。`executions` 只擁有正式准入／控制資格與預算，不能再存一份 Graph node 游標、候選全文或模型對話。
@@ -95,13 +107,15 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 | 模組 | 責任 |
 |---|---|
-| `checkpoints.py` | 原生格式讀取 |
+| `checkpoints.py` | 診斷需要的 thread 分類與擷取內容投影 |
 | `projection.py` | 純投影與遮蔽 |
-| `persistence.py` | 診斷表定義 |
-| `refresh.py` | 一次性更新交易 |
-| `inspection.py` | 唯讀查閱 |
+| `inspection.py` | 同一唯讀交易的查閱組裝入口 |
+| `control_history.py` | 沿原 interrupt 與 checkpoint ancestry 投影可證實的控制接續 |
+| `__main__.py` | 隨套件交付的 `python -m caliburn.diagnostics` 管理入口 |
 
-跨表 JOIN 放在 Alembic 版本化的唯讀 VIEW，不把各領域的寫入 SQL 搬出原 feature。副本只供排查，不用來恢復工作、判斷提交或提供模型 context；操作見 [runbook](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+業務表由各 owner 的具名唯讀查詢提供，診斷入口沿同一 Repeatable Read 交易組裝原生原件、操作與固定版本，不直接匯入 feature 私有表，也不另存正文副本。查阅不啟動模型、不恢復工作、不取得正式採用資格；操作見 [runbook](../operations/README.md#查閱-ai-執行原件)。
+
+原生 checkpoint 讀取由 `adapters/native_checkpoint_reads.py` 借用同一交易的 psycopg 連線，透過官方 saver 取得 checkpoint 與 pending writes；只有原件完整性核對留在 adapter。`agent_execution/native_observations.py` 負責共用 Step 純投影，`tool_observations.py` 提供工具觀察值。診斷與人用工具查閱沿這些共同能力，不讓產品 workflow 反向依賴 diagnostics，也不在通用 adapter 解讀業務角色或版本。
 
 ## 2. 依賴方向與可檢查限制
 
@@ -123,7 +137,7 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 **領域型別與傳輸邊界**
 
-領域純型別模組（`models.py` 及按責任拆分的 `*_models.py`）不 import FastAPI、SQLAlchemy、LangGraph、OpenAI 或別的 feature persistence。
+領域純型別模組（`models.py` 及按責任拆分的 `*_models.py`）不 import FastAPI、SQLAlchemy、LangChain／LangGraph、OpenAI 或別的 feature persistence。
 
 整個 `features`／`workflows` 不依賴 `contracts` 的 wire DTO、validator 或 package。傳輸驗證由 HTTP／Tool adapter 擁有，轉成內部型別後才進入領域及用例；規則沿[契約策略](contract-strategy.md)，不只限制生成檔的直接 import。
 
@@ -185,12 +199,13 @@ Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 **檢查範圍**
 
 - 純值與變換檢查間接 I/O 依賴；transport 的 SQL 限制只禁止直接 import，允許經 workflow／feature 呼叫。
+- 原生 `acyclic_siblings` 契約從 `caliburn` 向下檢查同層 package／module 的循環，包含 `TYPE_CHECKING` 匯入；不能只靠跨層禁止規則判斷無循環。機制見 [Import Linter 官方說明](https://import-linter.readthedocs.io/en/stable/contract_types/acyclic_siblings/)。
 - 架構 gate 同時使用合法與非法 import 測例確認規則。後端 `test_import_boundaries.py` 用真實臨時 Python package 驗證 relative import、re-export、`TYPE_CHECKING`、拆分 persistence、間接 ORM 及合法 workflow。
 - 另核對 graph 包含全部產品模組；新增 `*_models`／`*_changes`／`*_persistence` 須有對應政策。
 
 **拆分與例外**
 
-拆分 persistence 由原 feature、跨域 workflow、離線 diagnostics 及 migration 使用，其他 feature 不能直接匯入。一般 package 明確提供 `__init__.py`，避免工具漏掃巢狀 namespace。
+拆分 persistence 由原 feature、跨域 workflow 及 migration 使用，其他 feature 與 diagnostics 不能直接匯入；診斷沿 owner 公開查詢讀取。一般 package 明確提供 `__init__.py`，避免工具漏掃巢狀 namespace。
 
 需要例外時，先說明實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。靜態圖與架構 gate 不保證動態匯入、動態呼叫或所有業務責任切分已正確；驗證見程式組織審查。
 

@@ -3,7 +3,7 @@ import type { BrowserContext, Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { isJobFile } from '../../src/shared/api/validation';
 import { isSubmitInterviewInput } from '../../src/features/interview/interview-turn-api';
-import type { SubmitInterviewInput } from '../../src/shared/api/generated/submit-interview-input';
+import type { SubmitInterviewInput } from '../../src/shared/api/generated/http/types.gen';
 
 async function createFile(page: Page) {
   const response = await page.request.post('/api/job-files', {

@@ -9,8 +9,9 @@ import type {
   Condition,
   Detail,
   WorkTask,
-} from '../../shared/api/generated/jd-work-view';
-import type { ProfileField } from '../../shared/api/generated/revise-jd-profile-request';
+  ProfileField,
+} from '../../shared/api/generated/http/types.gen';
+
 import type { WorkIntent } from './jd-work-api';
 import { profileLabels } from './profile-command';
 import type { ProfileIntent } from './profile-command';

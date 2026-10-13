@@ -22,9 +22,8 @@ from caliburn.features.job_description.conditions import (
 )
 from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.features.job_description.tasks import CreateTask, EditJdTasks
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_item_deletion import JdItemDeletionWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.item_deletion import JdItemDeletionWorkflow
 
 pytestmark = pytest.mark.postgres
 
@@ -75,9 +74,7 @@ def test_area_delete_preserves_tasks_replays_original_and_rejects_used_capabilit
             ),
         )
         deletion = JdItemDeletionWorkflow(sessions)
-        prepared = await deletion.prepare(
-            PublishedMemoryRead(scope, None, 1), command_id=uuid4(), read_ref=jd_read_ref(area)
-        )
+        prepared = await deletion.prepare(scope, command_id=uuid4(), read_ref=jd_read_ref(area))
         result = await deletion.execute(writer, prepared)
         preview = await candidate.read(scope)
         assert not preview.work.areas
@@ -108,7 +105,7 @@ def test_area_delete_preserves_tasks_replays_original_and_rejects_used_capabilit
         )
         with pytest.raises(CapabilityInUseError):
             await deletion.prepare(
-                PublishedMemoryRead(scope, None, 1),
+                scope,
                 command_id=uuid4(),
                 read_ref=jd_read_ref(capability),
             )
@@ -168,12 +165,9 @@ def test_task_collaborator_and_condition_delete_keep_shared_knowledge_and_replay
         collaborator, condition = work.collaborators[0], work.conditions[0]
 
         deletion = JdItemDeletionWorkflow(sessions)
-        binding = PublishedMemoryRead(scope, None, 1)
 
         async def delete(item):
-            prepared = await deletion.prepare(
-                binding, command_id=uuid4(), read_ref=jd_read_ref(item)
-            )
+            prepared = await deletion.prepare(scope, command_id=uuid4(), read_ref=jd_read_ref(item))
             result = await deletion.execute(writer, prepared)
             after = await candidate.read(scope)
             # The same prepared operation returns its original result and changes nothing.

@@ -314,29 +314,6 @@ def test_parent_and_revision_cannot_cross_files(
         create_position(database_settings, window.job_file_id, (reference(other_revision),))
 
 
-def test_ancestry_is_inclusive_and_cannot_cross_boundary_or_branch(
-    database_settings: DatabaseSettings, window: MemorySourceWindow
-) -> None:
-    file_id = window.job_file_id
-    root = create_position(database_settings, file_id)
-    boundary = create_position(database_settings, file_id, parent=root)
-    middle = create_position(database_settings, file_id, parent=boundary)
-    tip = create_position(database_settings, file_id, parent=middle)
-    sibling = create_position(database_settings, file_id, parent=boundary)
-
-    async def check(session: AsyncSession) -> None:
-        assert await positions.is_position_ancestor(session, file_id, middle, tip, boundary)
-        assert await positions.is_position_ancestor(session, file_id, boundary, tip, boundary)
-        assert await positions.is_position_ancestor(session, file_id, tip, tip, boundary)
-        assert not await positions.is_position_ancestor(session, file_id, root, tip, boundary)
-        assert not await positions.is_position_ancestor(session, file_id, sibling, tip, boundary)
-        assert not await positions.is_position_ancestor(session, file_id, tip, tip, sibling)
-        assert not await positions.is_position_ancestor(session, file_id, tip, tip, uuid4())
-        assert not await positions.is_position_ancestor(session, uuid4(), middle, tip, boundary)
-
-    execute(database_settings, check)
-
-
 @pytest.fixture
 def batch_position(
     database_settings: DatabaseSettings,
@@ -345,7 +322,6 @@ def batch_position(
 ) -> MemoryBatchPosition:
     position = MemoryBatchPosition(
         window.job_file_id,
-        uuid4(),
         uuid4(),
         uuid4(),
         MemoryLayer.WORK_SITUATION,
@@ -365,7 +341,6 @@ def batch_position(
                 base_snapshot_id=None,
                 base_position_id=position.position_id,
                 current_position_id=position.position_id,
-                generation_id=position.generation_id,
                 stage_id=position.stage_id,
                 phase=position.phase.value,
                 status="open",
@@ -384,7 +359,6 @@ def result_fields(position: MemoryBatchPosition) -> dict[str, str]:
     return {
         "job_file_id": str(position.job_file_id),
         "execution_id": str(position.execution_id),
-        "generation_id": str(position.generation_id),
         "stage_id": str(position.stage_id),
         "phase": position.phase.value,
         "position_id": str(position.position_id),
@@ -459,7 +433,7 @@ def test_first_batch_has_no_head_and_reads_are_scoped(
     execute(database_settings, check)
 
 
-def test_recorded_position_requires_all_coordinates_and_accepts_extra_result_fields(
+def test_snapshot_and_operation_reads_keep_file_scope(
     database_settings: DatabaseSettings,
     batch_position: MemoryBatchPosition,
     published_snapshot: UUID,
@@ -474,26 +448,6 @@ def test_recorded_position_requires_all_coordinates_and_accepts_extra_result_fie
         operation = await batches.read_operation(session, file_id, execution_id)
         assert operation is not None and operation.kind == "start"
         assert await batches.read_operation(session, uuid4(), execution_id) is None
-        assert await batches.has_recorded_position(
-            session, file_id, execution_id, result_fields(batch_position)
-        )
-        for forged in (
-            replace(batch_position, job_file_id=uuid4()),
-            replace(batch_position, execution_id=uuid4()),
-            replace(batch_position, generation_id=uuid4()),
-            replace(batch_position, stage_id=uuid4()),
-            replace(batch_position, phase=MemoryLayer.WORK_UNDERSTANDING),
-            replace(batch_position, position_id=uuid4()),
-        ):
-            assert not await batches.has_recorded_position(
-                session, file_id, execution_id, result_fields(forged)
-            )
-        assert not await batches.has_recorded_position(
-            session, file_id, uuid4(), result_fields(batch_position)
-        )
-        assert not await batches.has_recorded_position(
-            session, file_id, execution_id, {"position_id": str(batch_position.position_id)}
-        )
 
     execute(database_settings, check)
 
@@ -713,9 +667,9 @@ def test_mutable_batch_and_head_updates_respect_the_callers_rollback(
     database_connection.execute(
         "INSERT INTO memory_batches "
         "(job_file_id,execution_id,base_snapshot_id,base_position_id,current_position_id,"
-        "generation_id,stage_id,phase,status,through_source_id,covered_through_sequence,"
+        "stage_id,phase,status,through_source_id,covered_through_sequence,"
         "through_sequence) SELECT job_file_id,%s,%s,base_position_id,current_position_id,"
-        "generation_id,stage_id,phase,status,through_source_id,covered_through_sequence,"
+        "stage_id,phase,status,through_source_id,covered_through_sequence,"
         "through_sequence FROM memory_batches",
         (second_execution, published_snapshot),
     )

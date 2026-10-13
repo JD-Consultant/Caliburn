@@ -6,20 +6,22 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
-from caliburn.contracts.generated.jd_source_changes_view import JdSourceChangesView
-from caliburn.contracts.generated.jd_source_content_view import JdSourceContentView
-from caliburn.contracts.generated.jd_sources_view import JdSourcesView
 from caliburn.features.interviews.models import InterviewReadError
 from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
+from caliburn.transport.http.models.jd_sources import (
+    JdSourceChangesView,
+    JdSourceContentView,
+    JdSourcesView,
+    SourceVersion,
+)
 from caliburn.transport.jd_source_markdown import (
     project_jd_source_changes,
     project_jd_target_changes,
 )
-from caliburn.workflows.jd_evidence import (
+from caliburn.workflows.job_description.evidence import (
     JdEvidenceComparisonError,
     JdEvidenceNotFoundError,
-    JdEvidenceStaleError,
     JdEvidenceWorkflow,
     MemoryEvidence,
 )
@@ -39,7 +41,6 @@ EvidenceWorkflow = Annotated[JdEvidenceWorkflow, Depends(get_evidence_workflow)]
 READ_ERRORS = (
     JobFileNotFoundError,
     JdEvidenceNotFoundError,
-    JdEvidenceStaleError,
     JdEvidenceComparisonError,
     MemoryRevisionNotFoundError,
     InterviewReadError,
@@ -51,23 +52,23 @@ def _read_error(error: Exception) -> HTTPException:
         return HTTPException(status_code=404, detail={"code": "job_file_not_found"})
     if isinstance(error, JdEvidenceNotFoundError):
         return HTTPException(status_code=404, detail={"code": "source_not_found"})
-    if isinstance(error, JdEvidenceStaleError):
-        return HTTPException(status_code=409, detail={"code": "jd_source_view_stale"})
     if isinstance(error, JdEvidenceComparisonError):
         return HTTPException(status_code=503, detail={"code": "jd_review_baseline_not_available"})
     return HTTPException(status_code=503, detail={"code": "source_not_available"})
 
 
-@router.get("", response_model=JdSourcesView)
+@router.get("", response_model=JdSourcesView, operation_id="read_jd_sources")
 async def read_sources(job_file_id: UUID, workflow: EvidenceWorkflow) -> JdSourcesView:
     try:
         result = await workflow.read_overview(job_file_id)
     except READ_ERRORS as error:
         raise _read_error(error) from error
-    return JdSourcesView.model_validate(asdict(result))
+    return JdSourcesView.model_validate(result, from_attributes=True)
 
 
-@router.get("/{citation_id}", response_model=JdSourceContentView)
+@router.get(
+    "/{citation_id}", response_model=JdSourceContentView, operation_id="read_jd_source_content"
+)
 async def read_source_content(
     job_file_id: UUID,
     citation_id: UUID,
@@ -97,7 +98,11 @@ async def read_source_content(
     )
 
 
-@router.get("/{citation_id}/changes", response_model=JdSourceChangesView)
+@router.get(
+    "/{citation_id}/changes",
+    response_model=JdSourceChangesView,
+    operation_id="read_jd_source_changes",
+)
 async def read_source_changes(
     job_file_id: UUID,
     citation_id: UUID,
@@ -115,6 +120,18 @@ async def read_source_changes(
         source_markdown=(
             project_jd_source_changes(
                 result.source_changes, comparison_label="本次讀取時的最新已發布 Memory"
+            )
+            if result.source_changes is not None
+            else None
+        ),
+        source_version=(
+            SourceVersion.model_validate(result.source_changes.source_version, from_attributes=True)
+            if result.source_changes is not None
+            else None
+        ),
+        comparison_version=(
+            SourceVersion.model_validate(
+                result.source_changes.comparison_version, from_attributes=True
             )
             if result.source_changes is not None
             else None

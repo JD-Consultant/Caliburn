@@ -14,14 +14,13 @@ from caliburn.agent_execution.context_compaction import (
     prepare_context_history,
     run_context_compaction,
 )
-from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
-from caliburn.agent_execution.tool_steps import (
+from caliburn.agent_execution.response_runtime import (
     InputCountSaveError,
     PausedResponseLoop,
     ResponseStepSaveError,
-    run_response_loop,
-    run_response_step,
 )
+from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
+from tests.fixtures.native_response_runtime import run_response_loop, run_response_step
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 from tests.unit.test_context_compaction import COMPACTED, options
 from tests.unit.test_response_pause import PauseProbe
@@ -77,7 +76,7 @@ async def test_original_response_is_automatically_saved_without_second_model(loo
     )
     if loop:
         # The fixture requests a tool; stop after one Step to inspect original recovery.
-        from caliburn.agent_execution.tool_steps import ModelStepLimitError
+        from caliburn.agent_execution.response_runtime import ModelStepLimitError
 
         with pytest.raises(ModelStepLimitError):
             await run_response_loop(saver, **args, max_model_steps=1)

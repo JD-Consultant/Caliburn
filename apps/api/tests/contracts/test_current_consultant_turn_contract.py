@@ -1,33 +1,18 @@
 """Discovery shares the public Turn shape, with a required nullable result."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 from pydantic import ValidationError
-from referencing import Registry, Resource
 
-from caliburn.contracts.generated.current_consultant_turn import CurrentConsultantTurn
+from caliburn.transport.http.models.consultant import CurrentConsultantTurn
+from tests.fixtures.http_contracts import http_validator
 
 
 @pytest.fixture
 def validator() -> Draft202012Validator:
-    directory = Path(__file__).parents[2] / "contracts/http"
-    schema = json.loads((directory / "current-consultant-turn.schema.json").read_text("utf-8"))
-    Draft202012Validator.check_schema(schema)
-    registry = Registry().with_resources(
-        (path.name, Resource.from_contents(json.loads(path.read_text("utf-8"))))
-        for path in directory.glob("*.schema.json")
-    )
-    registry = registry.with_resource(
-        "tools/interview-plan.schema.json",
-        Resource.from_contents(
-            json.loads((directory.parent / "tools/interview-plan.schema.json").read_text("utf-8"))
-        ),
-    )
-    return Draft202012Validator(schema, format_checker=FormatChecker(), registry=registry)
+    return http_validator(CurrentConsultantTurn)
 
 
 def public_turn() -> dict:

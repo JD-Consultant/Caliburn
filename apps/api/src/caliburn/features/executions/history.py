@@ -250,7 +250,7 @@ def _belongs_to_completed_role(scope: ExecutionScope, role: AgentRole, thread_id
         scope.kind == ExecutionKind.MEMORY_BATCH
         and stage is not None
         and stage.root_thread_id == root
-        and stage_thread_id(root, stage.generation_id, stage.stage_id) == thread_id
+        and stage_thread_id(root, stage.stage_id) == thread_id
     )
 
 

@@ -17,7 +17,7 @@ def validator():
     return Draft202012Validator(schema)
 
 
-def test_finite_changes_keep_each_direct_source_owner(validator):
+def test_finite_changes_keep_task_content_and_shared_evidence(validator):
     validator.validate(
         {
             "read_ref": "task_app",
@@ -28,7 +28,6 @@ def test_finite_changes_keep_each_direct_source_owner(validator):
                     "action": "add_detail",
                     "kind": "outcome",
                     "text": "成果",
-                    "supporting_sources": [],
                 },
                 {"action": "revise_detail", "detail_read_ref": "outcome_app", "text": "新成果"},
                 {"action": "remove_detail", "detail_read_ref": "requirement_app"},
@@ -36,7 +35,6 @@ def test_finite_changes_keep_each_direct_source_owner(validator):
                     "action": "set_capability",
                     "capability_read_ref": "skill_app",
                     "relationship": "link",
-                    "supporting_sources": [{"kind": "current_input"}],
                 },
                 {
                     "action": "set_capability",
@@ -55,12 +53,12 @@ def test_finite_changes_keep_each_direct_source_owner(validator):
                 },
                 {
                     "action": "remove_source",
-                    "target": {"kind": "detail", "detail_read_ref": "outcome_app"},
+                    "target": {"kind": "item"},
                     "citation_ref": "citation_app",
                 },
                 {
                     "action": "confirm_reference_alignment",
-                    "target": {"kind": "capability_relation", "capability_read_ref": "skill_app"},
+                    "target": {"kind": "item"},
                     "citation_ref": "citation_relation",
                 },
             ],
@@ -87,7 +85,7 @@ def test_finite_changes_keep_each_direct_source_owner(validator):
         {
             "action": "add_source",
             "target": {"kind": "item"},
-            "source": {"kind": "current_input", "source_id": "fake"},
+            "source": {"kind": "interview", "interview_sequence": 2, "source_id": "fake"},
         },
     ],
 )
@@ -95,8 +93,34 @@ def test_unrelated_fields_and_empty_shell_actions_are_rejected(validator, change
     assert list(validator.iter_errors({"read_ref": "task_app", "changes": [change]}))
 
 
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"action": "add_detail", "kind": "outcome", "text": "成果", "supporting_sources": []},
+        {
+            "action": "set_capability",
+            "capability_read_ref": "skill_app",
+            "relationship": "link",
+            "supporting_sources": [],
+        },
+        {
+            "action": "add_source",
+            "target": {"kind": "detail", "detail_read_ref": "outcome_app"},
+            "source": {"kind": "interview", "interview_sequence": 2},
+        },
+        {
+            "action": "add_source",
+            "target": {"kind": "capability_relation", "capability_read_ref": "skill_app"},
+            "source": {"kind": "interview", "interview_sequence": 2},
+        },
+    ],
+)
+def test_retired_child_sources_are_rejected(validator, change):
+    assert not validator.is_valid({"read_ref": "task_app", "changes": [change]})
+
+
 def test_revision_tool_guidance_routes_task_capability_order_to_its_own_action():
     definition = next(tool for tool in jd_write_definitions() if tool["name"] == "revise_jd_item")
     # Public contract wording, not a claim that the model will always select correctly.
-    assert "任務內 K/S 引用排序用本工具的 reorder_capability 動作" in definition["description"]
-    assert "項目／明細排序及任務移動用 move_jd_item" in definition["description"]
+    assert "任務內能力順序用本工具的 reorder_capability" in definition["description"]
+    assert "項目、明細排序及任務歸屬用 move_jd_item" in definition["description"]

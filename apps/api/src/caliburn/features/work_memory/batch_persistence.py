@@ -67,7 +67,6 @@ class MemoryBatchRecord(Base):
     base_snapshot_id: Mapped[UUID | None]
     base_position_id: Mapped[UUID]
     current_position_id: Mapped[UUID]
-    generation_id: Mapped[UUID]
     stage_id: Mapped[UUID]
     phase: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text)
@@ -212,32 +211,3 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> MemoryOperationRecord | None:
     return await session.get(MemoryOperationRecord, (job_file_id, command_id))
-
-
-async def has_recorded_position(
-    session: AsyncSession,
-    job_file_id: UUID,
-    execution_id: UUID,
-    result_fields: dict[str, str],
-) -> bool:
-    """Require an original result with all six coordinates; extra result fields are allowed."""
-    if (
-        set(result_fields)
-        != {"job_file_id", "execution_id", "generation_id", "stage_id", "phase", "position_id"}
-        or result_fields["job_file_id"] != str(job_file_id)
-        or result_fields["execution_id"] != str(execution_id)
-    ):
-        return False
-    return bool(
-        await session.scalar(
-            select(
-                select(MemoryOperationRecord.command_id)
-                .where(
-                    MemoryOperationRecord.job_file_id == job_file_id,
-                    MemoryOperationRecord.execution_id == execution_id,
-                    MemoryOperationRecord.result_payload.contains(result_fields),
-                )
-                .exists()
-            )
-        )
-    )

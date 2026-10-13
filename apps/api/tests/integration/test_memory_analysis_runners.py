@@ -3,7 +3,7 @@
 import asyncio
 import json
 from decimal import Decimal
-from uuid import uuid4
+from uuid import uuid4, uuid5
 
 import httpx2
 import psycopg
@@ -15,26 +15,245 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import create_responses_client
-from caliburn.agent_execution.tool_steps import (
-    ResponseStepSaveError,
-    read_completed_response_history,
-)
+from caliburn.agent_execution.response_runtime import InputCountSaveError, ResponseStepSaveError
+from caliburn.agent_execution.tool_steps import read_completed_response_history
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions import budgets, history
 from caliburn.features.executions import service as executions
-from caliburn.features.executions.history_models import AgentRole
+from caliburn.features.executions.budget_models import OutboundKind
+from caliburn.features.executions.history_models import (
+    AgentRole,
+    HistoryWindowKind,
+    context_thread_id,
+    stage_thread_id,
+)
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings, ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
-from caliburn.workflows.memory_analysis.results import AnalysisComplete
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
+from caliburn.transport.model_tools.memory_write_checkpoint import MEMORY_CHECKPOINT_TYPES
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead, MemoryReadWorkflow
+from caliburn.workflows.work_memory.results import AnalysisComplete
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.fixtures.response_loop import response_at
 
 pytestmark = pytest.mark.postgres
+
+
+@pytest.mark.parametrize(
+    "role", [AgentRole.WORK_SITUATION_ANALYST, AgentRole.WORK_UNDERSTANDING_ANALYST]
+)
+@pytest.mark.parametrize("count_saved", [False, True], ids=["count-lost", "count-saved"])
+def test_reopened_memory_role_recounts_only_unsaved_count_with_fixed_request(
+    database_settings: DatabaseSettings,
+    database_connection: psycopg.Connection,
+    role: AgentRole,
+    count_saved: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    file_id, source_id = uuid4(), uuid4()
+    database_connection.execute(
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'count recovery','count recovery','synthetic')",
+        (file_id,),
+    )
+    database_connection.execute(
+        "INSERT INTO interview_texts (job_file_id,source_id,speaker,interview_text) "
+        "VALUES (%s,%s,'employee','合成工作：每月核對庫存。')",
+        (file_id, source_id),
+    )
+    database_connection.execute(
+        "INSERT INTO formal_interviews (job_file_id,interview_sequence,source_id) VALUES (%s,1,%s)",
+        (file_id, source_id),
+    )
+    http_requests = []
+
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        http_requests.append((request.url.path, json.loads(request.content)))
+        if request.url.path.endswith("/input_tokens"):
+            return httpx2.Response(
+                200, json={"object": "response.input_tokens", "input_tokens": 500}
+            )
+        assert request.url.path.endswith("/responses")
+        raw = response_at(1, final=True, tools=0).model_dump(mode="json")
+        raw["service_tier"] = "default"
+        raw["output"][1]["content"][0]["text"] = '{"status":"complete"}'
+        return httpx2.Response(200, json=raw)
+
+    async def scenario() -> None:
+        scope = ExecutionScope(file_id, uuid4(), ExecutionKind.MEMORY_BATCH)
+        database = Database(database_settings)
+        try:
+            async with database.sessions.begin() as session:
+                await executions.admit_execution(session, scope)
+                writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+            candidates = MemoryCandidateWorkflow(database.sessions)
+            stage = await candidates.start(writer, source_id)
+            assert stage is not None
+            if role == AgentRole.WORK_UNDERSTANDING_ANALYST:
+                stage = await candidates.handoff(writer, stage, uuid4())
+        finally:
+            await database.close()
+        thread_id = stage_thread_id(
+            context_thread_id(scope, role, HistoryWindowKind.COMPLETED_WORK), stage.stage_id
+        )
+        config = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
+        dsn = make_conninfo(
+            database_settings.url, options=f"-c search_path={database_settings.schema}"
+        )
+        active_run = None
+
+        async def interrupt_after_headers(response: httpx2.Response) -> None:
+            assert response.request.url.path.endswith("/input_tokens")
+            assert response.status_code == 200
+            assert active_run is not None
+            active_run.cancel()
+            await asyncio.sleep(0)
+
+        for reopening in (False, True):
+            database = Database(database_settings)
+            sdk = create_responses_client(
+                api_key="synthetic-only",
+                timeout_seconds=5,
+                http_client=httpx2.AsyncClient(
+                    transport=httpx2.MockTransport(respond),
+                    event_hooks={
+                        "response": [interrupt_after_headers]
+                        if not reopening and not count_saved
+                        else []
+                    },
+                ),
+            )
+            try:
+                async with AsyncPostgresSaver.from_conn_string(
+                    dsn, serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES)
+                ) as saver:
+                    await saver.setup()
+                    settings = ModelSettings(
+                        api_key="synthetic-only",
+                        reasoning_effort="low" if reopening else "high",
+                        max_cost_usd=Decimal("1"),
+                    )
+                    if role == AgentRole.WORK_SITUATION_ANALYST:
+                        role_runner = WorkSituationAnalystRunner(
+                            database.sessions, saver, sdk, settings, cpu=MemoryCpu()
+                        )
+                        arguments = {}
+                    else:
+                        role_runner = WorkUnderstandingAnalystRunner(
+                            database.sessions, saver, sdk, settings, cpu=MemoryCpu()
+                        )
+                        arguments = {
+                            "situation_changes": (
+                                [{"kind": "added", "target_title": "MUST_NOT_REFRESH"}]
+                                if reopening
+                                else []
+                            )
+                        }
+                    if not reopening:
+                        original_put = saver.aput
+
+                        async def lose_count_save_ack(
+                            config, checkpoint, metadata, new_versions, original_put=original_put
+                        ):
+                            result = await original_put(config, checkpoint, metadata, new_versions)
+                            if checkpoint["channel_values"].get("input_count") is not None:
+                                raise psycopg.errors.UndefinedTable(
+                                    "synthetic count checkpoint acknowledgement lost"
+                                )
+                            return result
+
+                        with monkeypatch.context() as fault:
+                            if count_saved:
+                                fault.setattr(saver, "aput", lose_count_save_ack)
+                            expected = (
+                                InputCountSaveError if count_saved else asyncio.CancelledError
+                            )
+                            active_run = asyncio.create_task(
+                                role_runner.run(writer, stage, **arguments)
+                            )
+                            with pytest.raises(expected):
+                                await active_run
+                        saved = await saver.aget_tuple(config)
+                        assert saved is not None
+                        original_values = saved.checkpoint["channel_values"]
+                        request_id = original_values["request_id"]
+                        original_request = original_values["request_snapshot"]
+                        saved_counts = []
+                        # Search every child namespace: capacity is a native agent subgraph.
+                        async for checkpoint in saver.alist(
+                            {"configurable": {"thread_id": thread_id}}
+                        ):
+                            value = checkpoint.checkpoint["channel_values"].get("input_count")
+                            if value is not None:
+                                saved_counts.append(value)
+                            saved_counts.extend(
+                                value
+                                for _, channel, value in checkpoint.pending_writes or []
+                                if channel == "input_count" and value is not None
+                            )
+                        assert bool(saved_counts) is count_saved
+                        async with database.sessions() as session:
+                            original_attempts = await budgets.read_request_attempts(
+                                session, scope, uuid5(request_id, "input_tokens")
+                            )
+                            original_budget = await budgets.read_execution_budget(session, scope)
+                        assert len(original_attempts) == 1
+                        assert original_attempts[0].failure is None
+                        assert original_attempts[0].reported_cost_usd is None
+                        assert [path for path, _ in http_requests] == ["/v1/responses/input_tokens"]
+                    else:
+                        result = await role_runner.run(writer, stage, **arguments)
+                        assert isinstance(result.outcome, AnalysisComplete)
+                        assert result.stage == stage
+                        request_count = len(http_requests)
+                        assert await role_runner.run(writer, stage, **arguments) == result
+                        assert len(http_requests) == request_count
+                        saved = await saver.aget_tuple(config)
+                        assert saved is not None
+                        values = saved.checkpoint["channel_values"]
+                        assert values["request_id"] == request_id
+                        assert values["request_snapshot"] == original_request
+                        assert values["input_count"]["input_tokens"] == 500
+                        async with database.sessions() as session:
+                            attempts = await budgets.read_request_attempts(
+                                session, scope, uuid5(request_id, "input_tokens")
+                            )
+                            assert (
+                                await budgets.read_execution_budget(session, scope)
+                                == original_budget
+                            )
+                            usage = await budgets.read_budget_usage(session, scope)
+                        assert len(attempts) == (1 if count_saved else 2)
+                        assert original_attempts[0] in attempts
+                        assert len({attempt.attempt_id for attempt in attempts}) == len(attempts)
+                        assert all(
+                            attempt.request == original_attempts[0].request for attempt in attempts
+                        )
+                        assert original_attempts[0].request.kind == OutboundKind.TOKEN_COUNT
+                        assert all(attempt.failure is None for attempt in attempts)
+                        assert all(attempt.reported_cost_usd is None for attempt in attempts)
+                        assert usage.outbound_attempts == len(attempts) + 1
+                        assert usage.model_steps == 1
+                        assert usage.compactions == 0
+                        assert usage.accounted_cost_usd >= sum(
+                            attempt.reserved_cost_usd for attempt in attempts
+                        )
+            finally:
+                await sdk.close()
+                await database.close()
+        count_payloads = [
+            payload for path, payload in http_requests if path.endswith("/input_tokens")
+        ]
+        assert len(count_payloads) == (1 if count_saved else 2)
+        assert all(payload == count_payloads[0] for payload in count_payloads)
+        assert http_requests[-1] == ("/v1/responses", original_request)
+        assert original_request["reasoning"]["effort"] == "high"
+        assert "MUST_NOT_REFRESH" not in json.dumps(http_requests, ensure_ascii=False)
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
 
 
 @pytest.mark.parametrize(
@@ -245,7 +464,6 @@ def test_b1_b2_publish_preserves_role_boundaries_native_history_and_fixed_fronti
                     budget_before = await budgets.read_execution_budget(session, scope)
                 stage2 = await candidates.handoff(writer, first.stage, uuid4())
                 assert stage2.phase == MemoryLayer.WORK_UNDERSTANDING
-                assert stage2.generation_id == first.stage.generation_id
                 second = await b2.run(
                     writer,
                     stage2,

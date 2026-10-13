@@ -1,13 +1,11 @@
 """Public consultant status and App controls; execution internals never enter the response."""
 
-from dataclasses import asdict
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from caliburn.contracts.generated.consultant_turn import ConsultantTurn
-from caliburn.contracts.generated.current_consultant_turn import CurrentConsultantTurn
+from caliburn.contracts.generated.tools.interview_plan import InterviewPlan
 from caliburn.features.executions.models import (
     ExecutionKind,
     ExecutionNotFoundError,
@@ -18,8 +16,15 @@ from caliburn.features.executions.models import (
 from caliburn.features.interviews.models import InterviewInputNotFoundError
 from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.transport.http.jd_work import work_view
-from caliburn.workflows.consultant_controls import ConsultantControlWorkflow
-from caliburn.workflows.consultant_status import (
+from caliburn.transport.http.models.consultant import (
+    AllowedControl,
+    ConsultantTurn,
+    CurrentConsultantTurn,
+    PublicCommentary,
+)
+from caliburn.transport.http.models.jd_views import CandidateJdPreview, Profile
+from caliburn.workflows.consultant_turns.controls import ConsultantControlWorkflow
+from caliburn.workflows.consultant_turns.status import (
     ConsultantStatusWorkflow,
     ConsultantTurnStatus,
     ConsultantTurnUnavailableError,
@@ -46,7 +51,11 @@ def find_consultant_controls(request: Request) -> ConsultantControlWorkflow | No
 OptionalControls = Annotated[ConsultantControlWorkflow | None, Depends(find_consultant_controls)]
 
 
-@router.get("/{job_file_id}/consultant-turns/current", response_model=CurrentConsultantTurn)
+@router.get(
+    "/{job_file_id}/consultant-turns/current",
+    response_model=CurrentConsultantTurn,
+    operation_id="read_current_consultant_turn",
+)
 async def read_current_consultant_turn(
     job_file_id: UUID,
     response: Response,
@@ -67,7 +76,11 @@ async def read_current_consultant_turn(
     )
 
 
-@router.get("/{job_file_id}/consultant-turns/{execution_id}", response_model=ConsultantTurn)
+@router.get(
+    "/{job_file_id}/consultant-turns/{execution_id}",
+    response_model=ConsultantTurn,
+    operation_id="read_consultant_turn",
+)
 async def read_consultant_turn(
     job_file_id: UUID,
     execution_id: UUID,
@@ -90,7 +103,9 @@ async def read_consultant_turn(
 
 
 @router.get(
-    "/{job_file_id}/consultant-turns/by-command/{command_id}", response_model=ConsultantTurn
+    "/{job_file_id}/consultant-turns/by-command/{command_id}",
+    response_model=ConsultantTurn,
+    operation_id="read_consultant_turn_by_command",
 )
 async def read_consultant_turn_by_command(
     job_file_id: UUID,
@@ -113,7 +128,11 @@ async def read_consultant_turn_by_command(
     return turn_view(status, controls)
 
 
-@router.post("/{job_file_id}/consultant-turns/{execution_id}/pause", response_model=ConsultantTurn)
+@router.post(
+    "/{job_file_id}/consultant-turns/{execution_id}/pause",
+    response_model=ConsultantTurn,
+    operation_id="pause_consultant_turn",
+)
 async def pause_consultant_turn(
     job_file_id: UUID,
     execution_id: UUID,
@@ -127,7 +146,11 @@ async def pause_consultant_turn(
     )
 
 
-@router.post("/{job_file_id}/consultant-turns/{execution_id}/cancel", response_model=ConsultantTurn)
+@router.post(
+    "/{job_file_id}/consultant-turns/{execution_id}/cancel",
+    response_model=ConsultantTurn,
+    operation_id="cancel_consultant_turn",
+)
 async def cancel_consultant_turn(
     job_file_id: UUID,
     execution_id: UUID,
@@ -141,7 +164,11 @@ async def cancel_consultant_turn(
     )
 
 
-@router.post("/{job_file_id}/consultant-turns/{execution_id}/resume", response_model=ConsultantTurn)
+@router.post(
+    "/{job_file_id}/consultant-turns/{execution_id}/resume",
+    response_model=ConsultantTurn,
+    operation_id="resume_consultant_turn",
+)
 async def resume_consultant_turn(
     job_file_id: UUID,
     execution_id: UUID,
@@ -210,34 +237,32 @@ async def _control_turn(
 def turn_view(
     status: ConsultantTurnStatus, controls: ConsultantControlWorkflow | None = None
 ) -> ConsultantTurn:
-    """Explicit allowlist; never serialize the candidate scope or native checkpoint."""
-    return ConsultantTurn.model_validate(
-        {
-            "job_file_id": status.job_file_id,
-            "execution_id": status.execution_id,
-            "status": status.status,
-            "pause_requested": status.pause_requested,
-            "input_text": status.input_text,
-            "allowed_controls": _allowed_controls(status, controls),
-            "commentary": None
-            if status.commentary is None
-            else [asdict(item) for item in status.commentary],
-            "candidate": None
-            if status.candidate is None
-            else {
-                "profile": asdict(status.candidate.profile),
-                "work": work_view(status.candidate.work).model_dump(mode="json"),
-            },
-            "plan_preview": None
-            if status.plan_preview is None
-            else {"plan": status.plan_preview.body},
-        }
+    """只投影公開欄位，不序列化候選資格或原生 checkpoint。"""
+    return ConsultantTurn(
+        job_file_id=status.job_file_id,
+        execution_id=status.execution_id,
+        status=status.status,
+        pause_requested=status.pause_requested,
+        input_text=status.input_text,
+        allowed_controls=_allowed_controls(status, controls),
+        commentary=None
+        if status.commentary is None
+        else [PublicCommentary.model_validate(item) for item in status.commentary],
+        candidate=None
+        if status.candidate is None
+        else CandidateJdPreview(
+            profile=Profile.model_validate(status.candidate.profile),
+            work=work_view(status.candidate.work),
+        ),
+        plan_preview=None
+        if status.plan_preview is None
+        else InterviewPlan(plan=status.plan_preview.body),
     )
 
 
 def _allowed_controls(
     status: ConsultantTurnStatus, controls: ConsultantControlWorkflow | None
-) -> list[str]:
+) -> list[AllowedControl]:
     if controls is None or status.status not in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
         return []
     if not controls.supervisor.running:

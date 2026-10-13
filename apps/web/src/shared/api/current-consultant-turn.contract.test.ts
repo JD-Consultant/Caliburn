@@ -1,7 +1,7 @@
 /** Compile the shared Turn definition through the real guard and cross-file discovery ref. */
 import { describe, expect, it } from 'vitest';
-import type { ConsultantTurn } from './generated/consultant-turn';
-import type { CurrentConsultantTurn } from './generated/current-consultant-turn';
+import type { ConsultantTurn, CurrentConsultantTurn } from './generated/http/types.gen';
+
 import { isConsultantTurn, isCurrentConsultantTurn } from './validation';
 
 const turn: ConsultantTurn = {

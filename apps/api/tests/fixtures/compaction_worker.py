@@ -11,7 +11,6 @@ from uuid import uuid4
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response
 from openai.types.responses.compacted_response import CompactedResponse
-from response_capacity import synthetic_capacity_limits
 
 from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
@@ -21,11 +20,10 @@ from caliburn.agent_execution.context_compaction import (
     ReceivedCompaction,
     run_context_compaction,
 )
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    ResponseStepRuntime,
-    run_response_loop,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
+from caliburn.agent_execution.tool_steps import read_completed_response_history
+from tests.fixtures.native_response_runtime import run_response_loop
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_capacity_limits
 
 
 async def run(mode, thread_id):
@@ -37,6 +35,7 @@ async def run(mode, thread_id):
     ]
     first = json.loads(Path(__file__).with_name("native-response.json").read_text("utf-8"))
     final = deepcopy(first)
+    final["id"] = "resp_synthetic_final"
     final["output"] = first["output"][:2]
     final["output"][1]["phase"] = "final_answer"
 
@@ -120,14 +119,14 @@ async def run(mode, thread_id):
             return items
 
         runtime = ResponseStepRuntime(
-            model,
-            read_tool,
-            execute_tool,
-            guard,
-            account_model,
-            count,
-            synthetic_capacity_limits(),
-            compact_window,
+            request_model=model,
+            prepare_tool=read_tool,
+            execute_tool=execute_tool,
+            ensure_active=guard,
+            account_response=account_model,
+            count_input=count,
+            capacity_limits=synthetic_capacity_limits(),
+            compact_window=compact_window,
         )
         request = ResponseRequest(
             model="gpt-6-luna",
@@ -150,7 +149,8 @@ async def run(mode, thread_id):
             result = await run_response_loop(saver, request=None, **options)
             assert result["next_action"] == "deliver_answer"
             assert result["completed_steps"] == 2
-            assert result["input_items"][:2] == window
+            completed = await read_completed_response_history(saver, thread_id=thread_id)
+            assert completed.items[:2] == window
             assert calls == {"model": 1, "compact": 0, "count": 1}
         print(
             json.dumps(

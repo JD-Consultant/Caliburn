@@ -52,3 +52,20 @@ def test_generation_rejects_same_filename_collision_between_families(tmp_path: P
         path.write_text('{"type":"string"}', encoding="utf-8")
     with pytest.raises(ValueError, match="unique filenames"):
         GENERATOR.stage_contract_schemas([http, tool], tmp_path / "staged", contracts_root=root)
+
+
+def test_managed_http_outputs_check_is_readonly_and_rejects_stale_files(tmp_path: Path) -> None:
+    directory = tmp_path / "http"
+    directory.mkdir()
+    current = directory / "sdk.gen.ts"
+    stale = directory / "unused.ts"
+    current.write_text("current\n", encoding="utf-8")
+    stale.write_text("stale\n", encoding="utf-8")
+    before = {path: path.stat().st_mtime_ns for path in (current, stale)}
+    assert not GENERATOR.write_outputs(
+        {current: "current\n"}, check=True, managed_directory=directory
+    )
+    assert {path: path.stat().st_mtime_ns for path in before} == before
+    assert GENERATOR.write_outputs({current: "current\n"}, check=False, managed_directory=directory)
+    assert not stale.exists()
+    assert GENERATOR.write_outputs({current: "current\n"}, check=True, managed_directory=directory)

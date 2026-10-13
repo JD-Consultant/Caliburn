@@ -1,10 +1,11 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { InterviewComposer } from './InterviewComposer';
 import { readTurnHint, retainTurnHint } from './interview-turn-api';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const executionId = '20000000-0000-4000-8000-000000000002';
@@ -25,7 +26,7 @@ interface Posted {
  */
 function stubBackend(options: { discoveryNeverAnswers?: boolean } = {}): Posted[] {
   const posts: Posted[] = [];
-  vi.stubGlobal('fetch', (path: string, init?: RequestInit) => {
+  stubHttp((path: string, init?: RequestInit) => {
     if (init?.method === 'POST') {
       if (typeof init.body !== 'string') throw new Error('Expected a JSON request body');
       const command = JSON.parse(init.body) as Posted;

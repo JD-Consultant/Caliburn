@@ -2,37 +2,39 @@
 
 import re
 
-from caliburn.features.job_description.sources import SourceTargetKind
+from caliburn.features.job_description.sources import SourceTargetKind, TaskSourceContents
 from caliburn.features.work_memory.edit_preparation import describe_body_change
-from caliburn.workflows.jd_evidence import JdEvidenceChanges
-from caliburn.workflows.jd_source_queries import JdSourceChanges, MemorySourceChange
+from caliburn.workflows.job_description.evidence import JdEvidenceChanges
+from caliburn.workflows.job_description.source_queries import JdSourceChanges, MemorySourceChange
 
 
 def project_jd_target_changes(result: JdEvidenceChanges) -> str:
     """Render only the exact target's reviewed/current values, never surrounding JD items."""
     lines = [
         "## JD 項目差異",
-        "比較：此引用上次核對的 JD 項目 → 目前正式 JD 的同一項目。",
+        "比較：此引用上次核對的 JD 項目 → 所選正式 JD 修訂的同一項目。",
         "只讀；未確認支持 JD，也未解除待核對。",
     ]
     if result.before == result.after:
         lines.append("此 JD 項目沒有淨差異。")
         if result.reference.needs_review:
-            lines.append("核對後曾修改，即使改回原文仍保留待核對。")
+            lines.append("人工曾修改此項，即使改回原文仍保留待核對。")
         return "\n".join(lines)
+    if result.reference.target.kind == SourceTargetKind.TASK:
+        if not isinstance(result.before, TaskSourceContents) or not isinstance(
+            result.after, TaskSourceContents
+        ):
+            raise ValueError("Task evidence comparison requires complete task support")
+        lines.extend(_task_changes(result.before, result.after))
+        return "\n".join(lines)
+    if isinstance(result.before, TaskSourceContents) or isinstance(
+        result.after, TaskSourceContents
+    ):
+        raise ValueError("Task evidence comparison must use the same support shape")
     labels = {
         SourceTargetKind.PROFILE_FIELD: ("欄位內容",),
         SourceTargetKind.AREA: ("職責名稱", "職責範圍"),
-        SourceTargetKind.TASK: ("任務名稱", "工作內容"),
-        SourceTargetKind.DETAIL: ("明細類型", "明細內容"),
         SourceTargetKind.CAPABILITY: ("能力類型", "能力名稱", "能力說明"),
-        SourceTargetKind.TASK_CAPABILITY: (
-            "任務名稱",
-            "工作內容",
-            "能力類型",
-            "能力名稱",
-            "能力說明",
-        ),
         SourceTargetKind.COLLABORATOR: ("協作對象", "合作範圍"),
         SourceTargetKind.CONDITION: ("條件分類", "條件內容"),
     }[result.reference.target.kind]
@@ -42,6 +44,69 @@ def project_jd_target_changes(result: JdEvidenceChanges) -> str:
                 [f"{label}：", *_fenced_diff(describe_body_change(before or "", after or ""))]
             )
     return "\n".join(lines)
+
+
+def _task_changes(before: TaskSourceContents, after: TaskSourceContents) -> list[str]:
+    lines = []
+    for label, old, new in (
+        ("任務名稱", before.title, after.title),
+        ("工作內容", before.description, after.description),
+    ):
+        if old != new:
+            lines.extend([f"{label}：", *_fenced_diff(describe_body_change(old or "", new or ""))])
+    old_details = {detail.detail_id: detail for detail in before.details}
+    new_details = {detail.detail_id: detail for detail in after.details}
+    for identity in sorted(old_details.keys() | new_details.keys()):
+        old_detail, new_detail = old_details.get(identity), new_details.get(identity)
+        if old_detail == new_detail:
+            continue
+        selected = new_detail or old_detail
+        assert selected is not None
+        label = "工作成果" if selected.kind.value == "outcome" else "工作要求"
+        effect = "新增" if old_detail is None else "移除" if new_detail is None else "修改"
+        old = f"{old_detail.kind.value}: {old_detail.text}" if old_detail else ""
+        new = f"{new_detail.kind.value}: {new_detail.text}" if new_detail else ""
+        lines.extend([f"{effect}{label}：", *_fenced_diff(describe_body_change(old, new))])
+    old_capabilities = {capability.capability_id: capability for capability in before.capabilities}
+    new_capabilities = {capability.capability_id: capability for capability in after.capabilities}
+    for identity in sorted(old_capabilities.keys() | new_capabilities.keys()):
+        old_capability, new_capability = (
+            old_capabilities.get(identity),
+            new_capabilities.get(identity),
+        )
+        if old_capability == new_capability:
+            continue
+        effect = (
+            "新增連結"
+            if old_capability is None
+            else "移除連結"
+            if new_capability is None
+            else "修改定義"
+        )
+        old = (
+            "\n".join(
+                (
+                    old_capability.kind.value,
+                    old_capability.name or "",
+                    old_capability.description or "",
+                )
+            )
+            if old_capability
+            else ""
+        )
+        new = (
+            "\n".join(
+                (
+                    new_capability.kind.value,
+                    new_capability.name or "",
+                    new_capability.description or "",
+                )
+            )
+            if new_capability
+            else ""
+        )
+        lines.extend([f"任務 K/S {effect}：", *_fenced_diff(describe_body_change(old, new))])
+    return lines
 
 
 def _fenced_diff(diff: str) -> list[str]:
@@ -112,5 +177,5 @@ def _memory_delta(change: MemorySourceChange) -> list[str]:
         and change.after is not None
         and change.before.revision_id != change.after.revision_id
     ):
-        lines.append("來源修訂已更新；沒有淨文字差異也不代表已核對，仍須檢查相關依據。")
+        lines.append("來源修訂已更新，沒有淨文字差異；依本輪正文判斷引用與 JD 是否需調整。")
     return lines

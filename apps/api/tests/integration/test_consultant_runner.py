@@ -81,7 +81,7 @@ def test_native_model_tools_then_atomic_completion(
                             {
                                 "action": "add_source",
                                 "field": "job_title",
-                                "source": {"kind": "current_input"},
+                                "source": {"kind": "interview", "interview_sequence": 2},
                             },
                         ],
                     }
@@ -194,7 +194,11 @@ def test_native_model_tools_then_atomic_completion(
     profile = client.get(f"/api/job-files/{file_id}/jd/profile").json()
     assert profile["profile"]["job_title"] == "前端工程師"
     assert len(sent) == 2
-    assert sent[0]["input"][-1]["content"] == "我是前端工程師，負責依設計稿製作網站頁面。"
+    assert json.loads(sent[0]["input"][-1]["content"]) == {
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "text": "我是前端工程師，負責依設計稿製作網站頁面。",
+    }
     assert sent[1]["input"][: len(sent[0]["input"])] == sent[0]["input"]
     assert sent[1]["input"][-1]["type"] == "function_call_output"
     assert next(item for item in sent[1]["input"] if item.get("type") == "reasoning")[

@@ -13,9 +13,7 @@ from caliburn.agents.job_consultant.configuration import (
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
 from caliburn.transport.model_tools.jd_reads import DEFAULT_JD_READ_MAX_RESULT_CHARACTERS
 
-type PromptSection = Literal[
-    "professional_method", "focus", "interview_plan", "occupation_references"
-]
+type PromptSection = Literal["professional_method", "interview_plan", "occupation_references"]
 
 
 class EvaluationCase(BaseModel):

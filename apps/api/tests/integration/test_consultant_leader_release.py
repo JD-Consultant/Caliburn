@@ -12,7 +12,7 @@ from caliburn.adapters.process_lock import PostgresProcessLock, ProcessLockUnava
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
 
 pytestmark = pytest.mark.postgres
 ExitPath = Literal["close", "scan_failure", "startup_failure"]

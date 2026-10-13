@@ -1,4 +1,4 @@
-"""Real HTTP and model-tool entrypoints accept the canonical wire before conversion."""
+"""HTTP 與工具的實際入口保留整數、UUID、文字及安全錯誤政策。"""
 
 import json
 from datetime import UTC, datetime
@@ -7,16 +7,17 @@ from unittest.mock import AsyncMock
 from uuid import UUID, uuid4
 
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.create_job_file_request import CreateJobFileRequest
+from caliburn.bootstrap import create_app
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_files.models import JobFile, JobFileCreation
-from caliburn.transport.http.job_files import get_job_file_workflow, router
+from caliburn.settings import Settings
+from caliburn.transport.http.job_files import get_job_file_workflow
+from caliburn.transport.http.models.job_files import JobFile as JobFileView
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 
 PLAIN_UUID = "12345678-1234-4234-8234-1234567890ab"
 
@@ -34,12 +35,13 @@ def http_boundary():
         commands.append(command)
         return JobFileCreation(job, True)
 
-    app = FastAPI()
-    app.include_router(router)
+    app = create_app(Settings())
     app.dependency_overrides[get_job_file_workflow] = lambda: SimpleNamespace(
         rename=rename, create=create
     )
-    with TestClient(app) as client:
+    with TestClient(
+        app, base_url="http://127.0.0.1:8100", headers={"Origin": "http://127.0.0.1:8100"}
+    ) as client:
         yield client, commands, job.job_file_id
 
 
@@ -103,7 +105,7 @@ def test_http_schema_error_does_not_echo_private_text_or_untrusted_property(http
         },
     )
     assert response.status_code == 422
-    assert "additionalProperties" in response.text
+    assert response.json() == {"detail": {"code": "invalid_http_request"}}
     assert all(text not in response.text for text in ["員工私密正文", "不應洩露的未知欄位", "機密"])
     assert commands == []
 
@@ -132,24 +134,29 @@ def test_http_nonblank_policy_matches_domain_without_changing_text(http_boundary
         assert commands == []
 
 
-def test_http_generated_representation_failure_is_internal_and_safe(http_boundary, monkeypatch):
+def test_http_output_representation_failure_is_internal_and_safe(http_boundary, monkeypatch):
     client, commands, _ = http_boundary
 
     def incompatible_dto(value, **_kwargs):
         raise ValidationError.from_exception_data(
             "RepresentationFailure",
-            [{"type": "int_parsing", "loc": ("display_name",), "input": value["display_name"]}],
+            [{"type": "int_parsing", "loc": ("display_name",), "input": "私密正文"}],
         )
 
-    monkeypatch.setattr(CreateJobFileRequest, "model_validate", incompatible_dto)
-    with TestClient(client.app, raise_server_exceptions=False) as failing_client:
+    monkeypatch.setattr(JobFileView, "model_validate", incompatible_dto)
+    with TestClient(
+        client.app,
+        base_url="http://127.0.0.1:8100",
+        headers={"Origin": "http://127.0.0.1:8100"},
+        raise_server_exceptions=False,
+    ) as failing_client:
         response = failing_client.post(
             "/api/job-files",
             json={"command_id": PLAIN_UUID, "display_name": "私密正文", "employee_name": "員工"},
         )
     assert response.status_code == 500
     assert "私密正文" not in response.text
-    assert commands == []
+    assert len(commands) == 1
 
 
 @pytest.mark.parametrize(

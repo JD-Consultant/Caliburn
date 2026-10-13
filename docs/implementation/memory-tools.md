@@ -10,7 +10,7 @@
 
 工具使用 `apps/api/contracts/tools/` 的 schema、生成 DTO 及安裝包內的唯讀 schema 資源；生成與 `--check` 依[資料與契約 §5](data-and-contracts.md#5-唯一契約來源及生成)。本頁只維護 Memory 工具如何消費這些生成物。
 
-App 先綁定角色、原執行身分、可見基準及訪談上界。`transport/model_tools/memory_reads.py` 驗證模型 arguments，再交 `workflows/memory_reads.py` 核對執行資格；依讀取種類分派到下列 owner，最後由工具產生 DTO 及精簡 JSON：
+App 先綁定角色、原執行身分、可見基準及訪談上界。`transport/model_tools/memory_reads.py` 驗證模型 arguments，再交 `workflows/work_memory/reads.py` 核對執行資格；依讀取種類分派到下列 owner，最後由工具產生 DTO 及精簡 JSON：
 
 | 讀取種類 | 由誰取得資料 |
 |---|---|
@@ -67,7 +67,7 @@ App 先綁定角色、原執行身分、可見基準及訪談上界。`transport
 | 位置 | 責任 |
 |---|---|
 | `transport/model_tools/memory_write_wire.py` | Schema／DTO 轉成 typed intent，將領域 preview 轉成模型成功回傳。 |
-| `workflows/memory_writes.py` | 核角色與固定位置，解析來源，關閉讀取 session 後安排純計算。 |
+| `workflows/work_memory/write_preparation.py` | 核角色與固定位置，解析來源，關閉讀取 session 後安排純計算。 |
 | `work_memory/edit_intents.py`、`edit_preparation.py` | 修改意圖、純內容計算及 preview 值；不含生成 wire DTO。 |
 | `MemoryCandidateWorkflow.edit` | 擁有短交易及 writer 檢查，交候選服務採用或查回原結果。 |
 
@@ -90,6 +90,9 @@ App 先綁定角色、原執行身分、可見基準及訪談上界。`transport
 若候選在準備後已變動，Memory 候選服務就拒絕過時命令，不能改採最新位置。
 
 `PreparedMemoryToolCall` 是 App 內部不可變的待執行命令，包含套用後正文以固定原操作；它不是模型參數、正式回執或第二份可編輯候選。可編輯工作稿仍由 Memory 候選服務保存，可靠序列化、checkpoint 採用及程序接續由[共用執行](agent-execution.md#42-單一模型工具-step)承接。
+
+角色工具由 `agents/memory_analysis/tools.py` 組裝；固定命令型別、serializer allowlist 與還原驗證
+集中在 `transport/model_tools/memory_write_checkpoint.py`，composition 不需匯入角色工具組裝。
 
 原操作恢復必須重用已保存的 prepared command，不重新用舊標題呼叫 prepare。例如物件改名後舊名稱被另一物件使用，原命令仍指原身分；真正新操作才解析現在的同名物件。再次進入 execute 時，Memory 候選服務核對同一命令及提交結果，不能重複效果。
 

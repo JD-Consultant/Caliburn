@@ -5,14 +5,17 @@ from sqlalchemy import Connection, create_engine, pool, text
 from sqlalchemy.schema import CreateSchema
 
 from caliburn.adapters.database import Base
-from caliburn.diagnostics.persistence import DiagnosticExecutionSnapshot
 from caliburn.features.executions.budget_persistence import ExecutionBudgetRecord
 from caliburn.features.executions.history_persistence import (
     ContextHistoryBindingRecord,
     ContextHistoryHeadRecord,
 )
 from caliburn.features.executions.persistence import ExecutionRecord
-from caliburn.features.interview_plans.persistence import PlanCandidateRecord, PlanOperationRecord
+from caliburn.features.interview_plans.persistence import (
+    PlanBodyRecord,
+    PlanCandidateRecord,
+    PlanOperationRecord,
+)
 from caliburn.features.interviews.persistence import (
     FormalInterviewRecord,
     InterviewInputRecord,
@@ -36,10 +39,6 @@ from caliburn.settings import Settings
 config = context.config
 # Explicit imports register each owned table for autogenerate, not application startup.
 target_metadata = Base.metadata
-assert (
-    DiagnosticExecutionSnapshot.__table__
-    is target_metadata.tables["diagnostic_execution_snapshots"]
-)
 assert JobFileRecord.__table__ is target_metadata.tables[JobFileRecord.__tablename__]
 assert InterviewTextRecord.__table__ is target_metadata.tables[InterviewTextRecord.__tablename__]
 assert (
@@ -48,6 +47,7 @@ assert (
 assert InterviewInputRecord.__table__ is target_metadata.tables[InterviewInputRecord.__tablename__]
 assert InterviewReplyRecord.__table__ is target_metadata.tables[InterviewReplyRecord.__tablename__]
 assert PlanCandidateRecord.__table__ is target_metadata.tables[PlanCandidateRecord.__tablename__]
+assert PlanBodyRecord.__table__ is target_metadata.tables[PlanBodyRecord.__tablename__]
 assert PlanOperationRecord.__table__ is target_metadata.tables[PlanOperationRecord.__tablename__]
 assert ExecutionRecord.__table__ is target_metadata.tables[ExecutionRecord.__tablename__]
 assert (

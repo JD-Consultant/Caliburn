@@ -18,7 +18,6 @@ def upgrade() -> None:
         sa.Column("target_kind", sa.Text(), nullable=False),
         sa.Column("target_field", sa.Text()),
         sa.Column("target_item_id", sa.Uuid()),
-        sa.Column("target_task_id", sa.Uuid()),
         sa.Column("source_kind", sa.Text(), nullable=False),
         sa.Column("interview_source_id", sa.Uuid()),
         sa.Column("memory_layer", sa.Text()),
@@ -61,12 +60,9 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "(target_kind = 'profile_field' AND target_field IS NOT NULL "
             "AND target_field IN ('job_title', 'organization_unit', 'reports_to', 'purpose') "
-            "AND target_item_id IS NULL AND target_task_id IS NULL) OR "
+            "AND target_item_id IS NULL) OR "
             "(target_kind IN ('area', 'task', 'capability', 'collaborator', 'condition') "
-            "AND target_field IS NULL AND target_item_id IS NOT NULL "
-            "AND target_task_id IS NULL) OR "
-            "(target_kind IN ('detail', 'task_capability') AND target_field IS NULL "
-            "AND target_item_id IS NOT NULL AND target_task_id IS NOT NULL)",
+            "AND target_field IS NULL AND target_item_id IS NOT NULL)",
             name=op.f("ck_jd_source_references_target_shape"),
         ),
         sa.CheckConstraint(
@@ -90,7 +86,6 @@ def upgrade() -> None:
             "target_kind",
             "target_field",
             "target_item_id",
-            "target_task_id",
             "source_kind",
             "interview_source_id",
             "memory_layer",
@@ -114,7 +109,7 @@ def upgrade() -> None:
         op.f("ck_jd_operations_kind"),
         "jd_operations",
         "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-        "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+        "'edit_collaborators', 'edit_conditions', "
         "'discard_candidate', 'adopt_candidate', 'edit_sources')",
     )
 

@@ -9,20 +9,23 @@ from caliburn.features.job_description.models import (
     ProfileField,
     SetProfileField,
 )
+from caliburn.features.job_description.source_intents import (
+    InterviewSourceSelection,
+    JdSourceSelection,
+    MemorySourceSelection,
+)
 from caliburn.features.job_description.sources import MemorySourceLayer
-from caliburn.workflows.jd_profile_writes import (
+from caliburn.workflows.job_description.profile_writes import (
     AddProfileSource,
     AlignProfileSource,
     ProfileSourceIntent,
     RemoveProfileSource,
 )
-from caliburn.workflows.jd_sources import (
-    CurrentInputSourceSelection,
-    InterviewSourceSelection,
-    JdSourceSelection,
-    MemorySourceSelection,
+from caliburn.workflows.job_description.task_writes import (
+    CreateTaskInput,
+    TaskCapabilityInput,
+    TaskDetailInput,
 )
-from caliburn.workflows.jd_task_writes import CreateTaskInput, TaskCapabilityInput, TaskDetailInput
 
 
 def parse_profile_write(
@@ -52,39 +55,20 @@ def parse_task_write(arguments: str) -> CreateTaskInput:
         parsed.parent_read_ref,
         parsed.title,
         parsed.description,
-        tuple(
-            TaskDetailInput(detail.text, _task_sources(detail.supporting_sources))
-            for detail in parsed.outcomes
-        ),
-        tuple(
-            TaskDetailInput(detail.text, _task_sources(detail.supporting_sources))
-            for detail in parsed.requirements
-        ),
-        tuple(
-            TaskCapabilityInput(item.capability_read_ref, _task_sources(item.supporting_sources))
-            for item in parsed.required_knowledge
-        ),
-        tuple(
-            TaskCapabilityInput(item.capability_read_ref, _task_sources(item.supporting_sources))
-            for item in parsed.required_skills
-        ),
+        tuple(TaskDetailInput(detail.text) for detail in parsed.outcomes),
+        tuple(TaskDetailInput(detail.text) for detail in parsed.requirements),
+        tuple(TaskCapabilityInput(item.capability_read_ref) for item in parsed.required_knowledge),
+        tuple(TaskCapabilityInput(item.capability_read_ref) for item in parsed.required_skills),
         _task_sources(parsed.supporting_sources),
     )
 
 
 type SourceWire = (
-    task.CurrentInputSource
-    | task.InterviewSource
-    | task.MemorySource
-    | profile.CurrentInputSource
-    | profile.InterviewSource
-    | profile.MemorySource
+    task.InterviewSource | task.MemorySource | profile.InterviewSource | profile.MemorySource
 )
 
 
 def source_selection(source: SourceWire) -> JdSourceSelection:
-    if isinstance(source, task.CurrentInputSource | profile.CurrentInputSource):
-        return CurrentInputSourceSelection()
     if isinstance(source, task.InterviewSource | profile.InterviewSource):
         return InterviewSourceSelection(source.interview_sequence)
     return MemorySourceSelection(MemorySourceLayer(source.kind.value), source.target_title)

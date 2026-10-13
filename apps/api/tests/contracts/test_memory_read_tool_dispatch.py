@@ -14,7 +14,7 @@ from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.models import MemoryMapEntry
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
-from caliburn.workflows.memory_reads import (
+from caliburn.workflows.work_memory.reads import (
     CandidateMemoryRead,
     MemoryReadBinding,
     MemoryReadWorkflow,
@@ -39,7 +39,6 @@ def make_tools(role: str) -> MemoryReadTools:
             MemoryBatchPosition(
                 scope.job_file_id,
                 scope.execution_id,
-                uuid4(),
                 uuid4(),
                 phase,
                 uuid4(),

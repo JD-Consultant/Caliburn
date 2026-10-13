@@ -20,12 +20,12 @@ from caliburn.features.job_description.sources import (
     ReviseJdSources,
     SourceTargetKind,
 )
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_editing import JdEditingWorkflow
-from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
-from caliburn.workflows.jd_export import JdExportWorkflow
-from caliburn.workflows.jd_reads import JdReadWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.evidence import JdEvidenceWorkflow
+from caliburn.workflows.job_description.export import JdExportWorkflow
+from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.integration.test_consultant_completion import complete, start_turn
 
 pytestmark = pytest.mark.postgres

@@ -4,7 +4,7 @@
  */
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import type { Target } from '../../shared/api/generated/jd-sources-view';
+import type { Target } from '../../shared/api/generated/http/types.gen';
 
 export type RenderSourceBadge = (target: Target) => ReactNode;
 
@@ -15,16 +15,12 @@ export function useSourceBadge(): RenderSourceBadge {
 }
 
 export function profileTarget(field: NonNullable<Target['field']>): Target {
-  return { kind: 'profile_field', field, item_id: null, task_id: null };
+  return { kind: 'profile_field', field, item_id: null };
 }
 
 export function itemTarget(
   kind: 'area' | 'task' | 'capability' | 'collaborator' | 'condition',
   itemId: string,
 ): Target {
-  return { kind, field: null, item_id: itemId, task_id: null };
-}
-
-export function detailTarget(taskId: string, detailId: string): Target {
-  return { kind: 'detail', field: null, item_id: detailId, task_id: taskId };
+  return { kind, field: null, item_id: itemId };
 }

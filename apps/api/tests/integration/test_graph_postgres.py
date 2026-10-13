@@ -34,7 +34,7 @@ def test_native_items_survive_process_restart_without_reexecuting_saved_node(
         pytest.skip("Set CALIBURN_TEST_DATABASE_URL to an isolated local database ending in _test")
     require_isolated_test_database(dsn, environment=os.environ)
     schema = "t01_" + uuid4().hex
-    worker = Path(__file__).parents[1] / "fixtures" / worker_name
+    worker_module = f"tests.fixtures.{Path(worker_name).stem}"
     with psycopg.connect(dsn, autocommit=True) as conn:
         conn.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
         try:
@@ -46,7 +46,8 @@ def test_native_items_survive_process_restart_without_reexecuting_saved_node(
             summaries = []
             for mode in ("write", "resume"):
                 process = subprocess.run(
-                    [sys.executable, str(worker), mode, thread_id],
+                    [sys.executable, "-m", worker_module, mode, thread_id],
+                    cwd=Path(__file__).resolve().parents[2],
                     env=env,
                     capture_output=True,
                     text=True,

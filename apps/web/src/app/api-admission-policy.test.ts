@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 /** Exercise the public feature boundaries before remote UUIDs can reach cache or hints. */
 import { QueryClient } from '@tanstack/react-query';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -11,8 +12,7 @@ afterEach(() => vi.unstubAllGlobals());
 test('source lists reject URN revision IDs before caching', async () => {
   const client = new QueryClient();
   const query = jdSourcesQuery(id);
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn().mockResolvedValue(Response.json({ revision_id: `urn:uuid:${id}`, references: [] })),
   );
   await expect(client.query(query)).rejects.toMatchObject({ kind: 'invalid_response' });
@@ -22,8 +22,7 @@ test('source lists reject URN revision IDs before caching', async () => {
 
 test('completed turn changes reject a matching URN execution scope', async () => {
   const client = new QueryClient();
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn().mockResolvedValue(Response.json({ execution_id: `urn:uuid:${id}`, markdown: '' })),
   );
   await expect(client.query(turnJdChangesQuery(id, `urn:uuid:${id}`))).rejects.toMatchObject({
@@ -34,8 +33,7 @@ test('completed turn changes reject a matching URN execution scope', async () =>
 
 test('input acknowledgement rejects URN execution IDs before retaining a hint', async () => {
   localStorage.clear();
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn().mockResolvedValue(
       Response.json({
         job_file_id: id,
@@ -53,8 +51,7 @@ test('input acknowledgement rejects URN execution IDs before retaining a hint', 
 
 test('uppercase hyphenated UUIDs remain valid and unchanged', async () => {
   const client = new QueryClient();
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn().mockResolvedValue(Response.json({ revision_id: id.toUpperCase(), references: [] })),
   );
   expect(await client.query(jdSourcesQuery(id))).toEqual({

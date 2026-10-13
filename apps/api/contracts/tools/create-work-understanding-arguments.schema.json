@@ -24,7 +24,7 @@
     "body": {
       "type": "string",
       "minLength": 1,
-      "description": "Complete initial Markdown body, with known facts and unknowns distinguished. References belong in the separate reference collection, not the body."
+      "description": "Complete initial Markdown understanding useful without reading every situation. Preserve necessary scope, responsibility, conditions, rules, methods and exact values/deadlines; distinguish unknowns. Do not require one understanding per situation or JD item. References belong in the separate reference collection, not the body."
     },
     "work_situation_references": {
       "type": "array",

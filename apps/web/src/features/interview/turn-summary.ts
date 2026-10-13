@@ -1,5 +1,5 @@
 /** Presentation-only summaries of a server-verified Turn; never a substitute for its status. */
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 
 export interface TurnBadge {
   label: string;

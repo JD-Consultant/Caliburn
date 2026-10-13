@@ -2,7 +2,7 @@
 
 - 狀態：**現行共用執行接線**。顧問 A、工作情境分析師 B1 與工作理解分析師 B2 共用原生接續、Step 控制與恢復。驗證見[架構驗證](../architecture/verification.md)；機制接通不等於所有恢復分支或模型品質已驗。
 - 驗證分假模型供應端＋真實 checkpoint 保存／PostgreSQL、有界真模型及產品旅程。新驗證依當次有效授權進行，不把模型自述或推理摘要當驗收證據。
-- 已確認但未實作的調整見[驗證範圍與限制](../architecture/verification.md)，包括輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 仍待討論；本文的現行節點、工具 wire 與驗證結論尚未變更。
+- A 在首次或新版 Memory 發布後的新 Turn 重建窗口，同版沿原生歷史延續；B1／B2 維持各自的歷史與準備流程。工程接線與模型品質分開驗收，未驗範圍見[架構驗證](../architecture/verification.md)。
 
 本頁維護原生窗口、模型與工具 Step、壓縮採用及原件補存。[模型外送、容量與費用](model-requests.md)及[程序監督、控制與背景調度](agent-supervision.md)分頁維護，外送、監督及 Graph 各有單一責任頁，避免重複維護同一規則。
 
@@ -21,7 +21,7 @@
 
 ## 1. 執行圖與業務資格分開
 
-`agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。各角色提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，共用模型與工具的執行迴圈。
+`agent_execution` 提供 A／B1／B2 共用的 LangChain `create_agent` 接線；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。各角色提供 instructions、允許工具、起始資料 projector 及結束結果轉譯。標準 Agent 管理模型／工具路由與配對；公開 model／middleware 接縫保留原生資料及產品准入。
 
 Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。實際接線與驗證見[本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作)。
 
@@ -29,7 +29,7 @@ Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator�
 
 | 節點 | 保存／動作 | 禁止 |
 |---|---|---|
-| `prepare_context` | 核新工作綁定、已採用基底；追加一次 App 資料及必要輸入；保存原位置 | 同工作恢復刷新 maps、重複員工原話 |
+| `prepare_context` | 核新工作綁定及已採用基底；A 依首次／Memory 版本選擇重建或延續，再加入本次輸入；B 追加本批資料；保存原位置 | 同工作恢復刷新 maps、重複員工原話 |
 | `count_input` | 用固定 request 計數；外送沿共同額度；保存結果後才作容量准入 | 計數失敗當零、重查已保存計數、把計數當模型 Step |
 | `request_model` | 容量／外送資格通過後呼叫 SDK；保存完整 R、原 calls 與 App 操作身分 | 同一未持久 node 內直接做寫入工具 |
 | `account_response` | R 已保存後，以原 attempt 冪等結算；失敗恢復不重呼模型 | 把記帳失敗變成原 R 遺失、把取消當未付費 |
@@ -40,9 +40,13 @@ Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator�
 | `compact_context` | 合法輪前／160K 交界，取得完整 C 並可靠採用 | 只存摘要、重加起始資料、讓輪中 C 越過取消基底 |
 | `deliver_result` | 交給 consultant_turn／memory_batch 協調服務；查原完成結果可重入 | Graph END 自行宣告 JD 或 Memory 已發布 |
 
-查碼入口：[共用迴圈與工具 Step](../../apps/api/src/caliburn/agent_execution/tool_steps.py)、[回應分類](../../apps/api/src/caliburn/agent_execution/response_steps.py)、[歷史資格接線](../../apps/api/src/caliburn/workflows/context_history.py)及[壓縮與輪前準備](../../apps/api/src/caliburn/agent_execution/context_compaction.py)。
+查碼入口：[共用 Agent 與工具屏障](../../apps/api/src/caliburn/agent_execution/native_agent.py)、[原生 I/O 與保存 handoff](../../apps/api/src/caliburn/agent_execution/response_runtime.py)、[完成歷史與暫停查讀](../../apps/api/src/caliburn/agent_execution/tool_steps.py)、[歷史資格接線](../../apps/api/src/caliburn/workflows/executions/context_history.py)及[壓縮與輪前準備](../../apps/api/src/caliburn/agent_execution/context_compaction.py)。
 
 Graph 入口使用 `durability="sync"`。**native super-step 不等於上述完整 Step** ；每個 node 結果可靠保存才容許下一個有副作用 node。未保存的 node 可能重入，靠業務 operation 保護效果。[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+
+標準 Agent 的 hooks 負責容量、原件交接與完整 Step 控制；固定命令另經同步子圖的 prepare superstep 保存，再進入 execute。`await @task` 的返回不作為相同可靠保存屏障。容量子圖以 `Command` 表達分支，不再平行保留第二套模型／工具路由。[middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)、[Command](https://docs.langchain.com/oss/python/langgraph/graph-api#update-and-goto)
+
+角色 runner 以官方 `tracing_context(enabled=False)` 關閉整次執行的框架雲端 tracing，環境變數不能暗中開啟。完整 Debug 仍沿本機不可變原件組裝。
 
 ### 1.1 組裝與可替換範圍
 
@@ -50,15 +54,13 @@ Graph 入口使用 `durability="sync"`。**native super-step 不等於上述完�
 
 | 可替換項目 | 現行入口與界線 |
 |---|---|
-| 顧問提示 | `ConsultantConfiguration.prompts` 分開專業方法、焦點、Plan 與公版指引，可替換其中一段 |
+| 顧問提示 | `ConsultantConfiguration.prompts` 分開專業方法（含訪談焦點）、Plan 與公版指引，可替換其中一段 |
 | 工具說明 | `tool_descriptions` 只替換具名工具的 description；schema、handler 及 scope 維持正式契約，重名或未啟用工具會拒絕 |
 | Plan 能力 | `interview_plans_enabled` 預設 `True`；新回合關閉時不加入 Plan 指引、工具及候選 |
 | JD 讀取大小 | `jd_read_max_result_characters` 設定正整數上限，於首次 context capture 固定，後續恢復沿原值 |
 | 模型及保存 I/O | `create_responses_client`、`open_checkpointer` 提供工廠；測試可注入替身，資源所有權及正式 workflow 不變 |
 
-提示與工具定義的細節由[顧問配置](../../apps/api/src/caliburn/agents/job_consultant/configuration.py)維護。提示、工具定義與 Plan 能力沿原 preparation／captured request 恢復。
-
-JD 工具的執行上限則在首次 context capture 才固定；若只完成歷史 preparation，capture 仍採當時配置。兩個邊界之後，各自沿已保存的值接續，不用目前配置覆寫原值。
+提示與工具定義的細節由[顧問配置](../../apps/api/src/caliburn/agents/job_consultant/configuration.py)維護。A 工作在歷史準備前捕捉提示、工具、Plan 能力及 JD 讀取上限；同工作暫停、重連或故障恢復沿原 captured request，不用目前配置覆寫。
 
 此接縫涵蓋顧問配置與外部 I/O，沒有提供移除整個 JD／Memory 的通用插件機制。模型選擇仍由 `ModelSettings` 與[模型 profile](model-requests.md#6-固定費率與-usage-成本估算)負責。比較品質須固定資料與變因；候選配置可並存，不代表可以繞過[共用領導資格](agent-supervision.md#11-共用領導資格與准入)讓多個 App 同時接管同一工作。
 
@@ -70,7 +72,9 @@ Graph State 保存執行與恢復所需的資料：不可變工作綁定的參�
 
 **State 不會全部送入 LLM。** 模型 input 由 App 依契約組裝；目前分析焦點、猜想等也不強制成為模型每 Step 必填欄位。
 
-原生窗口 channel 使用明確的「追加 items」與「可靠採用完整 compacted output」操作；不能套用會按 message ID 合併覆寫的通用 MessagesState／`add_messages`。serializer 保存 JSON-compatible 原生資料；output→input 轉換只按官方契約，不刪 reasoning／phase／call metadata。
+原生接續由已保存 request.input、完整 R 及有序工具結果組裝；完整 Step 的資格另由完成標記與 native task 邊界判定，不再持久化同義的完整窗口副本。下一請求先組裝，再置換 request 並清除上一 Step 欄位；壓縮則可靠採用完整 compacted output。框架 messages 僅保存供路由使用的 name／call ID 與配對結果，不承載完整 R，也不作下一次模型 input 的權威。原生項目不經 `add_messages` 合併；serializer 保存 JSON-compatible 原件，output→input 只按官方契約轉換，不刪 reasoning／phase／call metadata。
+
+新 R 可靠保存後，以官方 message reducer 將目前 `messages` 換成該 Step 的路由投影，避免已完成工具正文累積成第二份接續歷史。舊 checkpoint 保留，Debug 仍可按原 request 查回工具參數與結果；不靠最新 messages 重建過去。
 
 `status` 等 output-only 欄位按實際 SDK input 規則轉型。**保存原輸出**與**合法重送表示**須分開驗證，不能把整份 response envelope 原樣送回。[OpenAI 原生接續範例](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content)
 
@@ -84,33 +88,43 @@ Runtime 在業務 execute 前可靠保存它；恢復以同一命令核對原結
 
 每個 A 執行工作有獨立 Graph thread；Memory Parent 及各角色有可辨認的執行身分。
 
-新工作從該角色**已採用的合法歷史位置** 取得原生窗口，不從任意最新 checkpoint 猜。跨 Turn 延續的是原生 items，不要求 API `previous_response_id`，也不要求所有 Turn 共用一條可被晚到 callback 污染的 thread。
+新工作從該角色**已採用的合法歷史位置** 綁定原基底，不從任意最新 checkpoint 猜。A 依 Memory 版本決定是否承接原生 items；B1／B2 各自延續合法歷史。不要求 API `previous_response_id`，也不要求所有 Turn 共用一條可被晚到 callback 污染的 thread。
 
 B1／B2 各自保留私有歷史；同一階段中斷後沿原 thread 接續，下批再承接各自已採用的歷史。角色 Graph 由 Parent 依 B1 → B2 順序呼叫；Parent 只接領域位置與完成結果，不交換完整私有 State，也不接受 B2 回交。不能手改 checkpointer 表或靠重建 namespace 假裝已恢復。
 
 當前有效工作／已採用基底的參照由執行資格持有，checkpoint 存實際窗口。這不是第二套 session 日誌；只記「哪份既有窗口仍可採用」，不複製模型全文。取消、不可恢復回退或重新領取使舊 writer 失去提交資格；晚到 checkpoint 仍可能物理保存，但不可被下一輪當有效基底。
 
-- 新工作：先完成輪前 compaction 安全採用，再固定 maps／來源等本輪綁定、加入員工輸入。
+- A 新工作：先捕捉固定 Memory／來源、JD／Plan 候選及本次原話，再決定重建或延續；輪前準備完成後組成實際請求。
+- B 新批：先完成各角色輪前歷史準備，再固定 maps／來源等本批綁定、加入本批資料。
 - 同工作故障：用最新可靠位置正常 resume，不指定舊 checkpoint 做 time-travel replay；有 interrupt 才用 `Command(resume=...)`。
-- 有意回退到較早安全點：先使較晚工作資格失效，核對領域位置與 context 相容，再建立可執行分支；不能直接對舊 checkpoint invoke 並假設副作用會自動撤銷。
+- 不直接對舊 checkpoint invoke 並假設副作用會自動撤銷；整輪取消由業務完成工作流統一處理。
 - A 取消：後續新輸入從合法輪前基底與正式資料開始；重試 a 在模型眼中仍是新輸入。
-- Memory 回退：①是 B1 開始前的固定基準與候選起點，②是 B1 完成、B2 開始前的交接快照（[Memory 單向調度](agent-supervision.md)）。候選與各角色窗口一起回該位置；同批保留對應已採用輪前 compact，不重做它。中途較晚 compact 不跨越回退點。
+- Memory 恢復：接續已保存的候選 stage、固定 capture 與原生窗口。B1 完成位置證據與 B2 stage 交接同交易保存，B2 從該交接接續；最終發布時才共同採用 B1／B2 context 並完成 execution。失敗由批次 workflow 放棄未發布候選，已提交發布結果優先。（[Memory 單向調度](agent-supervision.md)）
 
 跨工作接續與回退的驗證對應 E02／E08–E11，見[驗證對照](verification-plan.md)。調整 thread 組織仍須維持相同資格與回退保證，不增加第二套恢復引擎。
 
-顧問工作計畫的產品用途及內容沿 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)；本頁維護它與原生歷史的三個接縫：
+顧問工作計畫的產品用途及內容沿 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)；本頁維護它與原生歷史的接縫：
 
-- 共同 `FOCUS_INSTRUCTIONS` 提供訪談推進方法，Plan 專屬指引及 read／edit 工具維護同份 Markdown 的焦點、工作方向與剩餘訪談／分析／JD 整理工作。原捕捉工具能力決定 v1／v2，新輪固定原基底；舊 captured request 保留原指令與能力。
-- 輪中 native C 沿共用流程保存與核帳後，A 的私有 `plan_projection` Graph 固定精確 C 位置與一個原計畫 item，父 request 採用完整 C＋該 item。
+- 共同 `CONSULTANT_INSTRUCTIONS` 整合訪談、分析與 JD 核對方法，Plan 專屬指引及 read／edit 工具維護同份 Markdown 的焦點、工作方向與剩餘訪談／分析／JD 整理工作。每輪固定合法基底及工具能力，同輪恢復沿原指令與能力。
+- 新 A 工作在首次／Memory 換版時投影合法 Plan；同版新 Turn 及 native C 之後不再追加 App／Plan。Plan 工具仍讀寫本輪合法候選。
 - completed 重入只核對原完成窗口、正式答覆及同 Turn final plan，回傳原結果；不再執行 active-only preview 或 native 外送。
 
 ### 3.1 跨工作的合法歷史選用
 
-`features/executions/history.py` 管理**是否可採用** ；`workflows/context_history.py` 的 `RoleContextHistory` 將資格接到既有準備／模型 Graph；完整原生窗口仍只由官方 saver 保存。每份職務檔案、每個角色各有一個已採用位置，每次 execution 綁定一次原基底，不能因重開而改選目前最新 checkpoint。
+`features/executions/history.py` 管理**是否可採用** ；`workflows/executions/context_history.py` 的 `RoleContextHistory` 將資格接到既有準備／模型 Graph；完整原生窗口仍只由官方 saver 保存。每份職務檔案、每個角色各有一個已採用位置，每次 execution 綁定一次原基底，不能因重開而改選目前最新 checkpoint。
 
-角色初次擷取的業務資料由 `ConsultantContextWorkflow` 與 `MemoryAnalysisContextWorkflow` 提供具型別的固定讀取結果。前者在原檔案鎖與 writer 交易內綁定 Memory／訪談、建立 JD 及可選 Plan 候選；後者讀取原 Memory stage 的 K／F、地圖與 B1 必要訪談。Agent 將資料投影為模型輸入，保存及恢復原 captured request；workflow 不依賴模型 JSON 或原生 checkpoint 格式。
+角色初次擷取的業務資料由 `ConsultantContextWorkflow` 與 `MemoryAnalysisContextWorkflow` 提供具型別的固定讀取結果。前者在原檔案鎖與 writer 交易內綁定 Memory／訪談、建立 JD 及可選 Plan 候選，並比較固定兩端的人工最終差異；後者讀取原 Memory stage 的 K／F、地圖與 B1 必要訪談。Agent 經 `RoleContextHistory` 取得前一個已完成 A 的 capture，將其 Memory 綁定交給前者比較版本。Agent 將資料投影為模型輸入，保存及恢復原 captured request；workflow 不依賴模型 JSON 或原生 checkpoint 格式。
 
-Plan 壓縮所需的讀取能力由 runner 明確注入，`RoleContextHistory` 不作跨領域資料存取入口。
+新 A 的 capture 先可靠保存本輪資料，再進行 `prepare_history` 的 count／compact。`ConsultantContextWorkflow` 比較本輪與前一個已完成 A 的 captured `snapshot_id`：沒有前一個完成回合，或版本不同，就從空模型歷史重建；兩者同為無 Memory 的 `None` 則屬同版延續。
+
+| A 新 Turn 的條件 | 實際模型輸入 |
+|---|---|
+| 首次或 Memory 新版 | App 資料（Memory 情境／理解導覽、嚴格 `(K,H]` 正式原話、JD 導覽）→ 合法 Plan（已啟用時）→ 完整人工最終差異（有變動時）→ 附 H+1 的本次 JSON input |
+| 同一 Memory 版本 | 已準備的完整原生歷史 → 完整人工最終差異（有變動時）→ 附 H+1 的本次 JSON input |
+
+K 是本輪固定 Memory 的涵蓋上界，H 是本輪開始時的正式訪談上界。首次無 Memory 時 K=0，App 開場自然包含在原話範圍；不另補已涵蓋前問。同版每輪仍固定工具讀取範圍並建立候選，這些資格不等於再次投影 App 資料。
+
+換窗僅改模型 items，不切斷 `base` 與前輪完成關係。人工最終差異由 JD owner 比較上一成功 A 採用的正式稿與本輪 JD 候選起點；尚無成功 A 時以建檔初稿為基底。全部差異獨立於導覽提供，不是待套用 patch，也不表示來源已核清。prepared 是尚未加入本輪差異與 input 的安全基底。新版首輪取消後，下一個新 Turn 仍與前一個完成 A 的版本比較並重建；同工作暫停、重連或故障恢復則承接原 capture，不因背景新發布而換窗。
 
 Memory stage thread 的固定格式由 `features/executions/history_models.py` 的 builder／parser 維護。producer、完成核對、history 及 diagnostics 共用格式，各層保留自身的角色、檔案及完成資格檢查；history 要求 canonical 身分，diagnostics 保留原本較寬的合法語法識別。解析成功本身不授予採用資格。
 
@@ -130,7 +144,7 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 
 角色資料組裝、正式產品完成與歷史採用由 A／Memory workflow 協調；Graph 返回 final 不取代正式完成交易。
 
-- `prepare_history` 只接收不含新輸入／maps 的 request template，歷史從綁定位置回讀；A 使用已確認的 128K 門檻。準備 Graph 保存成功、但採用交易尚未成立時，重入同一準備 thread 承接原結果。若已採用準備基底後取消，後續新工作直接重用同一基底，即使 C 仍很大也不因此重壓一次。
+- `prepare_history` 只接收不含新輸入／maps 的 request template；A 重建時準備空模型歷史，延續時從綁定位置回讀，門檻仍為 128K。準備 Graph 保存成功、但採用交易尚未成立時，重入同一準備 thread 承接原結果。延續模式下，已採用準備基底後取消，後續新工作直接重用同一基底，即使 C 仍很大也不重壓一次；新版重建則依上述版本比較重新建立空基底。
 - `read_prepared_history` 只讀已採用的**輪前準備** 結果，不把輪中 compact 當取消後基底。`read_completed_response_history` 核保存的 final 路由及官方 StateSnapshot 沒有待執行 node／task；暫停中的 final、只有 R 或 pending writes，都不能直接成為完成歷史。完整 reasoning、message、工具往返保留原順序，回傳獨立複本。
 - 讀取固定 checkpoint 是純查詢，不是 `invoke` 歷史位置做 replay。同工作續作仍走原 Graph 的最新可靠執行位置；取消後的新工作則只取領域已採用的位置，兩者不能混淆。
 - `complete_context_histories` 由產品協調方在**同一正式完成交易** 中呼叫：A 採用一個角色；Memory 同時採用 B1／B2，不容許只完成一邊。它核各自的原準備基底並由執行資格模組完成 execution；JD、正式訪談及 Memory 發布不在此重寫。產品協調方仍須先驗真實 Graph 完成及相應業務資格。
@@ -142,7 +156,7 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 
 `openai_responses.py` 明確設 `store=False`、`reasoning.context="all_turns"`，不帶 response chaining／server-side compact／silent truncation。instructions 與 tools 在 request 層明確提供，並保留原生 items；SDK 的默認 retry 關閉，由 Runtime 在有界預算內分類處理。
 
-起始順序依角色權威：歷史／完整 C → user-role App 資料 → A 的本輪 user 原文 → 後續原生模型／工具項目。A JD map 按需，不放回起始 context。B1 無理解導覽／工具，B2 無情境寫入工具。App 資料 user-role **不等於防注入已完成** ；service 仍驗權限與來源範圍。
+A 的首次／換版與同版延續順序依[跨工作的合法歷史選用](#31-跨工作的合法歷史選用)，JD 導覽隨首次／換版基底提供。B 以歷史／完整 C 接上當批 App 資料，再延續原生模型／工具項目；B1 無理解導覽／工具，B2 無情境寫入工具。App 資料 user-role **不等於防注入已完成** ；service 仍驗權限與來源範圍。
 
 一次 response 可能零／一／多 calls，也可能有公開中間文字。以原生項目與尚未完成的 calls 路由，不能憑 `output_text` 非空或 response.completed 當 Turn 結束。每一 call 都保留 call_id 與結果，已拒絕可回確定錯誤，未知效果先對帳。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls)
 
@@ -171,9 +185,9 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 
 ### 4.2 單一模型／工具 Step
 
-`agent_execution/tool_steps.py` 使用 `request_model → account_response → prepare_tool → execute_tool → prepare_tool → finish_step` 的責任順序；生成前另經計數及容量准入。
+`native_agent.py` 透過 `create_agent` 與公開 middleware 維持「計數及准入 → 模型 → 保存 R → 結算及路由 → 有序工具 → 完整 Step」的責任順序。`NativeModel` 僅轉接既有 direct SDK；框架 messages 不拿來重建供應端 request。
 
-純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整窗口；[有界多 Step 接續](#44-有界多-step-接續) 的共用 loop 承接下一步，A／B1／B2 不各寫一套迴圈。
+純讀／已知拒絕由 prepare 保存觀察，不執行业務寫入。所有 call 處理完且完成資格成立，才可由原件組裝新完整窗口；[有界多 Step 接續](#44-有界多-step-接續) 由同一標準 Agent 承接，A／B1／B2 不各寫一套迴圈。
 
 ![現行流程：單一模型與工具 Step](../diagrams/implementation/agent-execution/model-tool-step.png)
 
@@ -181,10 +195,12 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 
 這張圖展開 [§4.4](#44-有界多-step-接續) 的「單一模型／工具 Step」子流程，只畫成功及確定拒絕路徑；資格、協定或保存失敗沿原錯誤責任退出。平行四邊形標示遠端回應、命令及結果跨 provider／saver 的交接；處理矩形標示核對、結算與組裝。`prepare` 的讀取／命令分流依本節下文；寫入接縫見 [Memory 工具](memory-tools.md#4-寫入準備採用與原結果接續)，JD 工具依[保存與工具契約](jd-storage.md)。**同一原 R 有 calls 時，`next_action` 仍為繼續，即使同時有 final；完成 calls 不會將它改判為 final。**
 
-- 正常入口 `run_response_step` 統一指定 `durability="sync"`，依本次允許 call 數設定有界 graph recursion limit；超過 call 上限在派送前拒絕。框架 super-step 數與模型 Step 數不是同一上限。只在隔離故障測例使用私有 builder，不讓角色自行選保存模式。
-- 單 Step 入口使用獨立 thread；多 Step 入口讓**整次 loop 共用同一 thread** ，不要求每次迭代新建 thread。新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行資格模組保證。使用官方 `GraphOutput.value` typed 返回，不自造圖結果格式。
-- 原回應先保存，下一節點才檢查協定／工具。未知 phase 等被拒絕時，R 仍可回讀；不是先丟掉 R 再宣稱可恢復。操作 seed 和 R 同存，每個 call 以 `uuid5(operation_seed, call_id)` 得到穩定 App 操作身分，不由模型指定業務 ID。診斷副本也沿同一規則還原；原 seed 缺失時標示無法定位，不能靠相同參數猜測。工具執行與查閱方式見[執行診斷](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
-- 寫入 prepare 的命令先保存，execute 才交給相應的 JD／Memory 領域模組。工具結果僅按原 calls 的有序前綴增加，下一筆 prepare 能看見上一筆已成立的候選；不平行派送。恢復不重新解析已保存命令的標題／正文，也不重算成功回傳。
+- 唯一正常入口 `run_native_agent` 指定 `durability="sync"`；工具子圖同樣同步保存。超過 call 上限在派送前拒絕，框架 super-step 數與模型 Step 數分別有界，不讓角色另選保存模式。
+- **整次角色執行共用同一 thread**，工具與容量使用框架子圖 namespace。新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行資格模組保證。使用官方 `GraphOutput.value` 返回，不自造圖結果格式。
+- 原回應先保存，下一節點才檢查協定／工具。未知 phase 等被拒絕時，R 仍可回讀；不是先丟掉 R 再宣稱可恢復。操作 seed 和 R 同存，每個 call 以 `uuid5(operation_seed, call_id)` 得到穩定 App 操作身分，不由模型指定業務 ID。診斷查閱也沿同一規則還原；原 seed 缺失時標示無法定位，不能靠相同參數猜測。工具執行與查閱方式見[執行診斷](../operations/README.md#查閱-ai-執行原件)。
+- 工具由公開 `awrap_tool_call` 依原 R 的 calls 順序處理；同次呼叫的 `asyncio.Condition` 只協調工具，不限制框架的 checkpoint 保存。前一個 handler 完整成功後才放行下一個；普通錯誤由框架停止其餘工作，外層 task 取消仍向下傳遞。固定命令先取得 prepare 保存 ACK，execute 才交給 JD／Memory 領域模組，下一筆 prepare 能看見上一筆已成立的候選。
+- 程序內已完成項以原 `request_id`／`call_id` 區分；恢復從入口已讀取的當前原生快照承接 ToolMessages，包含已保存 pending writes 的投影，不新增查詢或持久進度。工具節點自己的 State 不一定包含這些待整合結果。恢復承接子圖最新可靠位置，不沿父 checkpoint ID 重播已完成的 prepare；不重新解析已保存命令或重算成功回傳。程序內同步物件不取代 checkpoint、原操作 receipt 或 writer 資格。
+- 模型參數的確定拒絕由工具入口回傳；原回應還原、命令準備／解碼或結果驗證漏出的 `ValidationError`，由共用工具入口轉為保留原因的內部失敗，停止後續工具與模型。不交給框架要求模型修正 App 內部資料；其他例外與取消沿原責任向外傳遞。
 - `ResponseStepRuntime` 注入模型、結算、工具與資格 I/O，不持久化 SDK client／DB session。共用 State 不理解 Memory 命令內容；工具接線必須核對還原型別及原工作資格，業務效果仍由 JD／Memory 領域模組的交易／冪等機制處理。
 - `adapters/graph_checkpointer.py` 只配置官方 `JsonPlusSerializer`：關閉 pickle 與 legacy JSON 自訂 constructor；自訂 msgpack 型別由實際 caller 明確 allowlist，不建立 domain registry。Memory prepared create／revise／delete 的巢狀 dataclass、Enum、UUID、frozenset 已驗。框架 4.2.0 對未允許型別會降為 dict／原始值，且 tuple 會變 list，不能拿值相等當型別正確；本 Step 原生集合用 list，Memory prepared 無 tuple 欄位。不補第二套 codec。
 
@@ -192,39 +208,39 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 
 checkpoint 與 pending writes 同時失敗時，`astream` 不保證能交出 node update；原回應由 [原回應補存與資格接線](#43-原回應補存與資格接線) 的 typed recovery 補存，不依賴呼叫方手寫 Graph update。
 
-執行／預算准入、控制、角色歷史及 compact 分別依 [thread／私有歷史與回退接線](#3-thread私有歷史與回退接線)、[完整 Step 暫停與原生續作](#45-完整-step-暫停與原生續作)、[容量與外送准入](model-requests.md#4-固定請求計數與容量准入)、[本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 接入。依據：[durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。
+執行／預算准入、控制、角色歷史及 compact 分別依 [thread／私有歷史與回退接線](#3-thread私有歷史與回退接線)、[完整 Step 暫停與原生續作](#45-完整-step-暫停與原生續作)、[容量與外送准入](model-requests.md#4-固定請求計數與容量准入)、[本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 接入。依據：[durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[公開工具 middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)及[Python Condition](https://docs.python.org/3.14/library/asyncio-sync.html#condition)。工具順序是本案契約，不假定平行工具抵達 middleware 的順序等於原 calls 順序。
 
 ### 4.3 原回應補存與資格接線
 
-`run_response_step` 在模型 node 返回前保留完整原 R、固定原 request 及同一 operation seed；僅在尚未進入下游節點的保存失敗時，以 `ResponseStepSaveError.recovery` 交還程序內的 `HeldModelResponse`。
+`NativeModel` 在 model node 返回前保留完整原 R、固定原 request 及同一 operation seed；原件尚未確認保存時，以 `ResponseStepSaveError.recovery` 交還程序內的 `HeldModelResponse`。
 
 一般結算／工具／協定／資格錯誤仍保持原分類，不一律轉為可重試保存錯誤。這不是另一份持久 ResponseStore，不寫入業務表、模型 context 或一般 log。
 
 - 仍握有 recovery 時，以同一 thread、`request=None`、`recovery=...` 回到公開入口。先查官方 saver／原 request 身分；任何採用與執行仍須通過工作資格；不呼叫模型、不由呼叫方自行改 Graph State。無採用資格的晚到 R 只允許原計量，詳 [外送與結算](model-requests.md#2-固定請求一次外送與保存後結算)。
 - 原 R／seed 已在 checkpoint 或 pending writes 時核對相符，沿目前位置恢復，**不覆寫之後的 prepared command、工具結果或完成視窗** 。此時立即釋放該次呼叫的暫存保存責任，避免直接恢復 execute node 的工具／資格錯誤被誤分類。
-- 原 R 尚未保存時，必須仍在原 `request_model` 邊界、原 input 相同且無後續效果資料；再查資格，以官方 `aupdate_state(as_node="request_model")` 補存原 update，然後正常 `None` 接續。不同 thread、不同 input、不同已存 R／seed 或不相容位置拒絕，不猜測、不回退。
+- 原 R 尚未保存時，只能回到原 request 的 model 邊界；轉接器交回 handoff 中同一原 R／seed，不重新呼叫 SDK。框架將原件保存後才進下游。不同 thread、不同 input、不同已存 R／seed 或不相容位置拒絕，不猜測、不回退。
 - 查詢／補存再次失敗，仍交還同一原件；沒有自行循環、重新推論或增加付費請求。自動補存由共用 Graph 入口的[有限補存政策](#53-原件補存的有限自動恢復)承接；supervisor 只保留原件與停止原因；程序整個消失且兩種保存皆失敗時，不保證記憶體原件可恢復。`store=false` 不能靠 response ID 補取遺失內容。
 - `ResponseStepRuntime.ensure_active` 是必要注入，入口、模型／工具 I/O 前、完成 Step 及交回結果前均檢查。產品接線用執行資格模組保存的原 scope／writer，短交易結束後才做模型 I/O；不把 DB session 或 writer 狀態塞入模型 input。單一 writer 調度仍由外層負責，這不是新的租約實作。
 - Guard 與 saver／provider 不共用原子交易：取消後晚到 R 仍可能物理保存，但不能派送工具或交付有效結果。業務工具還須在自己的提交交易內核資格；A／Memory workflow 決定有效 Turn／批次基底，不能把任意 latest checkpoint 當成可採用歷史。
 
-驗證：原回應補存與資格。機制依 [LangGraph 狀態更新與接續](https://docs.langchain.com/oss/python/langgraph/use-time-travel)；只在核對原位置後補存既有 R，不以舊 checkpoint replay 重算外部工作。自動補存見 [原件補存的有限自動恢復](#53-原件補存的有限自動恢復)，不能恢復已遺失且未持久保存的原件。
+驗證：原回應補存與資格。機制依 [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)及[Agent middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)；只在核對原位置後補存既有 R，不以舊 checkpoint replay 重算外部工作。自動補存見 [原件補存的有限自動恢復](#53-原件補存的有限自動恢復)，不能恢復已遺失且未持久保存的原件。
 
 ### 4.4 有界多 Step 接續
 
-`run_response_loop` 與單步入口共用原 StateGraph、原生 State 及恢復接線，只增加完成 Step 後的條件路由與 `prepare_next_request`。外層不手動另存 cursor，也不為每次模型迭代建 child graph／thread。官方支援 conditional edges 與持久迴圈；採用這個較小組合是本案取捨，不代表所有大廠都用同一個 loop。[LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api#conditional-edges)、[OpenAI 工具接續](https://developers.openai.com/api/docs/guides/function-calling)
+`run_native_agent` 是唯一模型／工具執行入口。標準 Agent 管理迴圈，middleware 在完整 Step 邊界核控制、組裝下一個原生 request，容量子圖先保存計數／壓縮結果。沒有測試專用單步引擎、第二套 topology 或外層 cursor；一次測試需要有界停止時沿正式模型步數上限驗證。[LangChain Agent](https://docs.langchain.com/oss/python/langchain/agents)、[OpenAI 工具接續](https://developers.openai.com/api/docs/guides/function-calling)
 
 ![現行流程：有界模型與工具迴圈](../diagrams/implementation/agent-execution/response-loop.png)
 
 [圖源](../diagrams/implementation/agent-execution/response-loop.mmd) · [SVG](../diagrams/implementation/agent-execution/response-loop.svg)
 
-這是現行共用 loop 的總覽。雙側線框分別展開於[計數與准入](model-requests.md#4-固定請求計數與容量准入)、[完整 Step](#42-單一模型工具-step)、[W → C 交接](#51-完整-c-保存採用與中途接續)及[Step 後控制](#45-完整-step-暫停與原生續作)，不是新增程式子圖。容量拒絕是准入節點拋出的錯誤，不是新增的已保存路由值。中途壓縮仍以完整 Step 後達 160K 為門檻；同一未增長 C 仍超門檻時停止。A 首請求可縮減時另走[近期訪談縮減](#54-首請求超量的近期訪談縮減)，本圖省略此支線及資格／保存故障。明確續作沿原 interrupt 位置進入控制流程，不從圖頂重新初始化或重送模型；角色 final 仍須另經正式完成交易。
+這是現行共用 loop 的責任總覽。雙側線框分別展開於[計數與准入](model-requests.md#4-固定請求計數與容量准入)、[完整 Step](#42-單一模型工具-step)、[W → C 交接](#51-完整-c-保存採用與中途接續)及[Step 後控制](#45-完整-step-暫停與原生續作)，與框架 node／子圖不是一對一關係。容量拒絕是准入錯誤，不是新增的已保存路由值。中途壓縮仍以完整 Step 後達 160K 為門檻；同一未增長 C 仍超門檻時停止。A 首請求可縮減時另走[近期訪談縮減](#54-首請求超量的近期訪談縮減)，本圖省略此支線及資格／保存故障。明確續作沿原 interrupt 位置進入控制流程，不從圖頂重新初始化或重送模型；角色 final 仍須另經正式完成交易。
 
 - 每次模型 Step 可有多工具，全部依序完成後才接下一請求；工具旁有 final 文字仍先處理 calls，只有 commentary 的完整回應則繼續。下一請求只替換 input 為已完成窗口，不重新取 maps／指令／模型設定，不改歷史、不重加起始輸入。
-- 同一 loop 的模型步數上限、每回應工具上限在初始 checkpoint 固定。`completed_steps` 由完成 Step 前進，恢復不歸零；不能用較大上限或單步入口繞過原 loop 限制。最後准許的一步若有合法 final，仍可交回；需要再呼叫才觸發 `ModelStepLimitError`，保留最後完整窗口，不偽造收尾答覆。
+- 同一 loop 的模型步數上限、每回應工具上限在初始 checkpoint 固定。`completed_steps` 由完成 Step 前進，恢復不歸零，不能用較大上限繞過。最後准許的一步若有合法 final，仍可交回；需要再呼叫才觸發 `ModelStepLimitError`，保留最後完整窗口，不偽造收尾答覆。
 - 這是**單次角色 loop 的局部上限** ；整個工作／Memory batch 的計量、時限與重試共用額度仍由 [持久工作額度](model-requests.md#3-工作額度保存) 的執行模組負責。LangGraph `recursion_limit` 只是本次 graph invoke 的 super-step 防護，依有限工具／模型步數配置，不代替產品計量。
 - 下一 request 的新 logical ID／完整 payload 先經 sync 保存，才可外送；只有完成前一 Step 才產生新 request。清除當前 response 欄位，避免把前一步 R 認成下一步的 R。第二步以後同樣可承接 Held 原件；後來步驟不能拿舊 handoff 倒轉目前位置。
 - 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
-- 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
+- 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部沿同一原 R 保存、結算與業務冪等責任，沒有新增保存系統。
 
 驗證：多 Step 接續。圖中的返回只是角色結果；A Turn／Memory batch 的正式完成仍由 [本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 與各領域模組協調。
 
@@ -245,21 +261,21 @@ checkpoint 與 pending writes 同時失敗時，`astream` 不保證能交出 nod
 | 責任 | 已接線 | 不代表 |
 |---|---|---|
 | executions | 短交易受理暫停、writer fencing、停妥／續作、正式完成互斥 | UI 一按就已停止、可以用 checkpoint 猜正式效果 |
-| 共用 Response loop | 完整 Step 後 `check_control`，純 `pause_at_boundary` 原生 interrupt | 在工具結果不明時偽造 Step、在 interrupt 前重做模型／工具 |
+| 共用 Agent middleware | 下一次模型前／最終返回前核完整 Step，於控制邊界保存原生 interrupt | 在工具結果不明時偽造 Step、在 interrupt 前重做模型／工具 |
 | workflow 薄接線 | 注入讀要求、有效 writer 檢查、停妥確認 | 另建控制儲存或由節點自行決定正式效果 |
 
 #### 完整 Step 與暫停確認
 
-- `run_response_loop` 可注入 `ResponseLoopControls`；A 使用，B 不配置。設定是否存在隨初始 State 固定，恢復不能卸除控制來越過原暫停。`ConsultantExecutionControls` 拒絕 Memory kind；Memory 沒有使用者 pause／resume。
-- `check_control` 在 `finish_step` 之後且在 final 返回、下一次 count／compact／model 之前；控制讀取失敗保留節點供重入，不當成「沒有要求」。本輪多 call 全部配對後才可停，已保存 final 同樣先停在待交付位置，不另發模型。
-- `pause_at_boundary` 不執行业務副作用，重入必達同一個 `interrupt`；不能在恢復時根據最新要求跳過它。LangGraph 恢復會重跑節點開頭，故資格檢查可重入，但模型／工具不放在這裡。
+- `run_native_agent` 可注入 `ResponseLoopControls`；A 使用，B 不配置。設定是否存在隨初始 State 固定，恢復不能卸除控制來越過原暫停。`ConsultantExecutionControls` 拒絕 Memory kind；Memory 沒有使用者 pause／resume。
+- middleware 在完整 Step 之後且在 final 返回、下一次 count／compact／model 之前檢查控制；讀取失敗保留節點供重入，不當成「沒有要求」。本輪多 call 全部配對後才可停，已保存 final 同樣先停在待交付位置，不另發模型。
+- 控制邊界不執行业務副作用。LangGraph 恢復會重跑節點開頭，資格與暫停要求檢查可重入；原要求只有明確續作才解除，模型／工具不放在 interrupt 前。
 - 正常暫停回傳內部型別 `PausedResponseLoop`，含當前 `interrupt_id` 及原 State；不是執行失敗或給模型的新工具結果。UI 不直接取得整份 State／reasoning；UI 僅讀公開狀態投影。
 
 #### 恢復與待整合結果
 
 - 普通 `request=None` 重開已暫停圖，只核原停妥並回傳原暫停；不發 count／compact／model、不自動 final。明確續作需原 `interrupt_id`，轉為 `Command(resume={interrupt_id: True})`；不帶新 input／Held R、不換 maps／Memory 基準，錯誤或過時 ID 拒絕。顧問控制工作流須先依執行資格受理續作；Graph 不自行清除領域意圖。
-- 普通恢復若仍在完整 Step 後、尚未建立下一 request（`prepare_next_request` 或待交付 final 的 END），不能把先前已保存的 `continue` 當成現在仍有執行許可。使用當前 checkpoint 的 `aupdate_state(..., as_node="finish_step")` 僅重新安排 `check_control`，不重跑 `finish_step`、不改原生 items／完成步數、不讀歷史 checkpoint。新受理暫停能停在原完整 Step；無暫停才沿原路繼續。這不代表下一 request 已進入計數／外送後也可任意退回此點。
-- 上述更新不能覆蓋尚待整合的 Step 結果：`get_state()` 可把 pending writes 投影成完成值，不等於整個 Step checkpoint 已寫成。若公開 `StateSnapshot.tasks` 仍含 `finish_step`，直接走原生 `None` 恢復，由框架保存該結果並接續 `check_control`，不先呼叫 `aupdate_state`。如此保留已成立的完成步數／原生 items；不讀 saver 私有表，也不另存 Step 副本。
+- 普通恢復仍須核目前完整 Step 的控制，不能把先前已保存的 `continue` 當成現在仍有執行許可。待交付 final 已到 END 時，以當前 checkpoint 重新安排 after-agent 控制 successor，不重跑模型／工具；不讀歷史 checkpoint、不修改原生 items。這不代表已進入新 request 後可以任意倒回。
+- `get_state()` 可把 pending writes 投影成完成值，不等於整個 Step checkpoint 已寫成。完成歷史及暫停讀取須一併核原生 task／interrupt；未整合結果沿框架原位置恢復，不靠原回應含 final 或單一值猜完成，不讀 saver 私有表或另存 Step 副本。
 - 傳回原 R／count 的 handoff 若已核對為保存成功，不再屬於「待補存」；仍須套用上述完整 Step 控制重核。不能僅因呼叫參數還帶著 `recovery`，就跳過新受理的 pause；真正尚待補存或待整合的結果仍先沿自己的恢復邊界處理。
 
 #### 保存失敗與完成競爭
@@ -289,7 +305,7 @@ A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處�
 - C／pending writes 都未能保存但原件仍在程序內，`CompactionSaveError.recovery` 帶回完整原件；核對原 thread、request 與保存位置後補存。既有保存優先，不能回退已採用／後續位置。程序內原件不是遠端備份；真正遺失時由 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 核對並安全收尾，不宣稱能憑 response ID 取回。
 - 取消後仍可結算已保存 C，但不得採用或發新外送。父 loop 若停在 `compact_window`，其恢復入口亦須重入原受資格保護的子流程，才能核對子圖已有 C；不能只檢查父圖已清空的 R。接縫必須綁同一工作資格與 capacity policy，不接受另一套自動重送流程。
 - 中途透過 `ResponseStepRuntime.compact_window` 組合該流程；子圖 C 已採用、父圖尚未保存時，父節點重入可直接取原 C。父圖以確定的新 request ID 保存整份 C，清除舊 count，再計數實際下一請求；instructions／tools／模型及其他固定設定不換。
-- `check_capacity` 是獨立可恢復 node；條件路由只讀其已保存結果，不在路由內拋出容量拒絕。已實測條件路由錯誤可能留下已完成前置 node，重入不再執行原 gate；因此拒絕必須保留在可重入節點。
+- `check_capacity` 是獨立可恢復 node，核准後回傳 Command 選擇下一節點；容量拒絕在 node 內拋出。已實測條件路由錯誤可能留下已完成前置 node，重入不再執行原 gate；因此拒絕必須保留在可重入節點。
 - 新 request 記錄來自哪個已採用 C。尚未增長且仍達160K時明確停止，不再 compact；空模型 output 即使換 request ID，仍保留該判定，不能把換 ID 當成資料增長。完成後續 Step、窗口確有新增項目時才可再次觸發。final、步數耗盡或資格失效不新增 compact。pause 由 [完整 Step 暫停與原生續作](#45-完整-step-暫停與原生續作)、[A 控制協調](agent-supervision.md#2-a-pausecancelresume-控制) 承接。
 
 外送沿 `ModelRequestExecutor` 與原 executions 預算：`COMPACTION` 預留短交易確認後才 HTTP，完整 C 先交 Graph，再結算。`compaction_payload()` 是指紋與 wire 的共用組裝來源，明確使用 `service_tier="default"`；SDK 預設 auto 可能跟隨遠端 Project 設定。compact 需顯式行政預留與成本計算器；沒有 usage／計算結果時保留未知預留，不歸零。無新增資料表，固定費率估算見 [費率與 usage 估算](model-requests.md#6-固定費率與-usage-成本估算)；standalone compact 沒有 create 的輸出上限，不承諾遠端硬性帳單上限。
@@ -306,15 +322,15 @@ A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處�
 
 [圖源](../diagrams/implementation/agent-execution/history-preparation.mmd) · [SVG](../diagrams/implementation/agent-execution/history-preparation.svg)
 
-圖為現行輪前歷史準備；計數沿[固定請求計數](model-requests.md#4-固定請求計數與容量准入)，壓縮沿[完整 W → C 交接](#51-完整-c-保存採用與中途接續)。評估是處理動作，菱形只表示按結果分流；圖中拆開評估與保存是為了辨認恢復交界，不新增 Graph node。沿用 W 也要核資格並保存準備結果；同準備重入讀回已保存結果，不重送。返回後由角色接線固定新工作資料、追加一次輸入，再計數完整請求；本圖不完成訪談或發布 Memory，省略各資格與保存故障出口。
+圖為共用輪前歷史準備元件；計數沿[固定請求計數](model-requests.md#4-固定請求計數與容量准入)，壓縮沿[完整 W → C 交接](#51-完整-c-保存採用與中途接續)。A 在進入此元件前已捕捉本輪資料並決定重建或延續；B 在返回後固定本批資料。評估節點核對資格與容量，分流由原 count 及固定 policy 推導，不另存同義 boolean。沿用 W 也要核資格並保存準備結果；同準備重入讀回原結果，不重送。返回後由角色組成實際輸入，再計數完整請求；本圖不完成訪談或發布 Memory，省略各資格與保存故障出口。
 
 - 準備的歷史 request、門檻、Agent 要求及容量限制先保存；恢復必須使用同一身分及原參數，不能換歷史或再次壓縮。連「未達門檻，沿用 W」也有持久結果。A 的新 Turn／B 的新批首次準備與同階段恢復使用明確身分，不能每次呼叫便產生新 thread。
-- 首次無歷史不呼叫 count／compact，即使有壓縮要求亦不壓空窗口。有歷史時，計數含該角色固定 instructions／tools 及歷史 items；壓縮只送原歷史 items。這是保守的輪前計量接法，不以字元數或上一 response usage 代替；加入新資料後，仍須由共用 loop 計數完整實際請求。
+- 首次無歷史不呼叫 count／compact，即使有壓縮要求亦不壓空窗口。A 因新版 Memory 重建時亦準備空歷史，不先計數或壓縮即將捨棄的舊窗口。有歷史時，計數含該角色固定 instructions／tools 及歷史 items；壓縮只送原歷史 items。這是保守的輪前計量接法，不以字元數或上一 response usage 代替；加入新資料後，仍須由共用 loop 計數完整實際請求。
 - `count_history → assess_history` 使用原 saver 的 sync 交界；先保存原 count，再判門檻／容量。計數與 compact 使用不同且穩定的 logical request 身分，共用原工作預算。計數失敗不當零；超模型容量不盲目嘗試壓縮。不新增永久 count cache、資料表或另一份候選／模型全文。
-- `PreparationCountSaveError.recovery` 只保留程序內仍完整的原 count。核對 thread／原 request 後，優先承接原 checkpoint 或 pending writes；未保存才補存，不能倒退後面的 C／採用結果。完整 C 的保存故障沿原 `CompactionSaveError`，沒有第二份恢復協定。真正遺失的結果仍需上位核對／重試政策。
+- `PreparationCountSaveError.recovery` 只保留程序內仍完整的原 count。核對 thread／原 request 後，優先承接原 checkpoint 或 pending writes；未保存才補存，不能倒退後面的 C／採用結果。完整 C 的保存故障沿原 `CompactionSaveError`，沒有第二份恢復協定。count 未保存且程序也已遺失時，可沿同一固定 request 重新計數；新 attempt 仍受原 writer、取消、deadline、次數、費用及已保存故障限制，接線見[計數與容量准入](model-requests.md#4-固定請求計數與容量准入)。
 - 返回的是原歷史或**全部** `compacted.output` 的複本；呼叫方追加新輸入不改掉保存的輪前基底。不在這一步重加 maps、改 opaque items 或將準備完成當作整個 Turn 完成。
 
-**產品接線邊界：** 元件不自行選擇可跨取消採用的 checkpoint；[跨工作的合法歷史選用](#31-跨工作的合法歷史選用) 的 executions 執行歷史模組管理合法基底。角色 runner 固定 maps／來源、只追加一次本工作資料，Memory workflow 協調候選與各角色歷史安全點；恢復不能繞過原 writer guard。
+**產品接線邊界：** 元件不自行選擇可跨取消採用的 checkpoint；[跨工作的合法歷史選用](#31-跨工作的合法歷史選用) 的 executions 執行歷史模組管理合法基底。A 的 capture 固定本輪資料及換窗條件，B 的角色接線追加本批資料；Memory workflow 協調候選與各角色歷史安全點。恢復不能繞過原 writer guard。
 
 依據：[OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
@@ -324,14 +340,14 @@ A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處�
 
 - 模型請求先沿原工具執行邊界保存，再由 `RoleContextHistory` 交 executions 執行歷史模組，在既有 `context_history_bindings` 設定 `compact_requested`（migration `0020_context_compaction_intent`，原資料預設 false）。同輪重複要求或工具重入只設同一布林值，不新增操作帳本、全文副本或壓縮工作平台。
 - 下一輪只採用**本次選定且已完成的歷史基底** 所附要求，與既有 128K 門檻做 OR。取消／最終失敗沒有完成歷史資格，其要求不傳給新輸入；暫停仍保留同輪要求，成功完成後才有跨輪效果。
-- 本輪中途保險壓縮不抹除這個已保存的意圖，也不因此在本輪立即執行額外壓縮。仍由下一輪準備元件處理完整合法歷史；新 App 資料與員工輸入在完整 C 採用後才追加。
+- 本輪中途保險壓縮不抹除這個已保存的意圖，也不因此在本輪立即執行額外壓縮。下一輪同版延續時，由準備元件處理完整合法歷史，再加入完整人工最終差異及本次 input；若因新版 Memory 重建，則直接準備空歷史，不為即將捨棄的窗口壓縮。
 - 若已採用的基底是 prepared history，代表上一個準備交界已成立，重用該基底，不向前追溯舊要求再壓一次。這也涵蓋準備完成後取消、改用新輸入；不要求永久清除歷史要求欄位來表示消耗。
 
-這是既定「Agent 按需要求＋輪前門檻」的角色接線，不改 128K／160K／B 的門檻，也不新增 B1／B2 的工具。完整窗口契約依 [OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)；成功／取消資格是 Caliburn 的產品取捨，不是供應商保證。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。既有安裝須先依 runbook 執行 Alembic upgrade；App 不偷偷遷移正在使用的資料庫。
+這是既定「Agent 按需要求＋輪前門檻」的角色接線，不改 128K／160K／B 的門檻，也不新增 B1／B2 的工具。完整窗口契約依 [OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)；成功／取消資格是 Caliburn 的產品取捨，不是供應商保證。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。保存格式更新依 [runbook](../operations/README.md#更新已有安裝)明示初始化適用 schema；App 啟動不自動遷移資料庫。
 
 ### 5.3 原件補存的有限自動恢復
 
-四個既有入口 `run_response_step`、`run_response_loop`、`prepare_context_history`、`run_context_compaction` 共用 `result_save_retries.py` 的有限調度。它只承接 **typed save error 仍持有的完整 R／C／count** ，回到原 thread 的既有核對／補存入口；不是對所有 Graph 失敗重新 invoke，也不重跑原付費請求。
+`run_native_agent`、`prepare_context_history` 與 `run_context_compaction` 共用 `result_save_retries.py` 的有限調度。它只承接 **typed save error 仍持有的完整 R／C／count**，回到原 thread 的既有核對／補存入口；不是對所有 Graph 失敗重新 invoke，也不重跑原付費請求。
 
 ![現行流程：原件保存錯誤的有限補存](../diagrams/implementation/agent-execution/result-save-recovery.png)
 
@@ -343,9 +359,9 @@ A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處�
 - **准入很窄：** 外層必須是原件保存錯誤；直接原因才交 `adapters/checkpoint_failures.py` 判斷 Psycopg SQLSTATE。已知連線、服務暫停、連線耗盡與交易暫時衝突可有限重試；明確認證／schema／約束／序列化／查詢取消等錯誤不自動碰撞。不沿任意例外鏈猜原因，也不解析可能含 DSN 的訊息。無 SQLSTATE 的 `OperationalError` 無法完全區分連線與認證設定故障，採**有限允許** ，不是保證故障暫時性。
 - **預設限制：** 每次入口呼叫最多 3 次嘗試（含首次），0.25 秒起的 full jitter、等待上限 1 秒；`max_attempts=1` 可停用自動補存。這是程序內保存重試配置，與模型外送次數上限分開；不增加、重置或釋放持久外送額度。I/O timeout 由連線管理模組設定，這個數量上限不冒充整輪硬 deadline。
 - **原件優先：** 每次先查原 checkpoint／pending writes；已存就接續，未存才以同一原件、request／operation seed 補存。回應重入不重送新 input；已消耗的 pause resume 不再重送。C 完整窗口保留，沒有重新生成摘要或刷新 maps。
-- **失敗界線不變：** 保存後的結算／工具錯誤不納入這個 retry。取消與 writer 更替由原恢復入口阻止採用及後續效果；程序取消會傳遞，不當成業務取消完成。用盡仍拋原 typed error 與 handoff，不轉成成功、不丟掉仍可取得的原件。上位流程不能藉反覆呼叫本入口無限重設保存嘗試。
+- **失敗界線不變：** 保存後的結算／工具錯誤不納入這個原件補存 retry；可核對的短 DB 操作由[原用例入口](model-requests.md#21-純資料庫操作的有限恢復)承接。取消與 writer 更替由原恢復入口阻止採用及後續效果；程序取消會傳遞，不當成業務取消完成。用盡仍拋原 typed error 與 handoff，不轉成成功、不丟掉仍可取得的原件。上位流程不能藉反覆呼叫本入口無限重設保存嘗試。
 - **等待中取消仍交回原件：** Tenacity backoff 收到 task cancellation 時，拋 `ResultSaveCancelledError`（仍是 `asyncio.CancelledError`），其 `save_error` 保留原 typed save error 與 `.recovery`；不吞取消、不 `uncancel`、不重送 provider。直接呼叫方須在傳遞取消前承接需要的原件；不能假設 TaskGroup 或再次 await 已取消 task 仍會替它保留這個 handoff。等待結束就清除等待層的暫存參照，後續節點被取消不能帶回已失效的舊補存資料。這只是程序內交接，未授權恢復被取消的業務工作。
-- **能力界線：** 補存無法救回已隨程序遺失且未持久保存的 R／C／count；未明外送、業務 COMMIT 核對與最終收尾分別由執行資格、相應領域模組及 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的失敗收尾流程處理。程序內原件不是跨程序備份。
+- **能力界線：** 補存無法救回已隨程序遺失且未持久保存的 R／C／count。count 可由共用外送准入在原限制內重新計數，已保存或仍持有的 count 優先沿用；生成／壓縮未知原件仍禁止重送。未明外送、業務 COMMIT 核對與最終收尾分別由執行資格、相應領域模組及 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的失敗收尾流程處理。程序內原件不是跨程序備份。
 
 依據：[LangGraph node retry](https://docs.langchain.com/oss/python/langgraph/use-graph-api#add-retry-policies)針對節點執行，不替本案持有原結果與 saver 交接；[Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)要求故障分類、有限嘗試與單一責任；[Tenacity](https://tenacity.readthedocs.io/en/latest/)提供既有異步退避；[Psycopg SQLSTATE](https://www.psycopg.org/psycopg3/docs/api/errors.html)提供機器可判斷原因。具體分類、初值及原件接線是 Caliburn 取捨，不宣稱業界一致採此數字。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
@@ -353,17 +369,17 @@ A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處�
 
 ### 5.4 首請求超量的近期訪談縮減
 
-正常完整預載近期訪談；只有完整資料使首個請求無法容納時才進入下述例外。
+A 首次／Memory 換版重建窗口時，正常完整預載 `(K,H]` 原話；只有完整資料使首個請求無法容納時才進入下述例外。同版延續沒有新投影的 App 原話預載，不啟用此縮減回呼；同輪恢復仍沿原 request 及已保存的縮減進度。
 
 - **共用迴圈只增加一條有界路由。** `check_capacity` 對超過硬上限（`allowed_input_tokens = min(max_input, context_window − max_output)`，由 `request_capacity.py` 單一計算）的精確 count 丟出 `RequestOverCapacityError`（仍是 `RequestCapacityError`）。僅當**尚無完成 Step**、runtime 提供 `fit_first_request`，且已縮減少於 `MAX_FIRST_REQUEST_FITS`（3）次時，改走 `fit_first_request → count_input → check_capacity`。
 
   其餘情況維持原處理：B1／B2 不提供回呼，中途 Step 的原生歷史與工具結果不由 loop 縮短，160K compact 路徑不變。每次縮減換新 request ID 並重新精確 count，已縮減次數存於 State（`first_request_fits`）；耗盡仍超量就以容量受阻結束，不生成。
 - **縮減責任。** 顧問近期訪談投影的純函式 `agents/job_consultant/recent_preload.py` 只讀已保存 request 與 count，不查 DB、時間或模型；同輸入得同輸出，crash 後節點重跑不需 Held 交接，也不改任何業務資料。函式回傳完整替換 input items，loop 不知道訪談結構。
-- **保留範圍。** 保留最新的完整訊息後綴，加上員工回答所回應的前一則顧問／App 訊息（不論多大）；至少保留最新一則，不切任何一句原文。App 資料訊息以外的歷史與本輪員工原話原樣保留。若保留結果等於全部，則丟棄最舊訊息，確保確實縮減。
+- **保留範圍。** 保留最新的完整訊息後綴，加上員工回答所回應的前一則顧問／App 訊息（不論多大）；至少保留最新一則，不切任何一句原文。App 資料訊息以外的歷史、完整人工最終差異及本輪員工原話原樣保留。若保留結果等於全部，則丟棄最舊訊息，確保確實縮減。
 
   `interview_read_boundary` 追加 `preloaded` 與 `not_preloaded`（後者只列 Memory 尚未涵蓋的序號範圍）。A 指引說明這些未預載範圍尚未讀到，須以 `read_interview` 在同一固定讀取上界內按需讀取，不當作已讀或已整理。完整預載時兩欄不出現，既有輸出不變。
 - **大小估算。** 精確 count 是唯一權威。縮減只用「整份請求字元數／該次 count」估每字元 token，目標為硬上限的 80%，之後每次再減半（80%、40%、20%）；估錯由下一次精確 count 抓到，不用估算放行。
 
 容量例外由 App 明示未預載範圍，請求固定 `truncation="disabled"`，不交由伺服器靜默截斷。按需回讀參考 [just-in-time context](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)；這是設計依據，不是模型必然正確回讀的保證。
 
-**限制與未驗：** 單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證範圍見[架構驗證](../architecture/verification.md)。
+**限制與未驗：** 單一員工輸入、完整人工最終差異、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。人工最終差異不套局部工具截斷。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證範圍見[架構驗證](../architecture/verification.md)。

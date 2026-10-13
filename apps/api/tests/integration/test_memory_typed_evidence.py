@@ -17,8 +17,8 @@ from caliburn.features.interviews.persistence import (
 from caliburn.features.work_memory import consolidation_requests as requests
 from caliburn.features.work_memory.batch_persistence import MemoryOperationRecord
 from caliburn.features.work_memory.candidates import MemoryCommandConflictError
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_memory_batch_orchestration import complete_turn, execute, start_turn
 from tests.integration.test_memory_evidence_isolation import replace_evidence

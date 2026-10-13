@@ -24,7 +24,7 @@ class CreateWorkSituationArguments(BaseModel):
     )
     body: StrictStr = Field(
         ...,
-        description="Complete initial Markdown body, with known facts and unknowns distinguished. References belong in the separate reference collection, not the body.",
+        description="Complete initial Markdown situation integrating relevant effective interview fragments. Preserve known role/background, rules, methods, tools, exact values/deadlines, conditions, exceptions and corrections, including useful known background not yet anchored to a task. Distinguish unknowns; do not invent events or responsibilities. References belong in the separate reference collection, not the body.",
         min_length=1,
     )
     interview_references: list[InterviewReference] = Field(

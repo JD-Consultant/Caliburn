@@ -56,8 +56,7 @@ def apply_capability_change(
         updated = replace(updated, content_revision_id=uuid4())
         return tuple(updated if item == target else item for item in capabilities), links, updated
     if isinstance(change, DeleteCapability):
-        if any(link.capability_id == target.capability_id for link in links):
-            raise CapabilityInUseError("Capability is still linked to a task")
+        require_unused_capability(links, target.capability_id)
         return tuple(item for item in capabilities if item != target), links, None
     if isinstance(change, ReorderCapability):
         group = tuple(item.capability_id for item in capabilities if item.kind == target.kind)
@@ -148,3 +147,9 @@ def capability_change_payload(change: CapabilityChange) -> list[dict[str, str | 
                     else None,
                 }
             ]
+
+
+def require_unused_capability(links: tuple[TaskCapabilityLink, ...], capability_id: UUID) -> None:
+    """A shared definition can be deleted only after all task relationships are removed."""
+    if any(link.capability_id == capability_id for link in links):
+        raise CapabilityInUseError("Capability is still linked to a task")

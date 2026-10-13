@@ -49,8 +49,8 @@ from caliburn.features.job_description.sources import (
     ReviseJdSources,
     SourceTargetKind,
 )
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
 
 pytestmark = pytest.mark.postgres
 

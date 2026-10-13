@@ -1,4 +1,4 @@
-"""One admission per logical request; a saved R survives billing faults without requery."""
+"""Recount lost counts within durable limits; saved R survives billing faults without requery."""
 
 import asyncio
 import json
@@ -19,10 +19,6 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
 from caliburn.agent_execution.response_retries import ResponseRetryPolicy
-from caliburn.agent_execution.tool_steps import (
-    _build_response_step,
-    run_response_step,
-)
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import BudgetExceededError, ExecutionBudget
 from caliburn.features.executions.models import (
@@ -32,13 +28,14 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.model_requests import (
+from caliburn.workflows.executions.model_requests import (
     ModelRequestAccounting,
     ModelRequestExecutor,
-    PriorInputCountAttemptError,
     PriorModelAttemptError,
 )
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
 from tests.fixtures.response_capacity import synthetic_response_runtime
+from tests.fixtures.response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -139,7 +136,11 @@ def test_saved_response_is_settled_after_ack_loss_without_querying_model_again(
                     raise ConnectionError("synthetic accounting acknowledgement lost")
 
                 runtime = synthetic_response_runtime(
-                    executor.request_model, prepare, execute, ensure_active, account_then_lose_ack
+                    request_model=executor.request_model,
+                    prepare_tool=prepare,
+                    execute_tool=execute,
+                    ensure_active=ensure_active,
+                    account_response=account_then_lose_ack,
                 )
                 connection_string = make_conninfo(
                     database_settings.url,
@@ -189,9 +190,17 @@ def test_saved_response_is_settled_after_ack_loss_without_querying_model_again(
         runner.run(scenario())
 
 
-@pytest.mark.parametrize("failure_boundary", ["admission_ack", "http_timeout"])
-@pytest.mark.parametrize("outbound_kind", ["model", "count"])
-def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
+@pytest.mark.parametrize(
+    ("outbound_kind", "failure_boundary"),
+    [
+        ("model", "admission_ack"),
+        ("model", "http_timeout"),
+        ("count", "admission_ack"),
+        ("count", "http_timeout"),
+        ("count", "response_headers"),
+    ],
+)
+def test_resume_recounts_unknown_count_but_blocks_unknown_model_and_bounds_timeouts(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
     failure_boundary: str,
@@ -207,10 +216,28 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
     async def scenario():
         database = Database(database_settings)
         http_requests = []
+        resuming = False
 
-        def timeout(request):
+        def respond(request):
             http_requests.append(json.loads(request.content))
+            if resuming and failure_boundary != "http_timeout":
+                if request.url.path.endswith("/input_tokens"):
+                    return httpx2.Response(
+                        200, json={"object": "response.input_tokens", "input_tokens": 500}
+                    )
+                return httpx2.Response(200, json=response_at(1, final=True).model_dump(mode="json"))
+            if failure_boundary == "response_headers":
+                return httpx2.Response(
+                    200, json={"object": "response.input_tokens", "input_tokens": 500}
+                )
             raise httpx2.ReadTimeout("synthetic timeout", request=request)
+
+        async def interrupt_after_headers(response):
+            if failure_boundary == "response_headers" and not resuming:
+                assert response.status_code == 200
+                # HTTP headers 不等於 SDK 已交回並保存完整 count；取消外層模擬關閉。
+                active_run.cancel()
+                await asyncio.sleep(0)
 
         class CommitAcknowledgementLoss:
             @asynccontextmanager
@@ -240,7 +267,10 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
             async with create_responses_client(
                 api_key="synthetic-only",
                 timeout_seconds=5,
-                http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(timeout)),
+                http_client=httpx2.AsyncClient(
+                    transport=httpx2.MockTransport(respond),
+                    event_hooks={"response": [interrupt_after_headers]},
+                ),
             ) as client:
                 executor = ModelRequestExecutor(
                     database.sessions,
@@ -271,11 +301,11 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
                     pytest.fail("No tool is prepared")
 
                 runtime = synthetic_response_runtime(
-                    initial_executor.request_model,
-                    prepare,
-                    execute,
-                    ensure_active,
-                    executor.account_response,
+                    request_model=initial_executor.request_model,
+                    prepare_tool=prepare,
+                    execute_tool=execute,
+                    ensure_active=ensure_active,
+                    account_response=executor.account_response,
                 )
                 if outbound_kind == "count":
                     runtime = replace(runtime, count_input=initial_executor.count_input)
@@ -284,19 +314,24 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
                 )
                 thread_id = str(uuid4())
                 options = {"thread_id": thread_id, "max_tool_calls": 16}
-                expected = (
-                    ConnectionError if failure_boundary == "admission_ack" else BudgetExceededError
-                )
+                expected = {
+                    "admission_ack": ConnectionError,
+                    "http_timeout": BudgetExceededError,
+                    "response_headers": asyncio.CancelledError,
+                }[failure_boundary]
                 async with AsyncPostgresSaver.from_conn_string(
                     dsn, serde=create_graph_serializer()
                 ) as saver:
                     await saver.setup()
                     with pytest.raises(expected):
-                        await run_response_step(
-                            saver, request=request_fixture(), runtime=runtime, **options
+                        active_run = asyncio.create_task(
+                            run_response_step(
+                                saver, request=request_fixture(), runtime=runtime, **options
+                            )
                         )
+                        await active_run
                     config = {"configurable": {"thread_id": thread_id}}
-                    saved = await _build_response_step(saver, max_tool_calls=16).aget_state(config)
+                    saved = await read_response_state(saver, config)
                     assert saved.values["request_snapshot"] == request_fixture().create_payload()
                     request_id = saved.values["request_id"]
                     outbound_id = (
@@ -305,42 +340,63 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
                         else request_id
                     )
                     assert "response_snapshot" not in saved.values
+                    if failure_boundary == "response_headers":
+                        # 完整 checkpoint 與 pending writes 都沒有可採用的 count 原件。
+                        async for checkpoint in saver.alist(config):
+                            assert (
+                                checkpoint.checkpoint["channel_values"].get("input_count") is None
+                            )
+                            assert all(
+                                channel != "input_count"
+                                for _, channel, _ in checkpoint.pending_writes or []
+                            )
                 # A new saver and executor have no in-memory attempt identity to rely on.
+                resuming = True
                 async with AsyncPostgresSaver.from_conn_string(
                     dsn, serde=create_graph_serializer()
                 ) as saver:
-                    prior_error = (
-                        PriorInputCountAttemptError
-                        if outbound_kind == "count"
-                        else PriorModelAttemptError
-                    )
+                    prior_error = PriorModelAttemptError
                     if failure_boundary == "http_timeout":
                         prior_error = BudgetExceededError
                     resumed_runtime = replace(runtime, request_model=executor.request_model)
                     if outbound_kind == "count":
                         resumed_runtime = replace(resumed_runtime, count_input=executor.count_input)
-                    with pytest.raises(prior_error):
-                        await run_response_step(
-                            saver,
-                            request=None,
-                            runtime=resumed_runtime,
-                            **options,
+                    recount = outbound_kind == "count" and failure_boundary != "http_timeout"
+                    if recount:
+                        result = await run_response_step(
+                            saver, request=None, runtime=resumed_runtime, **options
                         )
-                    saved = await _build_response_step(saver, max_tool_calls=16).aget_state(config)
+                        assert result["next_action"] == "deliver_answer"
+                    else:
+                        with pytest.raises(prior_error):
+                            await run_response_step(
+                                saver,
+                                request=None,
+                                runtime=resumed_runtime,
+                                **options,
+                            )
+                    saved = await read_response_state(saver, config)
                     assert saved.values["request_id"] == request_id
-                expected_attempts = 1 if failure_boundary == "admission_ack" else 3
-                assert len(http_requests) == (0 if failure_boundary == "admission_ack" else 3)
+                expected_attempts = 3 if failure_boundary == "http_timeout" else 2 if recount else 1
+                assert len(http_requests) == {
+                    "admission_ack": 0,
+                    "http_timeout": 3,
+                    "response_headers": 1,
+                }[failure_boundary] + (2 if recount else 0)
                 async with database.sessions.begin() as session:
                     attempts = await budgets.read_request_attempts(session, scope, outbound_id)
                     usage = await budgets.read_budget_usage(session, scope)
-                assert len(attempts) == usage.outbound_attempts == expected_attempts
-                assert usage.model_steps == (1 if outbound_kind == "model" else 0)
+                assert len(attempts) == expected_attempts
+                assert usage.outbound_attempts == expected_attempts + int(recount)
+                assert usage.model_steps == int(outbound_kind == "model" or recount)
                 assert all(attempt.reported_cost_usd is None for attempt in attempts)
-                assert (
-                    usage.accounted_cost_usd
-                    == (Decimal("0.1") if outbound_kind == "model" else Decimal("0.001"))
-                    * expected_attempts
-                )
+                assert len({attempt.request for attempt in attempts}) == 1
+                if recount:
+                    assert all(attempt.failure is None for attempt in attempts)
+                    assert http_requests[-2] == request_fixture().count_payload()
+                assert usage.accounted_cost_usd == (
+                    Decimal("0.1") if outbound_kind == "model" else Decimal("0.001")
+                ) * expected_attempts + (Decimal("0.01") if recount else Decimal("0"))
         finally:
             await database.close()
 

@@ -19,14 +19,16 @@ class SetItemText(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["set_field"]
+    action: Literal["set_field"] = Field(
+        ..., description="set_field：以 value 完整取代欄位文字，來源變更另列。"
+    )
     field: FieldModel = Field(
         ...,
-        description="任務 title/description；職責 title/scope_text；K/S name/description；協作 name/scope_text；條件 text。",
+        description="依外層項目類別選欄：任務 title（名稱）／description（正文）；職責 title（名稱）／scope_text（範圍）；知識或技能 name（名稱）／description（定義正文）；協作 name（對象）／scope_text（合作範圍）；共通條件 text（正文）。",
     )
     value: StrictStr = Field(
         ...,
-        description="此欄完整的新文字，不是 patch；保留本次未更正的有效事實。這個動作不更改來源。",
+        description="該欄完整的新文字，不是 patch；須有非空白文字且不含 NUL。既有引用保留；實改的支持內容同步更新 JD 核對基準，Memory 來源版本仍由引用動作更新。",
         min_length=1,
     )
 
@@ -42,9 +44,12 @@ class ClearItemText(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["clear_field"]
+    action: Literal["clear_field"] = Field(
+        ..., description="clear_field：把可空欄位設為 null；不刪除項目或其引用。"
+    )
     field: Field1 = Field(
-        ..., description="僅可清空該型別可空欄；仍須保留有意義內容。不以空文字刪項。"
+        ...,
+        description="依項目類別選可空欄：任務 title／description、職責 title／scope_text、知識或技能 name／description、協作 name／scope_text；每組至少一欄仍有內容。共通條件及成果／要求正文不可清空。",
     )
 
 
@@ -60,9 +65,17 @@ class SetConditionKind(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["set_field"]
-    field: Literal["kind"]
-    value: Value
+    action: Literal["set_field"] = Field(
+        ..., description="set_field：更改外層共通條件的分類，保留其正文與物件身分。"
+    )
+    field: Literal["kind"] = Field(
+        ...,
+        description="固定填 kind，對應讀取結果的 condition_kind；僅外層為共通條件時適用。",
+    )
+    value: Value = Field(
+        ...,
+        description="新的共通條件分類。work_environment＝工作環境；schedule_travel＝工時、排程與差旅；shared_authority＝跨任務共通權限；shared_collaboration＝跨任務共通協作；qualification＝任職資格。",
+    )
 
 
 class Kind(StrEnum):
@@ -70,15 +83,40 @@ class Kind(StrEnum):
     REQUIREMENT = "requirement"
 
 
+class AddTaskDetail(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    action: Literal["add_detail"] = Field(
+        ..., description="add_detail：在外層任務新增一筆成果或要求，加入該類明細末尾。"
+    )
+    kind: Kind = Field(
+        ...,
+        description="outcome＝形成、交付或維持的結果與用途；requirement＝執行或完成時的品質、時限、條件與判準。",
+    )
+    text: StrictStr = Field(
+        ...,
+        description="這一筆成果／要求的完整非空正文；與任務共用 supporting_sources，不另填子項來源。",
+        min_length=1,
+    )
+
+
 class ReviseTaskDetail(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["revise_detail"]
-    detail_read_ref: StrictStr = Field(..., min_length=1)
+    action: Literal["revise_detail"] = Field(
+        ...,
+        description="revise_detail：取代外層任務中一筆既有成果或要求的正文，保留明細身分與類別。",
+    )
+    detail_read_ref: StrictStr = Field(
+        ...,
+        description="屬於外層任務的既有 outcome／requirement 定位，取自 read_jd 的任務明細或明細 item 結果之 read_ref；不可填其他任務明細。",
+        min_length=1,
+    )
     text: StrictStr = Field(
         ...,
-        description="此成果或要求的完整新文字；其他明細與既有來源保留，來源變動另列。",
+        description="該筆成果／要求完整的新正文；保留其他明細與任務引用，來源變更另列。",
         min_length=1,
     )
 
@@ -87,17 +125,51 @@ class RemoveTaskDetail(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["remove_detail"]
-    detail_read_ref: StrictStr = Field(..., min_length=1)
+    action: Literal["remove_detail"] = Field(
+        ...,
+        description="remove_detail：刪除外層任務的一筆成果或要求，保留任務及任務引用。",
+    )
+    detail_read_ref: StrictStr = Field(
+        ...,
+        description="要刪的既有 outcome／requirement 定位，取自 read_jd；必須屬於外層 read_ref 所選任務。",
+        min_length=1,
+    )
+
+
+class LinkCapability(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    action: Literal["set_capability"] = Field(
+        ..., description="set_capability：設定外層任務對既有知識／技能的使用關係。"
+    )
+    capability_read_ref: StrictStr = Field(
+        ...,
+        description="要讓此任務使用的既有知識或技能定義定位；尚無定義時先 create_jd_item。原樣使用目前仍有效的 jd_map、read_jd 或成功建立回傳提供的 read_ref，不依名稱或序號自行組出。",
+        min_length=1,
+    )
+    relationship: Literal["link"] = Field(
+        ...,
+        description="固定為 link，連接此任務與該共用定義；不改定義正文或其來源，也不另外接受用途文字。",
+    )
 
 
 class UnlinkCapability(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["set_capability"]
-    capability_read_ref: StrictStr = Field(..., min_length=1)
-    relationship: Literal["unlink"]
+    action: Literal["set_capability"] = Field(
+        ..., description="set_capability：設定外層任務對既有知識／技能的使用關係。"
+    )
+    capability_read_ref: StrictStr = Field(
+        ...,
+        description="要解除本任務使用關係的知識／技能定位；取自已取得的任務 required_knowledge／required_skills。",
+        min_length=1,
+    )
+    relationship: Literal["unlink"] = Field(
+        ...,
+        description="固定為 unlink，只解除此任務的關聯；共用定義及其他任務的關係保留。",
+    )
 
 
 class Kind1(StrEnum):
@@ -109,7 +181,9 @@ class EdgePosition(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Kind1
+    kind: Kind1 = Field(
+        ..., description="first 移到本任務同類能力的最前；last 移到最後，不提供鄰項。"
+    )
 
 
 class Kind2(StrEnum):
@@ -121,46 +195,39 @@ class RelativePosition(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Kind2
-    capability_read_ref: StrictStr = Field(..., min_length=1)
+    kind: Kind2 = Field(
+        ..., description="before 放在指定鄰項之前；after 放在指定鄰項之後。"
+    )
+    capability_read_ref: StrictStr = Field(
+        ...,
+        description="排序參照的鄰項，取自同一任務已連接的能力；與被排序項同為 knowledge 或同為 skill，不是外層要移動的項目。",
+        min_length=1,
+    )
 
 
 class ItemTarget(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Literal["item"]
-
-
-class DetailTarget(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+    kind: Literal["item"] = Field(
+        ...,
+        description="固定為 item，引用屬於外層 read_ref 所選的 JD 項目；不填來源類別或成果／要求類別。",
     )
-    kind: Literal["detail"]
-    detail_read_ref: StrictStr = Field(..., min_length=1)
-
-
-class CapabilityTarget(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    kind: Literal["capability_relation"]
-    capability_read_ref: StrictStr = Field(..., min_length=1)
-
-
-class CurrentInputSource(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    kind: Literal["current_input"]
 
 
 class InterviewSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Literal["interview"]
-    interview_sequence: StrictInt = Field(..., ge=1, le=9007199254740991)
+    kind: Literal["interview"] = Field(
+        ..., description="固定為 interview，引用指定序號的訪談原話。"
+    )
+    interview_sequence: StrictInt = Field(
+        ...,
+        description="直接支持內容的已讀訪談序號：歷史原話使用 context 的 historical_interview.messages 或 read_interview 結果中對應原文的 interview_sequence；本次員工原話使用本次 input 提供的 interview_sequence，不自行推算。",
+        ge=1,
+        le=9007199254740991,
+    )
 
 
 class Kind3(StrEnum):
@@ -172,48 +239,48 @@ class MemorySource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Kind3
-    target_title: StrictStr = Field(..., min_length=1)
+    kind: Kind3 = Field(
+        ...,
+        description="來源類別：work_situation 是已發布工作情境；work_understanding 是已發布工作理解。",
+    )
+    target_title: StrictStr = Field(
+        ...,
+        description="所選類別中、已讀正文的完整 title，原樣取自本輪可見的工作情境／工作理解結果。App 以它定位本輪固定發布版本中的物件；不填 JD 名稱、歷史舊名或自行摘要的標題。",
+        min_length=1,
+    )
 
 
 class ReorderCapability(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["reorder_capability"]
-    capability_read_ref: StrictStr = Field(..., min_length=1)
-    position: EdgePosition | RelativePosition
-
-
-class SourceTarget(RootModel[ItemTarget | DetailTarget | CapabilityTarget]):
-    root: ItemTarget | DetailTarget | CapabilityTarget
-
-
-class Source(RootModel[CurrentInputSource | InterviewSource | MemorySource]):
-    root: CurrentInputSource | InterviewSource | MemorySource
-
-
-class AddTaskDetail(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    action: Literal["add_detail"]
-    kind: Kind = Field(
+    action: Literal["reorder_capability"] = Field(
         ...,
-        description="outcome：交付或維持的結果與用途；requirement：已知的完成判準、執行條件或責任界線。不能把一次作法推定為固定要求。",
+        description="reorder_capability：調整外層任務已連接的知識／技能順序，不改全 JD 共用定義的排列。",
     )
-    text: StrictStr = Field(..., min_length=1)
-    supporting_sources: list[Source]
+    capability_read_ref: StrictStr = Field(
+        ...,
+        description="本任務中要重新排序的已連接知識／技能定位；取自任務的 required_knowledge／required_skills，不能選未連接項目。",
+        min_length=1,
+    )
+    position: EdgePosition | RelativePosition = Field(
+        ...,
+        description="在本任務同類能力關係中的新位置；first／last 不填鄰項，before／after 指定另一個已連接的同類能力。",
+    )
 
 
-class LinkCapability(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+class SourceTarget(RootModel[ItemTarget]):
+    root: ItemTarget = Field(
+        ...,
+        description="引用所屬目標；本工具只接受 kind=item，表示外層 read_ref 指向的項目。任務成果／要求與能力用途皆歸任務，不另設子目標。",
     )
-    action: Literal["set_capability"]
-    capability_read_ref: StrictStr = Field(..., min_length=1)
-    relationship: Literal["link"]
-    supporting_sources: list[Source]
+
+
+class Source(RootModel[InterviewSource | MemorySource]):
+    root: InterviewSource | MemorySource = Field(
+        ...,
+        description="要加入此項的已讀訪談或 Memory 來源。任務來源支持正文、成果、要求與能力用途；能力定義自己的來源須選該定義另行修改。",
+    )
 
 
 class AddSource(BaseModel):
@@ -222,7 +289,7 @@ class AddSource(BaseModel):
     )
     action: Literal["add_source"] = Field(
         ...,
-        description="增加支持此內容的直接依據，不替換既有來源。綜合內容可由多則原話共同支持。",
+        description="增加一筆直接支持所選內容的已讀來源；重加同一來源不會更新既有引用的版本或核對狀態，也不移除其他引用。",
     )
     target: SourceTarget
     source: Source
@@ -234,12 +301,12 @@ class RemoveSource(BaseModel):
     )
     action: Literal["remove_source"] = Field(
         ...,
-        description="移除此 target 的整筆引用，不是只排除原文中被更正的一句。局部更正後，仍須留下共同支持本項保留事實的依據；失效、重複或已有充分替代的引用可移除。",
+        description="移除 citation_ref 指定的整筆引用；不改 JD 正文，也不刪除訪談或 Memory 正文。",
     )
     target: SourceTarget
     citation_ref: StrictStr = Field(
         ...,
-        description="read_jd 返回、屬於此 target 的既有引用定位；不是訪談序號或 Memory 標題。",
+        description="取自 read_jd 中屬於外層項目的 supporting_sources[].citation_ref。能力 item 最外層引用屬於能力定義，used_by_tasks 中的引用屬於各任務，不可混用。",
         min_length=1,
     )
 
@@ -250,11 +317,13 @@ class AlignSource(BaseModel):
     )
     action: Literal["confirm_reference_alignment"] = Field(
         ...,
-        description="明確宣告已重評此筆引用仍支持所選 target 的目前內容，並完成必要修訂。不是確認其他引用或整項完成；僅讀過 diff、或此筆支持關係仍有未解衝突時不確認。",
+        description="核清人工改稿或來源更新後，確認這筆仍保留的引用支持目前內容，更新其核對基準；正文無需修改時也可使用。Memory 對齊本輪固定發布版本中的同一物件，訪談仍指同一原話。顧問自己的編修不必再確認；更換來源用 add_source 與 remove_source，未核清不用此動作。任務核對包含正文、成果、要求及已連能力的用途與定義；能力本體來源另核。",
     )
     target: SourceTarget
     citation_ref: StrictStr = Field(
-        ..., description="read_jd 返回、這次確實完成核對的既有引用定位。", min_length=1
+        ...,
+        description="取自 read_jd 中屬於外層項目的 supporting_sources[].citation_ref。能力 item 最外層引用屬於能力定義，used_by_tasks 中的引用屬於各任務，不可混用。",
+        min_length=1,
     )
 
 
@@ -264,7 +333,7 @@ class ReviseJdItemArguments(BaseModel):
     )
     read_ref: StrictStr = Field(
         ...,
-        description="read_jd 提供的既有項目定位；明細與能力關係以所屬 task 為外層目標。",
+        description="要修訂的既有職責、任務、知識／技能、協作或共通條件定位；成果／要求以其 task_read_ref 所指的任務作外層目標。原樣使用目前仍有效的 jd_map、read_jd 或成功建立回傳提供的 read_ref，不依名稱或序號自行組出。",
         min_length=1,
     )
     changes: list[
@@ -282,6 +351,6 @@ class ReviseJdItemArguments(BaseModel):
         | AlignSource
     ] = Field(
         ...,
-        description="只列本次要執行的變更；未列的內容與來源保留。改文字不等於替換來源集合，新增來源也不需要先刪除既有來源。",
+        description="本次單一項目的文字、明細、能力關係及來源動作；未列部分保留。每個文字欄位、既有明細或既有引用只改一次；每個能力關係的連接狀態與順序各至多改一次，解除的關係不可同次排序。",
         min_length=1,
     )

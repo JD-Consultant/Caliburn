@@ -30,7 +30,6 @@ from caliburn.adapters.owned_tasks import join_owned
 from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.diagnostics.inspection import read_diagnostics
-from caliburn.diagnostics.refresh import refresh_diagnostics
 from caliburn.settings import ModelSettings, Settings
 from evaluations.consultant_cases import (
     ConsultantCandidate,
@@ -159,11 +158,11 @@ async def capture_diagnostics(
 ) -> bool:
     """Keep observation failures separate from the already saved formal case result."""
     job_file_id = UUID(result["job_file_id"])
-    stage = "refresh"
+    stage = "read"
     try:
-        await asyncio.to_thread(refresh_diagnostics, database, job_file_id=job_file_id)
-        stage = "read"
-        diagnostics = await asyncio.to_thread(read_diagnostics, database, job_file_id=job_file_id)
+        diagnostics = await read_diagnostics(
+            database, job_file_id=job_file_id, full=True, limit=None
+        )
         stage = "save"
         await asyncio.to_thread(save_new, output_directory / "diagnostics.json", diagnostics)
     except Exception as error:

@@ -20,13 +20,13 @@ pytestmark = pytest.mark.postgres
 
 CANDIDATE_INSERT = (
     "INSERT INTO jd_candidates "
-    "(job_file_id, execution_id, base_revision_id, current_revision_id, generation_id, status) "
-    "VALUES (%s,%s,%s,%s,%s,%s)"
+    "(job_file_id, execution_id, base_revision_id, current_revision_id, status) "
+    "VALUES (%s,%s,%s,%s,%s)"
 )
 OPERATION_INSERT = (
     "INSERT INTO jd_operations (job_file_id, command_id, kind, expected_revision_id, "
-    "result_revision_id, candidate_execution_id, candidate_generation_id, request_payload) "
-    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+    "result_revision_id, candidate_execution_id, request_payload) "
+    "VALUES (%s,%s,%s,%s,%s,%s,%s)"
 )
 
 
@@ -59,25 +59,22 @@ def create_execution(connection: psycopg.Connection, job_file_id: UUID) -> UUID:
     return execution_id
 
 
-def create_candidate(
-    connection: psycopg.Connection, job_file_id: UUID, revision_id: UUID
-) -> tuple[UUID, UUID]:
+def create_candidate(connection: psycopg.Connection, job_file_id: UUID, revision_id: UUID) -> UUID:
     execution_id = create_execution(connection, job_file_id)
-    generation_id = uuid4()
     connection.execute(
         CANDIDATE_INSERT,
-        (job_file_id, execution_id, revision_id, revision_id, generation_id, "open"),
+        (job_file_id, execution_id, revision_id, revision_id, "open"),
     )
-    return execution_id, generation_id
+    return execution_id
 
 
-@pytest.mark.parametrize("kind", ["restore_candidate", "discard_candidate", "adopt_candidate"])
+@pytest.mark.parametrize("kind", ["discard_candidate", "adopt_candidate"])
 def test_candidate_operation_kinds_seal_nonformal_revision_results(
     database_connection: psycopg.Connection, kind: str
 ) -> None:
     connection = database_connection
     job_file_id, base_revision_id = create_file_revision(connection)
-    execution_id, generation_id = create_candidate(connection, job_file_id, base_revision_id)
+    execution_id = create_candidate(connection, job_file_id, base_revision_id)
     revision_id = uuid4()
     connection.execute(
         "INSERT INTO jd_revisions (job_file_id, revision_id, parent_revision_id) VALUES (%s,%s,%s)",
@@ -104,7 +101,6 @@ def test_candidate_operation_kinds_seal_nonformal_revision_results(
             base_revision_id,
             revision_id,
             execution_id,
-            generation_id,
             Jsonb({}),
         ),
     )
@@ -121,6 +117,7 @@ def test_candidate_operation_kinds_seal_nonformal_revision_results(
     for statement in (
         "UPDATE jd_operations SET request_payload = '{}'",
         "DELETE FROM jd_operations",
+        "DELETE FROM jd_candidates",
         "UPDATE jd_revisions SET job_title = 'changed'",
         "DELETE FROM jd_revisions",
         "UPDATE jd_area_selections SET position = 1",
@@ -147,7 +144,6 @@ def test_candidate_foreign_keys_reject_other_files(
                 other_execution_id if foreign_target == "execution" else execution_id,
                 other_revision_id if foreign_target == "base_revision" else revision_id,
                 other_revision_id if foreign_target == "current_revision" else revision_id,
-                uuid4(),
                 "open",
             ),
         )
@@ -155,54 +151,24 @@ def test_candidate_foreign_keys_reject_other_files(
     assert connection.execute("SELECT count(*) FROM jd_candidates").fetchone() == (0,)
 
 
-def test_candidate_identity_status_and_generation_are_constrained(
+def test_candidate_identity_and_status_are_constrained(
     database_connection: psycopg.Connection,
 ) -> None:
     connection = database_connection
     file_id, revision_id = create_file_revision(connection)
-    execution_id, generation_id = create_candidate(connection, file_id, revision_id)
+    execution_id = create_candidate(connection, file_id, revision_id)
     with pytest.raises(psycopg.errors.UniqueViolation):
         connection.execute(
             CANDIDATE_INSERT,
-            (file_id, execution_id, revision_id, revision_id, uuid4(), "open"),
+            (file_id, execution_id, revision_id, revision_id, "open"),
         )
     with pytest.raises(psycopg.errors.CheckViolation) as error:
         connection.execute("UPDATE jd_candidates SET status = 'completed'")
     assert error.value.diag.constraint_name == "ck_jd_candidates_status"
-    with pytest.raises(psycopg.errors.NotNullViolation):
-        connection.execute("UPDATE jd_candidates SET generation_id = NULL")
-    assert connection.execute("SELECT generation_id, status FROM jd_candidates").fetchone() == (
-        generation_id,
-        "open",
-    )
     # Status transitions are owned by the service; the DB only enforces the finite value set.
     for status in ("adopted", "discarded", "open"):
         connection.execute("UPDATE jd_candidates SET status = %s", (status,))
         assert connection.execute("SELECT status FROM jd_candidates").fetchone() == (status,)
-
-
-@pytest.mark.parametrize("missing", ["execution", "generation"])
-def test_operation_candidate_scope_requires_both_values(
-    database_connection: psycopg.Connection, missing: str
-) -> None:
-    connection = database_connection
-    file_id, revision_id = create_file_revision(connection)
-    execution_id, generation_id = create_candidate(connection, file_id, revision_id)
-    with pytest.raises(psycopg.errors.CheckViolation) as error:
-        connection.execute(
-            OPERATION_INSERT,
-            (
-                file_id,
-                uuid4(),
-                "revise_profile",
-                revision_id,
-                revision_id,
-                None if missing == "execution" else execution_id,
-                None if missing == "generation" else generation_id,
-                Jsonb({}),
-            ),
-        )
-    assert error.value.diag.constraint_name == "ck_jd_operations_candidate_scope"
 
 
 def test_candidate_operations_reject_foreign_or_missing_candidates_and_share_command_identity(
@@ -211,9 +177,7 @@ def test_candidate_operations_reject_foreign_or_missing_candidates_and_share_com
     connection = database_connection
     file_id, revision_id = create_file_revision(connection)
     other_file_id, other_revision_id = create_file_revision(connection)
-    other_execution_id, other_generation_id = create_candidate(
-        connection, other_file_id, other_revision_id
-    )
+    other_execution_id = create_candidate(connection, other_file_id, other_revision_id)
     execution_id = create_execution(connection, file_id)
     for candidate_execution_id in (other_execution_id, execution_id):
         with pytest.raises(psycopg.errors.ForeignKeyViolation) as error:
@@ -226,19 +190,18 @@ def test_candidate_operations_reject_foreign_or_missing_candidates_and_share_com
                     revision_id,
                     revision_id,
                     candidate_execution_id,
-                    other_generation_id,
                     Jsonb({}),
                 ),
             )
         assert error.value.diag.constraint_name == "fk_jd_operations_candidate"
     connection.execute(
         CANDIDATE_INSERT,
-        (file_id, execution_id, revision_id, revision_id, other_generation_id, "open"),
+        (file_id, execution_id, revision_id, revision_id, "open"),
     )
     command_id = uuid4()
     connection.execute(
         OPERATION_INSERT,
-        (file_id, command_id, "revise_profile", revision_id, revision_id, None, None, Jsonb({})),
+        (file_id, command_id, "revise_profile", revision_id, revision_id, None, Jsonb({})),
     )
     with pytest.raises(psycopg.errors.UniqueViolation):
         connection.execute(
@@ -246,58 +209,19 @@ def test_candidate_operations_reject_foreign_or_missing_candidates_and_share_com
             (
                 file_id,
                 command_id,
-                "restore_candidate",
+                "discard_candidate",
                 revision_id,
                 revision_id,
                 execution_id,
-                other_generation_id,
                 Jsonb({}),
             ),
         )
     with pytest.raises(psycopg.errors.CheckViolation) as error:
         connection.execute(
             OPERATION_INSERT,
-            (file_id, uuid4(), "unknown", revision_id, revision_id, None, None, Jsonb({})),
+            (file_id, uuid4(), "unknown", revision_id, revision_id, None, Jsonb({})),
         )
     assert error.value.diag.constraint_name == "ck_jd_operations_kind"
-
-
-def test_restore_result_keeps_its_generation_after_candidate_advances(
-    database_connection: psycopg.Connection,
-) -> None:
-    connection = database_connection
-    file_id, revision_id = create_file_revision(connection)
-    execution_id, generation_id = create_candidate(connection, file_id, revision_id)
-    result_generation_id = uuid4()
-    payload = {"result_generation_id": str(result_generation_id)}
-    connection.execute(
-        OPERATION_INSERT,
-        (
-            file_id,
-            uuid4(),
-            "restore_candidate",
-            revision_id,
-            revision_id,
-            execution_id,
-            generation_id,
-            Jsonb(payload),
-        ),
-    )
-    for current_generation_id in (result_generation_id, uuid4()):
-        connection.execute("UPDATE jd_candidates SET generation_id = %s", (current_generation_id,))
-    assert connection.execute(
-        "SELECT candidate_generation_id, request_payload FROM jd_operations"
-    ).fetchone() == (generation_id, payload)
-    with pytest.raises(
-        psycopg.errors.CheckViolation, match="Fixed JD revisions and original results are immutable"
-    ):
-        connection.execute("DELETE FROM jd_candidates")
-    assert connection.execute("SELECT generation_id FROM jd_candidates").fetchone() == (
-        current_generation_id,
-    )
-    assert connection.execute(
-        "SELECT candidate_generation_id, request_payload FROM jd_operations"
-    ).fetchone() == (generation_id, payload)
 
 
 def test_read_candidate_refreshes_cached_position_without_locking_or_committing(
@@ -305,7 +229,11 @@ def test_read_candidate_refreshes_cached_position_without_locking_or_committing(
 ) -> None:
     file_id, revision_id = create_file_revision(database_connection)
     execution_id = create_execution(database_connection, file_id)
-    generation_id, next_generation_id = uuid4(), uuid4()
+    next_revision_id = uuid4()
+    database_connection.execute(
+        "INSERT INTO jd_revisions (job_file_id, revision_id) VALUES (%s,%s)",
+        (file_id, next_revision_id),
+    )
 
     async def exercise() -> None:
         database = Database(database_settings)
@@ -316,7 +244,6 @@ def test_read_candidate_refreshes_cached_position_without_locking_or_committing(
                     execution_id=execution_id,
                     base_revision_id=revision_id,
                     current_revision_id=revision_id,
-                    generation_id=generation_id,
                     status="open",
                 )
                 session.add(record)
@@ -331,12 +258,12 @@ def test_read_candidate_refreshes_cached_position_without_locking_or_committing(
                     # A plain candidate read must not hold a row lock against another writer.
                     await writer.execute(text("SET LOCAL lock_timeout = '500ms'"))
                     await writer.execute(
-                        text("UPDATE jd_candidates SET generation_id = :generation_id"),
-                        {"generation_id": next_generation_id},
+                        text("UPDATE jd_candidates SET current_revision_id = :revision_id"),
+                        {"revision_id": next_revision_id},
                     )
                 refreshed = await read_candidate(session, file_id, execution_id)
                 assert refreshed is original
-                assert refreshed.generation_id == next_generation_id
+                assert refreshed.current_revision_id == next_revision_id
                 refreshed.status = "discarded"
                 await session.flush()
                 pending = await read_candidate(session, file_id, execution_id)
@@ -348,8 +275,8 @@ def test_read_candidate_refreshes_cached_position_without_locking_or_committing(
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(exercise())
     assert database_connection.execute(
-        "SELECT generation_id, status FROM jd_candidates"
-    ).fetchone() == (next_generation_id, "open")
+        "SELECT current_revision_id, status FROM jd_candidates"
+    ).fetchone() == (next_revision_id, "open")
 
 
 def test_upgrade_preserves_existing_operations_and_downgrade_refuses_history_loss(
@@ -412,10 +339,7 @@ def test_upgrade_preserves_existing_operations_and_downgrade_refuses_history_los
             assert connection.execute(original_query).all() == original
             assert (
                 connection.execute(
-                    text(
-                        "SELECT count(*) FROM jd_operations "
-                        "WHERE candidate_execution_id IS NULL AND candidate_generation_id IS NULL"
-                    )
+                    text("SELECT count(*) FROM jd_operations WHERE candidate_execution_id IS NULL")
                 ).scalar_one()
                 == 6
             )

@@ -13,7 +13,7 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.job_consultant.configuration import ConsultantConfiguration
 from caliburn.settings import ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
+from caliburn.transport.model_tools.memory_write_checkpoint import MEMORY_CHECKPOINT_TYPES
 
 
 def _create_responses_client(settings: ModelSettings) -> AsyncOpenAI:

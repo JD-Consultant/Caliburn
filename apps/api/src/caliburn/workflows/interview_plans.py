@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.database import retry_database_operation
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -43,7 +44,7 @@ async def start_interview_plan(
         session,
         scope.job_file_id,
         writer.scope.execution_id,
-        base.body if base is not None else None,
+        base.position if base is not None else None,
     )
 
 
@@ -51,6 +52,7 @@ class InterviewPlanWorkflow:
     def __init__(self, sessions: async_sessionmaker[AsyncSession]) -> None:
         self.sessions = sessions
 
+    @retry_database_operation
     async def read_current(self, scope: ExecutionScope) -> PlanSnapshot | None:
         """Read a known Turn's retained head, including terminal recovery and UI preview."""
         _require_consultant(scope)
@@ -68,6 +70,7 @@ class InterviewPlanWorkflow:
                 session, writer.scope.job_file_id, writer.scope.execution_id
             )
 
+    @retry_database_operation
     async def apply(self, writer: ExecutionWriter, edit: PlanEdit) -> PlanEditResult:
         _require_consultant(writer.scope)
         if (edit.position.job_file_id, edit.position.execution_id) != (

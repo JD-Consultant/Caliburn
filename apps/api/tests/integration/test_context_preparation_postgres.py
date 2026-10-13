@@ -5,7 +5,7 @@ import json
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from uuid import UUID, uuid4
+from uuid import UUID, uuid4, uuid5
 
 import httpx2
 import pytest
@@ -20,10 +20,11 @@ from caliburn.agent_execution.context_compaction import (
     ReceivedCompaction,
     prepare_context_history,
 )
-from caliburn.agent_execution.tool_steps import ResponseStepRuntime, run_response_step
 from caliburn.features.executions import budgets, service
+from caliburn.features.executions.budget_models import OutboundKind
 from caliburn.settings import DatabaseSettings
-from tests.fixtures.response_capacity import synthetic_capacity_limits
+from tests.fixtures.native_response_runtime import run_response_step
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_capacity_limits
 from tests.integration.test_compaction_accounting import (
     accounting_fixture,
     admitted_executor,
@@ -34,6 +35,137 @@ from tests.integration.test_compaction_accounting import file_id as file_id
 from tests.integration.test_compaction_accounting import runner as runner
 
 pytestmark = pytest.mark.postgres
+
+
+def test_reopened_preparation_recounts_unsaved_history_with_original_request(
+    database_settings: DatabaseSettings,
+    file_id: UUID,
+    runner: asyncio.Runner,
+) -> None:
+    async def scenario() -> None:
+        history_request = request_fixture()
+        http_requests = []
+
+        class InterruptedCountBody(httpx2.AsyncByteStream):
+            async def __aiter__(self):
+                # Headers arrived, but no complete SDK count can reach Graph storage.
+                active_run.cancel()
+                await asyncio.sleep(0)
+                yield b'{"object":"response.input_tokens","input_tokens":500}'
+
+        def respond(request: httpx2.Request) -> httpx2.Response:
+            assert request.url.path == "/v1/responses/input_tokens"
+            http_requests.append(json.loads(request.content))
+            if len(http_requests) == 1:
+                return httpx2.Response(
+                    200,
+                    headers={"content-type": "application/json"},
+                    stream=InterruptedCountBody(),
+                )
+            return httpx2.Response(
+                200, json={"object": "response.input_tokens", "input_tokens": 500}
+            )
+
+        async with admitted_executor(
+            database_settings, file_id, respond, accounting_fixture(lambda _: Decimal("0.03"))
+        ) as executor:
+
+            async def guard() -> None:
+                async with executor.sessions.begin() as session:
+                    await service.lock_active_writer(session, executor.writer)
+
+            options = dict(
+                thread_id=str(uuid4()),
+                history_request=history_request,
+                threshold_tokens=128_000,
+                compact_requested=False,
+                count_input=executor.count_input,
+                runtime=CompactionRuntime(
+                    executor.request_compaction,
+                    executor.account_compaction,
+                    guard,
+                    synthetic_capacity_limits(),
+                ),
+            )
+            config = {"configurable": {"thread_id": options["thread_id"]}}
+            dsn = make_conninfo(
+                database_settings.url, options=f"-c search_path={database_settings.schema}"
+            )
+            async with AsyncPostgresSaver.from_conn_string(
+                dsn, serde=create_graph_serializer()
+            ) as saver:
+                await saver.setup()
+                active_run = asyncio.create_task(prepare_context_history(saver, **options))
+                with pytest.raises(asyncio.CancelledError):
+                    await active_run
+                saved = await saver.aget_tuple(config)
+                assert saved is not None
+                request_id = saved.checkpoint["channel_values"]["request_id"]
+                assert (
+                    saved.checkpoint["channel_values"]["request_snapshot"]
+                    == history_request.create_payload()
+                )
+                async for checkpoint in saver.alist(config):
+                    assert checkpoint.checkpoint["channel_values"].get("input_count") is None
+                    assert all(
+                        channel != "input_count"
+                        for _, channel, _ in checkpoint.pending_writes or []
+                    )
+            outbound_id = uuid5(request_id, "input_tokens")
+            async with executor.sessions() as session:
+                original_attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, outbound_id
+                )
+                original_budget = await budgets.read_execution_budget(
+                    session, executor.writer.scope
+                )
+            assert len(original_attempts) == 1
+            assert original_attempts[0].failure is None
+            assert original_attempts[0].reported_cost_usd is None
+
+            # Rebuild the executor and saver without any held result or attempt identity.
+            reopened = replace(executor)
+            options["count_input"] = reopened.count_input
+            async with AsyncPostgresSaver.from_conn_string(
+                dsn, serde=create_graph_serializer()
+            ) as saver:
+                assert (
+                    await prepare_context_history(saver, **options)
+                    == (history_request.create_payload()["input"])
+                )
+                assert (
+                    await prepare_context_history(saver, **options)
+                    == (history_request.create_payload()["input"])
+                )
+                saved = await saver.aget_tuple(config)
+                assert saved is not None
+                values = saved.checkpoint["channel_values"]
+                assert values["request_id"] == request_id
+                assert values["request_snapshot"] == history_request.create_payload()
+                assert values["input_count"]["input_tokens"] == 500
+                assert values["adopted"] is True
+
+            async with executor.sessions() as session:
+                attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, outbound_id
+                )
+                usage = await budgets.read_budget_usage(session, executor.writer.scope)
+                assert await budgets.read_execution_budget(session, executor.writer.scope) == (
+                    original_budget
+                )
+            assert len(attempts) == 2
+            assert original_attempts[0] in attempts
+            assert len({attempt.attempt_id for attempt in attempts}) == 2
+            assert all(attempt.request == original_attempts[0].request for attempt in attempts)
+            assert original_attempts[0].request.kind == OutboundKind.TOKEN_COUNT
+            assert all(attempt.failure is None for attempt in attempts)
+            assert all(attempt.reported_cost_usd is None for attempt in attempts)
+            assert usage.outbound_attempts == 2
+            assert usage.model_steps == usage.compactions == 0
+            assert usage.accounted_cost_usd == Decimal("0.002")
+            assert http_requests == [history_request.count_payload()] * 2
+
+    runner.run(scenario())
 
 
 @pytest.mark.parametrize(
@@ -164,13 +296,13 @@ def test_reopened_preparation_reuses_original_history_count_and_next_context(
                     request=next_request,
                     max_tool_calls=1,
                     runtime=ResponseStepRuntime(
-                        executor.request_model,
-                        no_tool,
-                        no_tool,
-                        guard,
-                        executor.account_response,
-                        executor.count_input,
-                        synthetic_capacity_limits(),
+                        request_model=executor.request_model,
+                        prepare_tool=no_tool,
+                        execute_tool=no_tool,
+                        ensure_active=guard,
+                        account_response=executor.account_response,
+                        count_input=executor.count_input,
+                        capacity_limits=synthetic_capacity_limits(),
                     ),
                 )
                 assert result["next_action"] == "deliver_answer"

@@ -120,7 +120,6 @@ class RecordingWorkflow(OccupationReferenceWorkflow):
         self.position = ReferenceStatePosition(
             writer.scope.execution_id,
             uuid4(),
-            uuid4(),
             OccupationReferenceState(),
         )
         self.preparations = []

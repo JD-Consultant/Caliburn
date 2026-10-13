@@ -1,6 +1,9 @@
 /** JD command slots and the shared revision's refresh policy; drafts stay in their editors. */
-import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
-import type { ReviseJdProfileRequest } from '../../shared/api/generated/revise-jd-profile-request';
+import type {
+  JdProfileView,
+  ReviseJdProfileRequest,
+} from '../../shared/api/generated/http/types.gen';
+
 import { ApiError } from '../../shared/api/http';
 import { isReviseJdProfileRequest } from '../../shared/api/validation';
 import { createPendingCommandStore } from '../../shared/commands/pending-command';
@@ -43,6 +46,10 @@ export function profileCommand(
 ): JdCommand<ReviseJdProfileRequest, JdProfileView> {
   return {
     store: pendingProfile(jobFileId),
+    correlation: (command) => ({
+      jobFileId,
+      ...(command ? { commandId: command.command_id } : {}),
+    }),
     execute: (command: ReviseJdProfileRequest) => reviseJdProfile(jobFileId, command),
     classifyRejection: (error) => (isRejection(error) ? { reason: 'refused' } : null),
     refresh,
@@ -57,6 +64,10 @@ export function workCommand(
 ): JdCommand<WorkCommand, void> {
   return {
     store: pendingWork(jobFileId),
+    correlation: (command) => ({
+      jobFileId,
+      ...(command ? { commandId: command.request.command_id } : {}),
+    }),
     execute: (command: WorkCommand) => editJdWork(jobFileId, command),
     classifyRejection: (error, command) => {
       if (isRejection(error)) return { reason: 'refused' };

@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-本頁維護 HTTP 命令、公開串流、來源回查、PDF 與本機交付的接線。正式保存與權限由業務模組判定；JD 人工編輯的元件、草稿、收合及鍵盤操作見 [Web 工作畫面](web-workspace.md)。範圍不含雲端登入、多人權限或 Memory 操作台。
+本頁維護 HTTP 命令、公開串流、來源回查、PDF 與本機交付的接線。正式保存與權限由業務模組判定；JD 人工編輯的元件、草稿、收合及鍵盤操作見 [Web 工作畫面](web-workspace.md)。範圍不含雲端登入、多人權限或 Memory 編輯。
 
 | 閱讀目的 | 入口 |
 |---|---|
@@ -28,13 +28,13 @@ Web 採 React Router 管頁面定位，TanStack Query 管正式／候選資料 c
 
 UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修改由後端拒絕，前端禁用按鈕只是讓限制更清楚。第二筆輸入返回既定在途狀態，不排入無界隊列；不同檔案可並行使用，不需要每個檔案一個程序。
 
-元件按 feature 組織：interview 負責訊息與 A 控制；jd-editor 負責關聯式欄位及候選預覽；source-viewer 負責依據、待核對與詳細差異。不讓共用 UI component import database／provider 或決定來源版本。頁面組裝、版面與視覺 token 在 `app/`，見[工作畫面組裝](web-workspace.md#5-工作畫面組裝)。
+元件按 feature 組織：interview 負責訊息、A 控制與完成輪次工具；jd-editor 負責關聯式欄位及候選預覽；source-viewer 負責依據、待核對與詳細差異；memory 負責人用發布版本查閱。不讓共用 UI component import database／provider 或決定來源版本。頁面組裝、版面與視覺 token 在 `app/`，見[工作畫面組裝](web-workspace.md#5-工作畫面組裝)。
 
 ### 1.1 讀寫邊界
 
 [App](../../apps/web/src/app/App.tsx)組裝路由與確認刪除的生命週期；[檔案 feature](../../apps/web/src/features/job-files/JobFilesPage.tsx)管理清單及建立／改名／刪除入口，[訪談歷史](../../apps/web/src/features/interview/InterviewHistory.tsx)呈現正式訊息。跨 feature 的刷新由 App 組裝，各 feature 保有自己的查詢與命令規則。
 
-檔案 ID 進 URL 與 query key，同名標籤不混成同一份資料；切換不保留另一檔案的 placeholder。HTTP 回傳先由 Ajv 驗證 `apps/api/contracts/http` schema，再進 Query cache；TS 型別由同一來源生成。員工與 App 訊息以轉義文字顯示並保留換行；顧問訊息使用 `ChatMarkdown`，原始 HTML 顯示為文字、連結不導覽、圖片不載入。保存內容與來源回查的原文不受格式化影響。
+檔案 ID 進 URL 與 query key，同名標籤不混成同一份資料；切換不保留另一檔案的 placeholder。HTTP 回傳先由 OpenAPI 生成的 Ajv standalone 驗證，再核對檔案／輪次範圍後進 Query cache；SDK 與 TS 型別由同一份 OpenAPI 生成。員工與 App 訊息以轉義文字顯示並保留換行；顧問訊息使用 `ChatMarkdown`，原始 HTML 顯示為文字、連結不導覽、圖片不載入。保存內容與來源回查的原文不受格式化影響。
 
 圖中的建立命令流程由 `useStoredCommand` 管理，刷新及條件式清理不依賴原表單仍掛載。圖省略欄位驗證、改名及 JD 命令；這些命令共用前端機制，但後端拒絕條件各由 feature 提供。
 
@@ -56,7 +56,9 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 共用 HTTP 邊界維持 15 秒期限與 caller AbortSignal，將網路、期限、取消、非 JSON、契約錯誤與 HTTP 失敗分成受控種類。只保留長度最多 64、符合 ASCII snake_case 形狀的不可信分類碼、status，以及合法 UUID 格式的 `X-Request-ID`。公開業務碼能否判定原結果由 feature 決定，HTTP 不手寫跨 feature 業務枚舉。
 
-人工命令與訪談 POST 帶本機診斷用的檔案／命令／execution 身分，這些額外欄位不傳入 fetch。`shared/diagnostics` 統一本機 console 的安全輸出，只記事件種類、故障分類、status 與通過 UUID 檢查的關聯識別，不輸出 URL、body、原始 Error／stack、表單或模型正文。正常取消不記為故障，sink 失敗不改變業務結果。
+人工命令與訪談請求帶本機診斷用的檔案／命令／execution 身分，這些額外欄位不傳入 fetch。Feature 的 schema／scope 核對在同一 HTTP 錯誤邊界裁決，拒收仍保留 request ID。命令的保存、ACK、刷新與顯示故障沿原命令關聯，後處理失敗不將已受理改為拒絕。`shared/diagnostics` 統一本機 console 的安全輸出，只記事件種類、故障分類、status 與通過 UUID 檢查的關聯識別，不輸出 URL、body、原始 Error／stack、表單或模型正文。正常取消不記為故障，sink 失敗不改變業務結果。
+
+JD 來源使用同一 Query cache：首次讀取失敗明示尚未讀到來源並可重試；背景更新失敗保留已有引用並提示尚未更新，不將讀取失敗呈現為沒有引用。
 
 SSE 只記受控的中斷／資料拒收分類及訂閱身分。CONNECTING 由原生 EventSource 處理；CLOSED 由同一 hook 依 Query 確認狀態並有限恢復，不另建遙測服務。依據：[OWASP Logging](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)、[TanStack Query cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)。
 
@@ -84,7 +86,7 @@ SSE 只記受控的中斷／資料拒收分類及訂閱身分。CONNECTING 由�
 
 框架依據：[React Router 路由](https://reactrouter.com/start/declarative/installation)、[Query key 必須包含查詢變數](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[Ajv 型別守衛](https://ajv.js.org/guide/typescript.html)。本案關閉隱含 query／mutation retry，由 UI 明確重讀／確認；不把 cache 當正式資料。MUI 9 已移除 system props 與 `disableEscapeKeyDown`，使用 `sx` 及受控 `onClose`；焦點在 transition `onEntered` 後定位，保留框架焦點陷阱及關閉恢復，不移除 StrictMode。[MUI migration](https://mui.com/material-ui/migration/upgrade-to-v9/)
 
-命令卸載、晚到回覆、刪除清理與焦點的測試入口見[驗證責任](verification-plan.md#51-web-與交付的現行測試入口)。目前 Ajv 在 runtime 編譯 schema；standalone codegen、嚴格 CSP 相容性及整體 bundle 效能未由此證明。安全限制不能因驗證器需求而默默放寬。
+命令卸載、晚到回覆、刪除清理與焦點的測試入口見[驗證責任](verification-plan.md#51-web-與交付的現行測試入口)。Ajv 驗證器在生成階段編譯為 standalone 程式碼；這不等於已驗證全站嚴格 CSP 相容性及整體 bundle 效能。安全限制不能因驗證器需求而默默放寬。
 
 ## 2. 串流不是保存權威
 
@@ -92,7 +94,7 @@ SSE 只記受控的中斷／資料拒收分類及訂閱身分。CONNECTING 由�
 
 `GET /api/job-files/{job_file_id}/consultant-turns/current` 從該檔案的既有 execution 准入資料找出唯一 active／paused 顧問，回 `{"turn": <既有 ConsultantTurn>}`；無進行中顧問回 `{"turn": null}`，不存在檔案回 404。pending pause 仍是 active＋`pause_requested`。沿用既有公開狀態、候選與 commentary 白名單，不返回 terminal 歷史或 Memory 工作；GET 不啟動模型、不取得 writer、不 resume，回應 no-store。
 
-這只是讀取時的觀察，控制操作仍重新核資格。
+輪次、JD 候選與 Plan 在同一唯讀快照組裝，避免取消或完成交錯時混用不同時點；原生 commentary 仍在業務交易外查閱。這只是讀取時的觀察，控制操作仍重新核資格。
 
 前端缺少本機識別時用此入口發現工作，再沿同一 execution 的既有查詢／控制接續；找到後停止 discovery，保留原 execution 至終態，不因 `/current` 後來變空而丟掉結果。查詢中允許輸入局部草稿，但未確認閒置前不送出；查詢失敗明示錯誤與唯讀重查，不吞成 null。回應須通過同一 schema 及檔案身分核對。
 
@@ -152,7 +154,7 @@ EventSource error 不提供 status，不能直接分辨 503／204，須沿受控
 使用 HTTP commands＋同源 SSE 公開事件，無需 WebSocket 雙向協議。瀏覽器收到 event 只更新呈現，正式狀態仍可 GET 重取。SSE 的 event ID／重連不是完整產品恢復的唯一依據，斷線後先查當前 Turn 狀態、已保存公開內容與 JD 正式／候選位置，不因事件遺失就重新送員工原話。事件傳送使用標準 SSE framing／框架支援，不自製流式 JSON 切割協議。[WHATWG SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html)
 
 - 生成中可顯示短公開中間訊息；完整正式答覆保存完成後成為主要回覆，之前完整公開訊息可展開回看。
-- 原生 opaque reasoning、內部分析、密鑰、完整工具參數不公開。可顯示安全的工具名稱與進度，但不以新增 trace dashboard 作第一版 gate。
+- 活動串流不公開原生 opaque reasoning、內部分析、密鑰或完整工具參數。完成後的人用工具查閱由 §3.3 的具名讀取入口提供，不將完整 request／context 加入串流。
 - 逐 token delta 不要求永久保存。已保存完整中間 message 保留原順序／出處，不授正式訪談序號、不供引用。
 - API response 完成不代表 Turn 完成。UI 只在正式完成結果成立時顯示已完成／已保存；重連取得同一答覆。
 
@@ -182,7 +184,7 @@ SSE 可丟的暫態進度與必須保留的公開歷史分開，**不為每個�
 
 顧問 A 的新模型請求設定 `reasoning.summary=auto`，與 `context=all_turns`、`include=[reasoning.encrypted_content]` 並存。摘要是供人閱讀的解釋，不是完整內部推理；`encrypted_content` 才是不可讀的接續資料，兩者不能互相替代。B1／B2 不因此啟用或公開摘要。輪前歷史準備的 count／compact 契約不變；摘要選項只加入新的 Turn 生成模板，已保存的 Turn request 仍原樣恢復。
 
-`GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 是公開活動入口，在同一條 SSE 傳送 `commentary` 與 `reasoning_summary`。摘要事件只有 `response_id`、`item_id`、`output_index`、`summary_index`、`text`，其 schema 見 [`reasoning-summary.schema.json`](../../apps/api/contracts/http/reasoning-summary.schema.json)。`text` 為該段累積文字，依 response／item／summary index 替換，不逐事件追加；commentary 依自己的訊息契約合併。
+`GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 是公開活動入口，在同一條 SSE 傳送 `commentary` 與 `reasoning_summary`。摘要事件只有 `response_id`、`item_id`、`output_index`、`summary_index`、`text`，其 schema 見 [ReasoningSummary](../../apps/api/src/caliburn/transport/http/models/consultant.py)。`text` 為該段累積文字，依 response／item／summary index 替換，不逐事件追加；commentary 依自己的訊息契約合併。
 
 `GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/reasoning-summaries` 按序回傳已保存完整 Response 中的摘要。沒有摘要回 `[]`，缺少保存機制則回 unavailable，不編造摘要。它與 commentary 共用既有 checkpoint 原件讀取、去重與排序；不另建摘要表。歷史 GET 不需模型金鑰、不重跑模型；包括被取消 Turn 的已保存過程，也只能供回看，不能取得正式訪談序號或 JD／Memory 引用資格。未完成 Response 的串流片段不承諾永久恢復。
 
@@ -226,12 +228,12 @@ JD 顯示正式稿；A 活躍時可即時預覽該 Turn 候選，明示未完成
 
 這與 A 的「本 Turn 固定 Memory＋舊新 diff、無任意舊全文入口」不同，不把人用 API 暴露成 A tool。
 
-來源列表按結構化 `target` 分組，同一 JD 項目只顯示一個標題，各筆來源分列其下；缺少 `target` 時各筆獨立，不以同名合併。每筆待核對來源依後端的 `jd_changed`／`source_changed` 顯示「JD 已修改」「來源已更新」或「JD 與來源皆有變更」，並提供一個「查看差異」入口。JD 項目旁的彙總徽章仍表示其中有引用待核對，不把某一筆狀態套到同組其他來源。
+來源列表按必填結構化 `target` 分組，同一 JD 項目只顯示一個標題，各筆來源分列其下，不以同名合併。每筆待核對來源依後端的 `jd_changed`／`source_changed` 顯示「JD 已修改」「來源已更新」或「JD 與來源皆有變更」，並提供一個「查看差異」入口。JD 項目旁的彙總徽章仍表示其中有引用待核對，不把某一筆狀態套到同組其他來源。
 
 點擊後按需取得同一筆引用的兩種比較，分別列在「JD 內容變更」與「來源變更」兩個有標題的區塊（直接展開）：
 
-- **JD 內容變更** ：從該筆引用上次核對的正式 JD 修訂，比到目前選定正式稿的同一目標；不是上一輪起點，也不展開無關項目。改過又改回可顯示無淨內容差異，但不解除待核對。
-- **來源變更** ：原引用的固定來源鏈比到讀取時最新已發布 Memory；與 JD 的核對基準分開。不可變的訪談原話沒有這個區塊，但仍可查看引用它的 JD 項目變更。
+- **JD 內容變更** ：從該筆引用的 JD 核對基準，比到目前選定正式稿的同一目標；不是上一輪起點，也不展開無關項目。人工改過又改回可顯示無淨內容差異，但仍待核對；顧問實際編修的支持範圍同步更新此基準。
+- **來源變更** ：原引用的固定來源鏈比到讀取時最新已發布 Memory；顯示兩端各涵蓋至哪個訪談序號，與 JD 的核對基準分開。回應沿固定 snapshot／物件修訂識別兩端，不讀中間逐版歷史。不可變的訪談原話沒有這個區塊，但仍可查看引用它的 JD 項目變更。
 
 面板參考 Fluent drawer 與 Primer ActionList，結構如下：
 
@@ -259,7 +261,7 @@ JD 顯示正式稿；A 活躍時可即時預覽該 Turn 候選，明示未完成
 
 [圖源](../diagrams/implementation/interface-and-delivery/jd-source-lookup.mmd) · [SVG](../diagrams/implementation/interface-and-delivery/jd-source-lookup.svg)
 
-Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；切檔／重新取列表後，舊的展開與差異狀態不能混入新的選取。GET 錯誤需明示，不顯示空結果假裝成功；409 提供回列表重讀，不自動改基準。Memory 更新可以使同一 JD 的來源變成待核對，因此不能將來源列表視為僅由 JD 修訂決定的永久 cache。
+Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；AbortSignal 隨查詢傳入 HTTP。切檔／重新取列表後，舊的展開與差異狀態不能混入新的選取；列表讀取身分同時重建詳情，清除子來源位置。未刷新時仍可讀原來所選的正式修訂，head 前進不拒絕它；資格及引用不存在回 404，提供重讀入口。GET 錯誤需明示，不顯示空結果假裝成功。Memory 更新可以使同一 JD 的來源變成待核對，因此不能將來源列表視為僅由 JD 修訂決定的永久 cache。
 
 來源正文／差異回應外層的 `revision_id` 表示所選的正式 **JD 修訂** ，`citation_id` 表示該修訂上的直接引用；正文仍沿此引用的固定來源鏈讀取，不是切換到最新 Memory。列表、正文與差異必須維持同一查詢身分；示範替身也須遵守，不得回傳寫死的另一個修訂而要求前端略過檢查。
 
@@ -271,12 +273,28 @@ Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；切檔
 
 歷史正式回答展開「處理紀錄」後，按「查看這輪 JD 變更」才讀取；此按鈕與撤回操作獨立排列，不另顯示「JD 操作」標題。比較端點由後端從該 completed Turn 已保留的輪前／採用修訂取得，**不是目前正式稿** ；之後人工修改或撤回不改寫此歷史比較。資料責任見 [JD 保存 §3.8](jd-storage.md#38-完成-turn-的-jd-變更檢視)。
 
-- `GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/jd-changes` 回 `execution_id` 與 `markdown`；schema 為 `contracts/http/turn-jd-changes.schema.json`。不接受自選版本或額外參數。未完成、取消、失敗或沒有已採用端點回 409；另一檔案／找不到執行回 404，缺 DB 回 503。不把未完成候選當正式變更。
+- `GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/jd-changes` 回 `execution_id` 與 `markdown`；型別為 HTTP `TurnJdChanges`。不接受自選版本或額外參數。未完成、取消、失敗或沒有已採用端點回 409；另一檔案／找不到執行回 404，缺 DB 回 503。不把未完成候選當正式變更。
 - 正文用既有完整 JD 成品投影計算標準 unified diff，來源依據另外顯示新增／移除／調整筆數。這是**淨效果檢視** ，不是逐工具操作時間軸；改過又改回可能沒有淨文字差異，不能說從未操作。來源摘要不展開引用鏈；來源身分／版本／核對位置變化不能被純文字 diff 吞掉。
 - UI query key 含職務檔案與 execution；完整結果由同一 canonical schema 驗證並核對 execution。查詢失敗明示、提供重新讀取，不假裝無差異；不輪詢、不把 server data 複製到另一份 state。
 - 沿共用 `SafeMarkdown` 禁 active HTML／URL／遠端圖片；後端 fenced diff 保住正文中的反引號。GET 無寫入副作用，回 no-store；查看不解除待核對，也不決定是否允許撤回。撤回仍由 JD 撤回工作流檢查當前資格。
 
 本檢視不呼叫模型或另外保存 diff；不提供候選即時差異或任意逐筆歷史來源瀏覽。
+
+### 3.3 完成後查看這輪工具
+
+歷史顧問答覆的「處理紀錄」提供「查看這輪工具紀錄」，開啟後才呼叫 `GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/tools`。入口只讀該檔案已完成的顧問 Turn，正式格式見 [TurnTools](../../apps/api/src/caliburn/transport/http/models/consultant.py)。取消、失敗或未完成工作的完整原件仍由本機 [CLI](../operations/README.md#查閱-ai-執行原件)查閱。
+
+回應逐筆保留 request／response／call 身分、工具名稱、原參數字串及已保存結果。`result_state` 區分已保存與尚未保存；缺少 output 不能證明工具從未執行，已保存回傳也不能取代業務正式採用資格。UI 用轉義原文字串呈現，不經 JSON 解析再序列化，避免改動大整數、重複鍵或空白。無工具與讀取失敗分開顯示，錯誤可明示重試。
+
+後端沿同一唯讀 Repeatable Read 交易讀原生 checkpoint，與診斷共用底層原件讀取及純投影；HTTP 只投影上述欄位，不返回完整 request、context、opaque reasoning 或 operation receipt。沒有工具紀錄副本、重跑模型或第二條活動串流。JD 淨變更沿 §3.2 原入口核對。
+
+### 3.4 查閱目前已發布 Memory
+
+職務檔案標頭的「Memory」按需呼叫 `GET /api/job-files/{job_file_id}/memory`，取得讀取當時最新已發布快照、涵蓋訪談序號、工作情境及工作理解導覽；無發布版本時明示空態。格式見 [PublishedMemory](../../apps/api/src/caliburn/transport/http/models/memory.py)。
+
+選取物件後，以列表的固定 `snapshot_id` 呼叫 `GET /api/job-files/{job_file_id}/memory/{snapshot_id}/objects/{object_id}`，格式見 [PublishedMemoryObject](../../apps/api/src/caliburn/transport/http/models/memory.py)。後端核對同檔案與該發布快照的物件；正文使用安全 Markdown，不能執行 HTML 或載入任意圖片。讀取中即使發布新版，已選正文仍屬同一快照；返回導覽後可明示重讀最新版本。
+
+前端沿同一 Query cache 保存伺服器資料，key 包含檔案、快照及物件識別，component state 只保存開關與選取。切檔卸載舊查閱，刪檔沿 App 既有清理。刷新失敗保留已有導覽並標示尚未更新，初次失敗不顯示成沒有 Memory；Dialog 沿 MUI 的焦點、Escape 關閉及焦點返回能力。人工查最新不改 A 當輪綁定的版本，也不觸發 B 分析或發布。
 
 ## 4. PDF 與程序
 

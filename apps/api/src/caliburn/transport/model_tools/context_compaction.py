@@ -10,7 +10,7 @@ from caliburn.contracts.generated.tools.request_context_compaction_arguments imp
 )
 from caliburn.contracts.validation import parse_contract
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
-from caliburn.workflows.context_history import RoleContextHistory
+from caliburn.workflows.executions.context_history import RoleContextHistory
 
 
 @with_config(ConfigDict(strict=True, extra="forbid"))
@@ -28,10 +28,13 @@ def context_compaction_definitions() -> list[FunctionToolParam]:
     return [
         function_definition(
             "request_context_compaction",
-            "既有上下文冗長、需要整理接續歷史時，要求下一輪開始前壓縮。"
-            "只登記要求；本輪成功完成後，系統在下一輪加入新資料與輸入前處理，"
-            "本輪取消則不生效。不會立刻壓縮，也不整理或修改受訪者工作記憶。"
-            "不需填摘要、範圍或門檻，不必每輪呼叫。",
+            (
+                "既有對話與工具歷史冗長、需要壓縮以便接續時，登記下次執行前的上下"
+                "文壓縮要求，不必每輪呼叫。傳入空物件；上下文範圍與處理時點由 App"
+                ' 綁定。成功回 {"status":"requested"}，只表示已登記；本次執行成功'
+                "完成後，App 在下一次加入新資料與輸入前處理，本次取消或失敗則不生"
+                "效。此工具不立即壓縮，不回傳摘要，也不整理或修改工作記憶。"
+            ),
             "request-context-compaction-arguments",
         )
     ]

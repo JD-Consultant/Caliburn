@@ -1,4 +1,4 @@
-"""Model task creation keeps each child/relation's sources separate in one transaction."""
+"""模型建任務同交易保存共用來源；O/P 與能力用途共用，K/S 本體來源獨立。"""
 
 from collections.abc import Awaitable, Callable
 from uuid import UUID, uuid4
@@ -17,16 +17,17 @@ from caliburn.features.job_description.capabilities import (
     EditJdCapabilities,
 )
 from caliburn.features.job_description.navigation import jd_read_ref
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
 from caliburn.features.job_description.sources import SourceTargetKind
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection
-from caliburn.workflows.jd_task_writes import (
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.compound_writes import execute_prepared_jd_edit
+from caliburn.workflows.job_description.task_writes import (
     CreateTaskInput,
     JdTaskWriteWorkflow,
     TaskCapabilityInput,
     TaskDetailInput,
 )
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 
 pytestmark = pytest.mark.postgres
 
@@ -39,7 +40,7 @@ def transact[T](client: TestClient, operation: Callable[[AsyncSession], Awaitabl
     return client.portal.call(run)
 
 
-def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
+def test_task_details_and_capability_uses_have_shared_evidence_and_replay(
     client: TestClient,
     database_connection: psycopg.Connection,
 ) -> None:
@@ -74,7 +75,7 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
     capability = client.portal.call(candidates.read, scope).work.capabilities[0]
     workflow = JdTaskWriteWorkflow(client.app.state.database.sessions)
     binding = PublishedMemoryRead(scope, None, 1)
-    source = CurrentInputSourceSelection()
+    source = InterviewSourceSelection(2)
 
     async def prepare():
         return await workflow.prepare(
@@ -84,8 +85,8 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
                 None,
                 "製作網站頁面",
                 "依已確認設計實作頁面。",
-                outcomes=(TaskDetailInput("交付可操作網站", (source,)),),
-                required_skills=(TaskCapabilityInput(jd_read_ref(capability), (source,)),),
+                outcomes=(TaskDetailInput("交付可操作網站"),),
+                required_skills=(TaskCapabilityInput(jd_read_ref(capability)),),
                 sources=(source,),
             ),
         )
@@ -94,7 +95,7 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
     before_count = database_connection.execute(
         "SELECT count(*) FROM jd_revisions WHERE job_file_id = %s", (file_id,)
     ).fetchone()[0]
-    result = client.portal.call(workflow.execute, writer, prepared)
+    result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     after_count = database_connection.execute(
         "SELECT count(*) FROM jd_revisions WHERE job_file_id = %s", (file_id,)
     ).fetchone()[0]
@@ -112,10 +113,10 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
     )
     assert {r.target.kind for r in references} == {
         SourceTargetKind.TASK,
-        SourceTargetKind.DETAIL,
-        SourceTargetKind.TASK_CAPABILITY,
     }
     assert all(not r.needs_review for r in references)
     assert all(r.reviewed_revision_id == preview.position.revision_id for r in references)
-    assert client.portal.call(workflow.execute, writer, prepared) == result
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared) == result
+    )
     assert client.portal.call(candidates.read, scope).position == preview.position

@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.sources import MemorySource
 from caliburn.features.work_memory import candidate_queries
 from caliburn.features.work_memory.candidates import (
@@ -21,11 +22,11 @@ from caliburn.features.work_memory.models import MemoryContent, MemoryContentCha
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
 from caliburn.transport.model_tools.jd_reads import JdReadTools
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_changes import JdChangesWorkflow
-from caliburn.workflows.jd_reads import JdReadWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.job_description.source_changes import JdChangesWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 from tests.integration.test_jd_source_tool_actions import invoke, prepare, references, source_tools
@@ -156,14 +157,17 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
         result = client.portal.call(reader.read_source, binding, citation)
         assert result.changes
     # Public model reads/diffs/confirmations all use the same short citation locator.
-    read_tools = JdReadTools(JdReadWorkflow(sessions), binding)
+    locators = JdModelReferences(sessions, binding.scope.job_file_id)
+    read_tools = JdReadTools(JdReadWorkflow(sessions), binding, references=locators)
     profile = json.loads(
         client.portal.call(read_tools.invoke, "read_jd", '{"view":"profile","read_ref":null}')
     )
     citations = [item["citation_ref"] for item in profile["supporting_sources"]["job_title"]]
     assert all(len(ref) < 24 for ref in citations)
     changes_tools = JdChangesTools(
-        reader, binding, manual_jd_start_revision_id=turn.candidate.base_revision_id
+        reader,
+        binding,
+        references=locators,
     )
     for citation in citations:
         output = client.portal.call(
@@ -197,6 +201,40 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
     )
     assert client.portal.call(candidates.read, turn.writer.scope).position == before.position
     assert references(client, turn.writer, before.position.revision_id) == old_references
+    assert (
+        invoke(
+            client,
+            tools,
+            "revise_jd_profile",
+            {
+                "changes": [
+                    {
+                        "action": "set_field",
+                        "field": "job_title",
+                        "value": "季度庫存專員",
+                    }
+                ]
+            },
+        )
+        == "updated"
+    )
+    revised = client.portal.call(candidates.read, turn.writer.scope).position
+    revised_references = references(client, turn.writer, revised.revision_id)
+    assert [ref.source for ref in revised_references] == [ref.source for ref in old_references]
+    assert all(not ref.needs_review for ref in revised_references)
+    assert all(ref.reviewed_revision_id == revised.revision_id for ref in revised_references)
+    revised_profile = json.loads(
+        client.portal.call(read_tools.invoke, "read_jd", '{"view":"profile","read_ref":null}')
+    )
+    assert all(
+        item["needs_recheck"] and item["source_changed"] and not item["jd_changed"]
+        for item in revised_profile["supporting_sources"]["job_title"]
+    )
+    for reference in revised_references:
+        result = client.portal.call(
+            reader.read_source, binding, f"citation_{reference.citation_id.hex}"
+        )
+        assert result.changes, "顧問改稿不能自動確認 Memory 的新版來源"
     confirmations = [
         {"action": "confirm_reference_alignment", "field": "job_title", "citation_ref": citation}
         for citation in citations
@@ -257,7 +295,8 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
     assert invoke(client, tools, "revise_jd_profile", {"changes": confirmations}) == "unchanged"
     complete(client, replace(turn, candidate=aligned.position))
 
-    following = start_turn(client, file_id=file_id)
+    following = start_turn(client, file_id=file_id, with_candidate=False)
+    client.portal.call(candidates.start, following.writer)
     following_tools = source_tools(
         client,
         following.writer,

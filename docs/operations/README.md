@@ -34,7 +34,9 @@
 
 ## 更新已有安裝
 
-以下為 Docker 基本模式；原生開發沿[原生更新](native-development.md#更新已有安裝)，公版模式沿 [RAG 操作](rag.md#更新與保存)。三種方式均沿用原資料庫，不以新空庫代替更新。
+以下為 Docker 基本模式；原生開發沿[原生更新](native-development.md#更新已有安裝)，公版模式沿 [RAG 操作](rag.md#更新與保存)。
+
+目前的 `0034_jd_task_sources` 保存格式須在空 namespace 初始化，不搬移較早版本的資料或中斷工作。切換前完成或取消工作並停妥 App，在根 `.env` 將 `CALIBURN_DATABASE_SCHEMA` 設為一個新的空 schema（例如 `caliburn_v2`），再執行下列初始化。相同新版 schema 後續可原地使用；原 schema 與 volume 不會因此刪除。這是明示切換，不能用 Alembic stamp 跳過結構核對。
 
 1. 讓訪談與背景工作停在安全點，確認是自己的 App 後停止它：
 
@@ -73,6 +75,7 @@ ZIP 更新沿用 Compose 中的 `caliburn-jd-app` project 及原 Docker volume�
 | `CALIBURN_POSTGRES_PASSWORD` | 新專用 PostgreSQL 的密碼。初始化腳本只在沒有根 `.env` 時產生；既有資料庫須保留原值。手動設定只用英文字母、數字、`-`、`_`，避免 URL 分隔字元 |
 | `CALIBURN_APP_PORT` | App 主機埠，預設 `8100`；改埠後使用相應 URL |
 | `CALIBURN_POSTGRES_PORT` | PostgreSQL 主機埠，預設 `55440`，供 DataGrip 等本機工具使用 |
+| `CALIBURN_DATABASE_SCHEMA` | App namespace，預設 `caliburn`；不相容的保存版本選擇新空 schema |
 | `CALIBURN_OPENAI_ENV_FILE` | 本機金鑰檔路徑，預設 `./apps/api/.env`；由 Compose 在執行時注入後端，檔案不建進映像 |
 
 已有根 `.env` 時只補必要設定，不整份覆蓋。根 `.env` 與 key 檔不提交 Git，也不要分享展開後的 `docker compose config` 或完整容器環境。修改 key 後，讓工作停在安全點，再停止 App 並依[日常啟動](#日常啟停與更新)重新啟動，使 Compose 重新載入環境。
@@ -144,15 +147,9 @@ leader 鎖與 checkpoint 各持有一條資料庫連線，不會自動重連，�
 | Host／Port | `127.0.0.1`／`55440`（改埠後依根 `.env`） |
 | Database／User | `caliburn`／`caliburn` |
 | Password | 根 `.env` 的 `CALIBURN_POSTGRES_PASSWORD` |
-| Schema | 勾選 `caliburn`，不是 `public` |
+| Schema | App 實際的 `CALIBURN_DATABASE_SCHEMA`，預設 `caliburn` |
 
-建議另設唯讀連線。查閱 AI 執行紀錄時，依序準備：
-
-1. 完成[原生開發依賴](native-development.md#安裝依賴)。
-2. 在該環境將 `CALIBURN_DATABASE_URL` 設為上述主機連線。
-3. 沿下方[執行紀錄](#在-datagrip-查某個職務檔案的-ai-執行紀錄)執行 `apps/api/scripts/refresh_execution_diagnostics.py`，再從 DataGrip 查 VIEW。
-
-此開發診斷腳本不在執行映像中；不另造一份診斷來源。
+建議另設唯讀連線。DataGrip 可直接查業務表；包含原生 checkpoint 解碼、當時版本及工具往返的查閱，沿下方 [CLI](#查閱-ai-執行原件)。
 
 ### 判讀 `pnpm app:status`
 
@@ -167,98 +164,88 @@ leader 鎖與 checkpoint 各持有一條資料庫連線，不會自動重連，�
 
 因此，退出碼 0 不是所有產品能力已就緒的證明；AI 與 PDF 的實際功能仍須分別驗證。不要為消除「未設定」提示而把 key 複製到更多地方。
 
-### 在 DataGrip 查某個職務檔案的 AI 執行紀錄
+### 查閱 AI 執行原件
 
-先連到**正式 App 使用的 PostgreSQL database**，勾選 `caliburn` schema；不是 `public`。5180／8180 的記憶體示範站沒有這份資料。DataGrip 的 schema 選擇、Synchronize 及重新查詢是三件事：看不到 VIEW 先同步 schema，資料更新後再重新執行 SELECT。
+原生環境先完成[開發依賴](native-development.md#安裝依賴)，將終端的 `CALIBURN_DATABASE_URL` 與 `CALIBURN_DATABASE_SCHEMA` 設為要查閱的 App 資料庫及 schema。CLI 隨後端套件及執行映像交付，不載入 `.env`，也不需要模型 key。
 
-這是按需診斷功能：原生 checkpoint 有二進位內容，先解碼成一份可重建的本機副本，再用 VIEW 查閱。只讀原始執行／業務表，寫入的只有 `diagnostic_execution_snapshots`；不執行模型、不續跑 Turn、不修改 JD 或 Memory。
-
-在 repository 根目錄、與正式 App 相同的資料庫環境設定下執行：
+從職務檔案總覽找到 execution，再查該輪 Step；需要正文時才加 `--full`：
 
 ```powershell
-uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
-# 只更新某一輪，改用：
-uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
-# 不重新擷取，直接在終端查看該輪已有的診斷副本：
-uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID --show
+uv run --project apps/api --locked python -m caliburn.diagnostics --job-file-id 職務檔案UUID
+uv run --project apps/api --locked python -m caliburn.diagnostics --execution-id 執行UUID
+uv run --project apps/api --locked python -m caliburn.diagnostics --execution-id 執行UUID --request-id 請求UUID --full
 ```
 
-兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停妥 App 並升級資料庫，不是每次查詢都遷移。
+Compose 部署使用同一入口與容器的資料庫設定。App 執行中可用 `exec`；App 停止而資料庫仍執行時可用 `run` 單次查閱：
 
-匯入結果按以下方式判讀：
-
-- 沒有 execution 的既存空檔案回報 0 筆；找不到的 UUID 則報錯。
-- 權限、migration、原生紀錄解碼或並行更新出錯時，整次匯入回滾，原診斷副本仍保留。
-- 終端只印成功筆數或錯誤類別，避免洩露私人 payload。
-
-DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_file_id` 或 `execution_id` 篩選：
-
-| VIEW | 每列代表什麼 | 主要欄位 |
-|---|---|---|
-| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選、`captured_initial_context`、目前 Memory head 及本批發布的快照 |
-| `diagnostic_model_steps` | 一份已保存的邏輯請求；可能尚無回應，不等於已外送或業務 Step 已完成 | role、request_id、response_state、response_order、request（instructions、input、tools）、response（輸出與 usage）、原請求及回應的 checkpoint／source、snapshot_at |
-| `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、可空的 operation_id、對應 output、結果是否已保存 |
-
-`0029_diagnostic_tool_operations` 增加操作識別；需先沿既有更新流程套用 forward migration，再 refresh 診斷副本。投影只安全讀取原 response 的 UUID／null `operation_seed`，以既有 `uuid5(seed, call_id)` 規則計算。沒有 seed 的舊副本為 null，不按相同正文猜命令。
-
-`result_state=not_recorded` 只表示工具輸出未保存，仍可用 operation ID 查已提交的業務結果。複合 JD 命令以根 command ID 對應 `jd_operations.result_payload`；舊衍生操作依既有修訂因果查閱。這些 view 及 JSON metadata 是可重建的診斷副本，不參與正式恢復或重送。
-
-以下分別查整份檔案、單次執行的工具及模型請求：
-
-```sql
-SELECT * FROM caliburn.diagnostic_execution_history
-WHERE job_file_id = '換成職務檔案UUID'::uuid
-ORDER BY created_at, execution_id;
-
-SELECT * FROM caliburn.diagnostic_tool_calls
-WHERE execution_id = '換成執行UUID'::uuid
-ORDER BY response_order, output_index;
-
-SELECT role, response_order, request, response, snapshot_at
-FROM caliburn.diagnostic_model_steps
-WHERE execution_id = '換成執行UUID'::uuid
-ORDER BY response_order;
+```powershell
+docker compose -f compose.jd-app.yaml exec -T app python -m caliburn.diagnostics --execution-id 執行UUID --full
+docker compose -f compose.jd-app.yaml run --rm --no-deps -T app python -m caliburn.diagnostics --execution-id 執行UUID --full
 ```
 
-#### 請求、回應與版本欄位
+檔案總覽預設最多 100 輪，可用 `--limit` 調整、`--after 上頁最後的執行UUID` 續查。`--full` 是明示讀取完整原件；檔案範圍加上它會包含所有輪次，不能與 `--after` 合用。大型訪談優先選 execution，再選 request，避免不必要地展開整份檔案。
 
-`request` 是保存的當時請求（敏感欄位已遮蔽），可展開 JSON 看 Context、指引與工具說明。
+每次命令在同一唯讀 Repeatable Read 交易組裝業務資料及原生 checkpoint／pending writes，直接輸出 UTF-8 JSON，中文可直接閱讀；不寫診斷副本、不需要 refresh，也不啟動或暫停 Agent。`read` 記錄讀取起訖及模式；再次執行才取得新的讀取視野。
 
-| 欄位或值 | 判讀方式 |
+| 輸出 | 如何使用 |
 |---|---|
-| `response_state=request_only` | 尚未找到已保存回應，不能推定未外送；`recorded` 才有原回應 |
-| `response_order` | 為相容保留的欄位名，表示邏輯請求的觀察順序；不是重試次數或跨程序精確時鐘 |
-| `captured_initial_context` | 保存原始 binding、request 及來源，可核當輪固定的 Memory／Plan 版本 |
-| `current_published_snapshot_id` | 查詢當下的 Memory head |
-| `published_snapshot_ids` | 這次 execution 發布的快照 |
+| `execution`、`attempts`、`budget` | 查輪次狀態、故障嘗試及已記錄用量，失敗與取消也可定位 |
+| `steps`、`tool_calls` | 查 logical request、已保存 `input_count`、回應、call／operation ID 及工具結果是否保存；完整正文由 `--full` 展開 |
+| `context_bindings`、`captured_initial_context`、`captured_analysis_contexts` | 核對 A／B 當時綁定與組裝內容；B 尚無第一個回應的 capture 也可在 `--full` 查閱，不能拿目前的 Memory head 解釋歷史 |
+| `compactions` | 查已保存的壓縮請求／結果、局部採用及角色是否引用；尚無下一 request 的壓縮仍可查 |
+| `control_history` | 查保存的 `step_pause`、原 interrupt ID、完整 Step 計數及所在 checkpoint；`continuation` 沿同一 thread／namespace 的父子 checkpoint 關係查後續已提交進展 |
+| `candidates`、`memory_publications`、`interviews` | 對照正式採用、發布及訪談效果，和模型是否回覆完成分開判讀 |
+| `operations`、`versions`（`--full`） | 沿原 operation 與固定版本讀 Memory／JD／Plan 正文；缺少的原件明示為 missing，不改讀 latest |
 
-原請求與後續回應的 checkpoint／source 分列，避免用後來的回應時間冒充請求捕捉時間。三個 Context／快照欄位不能互換；Context 中有導覽或工具可用，也不表示模型已讀過正文，實際讀取依工具呼叫及回傳查證。
+`--request-id` 選出該 Step 與工具；同輪綁定、操作、控制歷史及壓縮仍提供判讀背景。只有已保存請求不代表已外送；`result_state=not_recorded` 只表示工具輸出尚未保存，不能推定沒有執行。沿 `operation_id` 和 `receipt_state` 核對已提交結果，整輪正式採用仍由業務狀態判斷。壓縮結果的局部採用與角色歷史引用也是不同事件。
 
-CLI `--show` 輸出同一份受控副本，包含工作正文，不能導入一般 Log 或提交 Git。
+Step 的 `input_count` 保留同 thread／request／完整請求快照已保存的 `input_tokens` 與 `attempt_id`，包括父節點尚未返回的子圖原件。`null` 表示本次未觀察到相符 count，不是零，也不能推定可重送；它與回應的 `usage` 分開判讀，不以輪前歷史 count 或目前重新計數補值。
 
-#### 查回業務寫入
+控制歷史的 `continuation.state=observed` 表示保存的後代 checkpoint 已通過該完整 Step 邊界；`checkpoint_path` 提供原件接續位置。`not_observed` 只表示未找到足夠後續證據，不能推定目前仍暫停，須對照 `execution.status`。暫停以 interrupt／checkpoint／`completed_steps` 定位；`continuation.request_id` 屬於後續 checkpoint。`checkpoint_time` 是 checkpoint 保存時間，暫停原件附在其 pending write；它不是 pause 或 resume 受理時間。這份投影不另存控制事件，也不推造未保存的時間。
 
-要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
+取消保留執行原件及未發布修訂供查閱，業務讀取已回到取消前。Context 可讀版本、實際送入模型的內容、工具實際讀到的內容各自查證，不把可讀視為已讀，也不推造 opaque 壓縮內容。
 
-```sql
-SELECT h.display_name, h.execution_id, o.kind, o.expected_revision_id,
-       o.result_revision_id, o.request_payload, o.created_at
-FROM caliburn.diagnostic_execution_history h
-JOIN caliburn.jd_operations o
-  ON o.job_file_id = h.job_file_id AND o.candidate_execution_id = h.execution_id
-WHERE h.execution_id = '換成執行UUID'::uuid
-ORDER BY o.created_at, o.command_id;
+輸出遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，仍可能含訪談與工作正文，**不代表匿名化**。只在核准範圍另存、分享；一般 Log 不輸出這些正文。查閱使用既有資料庫權限，建議提供唯讀連線；它不是跨使用者授權 API。查閱或匯出失敗不修改正式結果，也不觸發業務重送。
+
+#### 按 request 與 call 查正文
+
+以下 PowerShell 範例先設定 execution／request ID，取得一份完整 JSON 後在本機選欄位；不必為每個欄位重查資料庫。明示 UTF-8 讓 PowerShell 正確解讀原生命令輸出：
+
+```powershell
+$executionId = '執行UUID'
+$requestId = '請求UUID'
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$json = uv run --project apps/api --locked python -m caliburn.diagnostics --execution-id $executionId --request-id $requestId --full
+if ($LASTEXITCODE -ne 0) { throw '診斷讀取失敗，請查看 stderr。' }
+$document = @($json | ConvertFrom-Json)[0]
+$step = $document.steps | Where-Object request_id -EQ $requestId
+
+$step | Select-Object request_id, response_state, input_count
+$step.request.instructions                         # 當時組裝的 Prompt
+$step.request.input | ConvertTo-Json -Depth 100     # 實際請求 Context／原生歷史
+$step.request.tools | ConvertTo-Json -Depth 100     # 當時工具定義
+$step.response.output | ConvertTo-Json -Depth 100   # 已保存的模型輸出
 ```
 
-這個排列用於查閱，不宣稱同時間戳的 command_id 順序就是操作發生順序；修訂因果查 `expected_revision_id → result_revision_id`。`jd_candidate_status = adopted` 才表示本輪候選已採用；工具成功訊息本身不表示整輪已提交。
+先列 call ID，再代入要查的那一次；`arguments` 與 `output` 保留原字串，工具輸出不一定是 JSON：
 
-#### 判讀界線
+```powershell
+$document.tool_calls | Select-Object call_id, name, result_state, receipt_state
+$callId = '工具call_id'
+$call = $document.tool_calls | Where-Object call_id -EQ $callId
+$call.arguments
+$call.output
+$call.receipts | ConvertTo-Json -Depth 100
 
-- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；模型／工具正文是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入，兩種計數也為 null；`saved_response_count` 只計已有回應，`request_only_count` 另計只有請求。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
-- `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
-- 包含本 execution 各階段留下的原模型回應及 pending writes，可能含後來放棄的工作。不能把診斷項目當成正式訪談來源，或把模型回應 `completed` 當整輪成功。
-- 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
-- VIEW 沿用查詢者的資料庫權限；建議在 DataGrip 開啟唯讀連線。它不是跨使用者授權或資料隔離 API。
+# 沿該 call 的 operation ID 取得 owner 已保存的操作／回執正文。
+$document.operations.PSObject.Properties | ForEach-Object { $_.Value } |
+    Where-Object {
+        $call.operation_id -and
+        ($_.command_id -eq $call.operation_id -or $_.operation_id -eq $call.operation_id)
+    } | ConvertTo-Json -Depth 100
+```
+
+沒有對應回執時輸出為空，仍以 `receipt_state` 及正式業務狀態判讀。需要保存本次 JSON 可用 `$json | Set-Content -Encoding utf8 './execution.json'`；再次查閱使用 `Get-Content -Raw -Encoding utf8 './execution.json' | ConvertFrom-Json`。
 
 ### 一般 Log 與 HTTP 關聯
 
@@ -284,7 +271,7 @@ ORDER BY o.created_at, o.command_id;
 
 | 資料用途 | 保存與收尾 |
 |---|---|
-| 日常訪談、JD 與工作進度 | 保留既有資料來源；操作前核對 App 實際連線、schema 及 volume。更新 App 不另建一份空庫當作遷移完成 |
+| 日常訪談、JD 與工作進度 | 操作前核對 App 實際連線、schema 及 volume。不相容版本依本頁明示切換新空 schema；這不代表舊資料已遷移，原資料仍按保存授權處置 |
 | 可重建的整合測試 | 保存 fixture、命令與必要結果，完成後只回收本次建立的 schema／容器／volume；中斷留下的資源另核對，不全域 prune |
 | 已結案研究實驗 | 保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有 Git／遠端原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
 

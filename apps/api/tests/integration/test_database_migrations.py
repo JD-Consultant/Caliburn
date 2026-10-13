@@ -107,10 +107,11 @@ def test_migrations_match_owned_metadata(
             assert constraint.name in names
 
 
+@pytest.mark.parametrize("old_head", ["unknown_head", "0032_memory_typed_evidence"])
 def test_wrong_migration_head_fails_startup_without_automatically_migrating(
-    database_settings: DatabaseSettings, database_connection: psycopg.Connection
+    database_settings: DatabaseSettings, database_connection: psycopg.Connection, old_head: str
 ) -> None:
-    database_connection.execute("UPDATE alembic_version SET version_num = 'unknown_head'")
+    database_connection.execute("UPDATE alembic_version SET version_num = %s", (old_head,))
     with (
         pytest.raises(DatabaseSchemaError, match="migrations"),
         TestClient(
@@ -122,8 +123,45 @@ def test_wrong_migration_head_fails_startup_without_automatically_migrating(
     ):
         pytest.fail("Startup must not succeed with mismatched schema")
     assert database_connection.execute("SELECT version_num FROM alembic_version").fetchone() == (
-        "unknown_head",
+        old_head,
     )
+
+
+@pytest.mark.parametrize(
+    "legacy_shape",
+    [
+        "ALTER TABLE interview_plan_bodies RENAME TO old_plan_bodies",
+        "ALTER TABLE jd_candidates ADD COLUMN generation_id UUID",
+        "CREATE TABLE diagnostic_execution_snapshots (execution_id UUID)",
+    ],
+)
+def test_storage_release_rejects_old_shapes_without_stamping_or_erasing(
+    empty_database_settings: DatabaseSettings, legacy_shape: str
+) -> None:
+    settings = empty_database_settings
+    engine = create_engine(
+        settings.sqlalchemy_url, connect_args={"options": f"-c search_path={settings.schema}"}
+    )
+    try:
+        with engine.begin() as connection:
+            config = migration_config()
+            config.attributes.update(connection=connection, schema=settings.schema)
+            command.upgrade(config, "0032_memory_typed_evidence")
+            connection.execute(text(legacy_shape))
+            # An unrelated original survives failed validation; migration is not cleanup.
+            connection.execute(text("CREATE TABLE original_evidence (value TEXT NOT NULL)"))
+            connection.execute(text("INSERT INTO original_evidence VALUES ('keep original')"))
+        with pytest.raises(RuntimeError, match="fresh.*namespace"), engine.begin() as connection:
+            config = migration_config()
+            config.attributes.update(connection=connection, schema=settings.schema)
+            command.upgrade(config, "head")
+        with engine.connect() as connection:
+            assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
+                "0032_memory_typed_evidence"
+            )
+            assert connection.scalar(text("SELECT value FROM original_evidence")) == "keep original"
+    finally:
+        engine.dispose()
 
 
 def test_documented_migration_cli_is_repeatable_and_has_no_pending_schema_changes(

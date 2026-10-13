@@ -1,0 +1,173 @@
+{
+  "data_origin": "fully_synthetic",
+  "model_input_policy": "Only employee_input.text is sent as employee input. Manual edits are human JD material applied through the existing owner; observation labels and all other metadata are harness data, never model instructions.",
+  "journeys": [
+    {
+      "id": "memory_correction_consolidation",
+      "stages": [
+        {
+          "id": "initial_work",
+          "kind": "employee_input",
+          "text": "我是檢測中心受理組的樣品行政，直接向組長報告。我核對送驗單與樣品標籤，確認樣品編碼、檢測項目和聯絡人一致，再用 LIMS 登錄並交給實驗室。資料不一致就請送件人補正，我不決定檢測方法，也不簽報告。我核准急件的當日受理。急件目前下午14點前送到並補齊資料，才能排當日受理；一般件排下一工作日。月底我另核對當月送驗與收費紀錄，把差異清單交財務，每月最後工作日18點前交，財務處理款項。我用試算表比對編碼與金額。這兩塊是固定工作，請整理職務稿與已談的工作記憶。"
+        },
+        {
+          "id": "publication_one",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "initial_work",
+          "label": "M1"
+        },
+        {
+          "id": "urgent_correction",
+          "kind": "employee_input",
+          "text": "更正剛才急件的分工：我說『我核准』說錯了，實際上我只是核對資料並提報組長，組長核准後才排當日受理。我沒有急件核准權。下午14點前送到並補齊資料的條件不變，一般件仍排下一工作日。月底差異清單仍在最後工作日18點前交財務，月底分工沒有變。請把更正整理到職務稿與已談的工作記憶。"
+        },
+        {
+          "id": "publication_two",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "urgent_correction",
+          "label": "M2"
+        },
+        {
+          "id": "continue_after_consolidation",
+          "kind": "employee_input",
+          "text": "受理和月底核對的工作先談到這裡，時間與分工沒有其他更正。請幫我看目前職務稿是否已反映這些內容；有重要缺口再問我。"
+        }
+      ]
+    },
+    {
+      "id": "unanchored_background_and_shared_ks",
+      "stages": [
+        {
+          "id": "known_background",
+          "kind": "employee_input",
+          "text": "我是學習推廣組的課程行政，向組長報告，服務成人進修學員。平常要接觸學員報名與退費資料，所以所有含個資的檔案只能放校內權限資料夾，不用私人信箱傳。我已完成校內個資處理訓練，工作需要理解同意範圍與資料最小化，也會用教務系統和試算表核對名單。今天先談這些背景，具體任務我下次再說，請先整理已談的工作記憶。"
+        },
+        {
+          "id": "background_publication",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "known_background",
+          "label": "M1"
+        },
+        {
+          "id": "two_work_uses",
+          "kind": "employee_input",
+          "text": "補兩項固定工作。開課前我把報名資料與教務系統逐筆核對，按學員編號找重複或缺欄，再向本人確認；開課前兩個工作日17點前把確認過的名單交授課老師，只提供教學聯絡需要的欄位。退費時我按已公告的退費辦法核對申請日期與出席紀錄，算出適用級距和金額，把明細交組長核准，核准後交財務付款，我沒有核准或付款權。這兩項都用同一套個資限制與試算表核對方法。退費送核沒有統一期限，我還沒查到各類案件的要求。請整理職務稿與已談的工作記憶。"
+        },
+        {
+          "id": "work_publication",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "two_work_uses",
+          "label": "M2"
+        },
+        {
+          "id": "review_known_scope",
+          "kind": "employee_input",
+          "text": "退費期限我現在仍答不出，也沒有新資料。其他分工沒有改，請先把已能確定的工作整理好；職務名稱、組別和資料使用限制都與之前相同。"
+        }
+      ]
+    },
+    {
+      "id": "manual_cross_section_changes",
+      "stages": [
+        {
+          "id": "grounded_work",
+          "kind": "employee_input",
+          "text": "我是場館營運組的設備窗口，向營運組長報告。我的工作是維持借用設備可追蹤、異常能交給技師處理。每天我用借用系統核對借出與歸還件數，記錄欠件並通知借用人，完成後有可追查的設備流向清單。設備異常時我記錄故障現象、停用受影響設備並交技師；技師判斷維修和安全性，修復簽認後我才恢復借用。我需要理解停用標示與交接規則，會核對系統紀錄、描述異常及追蹤處理。尖峰是周末活動前，未歸還的設備我在當天17點前通知借用人；這個期限只適用欠件通知。我不做電氣維修，也不負責安全認證；這個職位不要求電氣維修證照。請先整理職務稿和已談的工作記憶。"
+        },
+        {
+          "id": "equipment_publication",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "grounded_work",
+          "label": "M1"
+        },
+        {
+          "id": "human_cross_section_edit",
+          "kind": "manual_jd_edit",
+          "edits": [
+            {
+              "section": "profile.purpose",
+              "target_cue": "職務目的",
+              "content": "自行維修並認證設備安全，保證場館全年零故障。"
+            },
+            {
+              "section": "responsibility_areas.title",
+              "target_cue": "承接設備異常處理的職責",
+              "content": "電氣維修與安全認證"
+            },
+            {
+              "section": "work_tasks.description",
+              "target_cue": "設備異常記錄、停用及技師交接工作",
+              "content": "自行拆修故障設備，判斷安全性並核准恢復借用。"
+            },
+            {
+              "section": "work_tasks.outcomes",
+              "target_cue": "設備異常處理任務的整組成果明細，移除原成果後改為以下單筆",
+              "content": "本人簽發的安全認證報告。"
+            },
+            {
+              "section": "work_tasks.requirements",
+              "target_cue": "設備異常處理任務的整組要求明細，移除原要求後改為以下單筆",
+              "content": "所有故障均於當天17點前完成維修與認證。"
+            },
+            {
+              "section": "required_skills.description",
+              "target_cue": "設備異常描述與追蹤相關技能，只改description並保留name",
+              "content": "電氣拆修與安全認證能力。"
+            },
+            {
+              "section": "main_collaborators.scope_text",
+              "target_cue": "技師",
+              "content": "技師只接收本人完成的安全認證報告，不參與維修判斷。"
+            },
+            {
+              "section": "job_wide_conditions.schedule_travel",
+              "target_cue": "人工新增一筆schedule_travel條件，不修改既有條件",
+              "content": "所有工作均須當天17點前完成。"
+            },
+            {
+              "section": "job_wide_conditions.qualification",
+              "target_cue": "人工新增一筆qualification條件，不修改既有條件",
+              "content": "本職位須持電氣維修證照。"
+            }
+          ]
+        },
+        {
+          "id": "new_periodic_work",
+          "kind": "employee_input",
+          "text": "另外我每季會清點設備耗材，把庫存數量和預估用量交組長，組長決定採購。我只整理需求，不下單。清點通常在季末最後一周，盤點表供組長安排下季補充。這一項也想補進職務稿。"
+        },
+        {
+          "id": "review_all_sections",
+          "kind": "employee_input",
+          "text": "這次先談到這裡，沒有其他補充。季末清點的分工也沒有更正。"
+        }
+      ]
+    },
+    {
+      "id": "answered_but_not_drafted",
+      "stages": [
+        {
+          "id": "unknown_completion_condition",
+          "kind": "employee_input",
+          "text": "我是倉儲組的收貨行政。我核對到貨單、數量和品項，再把差異交倉儲組長處理。我還帶新同事操作收貨登錄，但帶教何時算完成，我要先確認組內做法。先把目前能確定的收貨工作整理好，帶教的完成條件先留待補充。還有每月盤點工作，我下次再談本人分工。"
+        },
+        {
+          "id": "completion_answer",
+          "kind": "employee_input",
+          "text": "帶教的完成條件確認了：新同事要連續兩次獨立完成收貨登錄且沒有品項或數量錯誤，我核對系統紀錄並記錄結果，組長確認後才結束帶教；我不替組長作最後確認。這是一直在用的做法，不是新訂績效目標。請整理職務稿與已談的工作記憶。盤點我今天仍沒空談。"
+        },
+        {
+          "id": "training_publication",
+          "kind": "memory_publication_observation",
+          "through_input_stage": "completion_answer",
+          "label": "M1"
+        },
+        {
+          "id": "continue_without_reasking",
+          "kind": "employee_input",
+          "text": "帶教條件和分工都沒有更正。盤點今天先不要談，其他已談的部分請整理好；有待核對的職務稿可以先處理。"
+        }
+      ]
+    }
+  ]
+}

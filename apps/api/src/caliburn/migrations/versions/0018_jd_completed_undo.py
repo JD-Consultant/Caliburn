@@ -14,7 +14,7 @@ def upgrade() -> None:
         op.f("ck_jd_operations_kind"),
         "jd_operations",
         "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-        "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+        "'edit_collaborators', 'edit_conditions', "
         "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn')",
     )
 

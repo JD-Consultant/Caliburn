@@ -9,17 +9,15 @@ from uuid import UUID, uuid4
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response, ResponseFunctionToolCall
-from response_capacity import synthetic_response_runtime
 
 from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import response_input_items
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    _build_response_step,
-    run_response_loop,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
+from caliburn.agent_execution.tool_steps import read_completed_response_history
+from tests.fixtures.native_response_runtime import read_response_state, run_response_loop
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
 async def run(mode: str, thread_id: str) -> None:
@@ -98,7 +96,6 @@ async def run(mode: str, thread_id: str) -> None:
             "max_tool_calls": 4,
             "max_model_steps": 2,
         }
-        graph = _build_response_step(saver, max_tool_calls=4, max_model_steps=2)
         config = {"configurable": {"thread_id": thread_id}}
         if mode == "write":
             try:
@@ -107,17 +104,18 @@ async def run(mode: str, thread_id: str) -> None:
                 pass
             else:
                 raise AssertionError("The probe must stop at its injected interruption")
-            saved = await graph.aget_state(config)
-            assert saved.next == ("account_response",)
+            saved = await read_response_state(saver, config)
+            assert saved.next == ("NativePolicy.after_model",)
             assert saved.values["completed_steps"] == 1
             assert saved.values["response_snapshot"]["id"] == final.id
             assert model_calls == 2 and observation_calls == 1
         elif mode == "resume":
-            before = await graph.aget_state(config)
+            before = await read_response_state(saver, config)
             assert before.values["request_snapshot"]["input"] == first_window
             result = await run_response_loop(saver, request=None, **options)
             assert result["request_id"] == before.values["request_id"]
-            assert result["input_items"] == [*first_window, *response_input_items(final)]
+            window = await read_completed_response_history(saver, thread_id=thread_id)
+            assert window.items == [*first_window, *response_input_items(final)]
             assert result["completed_steps"] == 2
             assert result["next_action"] == "deliver_answer"
             assert await run_response_loop(saver, request=None, **options) == result

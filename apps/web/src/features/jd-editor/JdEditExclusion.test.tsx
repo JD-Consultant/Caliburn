@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 /** The basic data and the collections are two editors over one revision: only one edit may be open or unconfirmed. */
@@ -5,8 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdProfileView, JdWorkView } from '../../shared/api/generated/http/types.gen';
+
 import { EditSlots } from './EditSlots';
 import { JdProfileEditor } from './JdProfileEditor';
 import { JdWorkEditor } from './JdWorkEditor';
@@ -54,7 +55,7 @@ function serve(post?: () => Promise<Response>) {
     if (options?.method === 'POST') return post ? post() : Promise.resolve(Response.json({}));
     return Promise.resolve(Response.json(path.endsWith('/jd/profile') ? profile : work));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return fetch;
 }
 

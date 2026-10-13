@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 import { onlineManager, QueryClientProvider } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -27,7 +28,7 @@ const clients: QueryClient[] = [];
 
 function renderComposer() {
   const commandFetch = globalThis.fetch;
-  vi.stubGlobal('fetch', (url: RequestInfo | URL, options?: RequestInit) =>
+  stubHttp((url: RequestInfo | URL, options?: RequestInit) =>
     url === `/api/job-files/${fileId}/consultant-turns/current`
       ? Promise.resolve(Response.json({ turn: null }))
       : commandFetch(url, options),
@@ -60,8 +61,7 @@ afterEach(() => {
 test('pause intent waits for a safe point; resume keeps the same turn and original input', async () => {
   let current = active;
   const posts: string[] = [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((url: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         posts.push(url);
@@ -103,8 +103,7 @@ test('lost cancel acknowledgement reads the same turn; retrying original words i
   let cancelled = false;
   const controls: string[] = [];
   const inputs: { command_id: string; text: string }[] = [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((url: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         if (url.endsWith('/cancel')) {
@@ -150,8 +149,7 @@ test('lost cancel acknowledgement reads the same turn; retrying original words i
 
 test('an uncertain pause never claims paused or automatically repeats a command', async () => {
   const posts: string[] = [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((url: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         posts.push(url);

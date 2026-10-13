@@ -3,9 +3,9 @@
 import json
 from collections.abc import Callable
 
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue, TypeAdapter, ValidationError
 
-from caliburn.workflows.jd_model_references import JdModelReferences
+from caliburn.features.job_description.model_references import JdModelReferences
 
 _REF_FIELDS = frozenset(
     {
@@ -19,6 +19,10 @@ _REF_FIELDS = frozenset(
         "task_read_ref",
     }
 )
+
+
+class InvalidJdArgumentsError(ValueError):
+    """只有模型輸入的 JSON／wire 解析失敗使用此錯誤。"""
 
 
 def map_jd_reference_fields(value: JsonValue, transform: Callable[[str], str]) -> JsonValue:
@@ -49,7 +53,10 @@ def _references(value: JsonValue) -> set[str]:
 
 
 async def resolve_jd_arguments(references: JdModelReferences, arguments: str) -> str:
-    payload: JsonValue = TypeAdapter(JsonValue).validate_json(arguments)
+    try:
+        payload: JsonValue = TypeAdapter(JsonValue).validate_json(arguments)
+    except ValidationError:
+        raise InvalidJdArgumentsError("Invalid JD arguments JSON") from None
     resolved = await references.resolve(_references(payload))
     return json.dumps(map_jd_reference_fields(payload, resolved.__getitem__), ensure_ascii=False)
 

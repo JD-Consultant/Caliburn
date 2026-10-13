@@ -28,12 +28,12 @@ def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(
     candidates = (
         ConsultantCandidate(
             name="left",
-            prompts={"focus": "只屬於甲候選的訪談重點"},
+            prompts={"professional_method": "只屬於甲候選的訪談重點"},
             jd_read_max_result_characters=100,
         ),
         ConsultantCandidate(
             name="right",
-            prompts={"focus": "只屬於乙候選的訪談重點"},
+            prompts={"professional_method": "只屬於乙候選的訪談重點"},
             tool_descriptions={"read_jd": "乙候選工具說明"},
             jd_read_max_result_characters=200,
         ),
@@ -78,7 +78,7 @@ def test_two_candidates_run_concurrently_with_isolated_context_and_formal_data(
         assert "乙候選工具說明" in str(right_diagnostics)
         assert "乙候選工具說明" not in str(left_diagnostics)
         for diagnostics, limit in ((left_diagnostics, 100), (right_diagnostics, 200)):
-            captured = diagnostics[0]["execution"]["captured_initial_context"]
+            captured = diagnostics[0]["captured_initial_context"]
             assert captured["tool_configuration"] == {"jd_read_max_result_characters": limit}
     finally:
         # 只移除本測試新建並持有的隨機 schema；左側由既有 fixture 管理。

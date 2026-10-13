@@ -27,7 +27,7 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow, adopt_candidate_jd
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow, adopt_candidate_jd
 
 pytestmark = pytest.mark.postgres
 

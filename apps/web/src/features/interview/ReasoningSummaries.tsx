@@ -1,7 +1,7 @@
 /** Readable summaries stay separate from commentary, formal answers and opaque reasoning. */
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Typography } from '@mui/material';
-import type { ReasoningSummary } from '../../shared/api/generated/reasoning-summary';
+import type { ReasoningSummary } from '../../shared/api/generated/http/types.gen';
 import { describeReadError } from '../../shared/api/http';
 import { ChatMarkdown } from '../../shared/ui/ChatMarkdown';
 import { reasoningSummariesQuery, summaryKey } from './reasoning-summary-api';

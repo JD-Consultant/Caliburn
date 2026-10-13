@@ -11,7 +11,6 @@ class CandidateStateError(RuntimeError):
 @dataclass(frozen=True, slots=True)
 class JdCandidateScope:
     execution_id: UUID
-    generation_id: UUID
 
 
 @dataclass(frozen=True, slots=True)

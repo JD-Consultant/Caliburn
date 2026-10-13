@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { expect, test } from 'vitest';
-import type { CandidateJdPreview } from '../../shared/api/generated/consultant-turn';
+import type { CandidateJdPreview } from '../../shared/api/generated/http/types.gen';
 import { JdCandidatePreview } from './JdCandidatePreview';
 
 test('one candidate renders grouped and unassigned work with read-only related collections', () => {

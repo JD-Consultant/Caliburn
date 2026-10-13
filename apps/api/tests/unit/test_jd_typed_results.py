@@ -12,11 +12,14 @@ from caliburn.agents.job_consultant.configuration import (
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.job_description.areas import CreateArea, ResponsibilityArea
 from caliburn.features.job_description.candidates import JdCandidateScope
-from caliburn.features.job_description.compound_edits import JdCompoundEditResult
+from caliburn.features.job_description.compound_edits import (
+    CreateItemWithSources,
+    JdCompoundEditResult,
+)
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.navigation import JdReadTargetNotFoundError
 from caliburn.transport.model_tools.occupation_references import occupation_reference_definitions
-from caliburn.workflows import jd_item_creation
-from caliburn.workflows.jd_model_references import JdModelReferences
+from caliburn.workflows.job_description import compound_writes as jd_compound_writes
 
 
 def test_reference_description_is_only_wording():
@@ -57,20 +60,17 @@ async def test_creation_workflow_returns_committed_domain_result(monkeypatch):
     async def apply(*args, **kwargs):
         return result
 
-    monkeypatch.setattr(jd_item_creation.job_files, "lock_job_file", allowed)
-    monkeypatch.setattr(jd_item_creation.executions, "lock_active_writer", allowed)
-    monkeypatch.setattr(jd_item_creation.revision_editing, "require_open_candidate", allowed)
-    monkeypatch.setattr(jd_item_creation.compound_service, "apply_compound_edit", apply)
+    monkeypatch.setattr(jd_compound_writes.job_files, "lock_job_file", allowed)
+    monkeypatch.setattr(jd_compound_writes.executions, "lock_active_writer", allowed)
+    monkeypatch.setattr(jd_compound_writes.revision_editing, "require_open_candidate", allowed)
+    monkeypatch.setattr(jd_compound_writes.compound_service, "apply_compound_edit", apply)
     scope = ExecutionScope(uuid4(), uuid4(), ExecutionKind.CONSULTANT_TURN)
     writer = ExecutionWriter(scope, uuid4())
-    prepared = jd_item_creation.PreparedItemCreation(
-        uuid4(),
-        JdCandidateScope(scope.execution_id, uuid4()),
-        uuid4(),
-        CreateArea("盤點", None),
-        (),
+    prepared = jd_compound_writes.PreparedJdEdit(
+        JdCandidateScope(scope.execution_id),
+        CreateItemWithSources(uuid4(), uuid4(), CreateArea("盤點", None), ()),
     )
-    actual = await jd_item_creation.JdItemCreationWorkflow(Sessions()).execute(writer, prepared)
+    actual = await jd_compound_writes.execute_prepared_jd_edit(Sessions(), writer, prepared)
     assert committed
     assert actual == result
 

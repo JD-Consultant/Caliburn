@@ -40,10 +40,11 @@ from caliburn.features.work_memory.revisions import (
     MemoryRevisionReference,
 )
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.memory_candidates import (
+from caliburn.workflows.work_memory.candidates import (
     MemoryCandidateWorkflow,
     start_memory_candidate,
 )
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
@@ -342,35 +343,6 @@ def test_replay_retains_original_identity_after_rename_and_title_reuse(
     execute(database_settings, scenario)
 
 
-def test_restore_invalidates_late_branch_and_preserves_prior_candidate(
-    database_settings: DatabaseSettings, source: tuple[UUID, UUID]
-) -> None:
-    async def scenario(database: Database) -> None:
-        workflow, runner, initial = await start(database, source)
-        position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
-        command = uuid4()
-        restored = await workflow.restore(runner, position, initial, command)
-        assert restored.generation_id != initial.generation_id
-        assert restored.phase == SITUATION
-        assert not await workflow.read_map(runner.scope, stage=restored, layer=SITUATION)
-        assert await workflow.restore(runner, position, initial, command) == restored
-        with pytest.raises(MemoryCandidateStateError):
-            await workflow.edit(
-                runner,
-                ReviseMemoryObject(
-                    uuid4(),
-                    position,
-                    UNDERSTANDING,
-                    understanding_id,
-                    MemoryContentChanges(title="遲到修改"),
-                ),
-            )
-        await workflow.discard(runner, restored, uuid4())
-        assert await workflow.read_latest_snapshot(source[0]) is None
-
-    execute(database_settings, scenario)
-
-
 def test_batch_reentry_keeps_original_source_boundary(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
@@ -484,22 +456,6 @@ def test_new_writer_rejects_late_worker_and_can_continue_same_candidate(
     execute(database_settings, scenario)
 
 
-def test_restore_rejects_forged_stage_and_abandoned_descendant(
-    database_settings: DatabaseSettings, source: tuple[UUID, UUID]
-) -> None:
-    async def scenario(database: Database) -> None:
-        workflow, runner, initial = await start(database, source)
-        position, _, _ = await build_pair(workflow, runner, initial, source[1])
-        with pytest.raises(MemoryCandidateStateError):
-            await workflow.restore(runner, position, replace(initial, phase=UNDERSTANDING), uuid4())
-        restored = await workflow.restore(runner, position, initial, uuid4())
-        with pytest.raises(MemoryCandidateStateError):
-            await workflow.restore(runner, restored, position, uuid4())
-        assert not await workflow.read_map(runner.scope, stage=restored, layer=SITUATION)
-
-    execute(database_settings, scenario)
-
-
 def test_failed_execution_only_recovers_original_discard_not_new_effect(
     database_settings: DatabaseSettings, source: tuple[UUID, UUID]
 ) -> None:
@@ -508,7 +464,12 @@ def test_failed_execution_only_recovers_original_discard_not_new_effect(
         async with database.sessions.begin() as session:
             await executions.finish_execution(session, runner, ExecutionStatus.FAILED)
         with pytest.raises(ExecutionStateError):
-            await workflow.discard(runner, initial, uuid4())
+            await workflow.edit(
+                runner,
+                CreateMemoryObject(
+                    uuid4(), initial, SITUATION, MemoryContent("遲到", "描述", "正文")
+                ),
+            )
 
     execute(database_settings, scenario)
 
@@ -518,9 +479,9 @@ def test_system_discard_reentry_returns_original_without_reactivating(
 ) -> None:
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
-        command_id = uuid4()
-        await workflow.discard(runner, initial, command_id)
-        await workflow.discard(runner, initial, command_id)
+        settlement = MemoryConsolidationWorkflow(workflow.sessions)
+        await settlement.fail(runner, reason="execution_interrupted")
+        await settlement.fail(runner, reason="execution_interrupted")
         with pytest.raises(ExecutionStateError):
             await workflow.start(runner, source[1])
         assert await workflow.read_latest_snapshot(source[0]) is None
@@ -560,50 +521,6 @@ def test_new_snapshot_reuses_unchanged_objects_and_keeps_file_scope(
             ) == await workflow.read_snapshot_object(source[0], second.snapshot_id, identity)
         with pytest.raises(MemoryRevisionNotFoundError):
             await workflow.read_snapshot_object(uuid4(), second.snapshot_id, case_id)
-
-    execute(database_settings, scenario)
-
-
-def test_restore_retains_understanding_safe_point_and_rejects_abandoned_branch(
-    database_settings: DatabaseSettings, source: tuple[UUID, UUID]
-) -> None:
-    async def scenario(database: Database) -> None:
-        workflow, runner, initial = await start(database, source)
-        safe_point, case_id, understanding_id = await build_pair(
-            workflow, runner, initial, source[1]
-        )
-        before = await workflow.read_object(
-            runner.scope, stage=safe_point, layer=UNDERSTANDING, object_id=understanding_id
-        )
-        change = await workflow.edit(
-            runner,
-            ReviseMemoryObject(
-                uuid4(),
-                safe_point,
-                UNDERSTANDING,
-                understanding_id,
-                MemoryContentChanges(body="尚未確認的新理解"),
-            ),
-        )
-        after = await workflow.read_object(
-            runner.scope, stage=change.position, layer=UNDERSTANDING, object_id=understanding_id
-        )
-        assert after.content.body == "尚未確認的新理解"
-        assert after.work_situation_references == before.work_situation_references
-        restored = await workflow.restore(runner, change.position, safe_point, uuid4())
-        assert restored.phase == UNDERSTANDING
-        assert (
-            await workflow.read_object(
-                runner.scope, stage=restored, layer=UNDERSTANDING, object_id=understanding_id
-            )
-            == before
-        )
-        with pytest.raises(MemoryCandidateStateError):
-            await publish_memory_owner_fixture(workflow.sessions, runner, change.position, uuid4())
-        snapshot = await publish_memory_owner_fixture(workflow.sessions, runner, restored, uuid4())
-        assert (
-            await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, case_id)
-        ).content.title == "每月盤點"
 
     execute(database_settings, scenario)
 

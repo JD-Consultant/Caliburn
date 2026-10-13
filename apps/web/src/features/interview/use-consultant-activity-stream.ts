@@ -1,8 +1,8 @@
 /** One active Turn's disposable public display; never submits input or controls execution. */
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import type { CommentaryUpdate } from '../../shared/api/generated/commentary-update';
-import type { ReasoningSummary } from '../../shared/api/generated/reasoning-summary';
+import type { CommentaryUpdate, ReasoningSummary } from '../../shared/api/generated/http/types.gen';
+
 import {
   isCommentaryUpdate,
   isReasoningSummary,

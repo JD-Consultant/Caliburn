@@ -5,6 +5,12 @@ root_package = caliburn
 include_external_packages = True
 exclude_type_checking_imports = False
 
+[importlinter:contract:acyclic]
+name = Package siblings remain acyclic throughout the App
+type = acyclic_siblings
+ancestors =
+	caliburn
+
 [importlinter:contract:adapters-direction]
 name = adapters: dependencies point toward owned lower layers
 type = forbidden
@@ -114,7 +120,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.executions
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:interview_plans-persistence]
@@ -125,7 +130,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.interview_plans
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:interviews-persistence]
@@ -136,7 +140,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.interviews
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:job_description-persistence]
@@ -155,7 +158,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.job_description
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:job_files-persistence]
@@ -166,7 +168,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.job_files
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:occupation_references-persistence]
@@ -177,7 +178,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.occupation_references
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:work_memory-persistence]
@@ -190,7 +190,6 @@ protected_modules =
 allowed_importers =
 	caliburn.features.work_memory
 	caliburn.workflows
-	caliburn.diagnostics
 	caliburn.migrations
 
 [importlinter:contract:job_consultant-role]
@@ -243,10 +242,18 @@ source_modules =
 	caliburn.features.job_description.areas
 	caliburn.features.job_description.candidates
 	caliburn.features.job_description.capability_changes
+	caliburn.features.job_description.change_comparison
 	caliburn.features.job_description.collaborator_changes
 	caliburn.features.job_description.compound_changes
+	caliburn.features.job_description.edit_changes
 	caliburn.features.job_description.condition_changes
 	caliburn.features.job_description.item_results
+	caliburn.features.job_description.item_deletion
+	caliburn.features.job_description.item_movement
+	caliburn.features.job_description.item_revision
+	caliburn.features.job_description.source_intents
+	caliburn.features.job_description.sources
+	caliburn.features.job_description.source_targets
 	caliburn.features.job_description.models
 	caliburn.features.job_description.source_changes
 	caliburn.features.job_description.task_changes
@@ -267,4 +274,6 @@ forbidden_modules =
 	sqlalchemy
 	psycopg
 	langgraph
+	langchain
+	langchain_core
 	openai

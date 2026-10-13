@@ -13,7 +13,7 @@ from caliburn.contracts.generated.tools.request_memory_consolidation_arguments i
 from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 
 
 @with_config(ConfigDict(strict=True, extra="forbid"))
@@ -31,9 +31,15 @@ def memory_consolidation_definitions() -> list[FunctionToolParam]:
     return [
         function_definition(
             "request_memory_consolidation",
-            "當訪談某項工作的資訊已值得整理時，要求背景整理受訪者工作記憶。"
-            "只登記要求，本輪成功完成後才由系統整理；不是宣告已發布。"
-            "不需填範圍、不等待整理完成，也不因後續仍有未知就禁止整理已知。",
+            (
+                "某項工作的已知資訊已足以形成有用的工作情境時，要求 App 在背景整"
+                "理工作情境與工作理解。不必等所有未知釐清，也不必每輪要求。傳入空"
+                "物件；來源範圍由 App 決定。成功只回 message「已記錄整理要求；本"
+                "輪成功完成後由系統處理。」表示要求已登記；本輪成功完成後才取得背"
+                "景整理資格，不表示整理已開始、完成或發布。本輪取消或失敗不使要求"
+                "生效。繼續依已發布正文與可見原話工作，無須等待；重複要求不會強制"
+                "重試先前失敗的整理。"
+            ),
             "request-memory-consolidation-arguments",
         )
     ]

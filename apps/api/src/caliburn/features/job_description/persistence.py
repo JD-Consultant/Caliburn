@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Text,
+    and_,
     func,
     or_,
     select,
@@ -103,7 +104,7 @@ class JdOperationRecord(Base):
         ),
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-            "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+            "'edit_collaborators', 'edit_conditions', "
             "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn', "
             "'compound_edit')",
             name="kind",
@@ -113,10 +114,6 @@ class JdOperationRecord(Base):
             ["jd_candidates.job_file_id", "jd_candidates.execution_id"],
             name="fk_jd_operations_candidate",
             ondelete="CASCADE",
-        ),
-        CheckConstraint(
-            "(candidate_execution_id IS NULL) = (candidate_generation_id IS NULL)",
-            name="candidate_scope",
         ),
     )
 
@@ -128,7 +125,6 @@ class JdOperationRecord(Base):
     expected_revision_id: Mapped[UUID]
     result_revision_id: Mapped[UUID]
     candidate_execution_id: Mapped[UUID | None]
-    candidate_generation_id: Mapped[UUID | None]
     # Loaded JSON is untrusted until compared with the typed original command.
     request_payload: Mapped[object] = mapped_column(JSONB)
     result_payload: Mapped[object | None] = mapped_column(JSONB, nullable=True)
@@ -163,6 +159,46 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> JdOperationRecord | None:
     return await session.get(JdOperationRecord, (job_file_id, command_id))
+
+
+async def is_formal_revision(session: AsyncSession, job_file_id: UUID, revision_id: UUID) -> bool:
+    """正式資格沿初稿或正式回執；候選中間修訂與放棄回執不授權。"""
+    initial = (
+        select(JobDescriptionRecord.job_file_id)
+        .where(
+            JobDescriptionRecord.job_file_id == job_file_id,
+            JobDescriptionRecord.initial_revision_id == revision_id,
+        )
+        .exists()
+    )
+    receipt = (
+        select(JdOperationRecord.command_id)
+        .where(
+            JdOperationRecord.job_file_id == job_file_id,
+            JdOperationRecord.result_revision_id == revision_id,
+            or_(
+                JdOperationRecord.kind == "adopt_candidate",
+                and_(
+                    JdOperationRecord.candidate_execution_id.is_(None),
+                    JdOperationRecord.kind.in_(
+                        (
+                            "revise_profile",
+                            "edit_areas",
+                            "edit_tasks",
+                            "edit_capabilities",
+                            "edit_collaborators",
+                            "edit_conditions",
+                            "edit_sources",
+                            "undo_completed_turn",
+                            "compound_edit",
+                        )
+                    ),
+                ),
+            ),
+        )
+        .exists()
+    )
+    return bool(await session.scalar(select(or_(initial, receipt))))
 
 
 async def read_revision_interval(
@@ -213,29 +249,6 @@ async def read_manual_operations(
             )
         )
     return tuple(await session.scalars(statement.order_by(record.created_at, record.command_id)))
-
-
-async def is_revision_ancestor(
-    session: AsyncSession, job_file_id: UUID, *, ancestor: UUID, descendant: UUID, boundary: UUID
-) -> bool:
-    """Follow fixed parents only as far as this candidate's initial formal base."""
-    chain = (
-        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
-        .where(
-            JdRevisionRecord.job_file_id == job_file_id, JdRevisionRecord.revision_id == descendant
-        )
-        .cte("candidate_ancestry", recursive=True)
-    )
-    chain = chain.union_all(
-        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
-        .join(chain, JdRevisionRecord.revision_id == chain.c.parent_revision_id)
-        .where(JdRevisionRecord.job_file_id == job_file_id, chain.c.revision_id != boundary)
-    )
-    return (
-        await session.scalar(
-            select(chain.c.revision_id).where(chain.c.revision_id == ancestor).limit(1)
-        )
-    ) is not None
 
 
 async def insert_revision(

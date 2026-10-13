@@ -201,21 +201,18 @@ def test_latest_qualified_state_survives_skipped_cancelled_turns_and_file_isolat
     assert client.portal.call(flow.start, other_file).state.excluded_work == ()
 
 
-def test_restoring_position_revokes_prepared_exclusion_and_preserves_original_state(
+def test_advanced_position_rejects_stale_prepared_exclusion_and_keeps_current_state(
     client: TestClient,
 ) -> None:
     flow, _ = workflow(client)
     writer = new_writer(client)
-    initial = client.portal.call(flow.start, writer)
+    client.portal.call(flow.start, writer)
+    stale = client.portal.call(flow.prepare_excluded_work, writer, ("不負責採購",), (), uuid4())
     first = client.portal.call(flow.prepare_excluded_work, writer, ("不負責部署",), (), uuid4())
     client.portal.call(flow.execute, writer, first)
-    current = client.portal.call(flow.start, writer)
-    stale = client.portal.call(flow.prepare_excluded_work, writer, ("不負責採購",), (), uuid4())
-    restored = client.portal.call(flow.restore, writer, current, initial.revision_id, uuid4())
-    assert restored.state == initial.state
     with pytest.raises(StaleReferenceStateError):
         client.portal.call(flow.execute, writer, stale)
-    assert client.portal.call(flow.read, writer)["excluded_work"] == []
+    assert client.portal.call(flow.read, writer)["excluded_work"] == ["不負責部署"]
 
 
 def test_selection_is_not_permanently_limited_to_one_search_batch(client: TestClient) -> None:

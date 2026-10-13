@@ -5,7 +5,9 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from uuid import UUID
 
+from caliburn.features.job_description.capabilities import CapabilityKind
 from caliburn.features.job_description.models import ProfileField
+from caliburn.features.job_description.tasks import TaskDetail
 
 
 class InvalidJdSourceError(ValueError):
@@ -16,11 +18,9 @@ class SourceTargetKind(StrEnum):
     PROFILE_FIELD = "profile_field"
     AREA = "area"
     TASK = "task"
-    DETAIL = "detail"
     CAPABILITY = "capability"
     COLLABORATOR = "collaborator"
     CONDITION = "condition"
-    TASK_CAPABILITY = "task_capability"
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,18 +28,12 @@ class JdSourceTarget:
     kind: SourceTargetKind
     item_id: UUID | None = None
     field: ProfileField | None = None
-    task_id: UUID | None = None
 
     def __post_init__(self) -> None:
         if self.kind == SourceTargetKind.PROFILE_FIELD:
-            valid = self.field is not None and self.item_id is None and self.task_id is None
+            valid = self.field is not None and self.item_id is None
         else:
-            needs_task = self.kind in {SourceTargetKind.DETAIL, SourceTargetKind.TASK_CAPABILITY}
-            valid = (
-                self.field is None
-                and self.item_id is not None
-                and (self.task_id is not None) == needs_task
-            )
+            valid = self.field is None and self.item_id is not None
         if not valid:
             raise InvalidJdSourceError("The source target has missing or unrelated identity fields")
 
@@ -64,7 +58,26 @@ class MemorySource:
 
 
 type JdSource = InterviewSource | MemorySource
-type SourceTargetContents = Mapping[JdSourceTarget, tuple[str | None, ...]]
+
+
+@dataclass(frozen=True, slots=True)
+class TaskSourceCapability:
+    capability_id: UUID
+    kind: CapabilityKind
+    name: str | None
+    description: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class TaskSourceContents:
+    title: str | None
+    description: str | None
+    details: tuple[TaskDetail, ...]
+    capabilities: tuple[TaskSourceCapability, ...]
+
+
+type JdSourceContents = tuple[str | None, ...] | TaskSourceContents
+type SourceTargetContents = Mapping[JdSourceTarget, JdSourceContents]
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,7 +86,7 @@ class JdSourceReference:
     target: JdSourceTarget
     source: JdSource
     needs_review: bool = False
-    # None is only an unpersisted addition/alignment; storage binds the new JD revision.
+    # 尚未保存的核對基準由 storage 綁定本次新 JD 修訂。
     reviewed_revision_id: UUID | None = None
 
 
@@ -91,19 +104,26 @@ def carry_source_references(
     references: tuple[JdSourceReference, ...],
     before: SourceTargetContents,
     after: SourceTargetContents,
+    *,
+    review_changed_content: bool = False,
 ) -> tuple[JdSourceReference, ...]:
-    """Retain evidence on surviving targets without silently confirming changed text."""
+    """顧問完成變更範圍的 JD 核對；來源版本不動，未變更引用保留原狀。"""
     carried = []
     for reference in references:
         if reference.target not in before:
             raise InvalidJdSourceError("Existing evidence has no owner in its original JD")
         if reference.target in after:
+            changed = before[reference.target] != after[reference.target]
             carried.append(
                 replace(
                     reference,
-                    needs_review=(
-                        reference.needs_review
-                        or before[reference.target] != after[reference.target]
+                    needs_review=False
+                    if changed and review_changed_content
+                    else reference.needs_review or changed,
+                    reviewed_revision_id=(
+                        None
+                        if changed and review_changed_content
+                        else reference.reviewed_revision_id
                     ),
                 )
             )

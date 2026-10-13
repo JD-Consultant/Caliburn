@@ -97,7 +97,9 @@ def test_two_app_compositions_keep_actual_requests_and_resources_independent(dat
             settings,
             composition=AppComposition(
                 consultant_configuration=ConsultantConfiguration(
-                    prompts=replace(ConsultantPrompts(), focus=f"候選{name}的焦點指引"),
+                    prompts=replace(
+                        ConsultantPrompts(), professional_method=f"候選{name}的焦點指引"
+                    ),
                     tool_descriptions=(ToolDescriptionOverride("read_jd", f"候選{name}說明"),),
                 ),
                 interview_plans_enabled=plans,

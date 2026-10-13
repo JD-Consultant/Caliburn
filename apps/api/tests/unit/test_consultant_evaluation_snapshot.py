@@ -23,7 +23,7 @@ def comparison_and_mutation():
             "candidates": [
                 {
                     "name": name,
-                    "prompts": {"focus": name + "-focus"},
+                    "prompts": {"professional_method": name + "-method"},
                     "tool_descriptions": {"read_jd": name + "-read"},
                 }
                 for name in ("baseline", "candidate")
@@ -33,7 +33,7 @@ def comparison_and_mutation():
 
     def mutate():
         for candidate in comparison.candidates:
-            candidate.prompts["focus"] = "changed-after-entry"
+            candidate.prompts["professional_method"] = "changed-after-entry"
             candidate.tool_descriptions["read_jd"] = "changed-after-entry"
         inputs.append("不可追加的輸入")
         criteria.append("不可追加的判準")
@@ -48,8 +48,8 @@ def assert_recorded_and_executed_originals(output, observed):
     assert len(observed) == 2
     for recorded, (configuration, case) in zip(manifest["candidates"], observed, strict=True):
         name = recorded["name"]
-        assert recorded["configuration"]["prompts"]["focus"] == name + "-focus"
-        assert configuration.prompts.focus == name + "-focus"
+        assert recorded["configuration"]["prompts"]["professional_method"] == name + "-method"
+        assert configuration.prompts.professional_method == name + "-method"
         assert recorded["configuration"]["tool_descriptions"] == [
             {"name": "read_jd", "description": name + "-read"}
         ]

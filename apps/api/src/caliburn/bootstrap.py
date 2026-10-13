@@ -7,6 +7,7 @@ from functools import partial
 
 import httpx2
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from caliburn.adapters.database import Database
@@ -42,30 +43,35 @@ from caliburn.transport.http.jd_undo import router as jd_undo_router
 from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.logging import HttpLoggingMiddleware, unhandled_error_response
+from caliburn.transport.http.published_memory import router as published_memory_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
-from caliburn.workflows.consultant_activity import ConsultantActivityHub
-from caliburn.workflows.consultant_activity import (
+from caliburn.transport.http.turn_tools import router as turn_tools_router
+from caliburn.transport.http.validation_errors import HttpErrorResponse, invalid_request_response
+from caliburn.workflows.consultant_turns.activity import ConsultantActivityHub
+from caliburn.workflows.consultant_turns.activity import (
     PublicCommentaryUpdate as ScopedCommentaryUpdate,
 )
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_controls import (
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.controls import (
     ConsultantControlWorkflow,
     run_consultant_with_controls,
 )
-from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.execution_failures import run_with_failure_boundary
-from caliburn.workflows.interview_inputs import InterviewInputWorkflow
+from caliburn.workflows.consultant_turns.inputs import InterviewInputWorkflow
+from caliburn.workflows.consultant_turns.status import ConsultantStatusWorkflow
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.consultant_turns.tool_history import TurnToolsWorkflow
+from caliburn.workflows.executions.failure_boundary import run_with_failure_boundary
 from caliburn.workflows.interview_plans import InterviewPlanReadWorkflow
-from caliburn.workflows.jd_editing import JdEditingWorkflow
-from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
-from caliburn.workflows.jd_export import JdExportWorkflow
-from caliburn.workflows.jd_undo import JdUndoWorkflow
+from caliburn.workflows.job_description.evidence import JdEvidenceWorkflow
+from caliburn.workflows.job_description.export import JdExportWorkflow
+from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
+from caliburn.workflows.job_description.turn_changes import TurnJdChangesWorkflow
+from caliburn.workflows.job_description.undo import JdUndoWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
-from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-from caliburn.workflows.memory_supervisor import MemorySupervisor
-from caliburn.workflows.turn_jd_changes import TurnJdChangesWorkflow
+from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+from caliburn.workflows.work_memory.published_reads import PublishedMemoryWorkflow
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
 # Registration order is route-matching order.
 ROUTERS = (
@@ -86,6 +92,8 @@ ROUTERS = (
     jd_export_router,
     jd_undo_router,
     turn_jd_changes_router,
+    turn_tools_router,
+    published_memory_router,
 )
 
 
@@ -121,7 +129,11 @@ def create_app(
         title="Caliburn",
         version="0.1.0",
         lifespan=lifespan,
-        exception_handlers={Exception: unhandled_error_response},
+        exception_handlers={
+            Exception: unhandled_error_response,
+            RequestValidationError: invalid_request_response,
+        },
+        responses={422: {"model": HttpErrorResponse, "description": "Invalid HTTP input"}},
     )
     app.add_middleware(LocalHttpSecurityMiddleware, dev_origin=configured.dev_origin)
     app.add_middleware(HttpLoggingMiddleware)
@@ -156,6 +168,8 @@ def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
     app.state.jd_evidence_workflow = JdEvidenceWorkflow(sessions) if sessions else None
     app.state.jd_undo_workflow = JdUndoWorkflow(sessions) if sessions else None
     app.state.turn_jd_changes_workflow = TurnJdChangesWorkflow(sessions) if sessions else None
+    app.state.turn_tools_workflow = TurnToolsWorkflow(sessions) if sessions else None
+    app.state.published_memory_workflow = PublishedMemoryWorkflow(sessions) if sessions else None
     app.state.interview_input_workflow = InterviewInputWorkflow(sessions) if sessions else None
     app.state.interview_plan_read_workflow = (
         InterviewPlanReadWorkflow(sessions) if sessions else None

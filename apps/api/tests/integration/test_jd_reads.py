@@ -22,6 +22,7 @@ from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import SubmitInterviewInput
 from caliburn.features.job_description import source_persistence
 from caliburn.features.job_description.areas import CreateArea, EditJdAreas
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.features.job_description.sources import (
@@ -44,11 +45,13 @@ from caliburn.features.work_memory.models import MemoryContent, MemoryContentCha
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_reference_fields import resolve_jd_arguments
-from caliburn.workflows.interview_completion import record_formal_interview
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_reads import JdReadWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
@@ -159,7 +162,9 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
     )
     binding = PublishedMemoryRead(writer.scope, None, 1)
     reader = JdReadWorkflow(client.app.state.database.sessions)
-    tools = JdReadTools(reader, binding)
+    tools = JdReadTools(
+        reader, binding, references=JdModelReferences(client.app.state.database.sessions, file_id)
+    )
     output = json.loads(
         client.portal.call(tools.invoke, "read_jd", '{"view":"profile","read_ref":null}')
     )
@@ -168,11 +173,20 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
     output = json.loads(
         client.portal.call(resolve_jd_arguments, tools.references, json.dumps(output))
     )
+    assert output["supporting_sources"]["job_title"][0]["jd_changed"] is False
+    assert output["supporting_sources"]["job_title"][0]["source_changed"] is False
+    navigation = json.loads(
+        client.portal.call(tools.invoke, "read_jd", '{"view":"map","read_ref":null}')
+    )
+    assert navigation["profile"]["needs_recheck"] is False
     assert output["supporting_sources"]["job_title"] == [
         {
             "citation_ref": f"citation_{before[0].citation_id.hex}",
-            "kind": "current_input",
-            "needs_recheck": True,
+            "kind": "interview",
+            "interview_sequence": 2,
+            "needs_recheck": False,
+            "jd_changed": False,
+            "source_changed": False,
         }
     ]
     assert output["supporting_sources"]["purpose"] == [
@@ -180,12 +194,17 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
             "citation_ref": f"citation_{before[1].citation_id.hex}",
             "kind": "interview",
             "interview_sequence": 1,
+            "needs_recheck": False,
+            "jd_changed": False,
+            "source_changed": False,
         }
     ]
     assert "不應由JD展開的原話" not in json.dumps(output, ensure_ascii=False)
     assert client.get(f"/api/job-files/{file_id}/jd/profile").json()["profile"]["job_title"] is None
     assert len(client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]) == 1
-    inaccessible = JdReadTools(reader, replace(binding, interview_through_sequence=0))
+    inaccessible = JdReadTools(
+        reader, replace(binding, interview_through_sequence=0), references=tools.references
+    )
     assert (
         json.loads(
             client.portal.call(inaccessible.invoke, "read_jd", '{"view":"profile","read_ref":null}')
@@ -208,6 +227,14 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
             tools.invoke, "read_jd", json.dumps({"view": "work_tasks", "read_ref": area_ref})
         )
     ) == {"items": []}
+    assert client.portal.call(workflow.read, writer.scope).position == position
+    assert (
+        transact(
+            client,
+            lambda s: source_persistence.read_source_references(s, file_id, position.revision_id),
+        )
+        == before
+    )
 
     # A later candidate change must be visible to the next read, not a cached preview.
     latest = client.portal.call(
@@ -231,7 +258,11 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
 
     second = start_input(client, create_file(client))
     client.portal.call(workflow.start, second)
-    foreign = JdReadTools(reader, PublishedMemoryRead(second.scope, None, 1))
+    foreign = JdReadTools(
+        reader,
+        PublishedMemoryRead(second.scope, None, 1),
+        references=JdModelReferences(client.app.state.database.sessions, second.scope.job_file_id),
+    )
     assert (
         json.loads(
             client.portal.call(
@@ -241,7 +272,9 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
         == "target_not_found"
     )
     wrong_scope = replace(writer.scope, job_file_id=second.scope.job_file_id)
-    forged = JdReadTools(reader, PublishedMemoryRead(wrong_scope, None, 1))
+    forged = JdReadTools(
+        reader, PublishedMemoryRead(wrong_scope, None, 1), references=foreign.references
+    )
     assert (
         json.loads(
             client.portal.call(forged.invoke, "read_jd", '{"view":"profile","read_ref":null}')
@@ -259,7 +292,9 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
     latest_sources = transact(
         client, lambda s: source_persistence.read_source_references(s, file_id, latest.revision_id)
     )
-    assert all(reference.needs_review for reference in latest_sources)
+    assert all(not reference.needs_review for reference in latest_sources)
+    assert latest_sources[0] == before[0]
+    assert latest_sources[1].reviewed_revision_id == latest.revision_id
     transact(client, lambda s: executions.finish_execution(s, writer, ExecutionStatus.CANCELLED))
     assert (
         json.loads(client.portal.call(tools.invoke, "read_jd", '{"view":"map","read_ref":null}'))[
@@ -445,7 +480,9 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
             before = await source_persistence.read_source_references(
                 session, file_id, position.revision_id
             )
-        tools = JdReadTools(JdReadWorkflow(sessions), binding)
+        tools = JdReadTools(
+            JdReadWorkflow(sessions), binding, references=JdModelReferences(sessions, file_id)
+        )
         output = await tools.invoke("read_jd", '{"view":"profile","read_ref":null}')
         data = json.loads(await resolve_jd_arguments(tools.references, output))[
             "supporting_sources"
@@ -457,6 +494,14 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
                 "target_title": "固定新版名",
                 "historical_title": "引用舊名",
                 "needs_recheck": True,
+                "source_version": {
+                    "covered_through_sequence": old_snapshot.covered_through_sequence
+                },
+                "comparison_version": {
+                    "covered_through_sequence": pinned_snapshot.covered_through_sequence
+                },
+                "jd_changed": False,
+                "source_changed": True,
             }
         ]
         assert data["job_title"] == [
@@ -465,6 +510,14 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
                 "kind": "work_situation",
                 "historical_title": "刪除後同名",
                 "needs_recheck": True,
+                "source_version": {
+                    "covered_through_sequence": old_snapshot.covered_through_sequence
+                },
+                "comparison_version": {
+                    "covered_through_sequence": pinned_snapshot.covered_through_sequence
+                },
+                "jd_changed": False,
+                "source_changed": True,
             }
         ]
         assert data["organization_unit"] == [
@@ -472,6 +525,15 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
                 "citation_ref": f"citation_{before[2].citation_id.hex}",
                 "kind": "work_understanding",
                 "target_title": "理解",
+                "source_version": {
+                    "covered_through_sequence": pinned_snapshot.covered_through_sequence
+                },
+                "comparison_version": {
+                    "covered_through_sequence": pinned_snapshot.covered_through_sequence
+                },
+                "needs_recheck": False,
+                "jd_changed": False,
+                "source_changed": False,
             }
         ]
         for forbidden in (

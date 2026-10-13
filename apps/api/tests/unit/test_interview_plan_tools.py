@@ -18,7 +18,6 @@ from caliburn.features.interview_plans.models import (
 )
 from caliburn.transport.model_tools.interview_plans import (
     InterviewPlanTools,
-    interview_plan_definitions,
 )
 
 INITIAL_PLAN = """## 目前焦點
@@ -96,22 +95,18 @@ async def test_markdown_refocus_keeps_pending_jd_work_and_unrelated_scope_in_rou
             assert original_line in workflow.snapshot.body.splitlines()
 
 
-async def test_advertised_examples_create_and_refocus_one_markdown_plan_in_roundtrip() -> None:
-    description = next(
-        tool["description"]
-        for tool in interview_plan_definitions()
-        if tool["name"] == "edit_interview_plan"
-    )
-    examples = re.findall(r"```diff\n(.*?)\n```", description, re.DOTALL)
-    assert len(examples) == 2, "Advertise executable creation and partial-replacement examples"
-
+async def test_creation_then_partial_refocus_preserves_one_markdown_plan_in_roundtrip() -> None:
+    creation_diff = "@@\n" + "\n".join("+" + line for line in INITIAL_PLAN.splitlines())
+    creation_diff += "\n*** End of File"
     tools, workflow = tools_for(None)
-    created = await tools.prepare("edit_interview_plan", json.dumps({"diff": examples[0]}), uuid4())
+    created = await tools.prepare(
+        "edit_interview_plan", json.dumps({"diff": creation_diff}), uuid4()
+    )
     assert isinstance(created, dict)
     await tools.execute(json.loads(json.dumps(created)))
     assert json.loads(await tools.invoke("read_interview_plan", "{}")) == {"plan": INITIAL_PLAN}
 
-    edited = await tools.prepare("edit_interview_plan", json.dumps({"diff": examples[1]}), uuid4())
+    edited = await tools.prepare("edit_interview_plan", json.dumps({"diff": REFOCUS_DIFF}), uuid4())
     assert isinstance(edited, dict)
     await tools.execute(json.loads(json.dumps(edited)))
     assert json.loads(await tools.invoke("read_interview_plan", "{}")) == {"plan": UPDATED_PLAN}

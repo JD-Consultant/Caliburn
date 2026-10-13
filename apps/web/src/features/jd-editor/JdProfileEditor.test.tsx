@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -5,7 +6,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
+import type { JdProfileView } from '../../shared/api/generated/http/types.gen';
 import { isReviseJdProfileRequest } from '../../shared/api/validation';
 import { JdProfileEditor } from './JdProfileEditor';
 import { jdProfileQuery } from './jd-profile-api';
@@ -82,7 +83,7 @@ test('click a field’s text to edit it in place: Enter sends one change for tha
     }
     return Promise.resolve(Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   expect(await screen.findByRole('textbox', { name: '職務名稱' })).toHaveFocus();
@@ -107,7 +108,7 @@ test('click a field’s text to edit it in place: Enter sends one change for tha
 test('emptying an optional field clears it, and a field without a value can be filled in place', async () => {
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
   fetch.mockImplementation(() => Promise.resolve(Response.json(original)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
 
   await userEvent.click(await screen.findByText('原目的'));
@@ -130,7 +131,7 @@ test('emptying an optional field clears it, and a field without a value can be f
 
 test('whitespace only is refused with a reason; the draft stays and nothing is sent', async () => {
   const fetch = vi.fn().mockImplementation(() => Promise.resolve(Response.json(original)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   const field = await screen.findByRole('textbox', { name: '職務名稱' });
@@ -145,7 +146,7 @@ test('whitespace only is refused with a reason; the draft stays and nothing is s
 
 test('saving without a change closes the editor and sends nothing; an unsaved identity is never sent', async () => {
   const fetch = vi.fn().mockImplementation(() => Promise.resolve(Response.json(original)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   await userEvent.click(await screen.findByRole('button', { name: '儲存' }));
@@ -178,7 +179,7 @@ test('a lost response keeps the draft in the editor, which re-confirms the same 
     }
     return Promise.resolve(Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   const field = await edit('前端工程師', '職務名稱', '維護工程師');
 
@@ -208,7 +209,7 @@ test('after a reload the unconfirmed command is found again and re-confirmed unc
     }
     return Promise.resolve(Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderEditor();
   await edit('前端工程師', '職務名稱', '維護工程師');
   await screen.findByRole('alert');
@@ -238,7 +239,7 @@ test('an explicit rejection is not retried and keeps the draft; the person reads
     }
     return Promise.resolve(Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   const field = await edit('前端工程師', '職務名稱', '不能覆蓋');
 
@@ -260,7 +261,7 @@ test('a background refresh does not replace the open editor’s draft or its rev
         : Response.json(current),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const view = renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   const field = await screen.findByRole('textbox', { name: '職務名稱' });
@@ -287,7 +288,7 @@ test('a failed background refresh keeps the profile draft, shows the error and b
       );
     return Promise.resolve(readFails ? Response.json({}, { status: 503 }) : Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   const field = await screen.findByRole('textbox', { name: '職務名稱' });
@@ -332,8 +333,7 @@ test('a failed background refresh keeps the profile draft, shows the error and b
 test.each(['invalid', 'offline'])(
   'a %s read is not an empty JD and offers no way to edit',
   async (failure) => {
-    vi.stubGlobal(
-      'fetch',
+    stubHttp(
       failure === 'invalid'
         ? vi.fn().mockResolvedValue(Response.json({ profile: {} }))
         : vi.fn().mockRejectedValue(new TypeError('offline')),
@@ -357,7 +357,7 @@ test('while a command is in flight a second Save and Esc do nothing; the editor 
   fetch.mockImplementation((_path, options) =>
     options?.method === 'POST' ? response : Promise.resolve(Response.json(original)),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByText('前端工程師'));
   const field = await screen.findByRole('textbox', { name: '職務名稱' });
@@ -378,7 +378,7 @@ test('while a command is in flight a second Save and Esc do nothing; the editor 
 
 test('while a Turn owns the JD the fields are plain text', async () => {
   const fetch = vi.fn().mockImplementation(() => Promise.resolve(Response.json(original)));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor(true);
   await userEvent.click(await screen.findByText('前端工程師'));
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument();

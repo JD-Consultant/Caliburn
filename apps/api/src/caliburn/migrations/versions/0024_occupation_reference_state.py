@@ -17,10 +17,7 @@ def upgrade() -> None:
         sa.Column("operation_id", sa.Uuid(), nullable=False),
         sa.Column("execution_id", sa.Uuid(), nullable=False),
         sa.Column("kind", sa.Text(), nullable=False),
-        sa.Column("generation_id", sa.Uuid(), nullable=False),
-        sa.Column("result_generation_id", sa.Uuid(), nullable=False),
         sa.Column("expected_revision_id", sa.Uuid(), nullable=True),
-        sa.Column("parent_revision_id", sa.Uuid(), nullable=True),
         sa.Column("revision_id", sa.Uuid(), nullable=False),
         sa.Column("state", postgresql.JSONB(), nullable=False),
         sa.PrimaryKeyConstraint("job_file_id", "operation_id"),
@@ -41,22 +38,10 @@ def upgrade() -> None:
             ],
             name="fk_reference_operation_expected",
         ),
-        sa.ForeignKeyConstraint(
-            ["job_file_id", "execution_id", "parent_revision_id"],
-            [
-                "occupation_reference_operations.job_file_id",
-                "occupation_reference_operations.execution_id",
-                "occupation_reference_operations.revision_id",
-            ],
-            name="fk_reference_operation_parent",
-        ),
+        sa.CheckConstraint("kind IN ('start', 'apply')", name="reference_operation_kind"),
         sa.CheckConstraint(
-            "kind IN ('start', 'apply', 'restore')", name="reference_operation_kind"
-        ),
-        sa.CheckConstraint(
-            "(kind = 'start' AND expected_revision_id IS NULL AND parent_revision_id IS NULL) OR "
-            "(kind <> 'start' AND expected_revision_id IS NOT NULL "
-            "AND parent_revision_id IS NOT NULL)",
+            "(kind = 'start' AND expected_revision_id IS NULL) OR "
+            "(kind = 'apply' AND expected_revision_id IS NOT NULL)",
             name="reference_operation_ancestry",
         ),
         sa.CheckConstraint(
@@ -73,23 +58,12 @@ def upgrade() -> None:
         "occupation_reference_candidates",
         sa.Column("job_file_id", sa.Uuid(), nullable=False),
         sa.Column("execution_id", sa.Uuid(), nullable=False),
-        sa.Column("generation_id", sa.Uuid(), nullable=False),
-        sa.Column("base_revision_id", sa.Uuid(), nullable=False),
         sa.Column("current_revision_id", sa.Uuid(), nullable=False),
         sa.PrimaryKeyConstraint("job_file_id", "execution_id"),
         sa.ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_reference_candidate_execution",
-        ),
-        sa.ForeignKeyConstraint(
-            ["job_file_id", "execution_id", "base_revision_id"],
-            [
-                "occupation_reference_operations.job_file_id",
-                "occupation_reference_operations.execution_id",
-                "occupation_reference_operations.revision_id",
-            ],
-            name="fk_reference_candidate_base",
         ),
         sa.ForeignKeyConstraint(
             ["job_file_id", "execution_id", "current_revision_id"],

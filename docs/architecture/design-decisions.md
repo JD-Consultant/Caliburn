@@ -52,7 +52,9 @@ Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、
 
 ## 5. 模型執行：以既有框架整合產品流程
 
-現行採用 LangGraph 與 OpenAI direct Responses SDK，不採 LangChain agent／message adapter 或 OpenAI Agents SDK。Graph 負責執行控制與 checkpoint，各角色的工具連接業務模組，原生模型輸出依原契約保存與重播。
+採用 LangChain `create_agent`、LangGraph 與 OpenAI direct Responses SDK。標準 Agent 管理模型／工具路由與配對，公開 model／middleware 接縫保留原生請求、回應及產品准入；各角色工具仍連接原業務模組。
+
+工具的固定命令由同步子圖先可靠保存，再執行業務效果；容量與壓縮仍使用有明確保存邊界的 Graph。框架 messages 僅用於路由，不取代原生 context 或不可變原件。沿已有責任組合框架，沒有第二套手寫模型／工具迴圈。採用範圍及狀態見[技術選型](../implementation/technology-decisions.md)。
 
 執行節點、SDK 傳輸格式、取消資格與模型容量詳見[共用執行與恢復](../implementation/agent-execution.md)。
 

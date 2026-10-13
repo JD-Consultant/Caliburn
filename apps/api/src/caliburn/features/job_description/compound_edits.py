@@ -24,7 +24,7 @@ from caliburn.features.job_description.conditions import (
 )
 from caliburn.features.job_description.models import ProfileChange, ProfileField, ReviseJdProfile
 from caliburn.features.job_description.sources import JdSource, JdSourceChange, JdSourceTarget
-from caliburn.features.job_description.tasks import CreateTask, DetailKind, ReviseTask, WorkTask
+from caliburn.features.job_description.tasks import CreateTask, ReviseTask, WorkTask
 
 type ItemCreation = CreateArea | CreateCapability | CreateCollaborator | CreateCondition
 type ItemContentRevision = (
@@ -43,19 +43,12 @@ class BoundProfileSources:
 @dataclass(frozen=True, slots=True)
 class BoundTaskCapability:
     capability_id: UUID
-    sources: tuple[JdSource, ...]
 
 
 @dataclass(frozen=True, slots=True)
 class BoundItemSources:
     target: JdSourceTarget
     changes: tuple[JdSourceChange, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class AddedDetailSources:
-    kind: DetailKind
-    sources: tuple[JdSource, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,7 +69,6 @@ class CreateTaskWithSources:
     expected_revision_id: UUID
     task: CreateTask
     task_sources: tuple[JdSource, ...]
-    detail_sources: tuple[tuple[JdSource, ...], ...]
     capabilities: tuple[BoundTaskCapability, ...]
 
 
@@ -95,7 +87,6 @@ class ReviseItemWithSources:
     content: ItemContentRevision | None
     capabilities: tuple[SetTaskCapability | ReorderTaskCapability, ...]
     sources: tuple[BoundItemSources, ...]
-    added_details: tuple[AddedDetailSources, ...]
 
 
 type CompoundJdEdit = (

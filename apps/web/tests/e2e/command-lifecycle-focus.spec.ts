@@ -248,7 +248,7 @@ test('來源面板可用鍵盤開啟關閉，焦點回到 disclosure／原徽章
   const citationId = randomUUID();
   const reference = {
     citation_id: citationId,
-    target: { kind: 'profile_field', field: 'job_title', item_id: null, task_id: null },
+    target: { kind: 'profile_field', field: 'job_title', item_id: null },
     target_label: '職務名稱',
     source_kind: 'interview',
     source_label: '合成鍵盤來源',

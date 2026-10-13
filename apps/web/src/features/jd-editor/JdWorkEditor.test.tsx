@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { JdWorkEditor } from './JdWorkEditor';
 import { jdWorkQuery } from './jd-work-api';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const revision = '20000000-0000-4000-8000-000000000002';
@@ -76,7 +77,7 @@ test('原目標後來已刪除仍能 remount 重新確認同命令，不復活�
     }
     return Promise.resolve(Response.json(current));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const first = renderEditor();
   await userEvent.click(await screen.findByRole('heading', { name: '網站交付' }));
   await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '新名稱{Enter}');
@@ -103,7 +104,7 @@ test('背景讀取不能替換草稿基底；409 後須明確讀目前稿', asyn
         : Response.json(original),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
   await userEvent.type(await screen.findByRole('textbox', { name: '職責名稱' }), '本機草稿');
@@ -129,7 +130,7 @@ test('背景讀取不能替換草稿基底；409 後須明確讀目前稿', asyn
 test.each([{}, { revision_id: revision, areas: [], tasks: [{ title: '不完整資料' }] }])(
   '非法讀取結果不是空稿，也不可編輯',
   async (value) => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(value)));
+    stubHttp(vi.fn().mockResolvedValue(Response.json(value)));
     renderEditor();
     expect(await screen.findByRole('alert')).toHaveTextContent('資料格式不符');
     expect(screen.queryByRole('button', { name: '新增職責' })).not.toBeInTheDocument();
@@ -138,7 +139,7 @@ test.each([{}, { revision_id: revision, areas: [], tasks: [{ title: '不完整�
 
 test('空白與暫存失敗均不發寫入；尚未送出的草稿可以離開', async () => {
   const fetch = vi.fn().mockResolvedValue(Response.json(original));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
   const field = await screen.findByRole('textbox', { name: '職責名稱' });
@@ -159,7 +160,7 @@ test('空白與暫存失敗均不發寫入；尚未送出的草稿可以離開',
 
 test('刪職責需明確確認，提示任務保留而非一起刪除', async () => {
   const fetch = vi.fn().mockResolvedValue(Response.json(original));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '刪除職責' }));
   const dialog = screen.getByRole('dialog');
@@ -181,7 +182,7 @@ test('請求在途時欄位與按鈕等待；保存已知但本機清理失敗�
       ? response.then((value) => value.clone())
       : Promise.resolve(Response.json(original)),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
   await userEvent.type(await screen.findByRole('textbox', { name: '職責名稱' }), '新職責{Enter}');
@@ -209,7 +210,7 @@ test('請求在途時欄位與按鈕等待；保存已知但本機清理失敗�
 
 test('損壞的待確認命令阻止新寫入，不默默丟棄', async () => {
   sessionStorage.setItem(`caliburn.pending-jd-work.${fileId}`, '{broken');
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(original)));
+  stubHttp(vi.fn().mockResolvedValue(Response.json(original)));
   renderEditor();
   expect(await screen.findByRole('alert')).toHaveTextContent('無法讀取待確認修改');
   expect(await screen.findByRole('button', { name: '新增職責' })).toHaveAttribute(
@@ -220,10 +221,7 @@ test('損壞的待確認命令阻止新寫入，不默默丟棄', async () => {
 });
 
 test('a responsibility always shows its task count and collapses to its header and back', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json(original))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json(original))));
   renderEditor();
   const collapse = await screen.findByRole('button', { name: '收合職責 網站交付' });
   expect(collapse).toHaveAttribute('aria-expanded', 'true');
@@ -242,10 +240,7 @@ test('a responsibility always shows its task count and collapses to its header a
 });
 
 test('a task collapses to its title and expands again, leaving its responsibility alone', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json(original))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json(original))));
   renderEditor();
   const collapse = await screen.findByRole('button', { name: '收合任務 實作網頁' });
   expect(collapse).toHaveAttribute('aria-expanded', 'true');

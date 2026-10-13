@@ -1,12 +1,10 @@
 """Undo the JD effects of one completed Turn, never accept a client-selected old revision."""
 
-from dataclasses import asdict
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from caliburn.contracts.generated.jd_profile_view import JdProfileView
 from caliburn.features.executions.models import (
     ExecutionBusyError,
     ExecutionNotFoundError,
@@ -15,7 +13,8 @@ from caliburn.features.executions.models import (
 from caliburn.features.job_description.candidates import CandidateStateError
 from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.workflows.jd_undo import JdUndoUnconfirmedError, JdUndoWorkflow
+from caliburn.transport.http.models.jd_views import JdProfileView
+from caliburn.workflows.job_description.undo import JdUndoUnconfirmedError, JdUndoWorkflow
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/consultant-turns", tags=["job-description"])
 
@@ -27,7 +26,9 @@ def get_jd_undo_workflow(request: Request) -> JdUndoWorkflow:
     return workflow
 
 
-@router.post("/{execution_id}/undo-jd", response_model=JdProfileView)
+@router.post(
+    "/{execution_id}/undo-jd", response_model=JdProfileView, operation_id="undo_completed_jd"
+)
 async def undo_completed_jd(
     job_file_id: UUID,
     execution_id: UUID,
@@ -52,4 +53,4 @@ async def undo_completed_jd(
         raise HTTPException(status_code=409, detail={"code": "jd_command_conflict"}) from error
     except JdUndoUnconfirmedError as error:
         raise HTTPException(status_code=503, detail={"code": "jd_undo_unconfirmed"}) from error
-    return JdProfileView.model_validate(asdict(result))
+    return JdProfileView.model_validate(result, from_attributes=True)

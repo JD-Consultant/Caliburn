@@ -60,22 +60,21 @@ class StageContextIdentity:
     """Parsed native stage identity; execution and candidate eligibility stay with callers."""
 
     root_thread_id: str
-    generation_id: UUID
     stage_id: UUID
 
 
-def stage_thread_id(root_thread_id: str, generation_id: UUID, stage_id: UUID) -> str:
-    """Preserve the persisted native thread format used by both Memory roles."""
-    return f"{root_thread_id}:stage:{generation_id}:{stage_id}"
+def stage_thread_id(root_thread_id: str, stage_id: UUID) -> str:
+    """Identify one retained stage used by either Memory role."""
+    return f"{root_thread_id}:stage:{stage_id}"
 
 
 def parse_stage_thread_id(thread_id: str) -> StageContextIdentity | None:
     """Parse only stage syntax; callers decide the permitted root and canonical spelling."""
     root, separator, suffix = thread_id.partition(":stage:")
     parts = suffix.split(":")
-    if not separator or len(parts) != 2:
+    if not separator or len(parts) != 1:
         return None
     try:
-        return StageContextIdentity(root, UUID(parts[0]), UUID(parts[1]))
+        return StageContextIdentity(root, UUID(parts[0]))
     except ValueError:
         return None

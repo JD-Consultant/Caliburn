@@ -2,8 +2,7 @@
 
 from caliburn.contracts.generated.tools import move_jd_item_arguments as wire
 from caliburn.contracts.validation import parse_contract
-from caliburn.features.job_description.tasks import DetailKind
-from caliburn.workflows.jd_item_movement import (
+from caliburn.features.job_description.item_movement import (
     CurrentItemContainer,
     ItemPosition,
     MoveItemInput,
@@ -11,6 +10,7 @@ from caliburn.workflows.jd_item_movement import (
     MovementTextChange,
     TaskParentDestination,
 )
+from caliburn.features.job_description.tasks import DetailKind
 
 
 def parse_item_movement(arguments: str) -> MoveItemInput:

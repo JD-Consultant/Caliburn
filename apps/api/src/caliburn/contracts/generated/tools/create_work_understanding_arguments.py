@@ -24,7 +24,7 @@ class CreateWorkUnderstandingArguments(BaseModel):
     )
     body: StrictStr = Field(
         ...,
-        description="Complete initial Markdown body, with known facts and unknowns distinguished. References belong in the separate reference collection, not the body.",
+        description="Complete initial Markdown understanding useful without reading every situation. Preserve necessary scope, responsibility, conditions, rules, methods and exact values/deadlines; distinguish unknowns. Do not require one understanding per situation or JD item. References belong in the separate reference collection, not the body.",
         min_length=1,
     )
     work_situation_references: list[WorkSituationReference] = Field(

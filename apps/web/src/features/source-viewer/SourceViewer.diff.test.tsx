@@ -1,6 +1,7 @@
+import { stubHttp } from '../../test-http';
 /** Citation changes are scoped to one JD target, not inferred from repeated labels. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, test, vi } from 'vitest';
 import { SourceViewer } from './SourceViewer';
@@ -12,7 +13,7 @@ const basePath = `/api/job-files/${fileId}/jd/sources`;
 const reference = {
   citation_id: citationId,
   target_label: '盤點產線需求',
-  target: { kind: 'task', item_id: fileId, task_id: null, field: null },
+  target: { kind: 'task', item_id: fileId, field: null },
   source_kind: 'work_understanding',
   source_label: '範圍管理',
   needs_recheck: true,
@@ -32,12 +33,20 @@ function showReferences(references = [reference], sourceMarkdown: string | null 
           revision_id: revisionId,
           citation_id: citationId,
           jd_markdown: 'JD 差異正文：每月改為每季',
+          source_version:
+            sourceMarkdown === null
+              ? null
+              : { snapshot_id: fileId, revision_id: revisionId, covered_through_sequence: 2 },
+          comparison_version:
+            sourceMarkdown === null
+              ? null
+              : { snapshot_id: citationId, revision_id: citationId, covered_through_sequence: 4 },
           source_markdown: sourceMarkdown,
         }),
       );
     throw new Error(`Unexpected request: ${path}`);
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
   render(
@@ -99,9 +108,88 @@ test('one difference action lazily opens both comparisons without loading source
   expect(screen.getByText('JD 差異正文：每月改為每季')).toBeVisible();
   expect(screen.getByRole('heading', { name: '來源變更' })).toBeVisible();
   expect(screen.getByText('來源差異正文')).toBeVisible();
+  expect(
+    screen.getByText(/原引用 Memory 涵蓋至訪談序號 2；\s*本次比較 Memory 涵蓋至訪談序號 4/),
+  ).toBeVisible();
   expect(screen.getByText('JD 與來源皆有變更')).toBeVisible();
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(screen.queryByRole('button', { name: '確認核對' })).not.toBeInTheDocument();
+});
+
+test('a late comparison response cannot replace the refreshed revision', async () => {
+  const nextRevision = '20000000-0000-4000-8000-000000000099';
+  let resolveOld!: (response: Response) => void;
+  let oldSignal: AbortSignal | undefined;
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  });
+  clients.push(client);
+  client.setQueryData(['jd-sources', fileId], { revision_id: revisionId, references: [reference] });
+  stubHttp((path: string, options?: RequestInit) => {
+    const selected = path.includes(nextRevision) ? nextRevision : revisionId;
+    if (path.includes('/changes')) {
+      if (selected === revisionId) {
+        oldSignal = options?.signal ?? undefined;
+        return new Promise<Response>((resolve) => {
+          resolveOld = resolve;
+        });
+      }
+      return Promise.resolve(
+        Response.json({
+          revision_id: selected,
+          citation_id: citationId,
+          jd_markdown: '新修訂差異',
+          source_markdown: null,
+          source_version: null,
+          comparison_version: null,
+        }),
+      );
+    }
+    return Promise.resolve(
+      Response.json({
+        revision_id: selected,
+        citation_id: citationId,
+        content: {
+          kind: 'interview',
+          interview_sequence: 2,
+          speaker: 'employee',
+          interview_text: '固定原話',
+        },
+      }),
+    );
+  });
+  render(
+    <QueryClientProvider client={client}>
+      <SourceViewer jobFileId={fileId} open onlyCitationIds={[citationId]} />
+    </QueryClientProvider>,
+  );
+  await screen.findByText('固定原話');
+  await userEvent.click(screen.getByRole('tab', { name: '差異' }));
+  await act(() =>
+    client.setQueryData(['jd-sources', fileId], {
+      revision_id: nextRevision,
+      references: [reference],
+    }),
+  );
+  await screen.findByText('固定原話');
+  await userEvent.click(screen.getByRole('tab', { name: '差異' }));
+  expect(await screen.findByText('新修訂差異')).toBeVisible();
+  await act(async () => {
+    resolveOld(
+      Response.json({
+        revision_id: revisionId,
+        citation_id: citationId,
+        jd_markdown: '晚到的舊修訂差異',
+        source_markdown: null,
+        source_version: null,
+        comparison_version: null,
+      }),
+    );
+    await Promise.resolve();
+  });
+  expect(oldSignal?.aborted).toBe(true);
+  expect(screen.queryByText('晚到的舊修訂差異')).not.toBeInTheDocument();
+  expect(screen.getByText('新修訂差異')).toBeVisible();
 });
 
 test('an immutable interview exposes JD changes only, never suggests an interview version diff', async () => {

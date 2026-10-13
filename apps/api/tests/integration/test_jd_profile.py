@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
-from caliburn.features.job_description import service
+from caliburn.features.job_description import revision_editing, service
 from caliburn.features.job_description.models import ReviseJdProfile
 
 pytestmark = pytest.mark.postgres
@@ -236,7 +236,7 @@ def test_active_or_paused_consultant_blocks_manual_write_but_not_reads_or_other_
 def test_revision_result_and_head_rollback_together(
     client: TestClient, database_connection: psycopg.Connection, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    revise = service.revise_profile
+    revise = revision_editing.apply_content_edit
 
     async def fail_after_write(
         session: AsyncSession, job_file_id: UUID, request: ReviseJdProfile
@@ -249,7 +249,7 @@ def test_revision_result_and_head_rollback_together(
     original = client.get(url).json()
     request = command(original["revision_id"])
     with monkeypatch.context() as patch:
-        patch.setattr(service, "revise_profile", fail_after_write)
+        patch.setattr(revision_editing, "apply_content_edit", fail_after_write)
         with pytest.raises(RuntimeError, match="Injected"):
             client.post(url, json=request)
     assert client.get(url).json() == original

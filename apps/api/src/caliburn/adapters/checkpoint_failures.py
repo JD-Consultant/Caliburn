@@ -1,4 +1,4 @@
-"""Classify direct saver-driver failures for bounded original-result resaving."""
+"""Classify direct Psycopg failures for bounded recovery of fixed DB operations."""
 
 from psycopg import OperationalError
 
@@ -21,10 +21,11 @@ _TRANSIENT_CHECKPOINT_SQLSTATES = frozenset(
 
 
 def is_transient_checkpoint_failure(error: BaseException | None) -> bool:
-    """Qualify a direct Psycopg failure after the caller checks its typed handoff.
+    """Qualify a direct Psycopg failure after the caller fixes its recovery operation.
 
-    Only bounded resaving of the original held result is eligible, not arbitrary
-    transaction or provider replay. A no-SQLSTATE OperationalError can mean lost
+    The caller owns the original operation and its idempotent reconciliation;
+    classification alone never authorizes transaction or provider replay.
+    A no-SQLSTATE OperationalError can mean lost
     connectivity or pool timeout, but also connection/authentication configuration
     failure; the caller must bound attempts. Never inspect messages (which may
     contain sensitive DSNs) or walk exception causes, contexts or groups.

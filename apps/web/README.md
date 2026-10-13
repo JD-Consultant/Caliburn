@@ -5,6 +5,7 @@
 - **職務檔案：**建立、列出、改名、選取與確認刪除資料隔離的檔案。整份刪除包含訪談、JD、Memory 與執行紀錄，不能復原；有未結束工作時不能刪除。
 - **訪談：**送出輸入（Enter 送出、Shift＋Enter 換行；輸入法組字中的 Enter 不送出）、暫停／繼續／取消，查看即時與已保存的公開訊息、回看歷史及依條件撤回。
 - **工作計畫：**展開同份唯讀 Markdown，查看焦點、工作方向與剩餘安排。顧問處理／暫停時可看候選，終局重新讀採用版；刷新失敗保留上一版並標示。空值不表示 JD 已完整，契約與驗證見 [Plan 保存與採用](../../docs/architecture/persistence.md#plan-從本輪候選到後輪可採用)。
+- **查閱過程：**已完成答覆的「處理紀錄」可展開這輪工具原參數與已保存回傳；既有 JD 變更入口核對該輪淨效果。職務檔案標頭的「Memory」可讀最新已發布導覽及固定版本正文，不啟動分析或修改模型當輪版本。
 - **JD：**人工編輯基本資料、職責與任務、成果／要求、知識／技能、協作與共通條件；顧問處理中可預覽候選 JD。
 - **核對與交付：**回查正式 JD 來源與待核對標示（含 JD 項目旁的來源徽章），透過章節導覽及可收合職責閱讀內容，匯出正式 JD 為 PDF。
 
@@ -51,7 +52,9 @@ uv sync --project apps/api --locked
 pnpm --filter @caliburn/frontend codegen:check
 ```
 
-`src/shared/api/generated` 只由後端 schema 生成，runtime guards 也使用相同 JSON Schema。不要為 TypeScript 另外手寫相同 wire 型別。路由在 `src/app`，檔案與訪談畫面分在 `src/features`；保存／快取／重送界線見[介面設計 §1.1](../../docs/implementation/interface-and-delivery.md#11-讀寫邊界)。
+HTTP 的唯一來源是後端 Pydantic model 與 FastAPI OpenAPI；`scripts/generate-http-contracts.mjs` 以鎖版 HeyAPI 生成 `src/shared/api/generated/http` 的 SDK／型別，並由同一份 OpenAPI 生成 Ajv standalone 驗證器。瀏覽器直接使用自包含的 ESM，不編譯 schema。工具契約仍由獨立 canonical schema 生成於 `generated/tools`。修改後執行 `pnpm --filter @caliburn/frontend codegen`；`codegen:check` 唯讀核對全部產物及多餘的 HTTP 生成檔。`--schema` 只限縮工具生成，HTTP 永遠完整生成。不要手改產物或另寫同義 wire 型別。
+
+`shared/api/http.ts` 透過 SDK 公開 interceptor 統一同源 credentials、timeout／abort、安全錯誤，並依 OpenAPI 生成的成功狀態／正文種類驗證一般 SDK 回應；JSON 再驗形狀及 scope，錯置結果在進入 query cache 或命令 ACK 前拒收。feature 保留產品用的 query keys、polling、invalidation 與命令恢復，不另產一套未使用的 TanStack keys。PDF 下載及原生 EventSource 仍沿既有傳輸入口。鎖版 HeyAPI `0.99.0` 複製的 client/core 範本不支援 `exactOptionalPropertyTypes`，僅這些外部範本由官方 header hook 標記 `@ts-nocheck`；生成 SDK／型別、手寫 policy 與所有消費端維持嚴格型別。路由在 `src/app`，檔案與訪談畫面分在 `src/features`；保存／快取／重送界線見[介面設計 §1.1](../../docs/implementation/interface-and-delivery.md#11-讀寫邊界)。
 
 沒有本機 Turn 提示時，訪談區會先查後端 `/consultant-turns/current`，找回原進行中／暫停工作與控制，不重送訪談。未確認狀態前 JD 暫時唯讀、新輸入不能送出；失敗可按「重新查詢進行中處理」。既有未知命令仍查回原請求，不被空 current 取代。此版須搭配包含 current 入口的後端；只更新前端而未重啟舊後端可能得到 422／查詢錯誤，不應以忽略錯誤解鎖。證據與限制見發現入口。
 
@@ -88,3 +91,5 @@ Playwright 依 lock 的 Chromium 版本執行，另開隔離 context、不使用
 目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、大寫 UUID 網址與小寫指向同一份檔案（`uuid-route.spec.ts`：唯一一次小寫 POST、唯一 hint key、原命令重開查回）、列表改名不改訪談／姓名、POST 真提交後故意丟回應再確認、舊改名重送不覆蓋較新名稱、列表連線失敗；另驗 JD 四欄／局部清空、職責／任務 CRUD／排序／移動、刪職責保留任務、共用知識／技能 CRUD 及多任務使用、反向用途、獨立排序、共用修訂刷新、協作與條件 CRUD／更正分類、過期基底與 A 准入拒絕新人工修改，以及 JD 提交回應遺失後沿原命令確認且呈現最新稿；`jd-structure.spec.ts` 另驗沒有 ✎、移到選單搬職責與更正分類、「+」新增與 × 移除各只送一筆命令，以及觸控裝置才看得到說明行；`jd-inline-edit.spec.ts` 另驗就地編輯（點文字改一欄、Enter／Ctrl＋Enter／Esc、其他控制項讓位、丟回應後在原處重新確認原命令、輸入法組字中的 Enter 不送出、窄螢幕）；`workspace.spec.ts` 另驗左右並排、整頁不捲動、章節導覽、職責、未歸屬任務、整段職責與任務與四個輔助區塊的收合，以及導覽跳到已收合的區塊時先展開它；`forced-colors.spec.ts` 另驗 Windows 高對比（強制色彩）下輸入器、送出鈕、說話者頭像、目前章節、聚焦與對話框仍有實線邊界或外框（該模式會移除陰影與底色）。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型品質、Memory 恢復或完整安全。
 
 顧問處理中的畫面行為（即時公開訊息、JD 唯讀、重開與另一分頁找回、暫停／續作、取消、被拒絕、PDF）用 `consultant-journey.spec.ts`，對象是**腳本化模型的隔離後端**（`apps/api/tests/fixtures/scripted_backend.py`，只替換 SDK 的 HTTP transport，其餘為真後端與 PostgreSQL），需另設 `CALIBURN_E2E_SCRIPT_URL`；沒設就 skip，skip 不代表通過。它是合成替身，不驗模型品質。
+
+同一旅程也驗完成後工具原件及 JD 變更。`published-memory.spec.ts` 使用 `public_memory_browser_seed.py` 在明示隔離 `_test` DB 建立的新 namespace；依產出 manifest 啟動後端，並設定 `CALIBURN_E2E_MEMORY_FILE_ID` 才執行。它用兩次合成發布核對最新導覽與固定正文，沒有替換 Memory HTTP 回應；此種 owner fixture 驗證查閱，不代表 B 分析品質或恢復已由瀏覽器驗證。

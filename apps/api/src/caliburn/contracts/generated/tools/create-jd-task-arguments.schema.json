@@ -1,56 +1,158 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CreateJdTaskArguments",
-  "type": "object", "additionalProperties": false,
+  "type": "object",
+  "additionalProperties": false,
   "properties": {
-    "parent_read_ref": {"type": ["string", "null"], "description": "既有職責的 read_ref；null 表示未歸屬。"},
-    "title": {"type": ["string", "null"], "description": "可辨認本人工作動作與對象的短標題；不是每個案例各建一項任務。"},
-    "description": {"type": ["string", "null"], "description": "本人做什麼及必要的適用條件、頻率與責任界線；已有事實才寫，不以通用職業知識補齊。"},
-    "outcomes": {"type": "array", "items": {"$ref": "#/$defs/TaskDetail"}, "description": "形成或維持的結果、交付物與用途，不是操作步驟。沒有已知內容時用 []。"},
-    "requirements": {"type": "array", "items": {"$ref": "#/$defs/TaskDetail"}, "description": "已知的完成判準、執行條件或責任界線；與成果並列，不逐項配對，不捏造 KPI。沒有已知內容時用 []。"},
-    "required_knowledge": {"type": "array", "items": {"$ref": "#/$defs/TaskCapability"}},
-    "required_skills": {"type": "array", "items": {"$ref": "#/$defs/TaskCapability"}},
-    "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}, "description": "直接支持任務標題與說明的依據；多項事實可用多筆來源。成果、要求與 K/S 關係各自提供依據，不繼承本清單。"}
+    "parent_read_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "新任務所屬的既有職責定位；null 表示未歸屬。原樣使用目前仍有效的 jd_map、read_jd 或成功建立回傳提供的 read_ref，不依名稱或序號自行組出。"
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "任務短標題，用於辨認工作動作與對象；未提供標題用 null。title 與 description 至少一個有非空白文字。"
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "任務正文，寫本人做什麼、作用對象及必要的條件與責任界線；不是導覽摘要。未提供正文用 null，不能與 title 同時為 null。"
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskDetail"
+      },
+      "description": "任務形成、交付或維持的結果與用途，每筆放在 text；依陣列順序建立。沒有已確認內容時用 []。"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskDetail"
+      },
+      "description": "任務執行或完成時須符合的品質、時限、條件與判準，每筆放在 text；依陣列順序建立，與成果不必一對一，沒有內容用 []。"
+    },
+    "required_knowledge": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskCapability"
+      },
+      "description": "此任務需使用的既有知識定義，以 capability_read_ref 連接；只接受 knowledge，依陣列順序排列，不在此建立或改寫定義，沒有連接項目用 []。"
+    },
+    "required_skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskCapability"
+      },
+      "description": "此任務需使用的既有技能定義，以 capability_read_ref 連接；只接受 skill，依陣列順序排列，不在此建立或改寫定義，沒有連接項目用 []。"
+    },
+    "supporting_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "description": "直接支持本任務正文、成果、要求及能力使用的已讀依據；每個來源列一次，可混合訪談與 Memory。來源不從職責或能力本體自動繼承；本欄不改能力定義的引用。"
+    }
   },
-  "required": ["parent_read_ref", "title", "description", "outcomes", "requirements", "required_knowledge", "required_skills", "supporting_sources"],
+  "required": [
+    "parent_read_ref",
+    "title",
+    "description",
+    "outcomes",
+    "requirements",
+    "required_knowledge",
+    "required_skills",
+    "supporting_sources"
+  ],
   "$defs": {
     "TaskDetail": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "text": {"type": "string", "minLength": 1},
-        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}, "description": "直接支持這一項成果或要求的來源；不能一律複製整個任務的來源。"}
-      }, "required": ["text", "supporting_sources"]
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "一筆成果或要求的完整正文；意義由所在的 outcomes／requirements 陣列決定，須有非空白文字且不含 NUL。"
+        }
+      },
+      "required": [
+        "text"
+      ]
     },
     "TaskCapability": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "capability_read_ref": {"type": "string", "minLength": 1, "description": "read_jd 返回的既有知識或技能定位；尚不存在時先 create_jd_item，不猜 ID。"},
-        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}, "description": "支持這項任務確實需要該能力的依據，不只是能力定義本身的來源。"}
-      }, "required": ["capability_read_ref", "supporting_sources"]
+        "capability_read_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "要連接的共用知識／技能定位，類別須符合所在陣列，每個定義只列一次。原樣使用目前仍有效的 jd_map、read_jd 或成功建立回傳提供的 read_ref，不依名稱或序號自行組出。"
+        }
+      },
+      "required": [
+        "capability_read_ref"
+      ]
     },
-    "Source": {"anyOf": [
-      {"$ref": "#/$defs/CurrentInputSource"},
-      {"$ref": "#/$defs/InterviewSource"},
-      {"$ref": "#/$defs/MemorySource"}
-    ]},
-    "CurrentInputSource": {
-      "type": "object", "additionalProperties": false,
-      "properties": {"kind": {"const": "current_input", "type": "string"}},
-      "required": ["kind"]
+    "Source": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InterviewSource"
+        },
+        {
+          "$ref": "#/$defs/MemorySource"
+        }
+      ]
     },
     "InterviewSource": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "kind": {"const": "interview", "type": "string"},
-        "interview_sequence": {"type": "integer", "maximum": 9007199254740991, "minimum": 1}
-      }, "required": ["kind", "interview_sequence"]
+        "kind": {
+          "const": "interview",
+          "type": "string",
+          "description": "固定為 interview，引用指定序號的訪談原話。"
+        },
+        "interview_sequence": {
+          "type": "integer",
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "description": "直接支持內容的已讀訪談序號：歷史原話使用 context 的 historical_interview.messages 或 read_interview 結果中對應原文的 interview_sequence；本次員工原話使用本次 input 提供的 interview_sequence，不自行推算。"
+        }
+      },
+      "required": [
+        "kind",
+        "interview_sequence"
+      ]
     },
     "MemorySource": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "kind": {"type": "string", "enum": ["work_situation", "work_understanding"]},
-        "target_title": {"type": "string", "minLength": 1}
-      }, "required": ["kind", "target_title"]
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work_situation",
+            "work_understanding"
+          ],
+          "description": "來源類別：work_situation 是已發布工作情境；work_understanding 是已發布工作理解。"
+        },
+        "target_title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "所選類別中、已讀正文的完整 title，原樣取自本輪可見的工作情境／工作理解結果。App 以它定位本輪固定發布版本中的物件；不填 JD 名稱、歷史舊名或自行摘要的標題。"
+        }
+      },
+      "required": [
+        "kind",
+        "target_title"
+      ]
     }
   }
 }

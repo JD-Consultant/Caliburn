@@ -6,7 +6,7 @@ import {
   isJobFile,
   isReviseJdProfileRequest,
 } from '../../src/shared/api/validation';
-import type { JdProfileView } from '../../src/shared/api/generated/jd-profile-view';
+import type { JdProfileView } from '../../src/shared/api/generated/http/types.gen';
 
 async function createFile(request: APIRequestContext): Promise<string> {
   const response = await request.post('/api/job-files', {

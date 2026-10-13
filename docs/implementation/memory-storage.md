@@ -15,6 +15,8 @@
 
 `features/work_memory` 是唯一負責寫入候選、物件修訂、固定快照及原操作的領域模組。Agent 工具只翻譯模型意圖、投影結果；背景 workflow 管理交接與執行資格，不另存可寫 Memory；checkpointer 記錄位置與接續資訊，不持有第二份可修改正文。
 
+內容責任沿[產品內容判準](../product/concepts.md#內容判準)：B1 承接相關有效訪談的背景、規則／方法／工具、精確數值期限、例外與更正，尚無任務的已知背景／共通條件／K/S 仍在現有情境表示保存；B2 形成有用理解並保留必要範圍與精確條件，不修改情境或回交 B1。格式、來源資格與成功發布不能證明內容完整；A 回查原話補回遺漏也不能抵銷 B1／B2 的內容缺陷。角色方法由正式提示維護，不新增保存層或分析狀態。
+
 候選操作共用下列純規則：
 
 - 三個內容欄位均為必要且非空白的字串；保留原文，不 trim、大小寫折疊或 Unicode 正規化。Markdown `body` 由[正文編輯器](memory-body-editing.md)計算；領域只接收已計算、仍須合法的結果，不提供模型整文覆寫捷徑。
@@ -102,7 +104,7 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 
   `candidates.py`
 
-  App 綁定檔案、execution、generation、stage、position；不是模型參數。B1 只讀寫情境；B2 讀情境、讀寫理解。
+  App 綁定檔案、execution、stage、phase、position；不是模型參數。B1 只讀寫情境；B2 讀情境、讀寫理解。
 
 - **工作稿及原操作**
 
@@ -114,7 +116,7 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 
   `candidate_lifecycle.py`
 
-  交接只允許 B1 → B2，不允許 B2 回交；恢復只採本批可證明的原位置，換 generation／stage 阻擋遲到寫入。發布固定化理解來源並保存完整快照。
+  交接只允許 B1 → B2，不允許 B2 回交；恢復只採本批可證明的原位置，新 stage 與 phase 排除上一階段的新寫入，execution writer 排除已被接管的程序。已提交原操作仍能回原結果。發布固定化理解來源並保存完整快照。
 
 - **可見資料投影**
 
@@ -130,19 +132,19 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 
 - **候選短交易**
 
-  `workflows/memory_candidates.py`
+  `workflows/work_memory/candidates.py`
 
   鎖檔案、驗既有 writer、協調候選操作；不提供獨立發布完成捷徑。adapter／領域不自行 commit。
 
 - **正式完成交易**
 
-  `workflows/memory_batch.py`
+  `workflows/work_memory/batch.py`
 
   父流程核對 B1／B2 完成結果，在同一交易發布 snapshot、採用兩角色 context history 並完成 execution。任何必要 history 缺失皆回滾該次發布。
 
 #### 位置、讀取與恢復
 
-每次內容修改只新增必要修訂與輕量選用列。位置沿 parent 保存可恢復路徑；回復必須在本批 base 到目前位置的路徑內，且完整階段座標曾由真實原結果提供，不能只拿一個存在的 position ID 偽造 B2 資格。
+每次內容修改只新增必要修訂與輕量選用列，位置沿 parent 保留修訂因果。同工作恢復沿已存原命令、原結果及目前 stage 接續；完整階段座標須匹配真實原結果，不能只拿一個存在的 position ID 偽造 B2 資格，也不提供任意位置回退。
 
 候選讀取使用目前 stage，會看到該 stage 內後續成功操作；新修改則須符合精確目前位置。這兩種檢查不同，不把模型歷史文字改成 latest。
 
@@ -170,7 +172,7 @@ Memory 領域模組不保存原生模型 request，也不提供全歷史模型�
 
 [consolidation_requests.py](../../apps/api/src/caliburn/features/work_memory/consolidation_requests.py)提供專用 recorder；工具文字留到 transport 才呈現。遷移對有效舊 JSON 一次嚴格轉換，無效資料使 migration 回滾；執行期沒有舊格式 parser，downgrade 也不猜回原格式。
 
-[資格查詢](../../apps/api/src/caliburn/workflows/memory_consolidation_queries.py)以各 owner 的唯讀投影做集合查詢，先核證據完整性，再篩 completed 且未涵蓋的來源。已涵蓋不會掩蓋來源損毀；claim 取得檔案鎖後重用相同資格規則。
+[資格查詢](../../apps/api/src/caliburn/workflows/work_memory/consolidation_queries.py)以各 owner 的唯讀投影做集合查詢，先核證據完整性，再篩 completed 且未涵蓋的來源。已涵蓋不會掩蓋來源損毀；claim 取得檔案鎖後重用相同資格規則。
 
 錯誤限於單一檔案時，隔離該檔並回報，不讓它變成「沒有待辦」，也不停止其他檔案；派送、日誌與修復後重查由[背景監督](agent-supervision.md#5-memory-背景工作)維護。
 
@@ -192,7 +194,7 @@ B1 → B2 的差異同樣先讀固定 snapshot 純值，再關閉 session，交 
 2. 同層目前 title 唯一；App 精確解析及 DB 封存約束採相同相等語意。使用明確 `COLLATE "C"`，不因部署環境而改變字串比較；SQL 層仍以 ID 定位，不用 title 作 UPDATE／DELETE 目標。
 3. 情境刪除與候選入邊解除同交易，理解本身保留；B1 結果不外露理解資料。歷史快照不改寫，不用歷史 FK cascade 清除正式來源。
 4. 候選修改後 current read 取得最新已成立狀態；單次物件／map 投影捕捉同一位置。A 只能沿已發布的固定 snapshot 查詢，不能混入候選。
-5. 階段恢復沿已保存的候選位置；新 writer／回退分支使遲到修改失效。同批只依 B1 → B2 前進，B2 恢復沿自己的原進度，不重跑已完成的 B1。
+5. 階段恢復沿已保存的候選位置；新 writer／已完成階段使遲到修改失效。同批只依 B1 → B2 前進，B2 恢復沿自己的原進度，不重跑已完成的 B1。
 6. 發布在同一短提交中保存固定選用／關係、涵蓋與原結果，並採用正式 head。已成立結果重入回原快照，不重新發一版；未知提交不當未執行。
 
 不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；DB 快照結構 gate 只防止不一致資料落地，不推斷 B2 是否真正理解。發布入口只接受目前 B2 階段，背景 workflow 在確認該階段完成後呼叫，不能將 read 次數、零 diff 或正常返回一個工具當作完成。
@@ -241,7 +243,7 @@ B1 → B2 的差異同樣先讀固定 snapshot 純值，再關閉 session，交 
 
 - **writer、回退與原操作**
 
-  重用 `executions` 的准入／fencing，回退以 generation 使被放棄分支失效。Memory 保存自己的原意圖摘要與結果，借鑑 JD 的恢復模式但不共用 JD 操作表。workflow 在同一短交易協調交接／發布與相應終態。
+  重用 `executions` 的准入／fencing，並以固定 stage、phase 與 expected position 核對新效果。Memory 保存自己的原意圖摘要與結果，借鑑 JD 的恢復模式但不共用 JD 操作表。workflow 在同一短交易協調交接／發布與相應終態。
 
 - **模型與程序接續**
 
@@ -249,4 +251,4 @@ B1 → B2 的差異同樣先讀固定 snapshot 純值，再關閉 session，交 
 
 單次 read 先捕捉位置，再沿固定選用投影，避免 [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED) 下多次 latest 查詢混入不同提交；並行工作各用[獨立 AsyncSession](https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)。這些官方機制支持本案接法，具體 schema 仍是 Caliburn 的取捨。
 
-此接縫的行為驗證須涵蓋「候選看新／歷史看舊／發布成同一鏈」、刪除多個理解共用情境的全成全拒，以及改回舊字串、舊 writer／回退分支與發布確認遺失。所有已發布快照與可達依據不自動清理；候選／checkpoint 保留依[資料保留政策](../architecture/persistence.md#6-保留失效與清理)。
+此接縫的行為驗證須涵蓋「候選看新／歷史看舊／發布成同一鏈」、刪除多個理解共用情境的全成全拒，以及改回舊字串、舊 writer／已完成階段與發布確認遺失。所有已發布快照與可達依據不自動清理；候選／checkpoint 保留依[資料保留政策](../architecture/persistence.md#6-保留失效與清理)。

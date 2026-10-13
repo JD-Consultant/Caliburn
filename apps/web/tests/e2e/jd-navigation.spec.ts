@@ -1,7 +1,7 @@
 /** Browser coverage of committed fold reveals, focus visibility and persistent responsive panes. */
 import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import type { JdWorkView } from '../../src/shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../src/shared/api/generated/http/types.gen';
 import { isJobFile } from '../../src/shared/api/validation';
 
 test('雙向交叉連結展開所有祖先並保留草稿，窄寬版切換保持分頁語義', async ({ page }) => {

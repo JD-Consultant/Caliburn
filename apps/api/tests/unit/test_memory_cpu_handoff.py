@@ -14,7 +14,7 @@ from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.features.work_memory.stage_changes import SituationChange, SituationRevision
-from caliburn.workflows import memory_batch
+from caliburn.workflows.work_memory import batch as memory_batch
 
 
 @pytest.mark.asyncio
@@ -32,7 +32,11 @@ async def test_b2_comparison_releases_read_session_and_loop(monkeypatch):
             active_sessions -= 1
 
     stage = MemoryBatchPosition(
-        *(uuid4() for _ in range(4)), MemoryLayer.WORK_UNDERSTANDING, uuid4()
+        job_file_id=uuid4(),
+        execution_id=uuid4(),
+        stage_id=uuid4(),
+        phase=MemoryLayer.WORK_UNDERSTANDING,
+        position_id=uuid4(),
     )
     writer = SimpleNamespace(
         scope=SimpleNamespace(job_file_id=stage.job_file_id, execution_id=stage.execution_id)

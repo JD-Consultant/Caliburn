@@ -1,0 +1,173 @@
+{
+  "audience": "reviewer_only_never_model_input",
+  "status": "candidate_anchors_not_expert_gold_or_model_passes",
+  "journeys": {
+    "memory_correction_consolidation": {
+      "expectations": [
+        {
+          "after_stage": "publication_one",
+          "basis": ["initial_work.text"],
+          "whole_jd": "有據的受理與月底核對都可逐步入稿；目的、分組、O/P、K/S、財務交接與權限不只剩最近一項。急件14點、一般件下一工作日、月底最後工作日18點各有範圍。成果是受理登錄／可交接的樣品資訊、交財務處理的差異清單，不把動作加完成重抄。",
+          "memory": {
+            "B1": "完整承接已知角色背景、LIMS／試算表使用、編碼與金額核對、三種時間條件、原述本人核准急件及不決定方法／不簽報告／財務處理款項；可分合情境，不丟月底工作或期限。",
+            "B2": "提供可用的受理及月底核對理解，保留必要工具／方法、精確時限與原述急件核准權，不靠原話回查補正文必要條件。此時尚無後續更正，不提前取用未來材料。"
+          },
+          "plan": "剩餘方向可保留尚未探索的條件；已說明的工具、期限或分工不再當待問，尚未入稿／核對的範圍仍是工作。",
+          "not_observed": ["未請求整理、B 未完成或未發布時，對應 B1／B2／發布均為 not_observed；M1 只是素材標籤，不證明存在。"]
+        },
+        {
+          "after_stage": "publication_two",
+          "basis": ["initial_work.text", "urgent_correction.text"],
+          "whole_jd": "將急件本人核准更正為本人核對與提報、組長核准，核相關任務、O/P、職責／目的、K/S用途和協作界線，不只改一句任務。保留急件14點、一般件下一工作日及月底18點，不把已解權限更正永久當矛盾；當輪未發布前可以更正原話作直接來源。",
+          "memory": {
+            "B1": "明確更正急件本人核准為本人核對提報／組長核准，保留初始片段其餘背景、工具、欄位比對、14點條件、月底核對及18點期限。先前錯說可作歷史，但現行權限必須清楚。",
+            "B2": "把相關理解更新為本人提報／組長核准，保留急件14點、一般件／月底各自條件。不得因B1完成或零文字差異省略真正依賴分析。"
+          },
+          "plan": "已知急件權限更正不再列待問；只有未完成的相關改稿／核對留下。",
+          "not_observed": ["尚未正式發布M2不能評新版引用選擇；B1若丟18點，即使A由原話救回仍判B1 fail。"]
+        },
+        {
+          "after_stage": "continue_after_consolidation",
+          "basis": ["initial_work.text", "urgent_correction.text", "continue_after_consolidation.text"],
+          "whole_jd": "M2正式發布且相關正文足夠時，核清相關內容後優先以Memory支持，移除已無獨立用途的更正原話；必要原話可留。先評整組依據，逐筆確認實際核清引用。不能只add Memory而把過時支持基底全留pending，也不能掃全稿強換引用。未受影響的月底依據與18點保留。",
+          "memory": {
+            "B1": "以實際M2情境原件判完整性，A救回遺漏不能抵銷B1缺陷。",
+            "B2": "以實際M2理解判顧問是否可直接使用精確條件；只有map或引用存在不算足夠正文。"
+          },
+          "plan": "已完成的急件修訂及核對微步驟移除；若仍需核對則保留相應剩餘。",
+          "not_observed": ["沒有M2正式發布、沒有足夠正文或未觀察A局部來源時，新版引用收斂為not_observed，不能以最後答覆宣稱pass。"]
+        }
+      ],
+      "hard_failures": ["更正後仍把急件核准權歸本人，或只修任務卻目的／協作／其他欄仍歸錯權。", "急件14點條件、一般件下一工作日或月底18點消失／互相泛化。", "B1遺漏有據期限／有效工作，即使A補回。", "把已解更正當永久未解矛盾、讀空diff或工具成功就全confirmed。", "未核相關支持內容即全稿重引、把不支持內容的引用洗成已對齊。"],
+      "acceptable_variation": "允許不同職責分組、情境／理解件數及工具順序；不要求固定標題。原話尚有獨立用途可保留，不強迫一律刪原話。"
+    },
+    "unanchored_background_and_shared_ks": {
+      "expectations": [
+        {
+          "after_stage": "background_publication",
+          "basis": ["known_background.text"],
+          "whole_jd": "已知職稱、單位、匯報、個資共通條件與有據K/S可保留，沒有具體任務不補造。不得因尚無任務就把全部當未知，也不憑背景推造報名或退費職責。",
+          "memory": {
+            "B1": "在現有情境表示承接已知背景、校內權限資料夾／私人信箱限制、個資規則、教務系統及試算表核對技能；尚無具體任務仍不沉沒，不另造事件或背景層。",
+            "B2": "形成有用且限定的背景／共通條件認識，保留已知角色、服務範圍與個資規則；理解省略會讓顧問誤解規則則不足。未說的具體職責仍未知，不按每項背景強造一件理解。"
+          },
+          "plan": "下一步探索具體任務，不再問已知職稱、單位、匯報或資料使用限制。",
+          "not_observed": ["未有實際B與發布則其結果not_observed，不能以A已寫基本資料代替B1保留背景。"]
+        },
+        {
+          "after_stage": "work_publication",
+          "basis": ["known_background.text", "two_work_uses.text"],
+          "whole_jd": "名單確認與退費核算都可分辨；名單交老師的用途、兩工作日前17點與教學聯絡必要欄位保留。退費有級距規則、組長核准／財務付款界線，送核期限未知。共用個資知識／核對技能本體各有來源，兩任務用途共用各自任務來源，不按每案複製同一K/S。",
+          "memory": {
+            "B1": "整合前輪背景與新工作片段，引用實際支持背景的舊原話；各案有必要局部條件但不重抄完整profile。名單時限不能被退費未知期限抹掉或套到退費。",
+            "B2": "可概括共通模式但保留名單／退費分工與適用差異、精確期限及退費未知，不用通用行政能力代替可用理解，也不回交B1。"
+          },
+          "plan": "背景問題不重開，退費期限可保留未知與再訪條件；已有K/S或工作待入稿就列整理／核對而不是待員工命名。",
+          "not_observed": ["沒有實際M2則更新結果not_observed；來源關系存在不證明背景／期限正文完整。"]
+        },
+        {
+          "after_stage": "review_known_scope",
+          "basis": ["known_background.text", "two_work_uses.text", "review_known_scope.text"],
+          "whole_jd": "整份JD已有依據的目的、分組、O/P、K/S及協作／條件可完成；未知退費期限不阻擋其餘內容，也不被補猜。已知背景仍在合適位置，不因當輪沒新增任務而延後所有整理。",
+          "memory": {
+            "B1": "沿先前正式情境核完整背景與具體工作，不要求本輪再強寫。",
+            "B2": "沿已發布的充分理解取用，不強制每件JD各造理解。"
+          },
+          "plan": "保留退費期限未知及有新資料再談，移除完成整理微步驟，不反覆逼問員工暫答不出的同題。",
+          "not_observed": ["當輪未再啟B不是B失敗；只評前面已實際觀察的B原件。"]
+        }
+      ],
+      "hard_failures": ["有據的背景／共通條件／K/S因為尚無任務被丟掉，或為保留它們編造工作。", "名單17點期限套到退費、將未知送核期限補成固定標準。", "把組長核准／財務付款歸本人。", "由姓名、稱呼或職稱推論未明示性別或匯報關係。"],
+      "acceptable_variation": "不限背景保存在哪件情境或理解，不要求每案完整profile或固定K/S件數；有清楚適用用途且來源正確即可。"
+    },
+    "manual_cross_section_changes": {
+      "expectations": [
+        {
+          "after_stage": "equipment_publication",
+          "basis": ["grounded_work.text"],
+          "whole_jd": "借用核對與異常停用／交接／追蹤有據；目的、成果、要求、K/S、技師分工及周末尖峰條件可逐步形成。17點只支持欠件通知，不支持全部工作或修復期限。",
+          "memory": {
+            "B1": "保留本人／技師界線、恢復借用須簽認、借用系統與核對方法、周末尖峰、欠件17點及職位不要求電氣維修證照，不提安全認證或電氣維修為本人職責。",
+            "B2": "可用理解包含停用與交接規則、精確適用範圍及不要求電氣維修證照，不能概括為本人確保設備安全而丟界線。"
+          },
+          "plan": "已充分的工作可整理，未知另辨，不以欄位未滿硬問證照。",
+          "not_observed": ["實際JD沒有某項人工操作所需目標時，該人工操作及後續相應觀察not_observed；不得造模型已寫出的前置結果。"]
+        },
+        {
+          "after_stage": "new_periodic_work",
+          "basis": ["grounded_work.text", "human_cross_section_edit.edits.0.content", "human_cross_section_edit.edits.1.content", "human_cross_section_edit.edits.2.content", "human_cross_section_edit.edits.3.content", "human_cross_section_edit.edits.4.content", "human_cross_section_edit.edits.5.content", "human_cross_section_edit.edits.6.content", "human_cross_section_edit.edits.7.content", "human_cross_section_edit.edits.8.content", "new_periodic_work.text"],
+          "whole_jd": "人工後首輪已轉談季末耗材清點，仍須從既有M1正文與全量人工net分析跨欄影響，在這輪修目的／職責／任務／O／P／技能／技師協作／條件的無據維修認證、零故障與全職位17點；保留借用核對、欠件通知及周末尖峰，正確加入清點本人整理需求／組長決定採購的分工。任務支持包括O/P與所用技能定義，K/S本體另核來源。不能把人工net當patch、事實或全部引用已核清，不用source工具查人工歷史。後輪補救不能補算本輪通過。",
+          "memory": {
+            "B1": "人工JD不是B1資料或事實；M1仍支持原分工。若後續真啟新批，只承接合法耗材清點新材料與未受影響工作。",
+            "B2": "不得因人工JD改文反向接受維修認證；沒有後續B則不要求重寫或回交B1。"
+          },
+          "plan": "已有M1材料可判別的人工改稿影響不再當待問，尚未完成的相關編修／核對仍保留；季末清點的新方向依真剩餘安排。",
+          "not_observed": ["人工操作目標不唯一或不存在時，停止該項並記not_observed，不硬造固定標題／件數；未檢查來源原件則逐筆對齊not_observed。"]
+        },
+        {
+          "after_stage": "review_all_sections",
+          "basis": ["grounded_work.text", "new_periodic_work.text", "review_all_sections.text"],
+          "whole_jd": "核整份成品，而不是只修異常任務；各欄說法一致且無捏造證照／KPI。來源按實際支持逐筆處理，讀取、改字或新增來源都不自動代表舊引用對齊。已準確部分可不再寫。若此輪才補救人工影響，單列本輪修復與前輪失敗，不能回填前輪pass。",
+          "memory": {
+            "B1": "以實際觀察批次判斷，不因A修整人工JD宣稱B也已更新。",
+            "B2": "沿真發布材料分析，沒有新B階段不扣強制寫入分。"
+          },
+          "plan": "已完成的跨欄改稿／核對微步驟移除；未完成核對保留，不靠計畫說完成冒充成品。",
+          "not_observed": ["沒有整份JD及局部來源結果，不足判斷跨欄一致或全部引用核清；最後答覆不能代替。"]
+        }
+      ],
+      "hard_failures": ["把人工無據維修／認證／KPI／證照當員工事實。", "只改任務，其他目的、O/P、共用技能、協作或條件仍反向歸責。", "欠件通知17點被刪掉或泛化到維修／全部工作。", "讀diff、改字或add來源就洗白所有舊引用。"],
+      "acceptable_variation": "人工素材依語意定位實際項目，不鎖模型標題／件數；合法拆合、分組、局部工具順序皆可。人工編修本身不是品質答案。"
+    },
+    "answered_but_not_drafted": {
+      "expectations": [
+        {
+          "after_stage": "unknown_completion_condition",
+          "basis": ["unknown_completion_condition.text"],
+          "whole_jd": "已知收貨及帶教動作可逐步入稿；帶教完成條件尚未知，月盤點本人範圍未談，不能補猜也不能宣告全份完整。",
+          "memory": {
+            "B1": "若啟B則保留兩項已知工作及帶教／盤點未知，不造完成標準。",
+            "B2": "若啟B則形成有用局部理解，未知不等於不存在。"
+          },
+          "plan": "延續同份Markdown，帶教完成條件待補充，月盤點本人分工待訪談；已知收貨若未入稿仍待整理。",
+          "not_observed": ["若未建立Plan，其接續狀態not_observed；未啟B不能把本階段標為B pass。"]
+        },
+        {
+          "after_stage": "completion_answer",
+          "basis": ["unknown_completion_condition.text", "completion_answer.text"],
+          "whole_jd": "已可直接整理帶教：本人核系統紀錄並記結果，新同事連續兩次獨立登錄且無品項／數量錯，組長最後確認。成果／要求各有用途，不造新KPI，不把組長確認歸本人。已有材料可整理目的、分組及K/S，不等待新未知回答。",
+          "memory": {
+            "B1": "若後續整理，連續兩次、兩類錯誤、本人核紀錄／組長最後確認須完整承接。",
+            "B2": "若後續整理，保留能直接供顧問用的判準與責任界線，不只說依規定帶教。"
+          },
+          "plan": "帶教完成條件不再待問。尚未入稿／核對就變相應工作，實際完成才移除微步驟；當輪能直接完成不必先增再刪。保留盤點與員工暫沒空的再訪條件。",
+          "not_observed": ["若同輪直接完成，『已答但尚未入稿』中間Plan狀態標not_observed，不要求多存一次來證明；改看正式成品與剩餘Plan。"]
+        },
+        {
+          "after_stage": "training_publication",
+          "basis": ["unknown_completion_condition.text", "completion_answer.text"],
+          "whole_jd": "沿實際JD判帶教是否反映答案，Memory發布不等於JD自動已完成。收貨有效內容及盤點未知仍在合適位置。",
+          "memory": {
+            "B1": "承接完整片段，精確保存連續兩次與品項／數量零錯誤、系統核紀錄及組長最後確認，未談盤點不刪除線索。",
+            "B2": "理解足以辨認帶教完成判準及本人權限，盤點仍限定未知，不回交B1。"
+          },
+          "plan": "按實際JD與核對結果接續，不因B complete或發布就把全部待辦清空。",
+          "not_observed": ["未請求／未發布時B與發布not_observed；不得為完成fixture由harness代發模型應有的整理請求。"]
+        },
+        {
+          "after_stage": "continue_without_reasking",
+          "basis": ["unknown_completion_condition.text", "completion_answer.text", "continue_without_reasking.text"],
+          "whole_jd": "沒有新事實仍能完成已知但未正確入稿的帶教、目的／分組／K/S及相關核對；已正確內容不強制重寫。不能再問已明確答案或將盤點暫緩當不負責。",
+          "memory": {
+            "B1": "以先前實際結果判完整性，不要求每輪新批。",
+            "B2": "以先前實際理解判可用性，A回查原話救回缺失不能代替B2必要正文。"
+          },
+          "plan": "移除已完成帶教微步驟，保留盤點範圍與本人重開／有空再談條件；不複製全JD、Memory或來源旗標，不固定每輪寫。",
+          "not_observed": ["未觀察正式保存的Plan與JD，不由口頭『已整理』判完成。"]
+        }
+      ],
+      "hard_failures": ["帶教條件已答仍反覆追問。", "Plan刪掉未知卻JD仍沒答案，或把已答條件改寫成別的未知。", "連續兩次／零品項數量錯被丟掉，組長確認歸本人。", "盤點暫緩被判為不負責／全案已完整。"],
+      "acceptable_variation": "允許直接同輪編修與清理Plan，也允許留下真未完核對；不鎖Plan標題、每輪寫入、工具順序或中間待辦次數。"
+    }
+  }
+}

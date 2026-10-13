@@ -1,25 +1,25 @@
 /** One file cache owns adopted text; terminal refresh never reuses an earlier GET. */
 import { queryOptions } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
-import type { InterviewPlanView } from '../../shared/api/generated/interview-plan-view';
-import { ApiError, requestJson } from '../../shared/api/http';
-import { isInterviewPlanView } from '../../shared/api/validation';
+import type { InterviewPlanView } from '../../shared/api/generated/http/types.gen';
+import { scope } from '../../shared/api/http';
+import { readAdoptedInterviewPlan } from '../../shared/api/generated/http/sdk.gen';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 
 export function interviewPlanQuery(jobFileId: string) {
   return queryOptions({
     queryKey: ['job-file', jobFileId, 'interview-plan'],
-    queryFn: async ({ signal }) => {
-      const plan = await requestJson(
-        `/api/job-files/${encodeURIComponent(jobFileId)}/interview-plan`,
-        isInterviewPlanView,
-        { signal, cache: 'no-store' },
-      );
-      if (plan.job_file_id !== jobFileId) {
-        throw new ApiError('收到的工作計畫不屬於這份職務檔案，尚未採用。');
-      }
-      return plan;
-    },
+    queryFn: ({ signal }) =>
+      readAdoptedInterviewPlan({
+        path: { job_file_id: jobFileId },
+        signal,
+        cache: 'no-store',
+        throwOnError: true,
+        meta: {
+          correlation: { jobFileId },
+          scope: scope<InterviewPlanView>((value) => value.job_file_id === jobFileId),
+        },
+      }).then(({ data }) => data),
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,

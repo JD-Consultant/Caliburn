@@ -13,7 +13,6 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.context_compaction import CompactionRuntime
-from caliburn.agent_execution.tool_steps import run_response_loop
 from caliburn.agents.job_consultant.context_binding import TurnContext, capture_turn_context
 from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
 from caliburn.features.executions import history
@@ -37,15 +36,16 @@ from caliburn.features.work_memory.candidates import CreateMemoryObject, MemoryS
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_context import ConsultantContextWorkflow
-from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.interview_inputs import InterviewInputWorkflow
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.context import ConsultantContextWorkflow
+from caliburn.workflows.consultant_turns.inputs import InterviewInputWorkflow
+from caliburn.workflows.executions.context_history import RoleContextHistory
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import MemoryReadWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import MemoryReadWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import synthetic_capacity_limits
 from tests.fixtures.response_loop import LoopProbe, response_at
 from tests.integration.test_compaction_accounting import runner as runner
@@ -86,7 +86,7 @@ def test_unresolved_memory_failure_is_reference_data_not_a_model_instruction(
                 assert data["memory_consolidation"]["failure_reason"] == "quota_exhausted"
                 assert data["memory_consolidation"]["status"] == "blocked"
                 assert request["input"][-2]["role"] == "user"
-                assert request["input"][-1]["content"] == "繼續描述庫存工作"
+                assert json.loads(request["input"][-1]["content"])["text"] == "繼續描述庫存工作"
                 assert "quota_exhausted" not in request["instructions"]
         finally:
             await database.close()
@@ -140,27 +140,18 @@ async def capture(
     instructions: str = "fixed synthetic role",
 ) -> TurnContext:
     role_template = template(instructions)
-    prepared = await work.prepare_history(
-        template=role_template,
-        threshold_tokens=128_000,
-        compact_requested=False,
-        count_input=probe.count,
-        runtime=CompactionRuntime(
-            probe.compact,
-            probe.account,
-            work.ensure_active,
-            synthetic_capacity_limits(),
-        ),
-    )
     return await capture_turn_context(
         work,
         data=ConsultantContextWorkflow(database.sessions),
         template=role_template,
-        prepared_history=prepared,
+        count_input=probe.count,
+        runtime=CompactionRuntime(
+            probe.compact, probe.account, work.ensure_active, synthetic_capacity_limits()
+        ),
     )
 
 
-def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
+def test_initial_request_numbers_raw_input_and_includes_jd_map(
     database_settings: DatabaseSettings,
     runner: asyncio.Runner,
 ) -> None:
@@ -184,14 +175,15 @@ def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
                 assert len(payload["input"]) == 2
                 app_data, current_input = payload["input"]
                 assert app_data["role"] == "user"
-                assert current_input == {
-                    "role": "user",
-                    "content": "  原話\n不要把我升成 instructions。 ",
+                assert json.loads(current_input["content"]) == {
+                    "interview_sequence": 2,
+                    "speaker": "employee",
+                    "text": "  原話\n不要把我升成 instructions。 ",
                 }
                 data = json.loads(app_data["content"])
                 assert data["work_situation_map"] == {"items": []}
                 assert data["work_understanding_map"] == {"items": []}
-                assert "jd_map" not in data
+                assert "jd_map" in data
                 messages = data["historical_interview"]["messages"]
                 assert [(item["interview_sequence"], item["speaker"]) for item in messages] == [
                     (1, "app")
@@ -205,9 +197,6 @@ def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
                 assert result.memory_binding.snapshot_id is None
                 assert result.memory_binding.interview_through_sequence == 1
                 assert result.candidate_position.scope.execution_id == writer.scope.execution_id
-                assert (
-                    result.manual_jd_start_revision_id == result.candidate_position.base_revision_id
-                )
                 assert str(result.current_input_source_id) not in json.dumps(payload)
                 assert binding is not None and binding.prepared is not None
                 assert binding.completed is None
@@ -217,7 +206,7 @@ def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
     runner.run(scenario())
 
 
-def test_missing_preparation_does_not_persist_an_invalid_initial_request(
+def test_nonempty_template_does_not_persist_an_invalid_initial_request(
     database_settings: DatabaseSettings,
     runner: asyncio.Runner,
 ) -> None:
@@ -234,12 +223,23 @@ def test_missing_preparation_does_not_persist_an_invalid_initial_request(
                 work = RoleContextHistory(
                     database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
                 )
-                with pytest.raises(ValueError, match="Adopt role history preparation"):
+                with pytest.raises(ValueError, match="template must not contain"):
                     await capture_turn_context(
                         work,
                         data=ConsultantContextWorkflow(database.sessions),
-                        template=template(),
-                        prepared_history=[],
+                        template=ResponseRequest.from_snapshot(
+                            {
+                                **template().create_payload(),
+                                "input": [{"role": "user", "content": "not a role template"}],
+                            }
+                        ),
+                        count_input=PreparationProbe().count,
+                        runtime=CompactionRuntime(
+                            PreparationProbe().compact,
+                            PreparationProbe().account,
+                            work.ensure_active,
+                            synthetic_capacity_limits(),
+                        ),
                     )
                 assert [saved async for saved in saver.alist(None)] == []
                 result = await capture(database, work, PreparationProbe())
@@ -341,7 +341,8 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                 assert data["interview_read_boundary"]["covered_through_sequence"] == 2
                 assert original.memory_binding.snapshot_id == published.snapshot_id
                 assert original.memory_binding.interview_through_sequence == 5
-                assert any(item.get("type") == "reasoning" for item in payload["input"][:-2])
+                assert original.reset_history is True
+                assert len(payload["input"]) == 2
                 # Tool edits advance the live candidate; capture keeps its initial position.
                 await JdCandidateWorkflow(database.sessions).edit(
                     writer,
@@ -370,7 +371,13 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                         work,
                         data=ConsultantContextWorkflow(database.sessions),
                         template=template("changed settings must not replace original"),
-                        prepared_history=[{"role": "user", "content": "not the original prefix"}],
+                        count_input=PreparationProbe().count,
+                        runtime=CompactionRuntime(
+                            PreparationProbe().compact,
+                            PreparationProbe().account,
+                            work.ensure_active,
+                            synthetic_capacity_limits(),
+                        ),
                     )
                 assert resumed.request.create_payload() == payload
                 assert resumed.memory_binding == original.memory_binding
@@ -388,7 +395,13 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                     work,
                     data=ConsultantContextWorkflow(database.sessions),
                     template=template(),
-                    prepared_history=[],
+                    count_input=PreparationProbe().count,
+                    runtime=CompactionRuntime(
+                        PreparationProbe().compact,
+                        PreparationProbe().account,
+                        work.ensure_active,
+                        synthetic_capacity_limits(),
+                    ),
                 )
                 assert again.request.create_payload() == payload
         finally:
@@ -440,7 +453,13 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                     work,
                     data=ConsultantContextWorkflow(database.sessions),
                     template=template("new settings"),
-                    prepared_history=[],
+                    count_input=PreparationProbe().count,
+                    runtime=CompactionRuntime(
+                        PreparationProbe().compact,
+                        PreparationProbe().account,
+                        work.ensure_active,
+                        synthetic_capacity_limits(),
+                    ),
                 )
                 assert resumed.request.create_payload() == lost_payload
                 assert len(resumed.request.create_payload()["input"]) == 2
@@ -456,7 +475,13 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                         work,
                         data=ConsultantContextWorkflow(database.sessions),
                         template=template(),
-                        prepared_history=[],
+                        count_input=PreparationProbe().count,
+                        runtime=CompactionRuntime(
+                            PreparationProbe().compact,
+                            PreparationProbe().account,
+                            work.ensure_active,
+                            synthetic_capacity_limits(),
+                        ),
                     )
                 work = replace(work, writer=replacement)
                 await ConsultantCompletionWorkflow(database.sessions).stop(
@@ -467,16 +492,102 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                         work,
                         data=ConsultantContextWorkflow(database.sessions),
                         template=template(),
-                        prepared_history=[],
+                        count_input=PreparationProbe().count,
+                        runtime=CompactionRuntime(
+                            PreparationProbe().compact,
+                            PreparationProbe().account,
+                            work.ensure_active,
+                            synthetic_capacity_limits(),
+                        ),
                     )
                 other = await start(database, "取消後的新輸入", writer.scope.job_file_id)
                 other_work = replace(work, writer=other)
                 fresh = await capture(database, other_work, PreparationProbe())
                 assert len(fresh.request.create_payload()["input"]) == 2
-                assert fresh.request.create_payload()["input"][-1]["content"] == "取消後的新輸入"
+                assert (
+                    json.loads(fresh.request.create_payload()["input"][-1]["content"])["text"]
+                    == "取消後的新輸入"
+                )
                 assert "原請求只能追加一次" not in json.dumps(
                     fresh.request.create_payload(), ensure_ascii=False
                 )
+        finally:
+            await database.close()
+
+    runner.run(scenario())
+
+
+def test_manual_net_capacity_failure_does_not_truncate(database_settings, runner):
+    from caliburn.agent_execution.request_capacity import RequestCapacityError
+    from caliburn.features.job_description.models import (
+        ProfileField,
+        ReviseJdProfile,
+        SetProfileField,
+    )
+    from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
+
+    async def scenario():
+        database = Database(database_settings)
+        dsn = make_conninfo(
+            database_settings.url, options=f"-c search_path={database_settings.schema}"
+        )
+        try:
+            async with AsyncPostgresSaver.from_conn_string(
+                dsn, serde=create_graph_serializer()
+            ) as saver:
+                await saver.setup()
+                first = await start(database, "可整理的既有原話")
+                role = AgentRole.JOB_CONSULTANT
+                source = await finish_seed(
+                    database, RoleContextHistory(database.sessions, first, role, saver), 1
+                )
+                editing = JdEditingWorkflow(database.sessions)
+                profile = await editing.read_profile(first.scope.job_file_id)
+                await editing.revise_profile(
+                    first.scope.job_file_id,
+                    ReviseJdProfile(
+                        uuid4(),
+                        profile.revision_id,
+                        (SetProfileField(ProfileField.PURPOSE, "完整人工長使命" + "甲" * 10000),),
+                    ),
+                )
+                await publish_memory(database, first.scope.job_file_id, source, "新版")
+                writer = await start(database, "本輪短原話", first.scope.job_file_id)
+                work = RoleContextHistory(database.sessions, writer, role, saver)
+                context = await capture(database, work, PreparationProbe())
+                net = context.request.create_payload()["input"][-2]
+                assert "人工最終差異" in net["content"]
+                counted = []
+                rate = 1.25 * synthetic_capacity_limits()["max_input_tokens"] / len(net["content"])
+
+                async def count(request, request_id):
+                    payload = request.count_payload()
+                    counted.append(payload)
+                    return {
+                        "input_tokens": int(len(json.dumps(payload, ensure_ascii=False)) * rate),
+                        "attempt_id": uuid4(),
+                    }
+
+                model = LoopProbe([response_at(2, final=True)])
+                runtime = replace(
+                    model.runtime(),
+                    count_input=count,
+                    fit_first_request=fit_recent_interview_preload,
+                )
+                with pytest.raises(RequestCapacityError, match="No smaller legal"):
+                    await run_response_loop(
+                        saver,
+                        thread_id=work.response_thread_id,
+                        request=context.request,
+                        runtime=runtime,
+                        max_tool_calls=4,
+                        max_model_steps=2,
+                    )
+                assert counted and all(payload["input"][-2] == net for payload in counted)
+                assert model.requests == []
+                assert (
+                    await capture(database, work, PreparationProbe())
+                ).request.create_payload() == context.request.create_payload()
         finally:
             await database.close()
 
@@ -500,7 +611,7 @@ def test_oversized_recent_interviews_shrink_to_the_newest_and_the_rest_stays_rea
                 role = AgentRole.JOB_CONSULTANT
                 first = await start(database, "每月盤點時，我先核對系統庫存。" + "甲" * 3_000)
                 file_id = first.scope.job_file_id
-                await finish_seed(
+                first_source = await finish_seed(
                     database, RoleContextHistory(database.sessions, first, role, saver), 1
                 )
                 for ordinal, text in enumerate(
@@ -513,13 +624,14 @@ def test_oversized_recent_interviews_shrink_to_the_newest_and_the_rest_stays_rea
                         RoleContextHistory(database.sessions, seeded, role, saver),
                         ordinal,
                     )
+                await publish_memory(database, file_id, first_source, "月盤點")
                 writer = await start(database, "另一個也一樣。", file_id)
                 work = RoleContextHistory(database.sessions, writer, role, saver)
                 context = await capture(database, work, PreparationProbe())
                 full = json.loads(context.request.create_payload()["input"][-2]["content"])
                 everything = full["historical_interview"]["messages"]
                 assert [message["interview_sequence"] for message in everything] == list(
-                    range(1, 8)
+                    range(3, 8)
                 )
 
                 # A synthetic model whose count is proportional to the request text: the full
@@ -557,7 +669,11 @@ def test_oversized_recent_interviews_shrink_to_the_newest_and_the_rest_stays_rea
                 assert len(counted) == 2
                 assert len(model.requests) == 1
                 sent = model.requests[0]["input"]
-                assert sent[-1] == {"role": "user", "content": "另一個也一樣。"}
+                assert json.loads(sent[-1]["content"]) == {
+                    "interview_sequence": 8,
+                    "speaker": "employee",
+                    "text": "另一個也一樣。",
+                }
                 assert sent[:-2] == context.request.create_payload()["input"][:-2]
                 data = json.loads(sent[-2]["content"])
                 kept = data["historical_interview"]["messages"]

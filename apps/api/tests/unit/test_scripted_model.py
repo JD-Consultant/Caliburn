@@ -33,7 +33,12 @@ def request_for(text: str, *later_items: dict, stream: bool = True) -> ResponseR
         instructions="scripted",
         input_items=[
             {"role": "user", "content": "App 資料訊息"},
-            {"role": "user", "content": text},
+            {
+                "role": "user",
+                "content": json.dumps(
+                    {"interview_sequence": 2, "speaker": "employee", "text": text}
+                ),
+            },
             *later_items,
         ],
         tools=[],
@@ -65,9 +70,17 @@ async def test_profile_turn_records_each_field_from_current_input_then_answers_o
         assert [call.name for call in step.calls] == ["revise_jd_profile"]
         assert json.loads(step.calls[0].arguments)["changes"] == [
             {"action": "set_field", "field": "job_title", "value": "前端工程師"},
-            {"action": "add_source", "field": "job_title", "source": {"kind": "current_input"}},
+            {
+                "action": "add_source",
+                "field": "job_title",
+                "source": {"kind": "interview", "interview_sequence": 2},
+            },
             {"action": "set_field", "field": "reports_to", "value": "李主任"},
-            {"action": "add_source", "field": "reports_to", "source": {"kind": "current_input"}},
+            {
+                "action": "add_source",
+                "field": "reports_to",
+                "source": {"kind": "interview", "interview_sequence": 2},
+            },
         ]
         result = function_result_item(step.calls[0], "已更新")
         second = await create_response(

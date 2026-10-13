@@ -30,6 +30,15 @@ from caliburn.features.job_description.conditions import (
     CreateCondition,
     EditJdConditions,
 )
+from caliburn.features.job_description.item_movement import (
+    CurrentItemContainer,
+    InvalidItemMovementError,
+    ItemPosition,
+    MoveItemInput,
+    MovementDetailAddition,
+    MovementTextChange,
+    TaskParentDestination,
+)
 from caliburn.features.job_description.navigation import JdReadTargetNotFoundError, jd_read_ref
 from caliburn.features.job_description.sources import (
     AddJdSource,
@@ -44,18 +53,8 @@ from caliburn.features.job_description.tasks import (
     EditJdTasks,
     InvalidTaskChangeError,
 )
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_item_movement import (
-    CurrentItemContainer,
-    InvalidItemMovementError,
-    ItemPosition,
-    JdItemMovementWorkflow,
-    MoveItemInput,
-    MovementDetailAddition,
-    MovementTextChange,
-    TaskParentDestination,
-)
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.item_movement import JdItemMovementWorkflow
 from tests.fixtures.consultant_turn import start_consultant_turn as start
 from tests.fixtures.consultant_turn import transact
 
@@ -107,13 +106,7 @@ def setup_movement(client):
             execution_id=writer.scope.execution_id,
         ),
     )
-    for target in (
-        JdSourceTarget(SourceTargetKind.TASK, task.task_id),
-        JdSourceTarget(SourceTargetKind.DETAIL, task.details[0].detail_id, task_id=task.task_id),
-        JdSourceTarget(
-            SourceTargetKind.TASK_CAPABILITY, capability.capability_id, task_id=task.task_id
-        ),
-    ):
+    for target in (JdSourceTarget(SourceTargetKind.TASK, task.task_id),):
         edit(
             ReviseJdSources(
                 uuid4(),
@@ -130,7 +123,7 @@ def prepare(client, writer, intent):
 
     async def run():
         return await workflow.prepare(
-            PublishedMemoryRead(writer.scope, None, 1),
+            writer.scope,
             command_id=uuid4(),
             intent=intent,
         )
@@ -225,7 +218,19 @@ def test_cross_parent_content_is_atomic_and_replay_does_not_add_details_twice(cl
     assert len(revised.details) == len(task.details) + 1
     assert after.work.areas[0].scope_text == "原職責新範圍"
     assert after.work.areas[1].scope_text == "目的職責新範圍"
-    assert len(source_refs(client, writer, after)) == 3
+    (original_reference,) = source_refs(client, writer, before)
+    (revised_reference,) = source_refs(client, writer, after)
+    assert revised_reference.citation_id == original_reference.citation_id
+    assert revised_reference.target == JdSourceTarget(SourceTargetKind.TASK, task.task_id)
+    assert revised_reference.reviewed_revision_id != original_reference.reviewed_revision_id
+    assert not revised_reference.needs_review
+    reviewed_work = transact(
+        client,
+        lambda session: work_queries.read_work_at(
+            session, writer.scope.job_file_id, revised_reference.reviewed_revision_id
+        ),
+    )
+    assert next(t for t in reviewed_work.tasks if t.task_id == task.task_id) == revised
     assert client.portal.call(workflow.execute, writer, prepared).effect == "moved"
     assert client.portal.call(candidates.read, writer.scope) == after
 

@@ -62,7 +62,7 @@
 | 需求 | 主要責任 | 首要測試情境 |
 |---|---|---|
 | V16 | JD 領域／人工與模型工具 | JD 完整 CRUD、同規則與多對多關係 |
-| V17 | JD 來源／A 核對 | 人工改動＋來源換版兩基準、明確確認 |
+| V17 | JD 來源／A 核對 | 人工改動＋Memory 來源更新兩基準；顧問實改範圍同步對齊 JD，指定引用確認不清其他待核對 |
 | V18 | JD 引用／Memory 固定修訂 | 原來源 identity、改名／移除／同名重用 |
 | V20 | JD／Memory 工具 | 精簡 map、完整局部、按需下鑽及定位 |
 | V21 | 公開訊息／PDF／安全邊界 | 公開中間訊息／正式 PDF／敏感資料 |
@@ -90,6 +90,12 @@
 | E12、E13 | A 完成／Memory 發布及調度 | formal commit／通知成功確認遺失與重掃 |
 | E14 | 候選 UI／人工准入／PDF | 預覽、人工寫入限制、正式 PDF |
 | E15 | executions／外送 workflow | 不疊 retry、不重置預算、模型等待無長交易 |
+
+有限 DB 恢復須沿正式 `create_agent` 與真 PostgreSQL 驗准入、原件記帳、工具交易及正式完成／Memory 交接。提交前故障與「已提交、回覆遺失」分開注入，核原 attempt／operation、模型 HTTP 次數與正式版本；不只核最後狀態。暫停、取消及重試耗盡須沿原控制／失敗入口驗證，合成故障不冒充真實網路事故。
+
+串流驗 terminal 後普通 close、沒有 terminal、failed／incomplete 與真正 task cancellation。工具驗輸入錯誤可修正，以及 prepare／execute／render／restore 內部錯誤不被包成參數拒絕；提交後呈現錯誤另查候選與正式採用，不能由工具文字推定沒有寫入。
+
+保存中取消須同時核 checkpoint、pending writes、仍持有的原件與清理工作，不把沒有完整 checkpoint 一律判成原件遺失，也不把警告當成無害。測例捕捉未等待 coroutine，不能靠過濾警告通過。工具順序驗原 calls、前一筆 prepare／output 保存屏障、首錯停止、跨 Step 重複 call ID，以及部分工具已存後恢復；暫停須等完整 Step，取消後的新輸入不得採用取消輪資料。
 
 ### JD 模型工具 JDT-01–09
 
@@ -181,6 +187,12 @@
   [工作區語意](../../apps/web/src/app/WorkspaceLayout.test.tsx)、[JD 導覽](../../apps/web/tests/e2e/jd-navigation.spec.ts)、[逐欄編輯](../../apps/web/tests/e2e/jd-inline-edit.spec.ts)
 
   展開祖先後才捲動／聚焦；窄寬切換保留掛載；背景讀取不替換草稿基底
+
+- **工具原件與 Memory 查閱**
+
+  [讀取 API](../../apps/api/tests/integration/test_public_turn_tools_memory.py)、[Memory UI](../../apps/web/src/features/memory/PublishedMemoryViewer.test.tsx)、[工具原字串](../../apps/web/src/features/interview/TurnTools.test.tsx)、[顧問查閱旅程](../../apps/web/tests/e2e/consultant-journey.spec.ts)、[Memory 瀏覽器](../../apps/web/tests/e2e/published-memory.spec.ts)
+
+  完成 A 與跨檔範圍、缺回傳不等於未執行、固定發布正文不混入新版；初次／背景失敗、保留原字串、讀取重試及面板切換的焦點／Escape。Memory owner 合成發布只驗查閱，不替代 B 分析及恢復測試
 
 - **測試接線**
 

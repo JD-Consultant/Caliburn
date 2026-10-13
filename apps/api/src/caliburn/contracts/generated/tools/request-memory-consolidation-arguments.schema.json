@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "RequestMemoryConsolidationArguments",
-  "description": "Request background analysis of this interview after this consultant Turn completes. The App binds the valid source boundary; supply no arguments.",
+  "description": "傳入空物件 {}。App 綁定職務、執行與合法來源範圍；不填摘要、標題、序號或版本。",
   "type": "object",
   "additionalProperties": false,
   "required": [],

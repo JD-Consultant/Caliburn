@@ -1,9 +1,11 @@
+import { stubHttp } from '../test-http';
 import { onlineManager, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, test, vi } from 'vitest';
-import { requestJson } from '../shared/api/http';
+import '../shared/api/http';
+import { client } from '../shared/api/generated/http/client.gen';
 import { createAppQueryClient } from './query-client';
 
 const clients: QueryClient[] = [];
@@ -12,13 +14,28 @@ function isText(value: unknown): value is string {
   return typeof value === 'string';
 }
 
+function localRequest(method: 'GET' | 'POST') {
+  return client
+    .request<{ 200: string }, unknown, true>({
+      url: '/api/local-test',
+      method,
+      throwOnError: true,
+      parseAs: 'json',
+      responseValidator: (value) => {
+        if (!isText(value)) throw new Error('Invalid synthetic response');
+        return Promise.resolve(value);
+      },
+    })
+    .then(({ data }) => data);
+}
+
 function LocalRequests() {
   const query = useQuery({
     queryKey: ['local-test'],
-    queryFn: () => requestJson('/api/local-test', isText),
+    queryFn: () => localRequest('GET'),
   });
   const mutation = useMutation({
-    mutationFn: () => requestJson('/api/local-test', isText, { method: 'POST' }),
+    mutationFn: () => localRequest('POST'),
   });
   return (
     <>
@@ -51,10 +68,7 @@ afterEach(() => {
 
 test('the real app client reads and sends localhost requests even when the browser reports offline', async () => {
   onlineManager.setOnline(false);
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json('本機已回應'))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json('本機已回應'))));
   renderRequests();
   await userEvent.click(screen.getByRole('button', { name: '送出本機命令' }));
 
@@ -67,7 +81,7 @@ test('the real app client reads and sends localhost requests even when the brows
 test('a real transport failure finishes as an error without a delayed send on reconnect', async () => {
   onlineManager.setOnline(false);
   const fetch = vi.fn(() => Promise.reject(new TypeError('local service unavailable')));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderRequests();
   await userEvent.click(screen.getByRole('button', { name: '送出本機命令' }));
 

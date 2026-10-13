@@ -1,23 +1,16 @@
 """The single SSE wire authority permits only five public fields."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.commentary_update import CommentaryUpdate
+from caliburn.transport.http.models.consultant import CommentaryUpdate
+from tests.fixtures.http_contracts import http_validator
 
 
 def test_public_commentary_wire_matches_generated_model_and_rejects_private_fields() -> None:
-    schema = json.loads(
-        (Path(__file__).parents[2] / "contracts/http/commentary-update.schema.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    validator = http_validator(CommentaryUpdate)
     payload = {
         "job_file_id": str(uuid4()),
         "execution_id": str(uuid4()),

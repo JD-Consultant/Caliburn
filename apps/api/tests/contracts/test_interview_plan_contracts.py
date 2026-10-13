@@ -9,7 +9,6 @@ from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 from referencing import Registry, Resource
 
-from caliburn.contracts.generated.interview_plan_view import InterviewPlanView
 from caliburn.contracts.generated.tools.edit_interview_plan_arguments import (
     EditInterviewPlanArguments,
 )
@@ -18,16 +17,17 @@ from caliburn.contracts.generated.tools.interview_plan_write_result import Inter
 from caliburn.contracts.generated.tools.read_interview_plan_arguments import (
     ReadInterviewPlanArguments,
 )
+from caliburn.transport.http.models.consultant import ConsultantTurn, InterviewPlanView
+from tests.fixtures.http_contracts import http_validator
 
 CONTRACTS = Path(__file__).parents[2] / "contracts"
 
 
-def validator(family: str, name: str) -> Draft202012Validator:
-    schema = json.loads((CONTRACTS / family / f"{name}.schema.json").read_text(encoding="utf-8"))
+def validator(name: str) -> Draft202012Validator:
+    schema = json.loads((CONTRACTS / "tools" / f"{name}.schema.json").read_text(encoding="utf-8"))
     resources = [
-        (prefix + path.name, Resource.from_contents(json.loads(path.read_text(encoding="utf-8"))))
-        for source_family, prefix in (("http", ""), ("tools", "../tools/"))
-        for path in (CONTRACTS / source_family).glob("*.schema.json")
+        (path.name, Resource.from_contents(json.loads(path.read_text(encoding="utf-8"))))
+        for path in (CONTRACTS / "tools").glob("*.schema.json")
     ]
     return Draft202012Validator(
         schema, registry=Registry().with_resources(resources), format_checker=FormatChecker()
@@ -37,10 +37,10 @@ def validator(family: str, name: str) -> Draft202012Validator:
 @pytest.mark.parametrize("body", [None, "", " \r\n原文\r\n"])
 def test_read_and_http_preserve_null_empty_and_original_body(body: str | None) -> None:
     read = {"plan": body}
-    validator("tools", "interview-plan").validate(read)
+    validator("interview-plan").validate(read)
     assert InterviewPlan.model_validate(read).model_dump() == read
     view = {"job_file_id": str(uuid4()), "plan": body}
-    validator("http", "interview-plan-view").validate(view)
+    http_validator(InterviewPlanView).validate(view)
     assert InterviewPlanView.model_validate(view).model_dump(mode="json") == view
 
 
@@ -55,7 +55,7 @@ def test_read_and_edit_arguments_expose_only_required_model_owned_parameters() -
 
 
 def test_write_success_branches_require_actual_diff_only_when_updated() -> None:
-    wire = validator("tools", "interview-plan-write-result")
+    wire = validator("interview-plan-write-result")
     for result in ({"status": "unchanged"}, {"status": "updated", "diff": "actual difference"}):
         wire.validate(result)
         assert InterviewPlanWriteResult.model_validate(result).model_dump() == result
@@ -73,7 +73,7 @@ def test_write_success_branches_require_actual_diff_only_when_updated() -> None:
 
 
 def test_turn_preview_is_required_nullable_and_does_not_repeat_scope() -> None:
-    wire = validator("http", "consultant-turn")
+    wire = http_validator(ConsultantTurn)
     turn = {
         "job_file_id": str(uuid4()),
         "execution_id": str(uuid4()),

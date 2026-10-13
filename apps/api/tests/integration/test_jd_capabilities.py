@@ -9,7 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import capability_persistence, capability_service
+from caliburn.features.job_description import capability_persistence, revision_editing
 from caliburn.features.job_description.capabilities import Capability, EditJdCapabilities
 
 pytestmark = pytest.mark.postgres
@@ -545,7 +545,7 @@ def test_before_commit_failure_rolls_back_all_effects(
         ]
 
     before = counts()
-    original_edit = capability_service.edit_capabilities
+    original_edit = revision_editing.apply_content_edit
 
     async def fail_after_write(
         session: AsyncSession, file_id: UUID, command: EditJdCapabilities
@@ -555,7 +555,7 @@ def test_before_commit_failure_rolls_back_all_effects(
 
     request = command_for(current, change)
     with monkeypatch.context() as patch:
-        patch.setattr(capability_service, "edit_capabilities", fail_after_write)
+        patch.setattr(revision_editing, "apply_content_edit", fail_after_write)
         with pytest.raises(RuntimeError, match="Injected"):
             client.post(endpoint, json=request)
     assert client.get(endpoint).json() == current

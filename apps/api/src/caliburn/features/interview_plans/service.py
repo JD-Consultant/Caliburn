@@ -19,12 +19,20 @@ from caliburn.features.interview_plans.models import (
 
 
 async def start_candidate(
-    session: AsyncSession, job_file_id: UUID, execution_id: UUID, base: str | None
+    session: AsyncSession, job_file_id: UUID, execution_id: UUID, base: PlanPosition | None
 ) -> PlanSnapshot:
-    """Capture a full nullable baseline once; reentry always returns its start operation."""
+    """Reference a fixed baseline once; reentry always returns its start operation."""
     existing = await read_base(session, job_file_id, execution_id)
     if existing is not None:
         return existing
+    body_id = None
+    if base is not None:
+        if base.job_file_id != job_file_id:
+            raise PlanStateError("The plan base belongs to another job file")
+        original = await _require_revision(
+            session, job_file_id, base.execution_id, base.revision_id
+        )
+        body_id = original.body_id
     operation = persistence.PlanOperationRecord(
         job_file_id=job_file_id,
         execution_id=execution_id,
@@ -32,7 +40,7 @@ async def start_candidate(
         kind="start",
         expected_revision_id=None,
         revision_id=uuid4(),
-        body=base,
+        body_id=body_id,
         intent_digest=None,
         result_text=None,
     )
@@ -47,7 +55,7 @@ async def start_candidate(
         )
     )
     await session.flush()
-    return _snapshot(operation)
+    return await _snapshot(session, operation)
 
 
 async def read_base(
@@ -62,7 +70,7 @@ async def read_base(
     )
     if operation.kind != "start":
         raise PlanStateError("The plan base does not address its original start")
-    return _snapshot(operation)
+    return await _snapshot(session, operation)
 
 
 async def read_current(
@@ -74,7 +82,15 @@ async def read_current(
     operation = await _require_revision(
         session, job_file_id, execution_id, candidate.current_revision_id
     )
-    return _snapshot(operation)
+    return await _snapshot(session, operation)
+
+
+async def read_at(session: AsyncSession, position: PlanPosition) -> PlanSnapshot:
+    """Read an immutable historical position on the caller's existing snapshot."""
+    operation = await _require_revision(
+        session, position.job_file_id, position.execution_id, position.revision_id
+    )
+    return await _snapshot(session, operation)
 
 
 async def apply_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditResult:
@@ -95,9 +111,21 @@ async def apply_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditResul
     digest = _intent_digest(edit)
     if candidate.current_revision_id != position.revision_id:
         raise StalePlanPositionError("The plan candidate has advanced past the expected revision")
-    await _require_revision(
+    expected = await _require_revision(
         session, position.job_file_id, position.execution_id, position.revision_id
     )
+    body_id = None
+    if edit.next_plan is not None:
+        if (await _snapshot(session, expected)).body == edit.next_plan:
+            body_id = expected.body_id
+        else:
+            body_id = uuid4()
+            session.add(
+                persistence.PlanBodyRecord(
+                    job_file_id=position.job_file_id, body_id=body_id, body=edit.next_plan
+                )
+            )
+            await session.flush()
     operation = persistence.PlanOperationRecord(
         job_file_id=position.job_file_id,
         execution_id=position.execution_id,
@@ -105,7 +133,7 @@ async def apply_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditResul
         kind="apply",
         expected_revision_id=position.revision_id,
         revision_id=uuid4(),
-        body=edit.next_plan,
+        body_id=body_id,
         intent_digest=digest,
         result_text=edit.result_text,
     )
@@ -113,7 +141,7 @@ async def apply_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditResul
     await session.flush()
     candidate.current_revision_id = operation.revision_id
     await session.flush()
-    return PlanEditResult(_snapshot(operation), edit.result_text)
+    return PlanEditResult(await _snapshot(session, operation), edit.result_text)
 
 
 async def recover_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditResult | None:
@@ -127,9 +155,11 @@ async def recover_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditRes
         or original.execution_id != position.execution_id
         or original.expected_revision_id != position.revision_id
         or original.intent_digest != _intent_digest(edit)
-        or original.body != edit.next_plan
         or original.result_text != edit.result_text
     ):
+        raise PlanConflictError("The operation identity already belongs to another plan intent")
+    snapshot = await _snapshot(session, original)
+    if snapshot.body != edit.next_plan:
         raise PlanConflictError("The operation identity already belongs to another plan intent")
     if (
         await persistence.read_candidate(session, position.job_file_id, position.execution_id)
@@ -141,7 +171,7 @@ async def recover_prepared(session: AsyncSession, edit: PlanEdit) -> PlanEditRes
     )
     if original.result_text is None:
         raise PlanStateError("The original plan result is unavailable")
-    return PlanEditResult(_snapshot(original), original.result_text)
+    return PlanEditResult(snapshot, original.result_text)
 
 
 async def validate_final(
@@ -152,8 +182,8 @@ async def validate_final(
 ) -> None:
     """Check the supplied final head in the settlement transaction, including completed replay.
 
-    Old capability has no candidate and passes None; new capability's caller must separately
-    require its saved root. Existing candidates can never be skipped by passing None.
+    No candidate and no position may return; callers enforce the Turn's preparation contract.
+    Existing candidates can never be skipped by passing None.
     """
     current = await read_current(session, job_file_id, execution_id)
     if current is None and position is None:
@@ -194,8 +224,12 @@ async def _require_revision(
     return operation
 
 
-def _snapshot(operation: persistence.PlanOperationRecord) -> PlanSnapshot:
+async def _snapshot(
+    session: AsyncSession, operation: persistence.PlanOperationRecord
+) -> PlanSnapshot:
     return PlanSnapshot(
         PlanPosition(operation.job_file_id, operation.execution_id, operation.revision_id),
-        operation.body,
+        await persistence.read_body(session, operation.job_file_id, operation.body_id)
+        if operation.body_id is not None
+        else None,
     )

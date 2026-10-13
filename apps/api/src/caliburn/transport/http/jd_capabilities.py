@@ -1,22 +1,16 @@
 """Manual shared knowledge/skill edits; wire types do not own JD rules."""
 
-from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
-from caliburn.contracts.generated import edit_jd_capabilities_request as wire
-from caliburn.contracts.generated import jd_capabilities_view as view
 from caliburn.features.job_description import capabilities
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.transport.http.contracts import canonical_body
 from caliburn.transport.http.jd_dependencies import JdEditing
+from caliburn.transport.http.models import jd_capabilities_edits as wire
+from caliburn.transport.http.models import jd_views as view
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
-
-
-def _nullable_text(value: str | wire.OptionalText | None) -> str | None:
-    return value.root if isinstance(value, wire.OptionalText) else value
 
 
 def _change_from_wire(
@@ -29,19 +23,16 @@ def _change_from_wire(
 ) -> capabilities.CapabilityChange:
     match change:
         case wire.CreateCapability():
-            item = change.root
             return capabilities.CreateCapability(
-                capabilities.CapabilityKind(item.kind.value),
-                _nullable_text(item.name),
-                _nullable_text(item.description),
+                change.kind,
+                change.name,
+                change.description,
             )
         case wire.ReviseCapability():
             return capabilities.ReviseCapability(
                 change.capability_id,
                 tuple(
-                    capabilities.CapabilityFieldChange(
-                        capabilities.CapabilityField(item.field.value), _nullable_text(item.value)
-                    )
+                    capabilities.CapabilityFieldChange(item.field, item.value)
                     for item in change.changes
                 ),
             )
@@ -65,7 +56,7 @@ def capabilities_view(result: capabilities.JdCapabilitiesRevision) -> view.JdCap
         capabilities=[
             view.Capability(
                 capability_id=item.capability_id,
-                kind=view.Kind(item.kind.value),
+                kind=item.kind,
                 name=item.name,
                 description=item.description,
             )
@@ -78,7 +69,9 @@ def capabilities_view(result: capabilities.JdCapabilitiesRevision) -> view.JdCap
     )
 
 
-@router.get("/capabilities", response_model=view.JdCapabilitiesView)
+@router.get(
+    "/capabilities", response_model=view.JdCapabilitiesView, operation_id="read_jd_capabilities"
+)
 async def read_capabilities(job_file_id: UUID, workflow: JdEditing) -> view.JdCapabilitiesView:
     try:
         return capabilities_view(await workflow.read_capabilities(job_file_id))
@@ -86,10 +79,12 @@ async def read_capabilities(job_file_id: UUID, workflow: JdEditing) -> view.JdCa
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
 
 
-@router.post("/capabilities", response_model=view.JdCapabilitiesView)
+@router.post(
+    "/capabilities", response_model=view.JdCapabilitiesView, operation_id="edit_jd_capabilities"
+)
 async def edit_capabilities(
     job_file_id: UUID,
-    body: Annotated[wire.EditJdCapabilitiesRequest, canonical_body(wire.EditJdCapabilitiesRequest)],
+    body: wire.EditJdCapabilitiesRequest,
     workflow: JdEditing,
 ) -> view.JdCapabilitiesView:
     try:

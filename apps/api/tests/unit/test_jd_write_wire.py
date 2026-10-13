@@ -10,9 +10,9 @@ from caliburn.features.job_description.models import (
     ProfileField,
     SetProfileField,
 )
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
 from caliburn.transport.model_tools.jd_write_wire import parse_profile_write, parse_task_write
-from caliburn.workflows.jd_profile_writes import AddProfileSource, AlignProfileSource
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection, InterviewSourceSelection
+from caliburn.workflows.job_description.profile_writes import AddProfileSource, AlignProfileSource
 
 
 def test_profile_wire_separates_text_clear_and_explicit_evidence_choices() -> None:
@@ -25,7 +25,7 @@ def test_profile_wire_separates_text_clear_and_explicit_evidence_choices() -> No
                     {
                         "action": "add_source",
                         "field": "job_title",
-                        "source": {"kind": "current_input"},
+                        "source": {"kind": "interview", "interview_sequence": 2},
                     },
                     {
                         "action": "confirm_reference_alignment",
@@ -41,12 +41,12 @@ def test_profile_wire_separates_text_clear_and_explicit_evidence_choices() -> No
         ClearProfileField(ProfileField.REPORTS_TO),
     )
     assert sources == (
-        AddProfileSource(ProfileField.JOB_TITLE, CurrentInputSourceSelection()),
+        AddProfileSource(ProfileField.JOB_TITLE, InterviewSourceSelection(2)),
         AlignProfileSource(ProfileField.PURPOSE, "citation_app"),
     )
 
 
-def test_task_wire_preserves_empty_unknown_fields_and_per_detail_evidence() -> None:
+def test_task_wire_preserves_empty_unknown_fields_and_shared_task_evidence() -> None:
     intent = parse_task_write(
         json.dumps(
             {
@@ -56,19 +56,18 @@ def test_task_wire_preserves_empty_unknown_fields_and_per_detail_evidence() -> N
                 "outcomes": [
                     {
                         "text": "交付可操作網站",
-                        "supporting_sources": [{"kind": "interview", "interview_sequence": 8}],
                     }
                 ],
                 "requirements": [],
                 "required_knowledge": [],
                 "required_skills": [],
-                "supporting_sources": [],
+                "supporting_sources": [{"kind": "interview", "interview_sequence": 8}],
             }
         )
     )
     assert intent.description is None
-    assert intent.sources == ()
-    assert intent.outcomes[0].sources == (InterviewSourceSelection(8),)
+    assert intent.sources == (InterviewSourceSelection(8),)
+    assert intent.outcomes[0].text == "交付可操作網站"
     assert intent.requirements == ()
 
 

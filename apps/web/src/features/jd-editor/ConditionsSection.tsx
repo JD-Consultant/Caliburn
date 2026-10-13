@@ -1,7 +1,11 @@
 /** Derived groups do not mirror server state or imply inheritance by task. */
 import { Box, Button, Stack, Typography } from '@mui/material';
-import type { ConditionKind } from '../../shared/api/generated/edit-jd-conditions-request';
-import type { Condition, JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type {
+  ConditionKind,
+  Condition,
+  JdWorkView,
+} from '../../shared/api/generated/http/types.gen';
+
 import type { WorkIntent } from './jd-work-api';
 import type { WorkDialogContent } from './WorkDialog';
 import { conditionLabels, isConditionKind } from './condition-labels';

@@ -1,7 +1,7 @@
 /** The Turn this tab tracks, read-only. The composer owns starting, recovering and polling it. */
 import { useSyncExternalStore } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import {
   consultantTurnByCommandQuery,
   consultantTurnQuery,

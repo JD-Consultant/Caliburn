@@ -7,9 +7,11 @@ from uuid import UUID, uuid4
 
 import psycopg
 import pytest
+from alembic import command
+from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 
-from caliburn.adapters.database import Database
+from caliburn.adapters.database import Database, migration_config
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.models import ProfileField
@@ -31,10 +33,61 @@ from caliburn.features.work_memory.models import MemoryContent, MemorySourceWind
 from caliburn.features.work_memory.revision_service import write_object_revision
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionReference
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
+
+
+def test_storage_release_rejects_retired_source_layout(
+    database_settings: DatabaseSettings, database_connection: psycopg.Connection
+) -> None:
+    database_connection.execute("ALTER TABLE jd_source_references ADD COLUMN target_task_id uuid")
+    engine = create_engine(
+        database_settings.sqlalchemy_url,
+        connect_args={"options": f"-c search_path={database_settings.schema}"},
+    )
+    try:
+        with engine.begin() as connection:
+            config = migration_config()
+            config.attributes.update(connection=connection, schema=database_settings.schema)
+            command.stamp(config, "0033_memory_context_storage")
+            with pytest.raises(RuntimeError, match="fresh database namespace"):
+                command.upgrade(config, "head")
+    finally:
+        engine.dispose()
+
+
+def test_fresh_schema_has_only_supported_source_owners(
+    database_connection: psycopg.Connection, source_file: SourceFile
+) -> None:
+    columns = database_connection.execute(
+        "SELECT column_name FROM information_schema.columns "
+        "WHERE table_schema=current_schema() AND table_name='jd_source_references'"
+    ).fetchall()
+    assert "target_task_id" not in {row[0] for row in columns}
+    revision_id = uuid4()
+    database_connection.execute(
+        "INSERT INTO jd_revisions (job_file_id,revision_id) VALUES (%s,%s)",
+        (source_file.file_id, revision_id),
+    )
+    for kind in ("detail", "task_capability"):
+        with pytest.raises(psycopg.errors.CheckViolation, match="target_shape"):
+            database_connection.execute(
+                "INSERT INTO jd_source_references "
+                "(job_file_id,revision_id,citation_id,target_kind,target_item_id,source_kind,"
+                "interview_source_id,needs_review,reviewed_revision_id,position) "
+                "VALUES (%s,%s,%s,%s,%s,'interview',%s,false,%s,0)",
+                (
+                    source_file.file_id,
+                    revision_id,
+                    uuid4(),
+                    kind,
+                    uuid4(),
+                    source_file.pending_source_id,
+                    revision_id,
+                ),
+            )
 
 
 def execute[T](settings: DatabaseSettings, operation: Callable[[Database], Awaitable[T]]) -> T:
@@ -141,7 +194,7 @@ def test_roundtrip_keeps_order_precise_targets_pending_input_and_fixed_memory_id
         references = (
             JdSourceReference(
                 uuid4(),
-                JdSourceTarget(SourceTargetKind.TASK_CAPABILITY, item_id=uuid4(), task_id=uuid4()),
+                JdSourceTarget(SourceTargetKind.TASK, item_id=uuid4()),
                 understanding,
             ),
             JdSourceReference(
@@ -152,7 +205,7 @@ def test_roundtrip_keeps_order_precise_targets_pending_input_and_fixed_memory_id
             ),
             JdSourceReference(
                 uuid4(),
-                JdSourceTarget(SourceTargetKind.DETAIL, item_id=uuid4(), task_id=uuid4()),
+                JdSourceTarget(SourceTargetKind.CAPABILITY, item_id=uuid4()),
                 situation,
             ),
             JdSourceReference(

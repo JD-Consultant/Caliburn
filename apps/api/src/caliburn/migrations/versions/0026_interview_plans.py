@@ -11,6 +11,18 @@ depends_on = None
 
 def upgrade() -> None:
     op.create_table(
+        "interview_plan_bodies",
+        sa.Column("job_file_id", sa.Uuid(), nullable=False),
+        sa.Column("body_id", sa.Uuid(), nullable=False),
+        sa.Column("body", sa.Text(), nullable=False),
+        sa.PrimaryKeyConstraint("job_file_id", "body_id"),
+        sa.ForeignKeyConstraint(
+            ["job_file_id"],
+            ["job_files.job_file_id"],
+            ondelete="CASCADE",
+        ),
+    )
+    op.create_table(
         "interview_plan_operations",
         sa.Column("job_file_id", sa.Uuid(), nullable=False),
         sa.Column("operation_id", sa.Uuid(), nullable=False),
@@ -18,11 +30,17 @@ def upgrade() -> None:
         sa.Column("kind", sa.Text(), nullable=False),
         sa.Column("expected_revision_id", sa.Uuid(), nullable=True),
         sa.Column("revision_id", sa.Uuid(), nullable=False),
-        sa.Column("body", sa.Text(), nullable=True),
+        sa.Column("body_id", sa.Uuid(), nullable=True),
         sa.Column("intent_digest", sa.Text(), nullable=True),
         sa.Column("result_text", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("job_file_id", "operation_id"),
         sa.UniqueConstraint("job_file_id", "execution_id", "revision_id", name="uq_plan_revision"),
+        sa.ForeignKeyConstraint(
+            ["job_file_id", "body_id"],
+            ["interview_plan_bodies.job_file_id", "interview_plan_bodies.body_id"],
+            name="fk_plan_operation_body",
+            ondelete="CASCADE",
+        ),
         sa.ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
@@ -50,6 +68,11 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "expected_revision_id <> revision_id", name="plan_operation_predecessor"
         ),
+    )
+    op.create_index(
+        "ix_interview_plan_operations_body",
+        "interview_plan_operations",
+        ["job_file_id", "body_id"],
     )
     op.create_index(
         "ix_interview_plan_operations_expected",
@@ -98,6 +121,10 @@ def upgrade() -> None:
         END $$;
         CREATE TRIGGER protect_plan_operations
         BEFORE UPDATE OR DELETE ON interview_plan_operations
+        FOR EACH ROW WHEN (job_file_row_is_present(to_jsonb(OLD)))
+        EXECUTE FUNCTION reject_plan_operation_mutation();
+        CREATE TRIGGER protect_plan_bodies
+        BEFORE UPDATE OR DELETE ON interview_plan_bodies
         FOR EACH ROW WHEN (job_file_row_is_present(to_jsonb(OLD)))
         EXECUTE FUNCTION reject_plan_operation_mutation();
     """)

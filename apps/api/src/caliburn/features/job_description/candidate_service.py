@@ -1,7 +1,7 @@
 """Private JD positions reuse fixed revisions; lifecycle changes join a short caller transaction."""
 
 from dataclasses import dataclass
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +29,7 @@ class JdCandidatePreview:
 
 def _position(record: candidate_persistence.JdCandidateRecord) -> JdCandidatePosition:
     return JdCandidatePosition(
-        JdCandidateScope(record.execution_id, record.generation_id),
+        JdCandidateScope(record.execution_id),
         record.base_revision_id,
         record.current_revision_id,
     )
@@ -50,7 +50,6 @@ async def start_candidate(
         execution_id=execution_id,
         base_revision_id=formal.current_revision_id,
         current_revision_id=formal.current_revision_id,
-        generation_id=uuid4(),
         status="open",
     )
     session.add(record)
@@ -114,49 +113,11 @@ async def _recover_control(
     )
     if record is None or record.base_revision_id != position.base_revision_id:
         raise CandidateStateError("The candidate base is unavailable")
-    generation_id = (
-        UUID(saved["result_generation_id"])
-        if kind == "restore_candidate"
-        else position.scope.generation_id
-    )
     return JdCandidatePosition(
-        JdCandidateScope(position.scope.execution_id, generation_id),
+        JdCandidateScope(position.scope.execution_id),
         record.base_revision_id,
         operation.result_revision_id,
     )
-
-
-async def restore_candidate(
-    session: AsyncSession,
-    job_file_id: UUID,
-    position: JdCandidatePosition,
-    target_revision_id: UUID,
-    command_id: UUID,
-) -> JdCandidatePosition:
-    payload = {"target_revision_id": str(target_revision_id)}
-    original = await _recover_control(
-        session, job_file_id, position, command_id, "restore_candidate", payload
-    )
-    if original is not None:
-        return original
-    record = await require_position(session, job_file_id, position)
-    if not await persistence.is_revision_ancestor(
-        session,
-        job_file_id,
-        ancestor=target_revision_id,
-        descendant=position.revision_id,
-        boundary=position.base_revision_id,
-    ):
-        raise CandidateStateError("Restore requires a retained ancestor within this candidate")
-    generation_id = uuid4()
-    record.current_revision_id = target_revision_id
-    record.generation_id = generation_id
-    payload["result_generation_id"] = str(generation_id)
-    _record_control(
-        session, job_file_id, position, command_id, "restore_candidate", payload, target_revision_id
-    )
-    await session.flush()
-    return _position(record)
 
 
 async def discard_candidate(
@@ -218,7 +179,6 @@ def _record_control(
             expected_revision_id=position.revision_id,
             result_revision_id=result_revision_id,
             candidate_execution_id=position.scope.execution_id,
-            candidate_generation_id=position.scope.generation_id,
             request_payload=payload,
         )
     )

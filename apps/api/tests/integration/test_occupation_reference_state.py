@@ -104,22 +104,6 @@ def read(client: TestClient, writer: ExecutionWriter) -> ReferenceStatePosition 
     )
 
 
-def restore(
-    client: TestClient,
-    writer: ExecutionWriter,
-    position: ReferenceStatePosition,
-    target_revision_id: UUID,
-    operation_id: UUID,
-) -> ReferenceStatePosition:
-    return transact(
-        client,
-        writer,
-        lambda session: service.restore_candidate(
-            session, writer.scope.job_file_id, position, target_revision_id, operation_id
-        ),
-    )
-
-
 def test_candidates_reopen_original_state_and_keep_file_scope(client: TestClient) -> None:
     writer, other = writer_for_new_file(client), writer_for_new_file(client)
     assert read(client, writer) is None
@@ -147,32 +131,9 @@ def test_replay_returns_exact_result_and_rejects_changed_intent(client: TestClie
         apply(client, writer, initial, uuid4(), first_state)
 
 
-def test_restore_fences_old_writes_and_keeps_its_original_result(client: TestClient) -> None:
-    writer = writer_for_new_file(client)
-    initial = start(client, writer)
-    first_id = uuid4()
-    first_state = OccupationReferenceState(("frontend:v1",), ("正式部署",))
-    first = apply(client, writer, initial, first_id, first_state)
-    abandoned = apply(client, writer, first, uuid4(), OccupationReferenceState((), ("帳務調整",)))
-    restore_id = uuid4()
-    restored = restore(client, writer, abandoned, first.revision_id, restore_id)
-    assert restored.state == first_state
-    assert restored.generation_id != first.generation_id
-    with pytest.raises(StaleReferenceStateError):
-        apply(client, writer, initial, first_id, first_state)
-    continued = apply(client, writer, restored, uuid4(), OccupationReferenceState(("new:v1",)))
-    assert restore(client, writer, abandoned, first.revision_id, restore_id) == restored
-    assert read(client, writer) == continued
-    with pytest.raises(ReferenceStateError):
-        restore(client, writer, continued, abandoned.revision_id, uuid4())
-
-
-def test_restore_cannot_select_other_turn_or_unknown_revision(client: TestClient) -> None:
+def test_state_cannot_select_other_turn(client: TestClient) -> None:
     writer, other = writer_for_new_file(client), writer_for_new_file(client)
     initial, foreign = start(client, writer), start(client, other)
-    for target in (foreign.revision_id, uuid4()):
-        with pytest.raises(ReferenceStateError):
-            restore(client, writer, initial, target, uuid4())
     with pytest.raises(ReferenceStateError):
         apply(client, writer, foreign, uuid4(), OccupationReferenceState(()))
     assert read(client, writer) == initial
@@ -248,15 +209,13 @@ def test_database_rejects_obsolete_or_extra_state_fields(
     with pytest.raises(psycopg.errors.CheckViolation):
         database_connection.execute(
             "INSERT INTO occupation_reference_operations "
-            "(job_file_id, operation_id, execution_id, kind, generation_id, "
-            "result_generation_id, expected_revision_id, parent_revision_id, revision_id, state) "
-            "VALUES (%s,%s,%s,'start',%s,%s,NULL,NULL,%s,%s)",
+            "(job_file_id, operation_id, execution_id, kind, "
+            "expected_revision_id, revision_id, state) "
+            "VALUES (%s,%s,%s,'start',NULL,%s,%s)",
             (
                 writer.scope.job_file_id,
                 uuid4(),
                 writer.scope.execution_id,
-                initial.generation_id,
-                initial.generation_id,
                 uuid4(),
                 Jsonb(obsolete),
             ),

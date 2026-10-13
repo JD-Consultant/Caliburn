@@ -13,14 +13,14 @@ from caliburn.features.work_memory.batch_models import MemoryBatchWork
 from caliburn.features.work_memory.candidates import MemoryCandidateStateError
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.excluded_work_reads import ExcludedWorkReadTools
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.memory_reads import (
+from caliburn.workflows.occupation_reference_reads import ExcludedWorkReadWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.reads import (
     CandidateMemoryRead,
     MemoryReadWorkflow,
     PublishedMemoryRead,
 )
-from caliburn.workflows.occupation_reference_reads import ExcludedWorkReadWorkflow
 from tests.integration.test_occupation_reference_workflow import (
     finish,
     new_writer,
@@ -183,16 +183,14 @@ def test_fixed_job_files_and_empty_state_remain_isolated(client: TestClient) -> 
         )
 
 
-def test_superseded_generation_cannot_read_but_the_restored_stage_can(client: TestClient) -> None:
+def test_completed_stage_cannot_read_but_next_stage_can(client: TestClient) -> None:
     work = start_batch(client, ("不負責部署",))
     candidates = MemoryCandidateWorkflow(client.app.state.database.sessions)
-    restored = client.portal.call(
-        candidates.restore, work.writer, work.position, work.position, uuid4()
-    )
+    next_stage = client.portal.call(candidates.handoff, work.writer, work.position, uuid4())
     reader = ExcludedWorkReadWorkflow(client.app.state.database.sessions)
     with pytest.raises(MemoryCandidateStateError):
         client.portal.call(reader.read, CandidateMemoryRead(work.writer.scope, work.position))
-    assert client.portal.call(reader.read, CandidateMemoryRead(work.writer.scope, restored)) == (
+    assert client.portal.call(reader.read, CandidateMemoryRead(work.writer.scope, next_stage)) == (
         "不負責部署",
     )
 
@@ -202,8 +200,8 @@ def test_inactive_memory_and_consultant_bindings_reject_instead_of_returning_emp
 ) -> None:
     work = start_batch(client, ("不負責部署",))
     reader = ExcludedWorkReadWorkflow(client.app.state.database.sessions)
-    candidates = MemoryCandidateWorkflow(client.app.state.database.sessions)
-    client.portal.call(candidates.discard, work.writer, work.position, uuid4())
+    settlement = MemoryConsolidationWorkflow(client.app.state.database.sessions)
+    client.portal.call(lambda: settlement.fail(work.writer, reason="execution_interrupted"))
     with pytest.raises(ExecutionStateError):
         client.portal.call(reader.read, CandidateMemoryRead(work.writer.scope, work.position))
     advisor = new_writer(client, work.writer.scope.job_file_id)

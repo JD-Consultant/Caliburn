@@ -12,7 +12,7 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type { JobFile } from '../../shared/api/generated/http/types.gen';
 import { useStoredCommand } from '../../shared/commands/use-stored-command';
 import type { StoredCommandState } from '../../shared/commands/use-stored-command';
 import { focusDialogInput } from '../../shared/ui/dialog-focus';

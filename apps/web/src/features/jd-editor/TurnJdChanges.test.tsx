@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -29,7 +30,7 @@ test('reads original Turn changes only on demand without sending an undo command
       Response.json({ execution_id: executionId, markdown: '## 這輪 JD 變更\n\n新增盤點任務。' }),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderActions();
   expect(fetch).not.toHaveBeenCalled();
   await userEvent.click(screen.getByRole('button', { name: '查看這輪 JD 變更' }));
@@ -53,10 +54,10 @@ test('rejects another Turn response and allows explicit read retry, never fake e
     .mockResolvedValueOnce(
       Response.json({ execution_id: executionId, markdown: '正文淨差異：無。' }),
     );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderActions();
   await userEvent.click(screen.getByRole('button', { name: '查看這輪 JD 變更' }));
-  expect(await screen.findByRole('alert')).toHaveTextContent('無法');
+  expect(await screen.findByRole('alert')).toHaveTextContent('尚未採用這份結果');
   expect(screen.queryByText('不屬於這轮')).not.toBeInTheDocument();
   expect(screen.queryByText('正文淨差異：無。')).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '重新讀取變更' }));

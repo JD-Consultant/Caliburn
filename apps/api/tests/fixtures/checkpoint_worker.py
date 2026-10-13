@@ -9,7 +9,6 @@ from uuid import UUID, uuid4
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response, ResponseFunctionToolCall
-from response_capacity import synthetic_capacity_limits, synthetic_response_runtime
 
 from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
@@ -18,10 +17,10 @@ from caliburn.adapters.response_serialization import (
     response_input_items,
     snapshot_response,
 )
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    _build_response_step,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
+from caliburn.agent_execution.tool_steps import _completed_step_items
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
 async def account_response(received: ReceivedModelResponse) -> None:
@@ -71,12 +70,16 @@ async def run(mode: str, thread_id: str) -> None:
     async def ensure_active() -> None:
         """Isolated saver probe; no product scope in this fixture."""
 
+    async def account_saved(received):
+        if mode == "write":
+            raise ConnectionError("synthetic stop after durable raw response")
+
     runtime = synthetic_response_runtime(
         request_model=request_model,
         prepare_tool=prepare_tool,
         execute_tool=execute_tool,
         ensure_active=ensure_active,
-        account_response=account_response,
+        account_response=account_saved,
     )
 
     async with AsyncPostgresSaver.from_conn_string(
@@ -84,50 +87,58 @@ async def run(mode: str, thread_id: str) -> None:
         serde=create_graph_serializer(),
     ) as saver:
         await saver.setup()
-        graph = _build_response_step(saver, max_tool_calls=16)
         config = {"configurable": {"thread_id": thread_id}}
-        before = await graph.aget_state(config)
+        before = await read_response_state(saver, config)
         if mode == "write":
-            assert not before.values
-            request_id = uuid4()
-            await graph.ainvoke(
-                {
-                    "request_snapshot": model_request.create_payload(),
-                    "request_id": request_id,
-                    "model_step_limit": None,
-                    "tool_call_limit": 16,
-                    "capacity_limits": synthetic_capacity_limits(),
-                },
-                config,
-                context=runtime,
-                durability="sync",
-                interrupt_before=["prepare_tool"],
-            )
-            saved = await graph.aget_state(config)
-            assert saved.next == ("prepare_tool",)
+            assert "request_id" not in before.values
+            try:
+                await run_response_step(
+                    saver,
+                    thread_id=thread_id,
+                    request=model_request,
+                    runtime=runtime,
+                    max_tool_calls=16,
+                )
+            except ConnectionError:
+                pass
+            else:
+                raise AssertionError("The fixture must stop after its durable raw response")
+            saved = await read_response_state(saver, config)
+            assert saved.next == ("NativePolicy.after_model",)
             assert saved.values["response_snapshot"] == original_snapshot
             assert saved.values["request_snapshot"] == model_request.create_payload()
             assert saved.values["request_snapshot"]["stream"] is False
-            assert saved.values["request_id"] == request_id
             assert "input_items" not in saved.values
             assert model_calls == 1 and observation_calls == 0
         elif mode == "resume":
-            assert before.next == ("prepare_tool",)
+            assert before.next == ("NativePolicy.after_model",)
             assert before.values["response_snapshot"] == original_snapshot
             assert before.values["request_snapshot"] == model_request.create_payload()
             assert before.values["request_snapshot"]["stream"] is False
             assert isinstance(before.values["request_id"], UUID)
-            await graph.ainvoke(None, config, context=runtime, durability="sync")
-            saved = await graph.aget_state(config)
-            assert not saved.next
+            await run_response_step(
+                saver, thread_id=thread_id, request=None, runtime=runtime, max_tool_calls=16
+            )
+            saved = await read_response_state(saver, config)
+            assert saved.values["completed_steps"] == 1
             assert saved.values["request_id"] == before.values["request_id"]
-            assert saved.values["input_items"] == [*original_items, observation]
+            assert "input_items" not in saved.values
+            assert _completed_step_items(
+                saved.values["request_snapshot"],
+                saved.values["response_snapshot"],
+                saved.values["tool_results"],
+            ) == [*original_items, observation]
             assert model_calls == 0 and observation_calls == 1
         else:
             raise ValueError("Unknown probe mode")
-        assert not (
-            await graph.aget_state({"configurable": {"thread_id": thread_id + "-other"}})
-        ).values
+        assert (
+            "request_id"
+            not in (
+                await read_response_state(
+                    saver, {"configurable": {"thread_id": thread_id + "-other"}}
+                )
+            ).values
+        )
         print(
             json.dumps(
                 {"mode": mode, "model_calls": model_calls, "observation_calls": observation_calls}

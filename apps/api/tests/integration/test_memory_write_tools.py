@@ -38,10 +38,11 @@ from caliburn.features.work_memory.models import (
 )
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
-from caliburn.transport.model_tools.memory_writes import MemoryWriteTools, PreparedMemoryToolCall
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
-from caliburn.workflows.memory_writes import MemoryWritePreparation
+from caliburn.transport.model_tools.memory_write_checkpoint import PreparedMemoryToolCall
+from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import CandidateMemoryRead, MemoryReadWorkflow
+from caliburn.workflows.work_memory.write_preparation import MemoryWritePreparation
 
 pytestmark = pytest.mark.postgres
 SITUATION = MemoryLayer.WORK_SITUATION

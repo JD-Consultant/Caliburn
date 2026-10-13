@@ -1,4 +1,4 @@
-"""Memory stage handoff, branch restore and publication; no model or checkpoint logic."""
+"""Memory stage handoff and publication; no model or checkpoint logic."""
 
 from uuid import UUID, uuid4
 
@@ -36,9 +36,8 @@ async def _recover_control(
     record = await batch_persistence.read_batch(
         session, position.job_file_id, position.execution_id
     )
-    generation = result.generation_id if kind == "restore" else position.generation_id
-    if record is None or record.generation_id != generation:
-        raise MemoryCandidateStateError("The saved control result belongs to a superseded branch")
+    if record is None:
+        raise MemoryCandidateStateError("The saved control result belongs to an unavailable batch")
     return result
 
 
@@ -57,44 +56,6 @@ async def handoff(
     record.stage_id = uuid4()
     result = queries.batch_position(record)
     await operations.record_result(session, result, command_id, "handoff", payload)
-    return result
-
-
-async def restore(
-    session: AsyncSession,
-    position: MemoryBatchPosition,
-    target: MemoryBatchPosition,
-    command_id: UUID,
-) -> MemoryBatchPosition:
-    if (target.job_file_id, target.execution_id) != (position.job_file_id, position.execution_id):
-        raise MemoryCandidateStateError("Restore requires a position from the same batch")
-    payload: dict[str, object] = {
-        "position": operations.position_fields(position),
-        "target": operations.position_fields(target),
-    }
-    prior = await _recover_control(session, position, command_id, "restore", payload)
-    if prior is not None:
-        return prior
-    record = await queries.require_stage(session, position, exact_position=True)
-    await require_base(session, record)
-    if not await batch_persistence.has_recorded_position(
-        session, position.job_file_id, position.execution_id, operations.position_fields(target)
-    ):
-        raise MemoryCandidateStateError("Restore requires an authentic retained stage position")
-    if not await position_persistence.is_position_ancestor(
-        session,
-        position.job_file_id,
-        target.position_id,
-        position.position_id,
-        record.base_position_id,
-    ):
-        raise MemoryCandidateStateError("Restore cannot adopt a foreign or abandoned position")
-    record.current_position_id = target.position_id
-    record.phase = target.phase.value
-    record.generation_id = uuid4()
-    record.stage_id = uuid4()
-    result = queries.batch_position(record)
-    await operations.record_result(session, result, command_id, "restore", payload)
     return result
 
 

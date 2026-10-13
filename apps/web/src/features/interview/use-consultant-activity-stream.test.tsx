@@ -1,7 +1,8 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { useConsultantActivityStream } from './use-consultant-activity-stream';
 import { clearDeletedInterview, consultantTurnQuery } from './interview-turn-api';
@@ -44,7 +45,7 @@ beforeEach(() => {
   Source.instances = [];
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   read = vi.fn(() => Promise.resolve(Response.json(active)));
-  vi.stubGlobal('fetch', read);
+  stubHttp(read);
   vi.stubGlobal('EventSource', Source);
 });
 afterEach(() => {

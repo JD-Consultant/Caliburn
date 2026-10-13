@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button } from '@mui/material';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 import { CloseIcon, PauseIcon, PlayIcon } from '../../shared/ui/icons';
 import { ApiError } from '../../shared/api/http';
 import { refreshQueries } from '../../shared/api/refresh-queries';

@@ -13,7 +13,10 @@ from starlette.types import Message, Scope
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.interviews.models import SubmitInterviewInput
-from caliburn.workflows.consultant_activity import ConsultantActivityHub, PublicCommentaryUpdate
+from caliburn.workflows.consultant_turns.activity import (
+    ConsultantActivityHub,
+    PublicCommentaryUpdate,
+)
 
 pytestmark = pytest.mark.postgres
 

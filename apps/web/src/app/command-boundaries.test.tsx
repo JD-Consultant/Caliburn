@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 import type { ReactNode } from 'react';
 import { QueryClientProvider, QueryObserver } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
@@ -9,7 +10,7 @@ import { pendingProfile, profileCommand, workCommand } from '../features/jd-edit
 import type { WorkCommand } from '../features/jd-editor/jd-work-api';
 import { jdSourcesQuery } from '../features/source-viewer/source-api';
 import { useStoredCommand } from '../shared/commands/use-stored-command';
-import type { ReviseJdProfileRequest } from '../shared/api/generated/revise-jd-profile-request';
+import type { ReviseJdProfileRequest } from '../shared/api/generated/http/types.gen';
 import { refreshFormalJd } from './workspace-refresh';
 import { createAppQueryClient } from './query-client';
 
@@ -42,7 +43,7 @@ test.each([
     .fn<(url: string, options?: RequestInit) => Promise<Response>>()
     .mockRejectedValueOnce(new TypeError('lost ACK'))
     .mockImplementationOnce(() => Promise.resolve(response()));
-  vi.stubGlobal('fetch', fetcher);
+  stubHttp(fetcher);
   const { result, unmount } = renderHook(() => useStoredCommand(creationCommand(client)), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
@@ -67,8 +68,7 @@ test('profile validation before original-result lookup cannot retire an uncertai
     expected_revision_id: revisionId,
     changes: [{ action: 'set_field', field: 'job_title', value: '新職稱' }],
   };
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi
       .fn()
       .mockRejectedValueOnce(new TypeError('lost ACK'))
@@ -107,7 +107,7 @@ test('manual JD refresh replaces a first source GET started before the commit', 
     .fn()
     .mockReturnValueOnce(before)
     .mockResolvedValue(Response.json(sources(nextRevision)));
-  vi.stubGlobal('fetch', fetcher);
+  stubHttp(fetcher);
   const query = jdSourcesQuery(fileId);
   const observer = new QueryObserver(client, query);
   const unsubscribe = observer.subscribe(() => {});

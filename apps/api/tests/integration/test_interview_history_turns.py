@@ -15,8 +15,8 @@ from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.interviews import queries
 from caliburn.settings import DatabaseSettings
 from caliburn.transport.http.consultant_turns import get_consultant_status_workflow
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.status import ConsultantStatusWorkflow
 from tests.fixtures.response_loop import response_at
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 

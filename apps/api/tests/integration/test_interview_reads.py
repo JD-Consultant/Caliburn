@@ -15,7 +15,9 @@ from caliburn.features.interviews.models import (
     InterviewReadError,
     InterviewReadScope,
 )
-from caliburn.workflows.interview_completion import record_formal_interview
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
 
 pytestmark = pytest.mark.postgres
 

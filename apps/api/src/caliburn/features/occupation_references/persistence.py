@@ -36,21 +36,10 @@ class ReferenceOperationRecord(Base):
             name="fk_reference_operation_expected",
             ondelete="CASCADE",
         ),
-        ForeignKeyConstraint(
-            ["job_file_id", "execution_id", "parent_revision_id"],
-            [
-                "occupation_reference_operations.job_file_id",
-                "occupation_reference_operations.execution_id",
-                "occupation_reference_operations.revision_id",
-            ],
-            name="fk_reference_operation_parent",
-            ondelete="CASCADE",
-        ),
-        CheckConstraint("kind IN ('start', 'apply', 'restore')", name="reference_operation_kind"),
+        CheckConstraint("kind IN ('start', 'apply')", name="reference_operation_kind"),
         CheckConstraint(
-            "(kind = 'start' AND expected_revision_id IS NULL AND parent_revision_id IS NULL) OR "
-            "(kind <> 'start' AND expected_revision_id IS NOT NULL "
-            "AND parent_revision_id IS NOT NULL)",
+            "(kind = 'start' AND expected_revision_id IS NULL) OR "
+            "(kind = 'apply' AND expected_revision_id IS NOT NULL)",
             name="reference_operation_ancestry",
         ),
         CheckConstraint(
@@ -68,10 +57,7 @@ class ReferenceOperationRecord(Base):
     operation_id: Mapped[UUID] = mapped_column(primary_key=True)
     execution_id: Mapped[UUID]
     kind: Mapped[str] = mapped_column(Text)
-    generation_id: Mapped[UUID]
-    result_generation_id: Mapped[UUID]
     expected_revision_id: Mapped[UUID | None]
-    parent_revision_id: Mapped[UUID | None]
     revision_id: Mapped[UUID]
     state: Mapped[object] = mapped_column(JSONB)
 
@@ -83,16 +69,6 @@ class ReferenceCandidateRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_reference_candidate_execution",
-            ondelete="CASCADE",
-        ),
-        ForeignKeyConstraint(
-            ["job_file_id", "execution_id", "base_revision_id"],
-            [
-                "occupation_reference_operations.job_file_id",
-                "occupation_reference_operations.execution_id",
-                "occupation_reference_operations.revision_id",
-            ],
-            name="fk_reference_candidate_base",
             ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
@@ -109,16 +85,13 @@ class ReferenceCandidateRecord(Base):
 
     job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
     execution_id: Mapped[UUID] = mapped_column(primary_key=True)
-    generation_id: Mapped[UUID]
-    base_revision_id: Mapped[UUID]
     current_revision_id: Mapped[UUID]
 
 
-def candidate_heads_projection(job_file_id: UUID) -> Select[UUID, UUID, UUID]:
+def candidate_heads_projection(job_file_id: UUID) -> Select[UUID, UUID]:
     """Expose coordinates only; the workflow selects qualification before JSON decoding."""
     return select(
         ReferenceCandidateRecord.execution_id,
-        ReferenceCandidateRecord.generation_id,
         ReferenceCandidateRecord.current_revision_id,
     ).where(ReferenceCandidateRecord.job_file_id == job_file_id)
 

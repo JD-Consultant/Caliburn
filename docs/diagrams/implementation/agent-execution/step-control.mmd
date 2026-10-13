@@ -5,7 +5,7 @@ flowchart TD
   START([完整 Step 已保存]) --> HAS{本工作配置暫停控制？}
   HAS -->|有| CHECK[核執行資格]
   CHECK --> READ[/讀取已受理的暫停要求/]
-  READ --> SAVE[/保存 control_action/]
+  READ --> SAVE[/Command 保存原生後繼位置/]
   SAVE --> PAUSE{需要暫停？}
   PAUSE -->|是| INT[執行原生 interrupt]
   INT --> DURABLE[/saver 可靠保存 interrupt/]

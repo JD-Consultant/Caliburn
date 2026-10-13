@@ -14,7 +14,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from caliburn.agent_execution.tool_steps import ModelStepLimitError
+from caliburn.agent_execution.response_runtime import ModelStepLimitError
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.bootstrap import create_app
 from caliburn.features.executions import service as executions
@@ -22,12 +22,12 @@ from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.features.work_memory import batch_persistence
 from caliburn.settings import DatabaseSettings, ModelSettings, Settings
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.execution_failures import run_with_failure_boundary
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.model_requests import PriorModelAttemptError
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.executions.failure_boundary import run_with_failure_boundary
+from caliburn.workflows.executions.model_requests import PriorModelAttemptError
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 from tests.integration.test_consultant_completion import complete, read_head, start_turn, transact
 from tests.integration.test_consultant_http_execution import create_file
 

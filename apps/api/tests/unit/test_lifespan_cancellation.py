@@ -12,8 +12,8 @@ from caliburn import bootstrap
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.app_composition import AppComposition
 from caliburn.settings import DatabaseSettings, ModelSettings, Settings
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
 
 @pytest.mark.asyncio

@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -5,7 +6,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { JdWorkEditor } from './JdWorkEditor';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 import { isEditJdCapabilitiesRequest } from '../../shared/api/validation';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
@@ -64,7 +65,7 @@ function mockServer() {
   fetch.mockImplementation((_path, options) =>
     Promise.resolve(Response.json(options?.method === 'POST' ? capabilitiesResult() : original)),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return fetch;
 }
 beforeEach(() => sessionStorage.clear());
@@ -169,7 +170,7 @@ test.each(['definition', 'relation'] as const)(
       }
       return Promise.resolve(Response.json(current));
     });
-    vi.stubGlobal('fetch', fetch);
+    stubHttp(fetch);
     const first = renderEditor();
     if (operation === 'definition') {
       const definition = await screen.findByRole('article', { name: '技能：診斷問題' });
@@ -212,7 +213,7 @@ test('概覽與任務關聯使用不同順序；同名仍操作選定身分', as
   fetch.mockImplementation((_path, options) =>
     Promise.resolve(Response.json(options?.method === 'POST' ? capabilitiesResult() : current)),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderEditor();
   const definitions = await screen.findAllByRole('article', { name: '知識：資料介面' });
   const firstDefinition = definitions[0];

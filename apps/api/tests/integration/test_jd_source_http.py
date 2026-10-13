@@ -1,17 +1,23 @@
 """Human source navigation stays on formal JD and the citation's original fixed chain."""
 
+import json
 from dataclasses import replace
 from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from psycopg.conninfo import make_conninfo
 from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.features.executions import service as executions
-from caliburn.features.executions.models import ExecutionKind, ExecutionScope
+from caliburn.features.executions.history_models import AgentRole
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.interviews import queries as interviews
-from caliburn.features.job_description import persistence, source_persistence
+from caliburn.features.job_description import persistence, source_persistence, source_service
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.features.job_description.sources import (
     AddJdSource,
@@ -34,13 +40,134 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.settings import DatabaseSettings
+from caliburn.transport.model_tools.jd_reads import JdReadTools
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.executions.context_history import RoleContextHistory
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.evidence import JdEvidenceWorkflow
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.job_description.undo import JdUndoWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
+from tests.integration.test_consultant_context_binding import capture
+from tests.integration.test_consultant_context_binding import start as start_context
+from tests.unit.test_context_preparation import PreparationProbe
 
 pytestmark = pytest.mark.postgres
+
+
+@pytest.mark.parametrize("status", ["active", "paused", "cancelled", "failed", "completed"])
+def test_evidence_rejects_unadopted_candidate_revisions(client: TestClient, status: str) -> None:
+    turn = start_turn(client)
+    file_id = turn.writer.scope.job_file_id
+    original = transact(
+        client,
+        lambda s: interviews.read_execution_input(
+            s,
+            job_file_id=file_id,
+            execution_id=turn.writer.scope.execution_id,
+        ),
+    )
+    workflow = JdCandidateWorkflow(client.app.state.database.sessions)
+    middle = client.portal.call(
+        workflow.edit,
+        turn.writer,
+        turn.candidate.scope,
+        ReviseJdSources(
+            uuid4(),
+            turn.candidate.revision_id,
+            JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=ProfileField.JOB_TITLE),
+            (AddJdSource(InterviewSource(original.source_id)),),
+        ),
+    )
+    citation = transact(
+        client,
+        lambda s: source_persistence.read_source_references(
+            s,
+            file_id,
+            middle.revision_id,
+        ),
+    )[0].citation_id
+    final = client.portal.call(
+        workflow.edit,
+        turn.writer,
+        middle.scope,
+        ReviseJdProfile(
+            uuid4(),
+            middle.revision_id,
+            (SetProfileField(ProfileField.PURPOSE, "候選中間版之後的內容"),),
+        ),
+    )
+    if status == "paused":
+        transact(client, lambda s: executions.pause_execution(s, turn.writer))
+    elif status in ("cancelled", "failed"):
+        client.portal.call(
+            ConsultantCompletionWorkflow(workflow.sessions).stop,
+            turn.writer,
+            ExecutionStatus(status),
+        )
+    elif status == "completed":
+        complete(client, replace(turn, candidate=final))
+    endpoint = f"/api/job-files/{file_id}/jd/sources/{citation}"
+    for suffix in ("", "/changes"):
+        assert (
+            client.get(
+                endpoint + suffix, params={"revision_id": str(middle.revision_id)}
+            ).status_code
+            == 404
+        )
+        assert client.get(
+            endpoint + suffix, params={"revision_id": str(final.revision_id)}
+        ).status_code == (200 if status == "completed" else 404)
+    assert transact(
+        client, lambda s: persistence.is_formal_revision(s, file_id, middle.base_revision_id)
+    )
+
+
+def test_adopted_evidence_remains_readable_after_undo(client: TestClient) -> None:
+    turn = start_turn(client)
+    file_id = turn.writer.scope.job_file_id
+    original = transact(
+        client,
+        lambda s: interviews.read_execution_input(
+            s,
+            job_file_id=file_id,
+            execution_id=turn.writer.scope.execution_id,
+        ),
+    )
+    workflow = JdCandidateWorkflow(client.app.state.database.sessions)
+    position = client.portal.call(
+        workflow.edit,
+        turn.writer,
+        turn.candidate.scope,
+        ReviseJdSources(
+            uuid4(),
+            turn.candidate.revision_id,
+            JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=ProfileField.JOB_TITLE),
+            (AddJdSource(InterviewSource(original.source_id)),),
+        ),
+    )
+    complete(client, replace(turn, candidate=position))
+    reference = client.get(f"/api/job-files/{file_id}/jd/sources").json()["references"][0]
+    undone = client.portal.call(
+        JdUndoWorkflow(workflow.sessions).undo, file_id, turn.writer.scope.execution_id
+    )
+    assert transact(
+        client, lambda s: persistence.is_formal_revision(s, file_id, undone.revision_id)
+    )
+    endpoint = f"/api/job-files/{file_id}/jd/sources/{reference['citation_id']}"
+    for suffix in ("", "/changes"):
+        assert (
+            client.get(
+                endpoint + suffix, params={"revision_id": str(position.revision_id)}
+            ).status_code
+            == 200
+        )
+    assert client.get(f"/api/job-files/{file_id}/jd/profile").json()["revision_id"] == str(
+        undone.revision_id
+    )
 
 
 def test_only_completed_jd_evidence_can_be_read_and_no_pending_input_is_exposed(
@@ -79,7 +206,7 @@ def test_only_completed_jd_evidence_can_be_read_and_no_pending_input_is_exposed(
     refused = client.get(
         f"{endpoint}/{citation_id}", params={"revision_id": str(candidate.revision_id)}
     )
-    assert refused.status_code == 409
+    assert refused.status_code == 404
     complete(client, replace(turn, candidate=candidate))
     listed = client.get(endpoint).json()
     assert listed["revision_id"] == str(candidate.revision_id)
@@ -91,7 +218,6 @@ def test_only_completed_jd_evidence_can_be_read_and_no_pending_input_is_exposed(
                 "kind": "profile_field",
                 "field": "job_title",
                 "item_id": None,
-                "task_id": None,
             },
             "source_kind": "interview",
             "source_label": "訪談序號 2 · 員工",
@@ -258,6 +384,16 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
     assert leaf["speaker"] == "employee"
     delta = client.get(f"{endpoint}/{citation_id}/changes", params=params)
     assert delta.status_code == 200
+    assert delta.json()["source_version"] == {
+        "snapshot_id": str(old.snapshot_id),
+        "revision_id": str(original.revision_id),
+        "covered_through_sequence": old.covered_through_sequence,
+    }
+    assert delta.json()["comparison_version"] == {
+        "snapshot_id": str(latest.snapshot_id),
+        "revision_id": str(published.revision_id),
+        "covered_through_sequence": latest.covered_through_sequence,
+    }
     assert "每月盤點。" in delta.json()["source_markdown"]
     assert "每季盤點。" in delta.json()["source_markdown"]
     assert "沒有淨差異" in delta.json()["jd_markdown"]
@@ -291,7 +427,7 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
             f"/api/job-files/{other.writer.scope.job_file_id}/jd/sources/{citation_id}",
             params=params,
         ).status_code
-        == 409
+        == 404
     )
     current_other = client.get(f"/api/job-files/{other.writer.scope.job_file_id}/jd/sources").json()
     assert (
@@ -335,7 +471,7 @@ def test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference(
     assert "不能展示同名替代物件。" not in removed_diff.json()["source_markdown"]
 
 
-def test_stale_formal_jd_requires_reload_and_read_errors_do_not_become_empty_lists(
+def test_invalid_citation_and_missing_file_do_not_become_empty_lists(
     client: TestClient,
 ) -> None:
     first = start_turn(client)
@@ -356,8 +492,109 @@ def test_stale_formal_jd_requires_reload_and_read_errors_do_not_become_empty_lis
         },
     )
     assert edited.status_code == 200
-    assert client.get(f"{endpoint}/{uuid4()}", params={"revision_id": old_id}).status_code == 409
+    assert client.get(f"{endpoint}/{uuid4()}", params={"revision_id": old_id}).status_code == 404
     assert client.get(f"/api/job-files/{uuid4()}/jd/sources").status_code == 404
+
+
+def test_selected_formal_revision_remains_readable_after_head_moves(client: TestClient) -> None:
+    file_id, old_revision = _reviewed_interview(client)
+    endpoint = f"/api/job-files/{file_id}/jd/sources"
+    reference = client.get(endpoint).json()["references"][0]
+    _edit_profile(client, file_id, old_revision, job_title="新的正式職稱")
+    source = client.get(
+        f"{endpoint}/{reference['citation_id']}", params={"revision_id": str(old_revision)}
+    )
+    assert source.status_code == 200
+    assert source.json()["revision_id"] == str(old_revision)
+    assert source.json()["content"]["interview_text"] == "我負責網站前端交付。"
+    changes = client.get(
+        f"{endpoint}/{reference['citation_id']}/changes",
+        params={"revision_id": str(old_revision)},
+    )
+    assert changes.status_code == 200
+    assert "沒有淨差異" in changes.json()["jd_markdown"]
+
+
+def test_initial_context_and_tool_map_share_recheck_policy(
+    client: TestClient,
+    database_settings: DatabaseSettings,
+) -> None:
+    created = client.post(
+        "/api/job-files",
+        json={
+            "command_id": str(uuid4()),
+            "display_name": "首次 map",
+            "employee_name": "合成人員",
+        },
+    )
+    assert created.status_code == 201
+    file_id = UUID(created.json()["job_file_id"])
+    old_revision = UUID(client.get(f"/api/job-files/{file_id}/jd/profile").json()["revision_id"])
+    opening = transact(client, lambda s: interviews.read_interview_history(s, file_id))[0]
+    # 首次原生 capture 不借用只有 owner 完成證明、沒有 saver 原件的 Turn fixture。
+    cited_revision = transact(
+        client,
+        lambda s: source_service.revise_sources(
+            s,
+            file_id,
+            ReviseJdSources(
+                uuid4(),
+                old_revision,
+                JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=ProfileField.JOB_TITLE),
+                (AddJdSource(InterviewSource(opening.source_id)),),
+            ),
+        ),
+    )
+    _edit_profile(client, file_id, cited_revision, job_title="人工新職稱")
+
+    async def read():
+        database = client.app.state.database
+        writer = await start_context(database, "首次訪談", file_id)
+        dsn = make_conninfo(
+            database_settings.url, options=f"-c search_path={database_settings.schema}"
+        )
+        async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
+            saver.serde = create_graph_serializer()
+            await saver.setup()
+            role_history = RoleContextHistory(
+                database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
+            )
+            context = await capture(database, role_history, PreparationProbe())
+            payload = context.request.create_payload()
+            initial = json.loads(payload["input"][0]["content"])["jd_map"]
+            assert "JD 人工最終差異" in payload["input"][-2]["content"]
+            reader = JdReadWorkflow(database.sessions)
+            before = await reader.read_candidate(context.memory_binding)
+            async with database.sessions() as session:
+                references = await source_persistence.read_source_references(
+                    session, file_id, before.position.revision_id
+                )
+            assert len(references) == 1 and references[0].needs_review
+            tools = JdReadTools(
+                reader,
+                context.memory_binding,
+                references=JdModelReferences(database.sessions, file_id),
+            )
+            tool_map = json.loads(await tools.invoke("read_jd", '{"view":"map","read_ref":null}'))
+            assert initial == tool_map
+            assert initial["profile"]["needs_recheck"]
+            assert "citation_ref" not in json.dumps(initial)
+            profile = json.loads(
+                await tools.invoke("read_jd", '{"view":"profile","read_ref":null}')
+            )
+            reference = profile["supporting_sources"]["job_title"][0]
+            assert reference["needs_recheck"] and reference["jd_changed"]
+            assert not reference["source_changed"]
+            assert (await reader.read_candidate(context.memory_binding)).position == before.position
+            async with database.sessions() as session:
+                assert (
+                    await source_persistence.read_source_references(
+                        session, file_id, before.position.revision_id
+                    )
+                    == references
+                )
+
+    client.portal.call(read)
 
 
 def _edit_profile(
@@ -415,16 +652,18 @@ def test_jd_comparison_uses_last_review_not_previous_turn_and_only_the_cited_tar
     client: TestClient,
 ) -> None:
     file_id, reviewed_id = _reviewed_interview(client)
-    next_turn = start_turn(client, file_id=file_id)
+    _edit_profile(client, file_id, reviewed_id, job_title="上一 Turn 職稱")
+    next_turn = start_turn(client, file_id=file_id, with_candidate=False)
     workflow = JdCandidateWorkflow(client.app.state.database.sessions)
+    candidate = client.portal.call(workflow.start, next_turn.writer)
     changed = client.portal.call(
         workflow.edit,
         next_turn.writer,
-        next_turn.candidate.scope,
+        candidate.scope,
         ReviseJdProfile(
             uuid4(),
-            next_turn.candidate.revision_id,
-            (SetProfileField(ProfileField.JOB_TITLE, "上一 Turn 職稱"),),
+            candidate.revision_id,
+            (SetProfileField(ProfileField.PURPOSE, "上一 Turn 僅編修目的"),),
         ),
     )
     complete(client, replace(next_turn, candidate=changed))
@@ -474,7 +713,7 @@ def test_jd_comparison_uses_last_review_not_previous_turn_and_only_the_cited_tar
         assert changes.after == ("目前職稱",)
 
     client.portal.call(read_only)
-    assert client.get(url, params={"revision_id": str(reviewed_id)}).status_code == 409
+    assert client.get(url, params={"revision_id": str(reviewed_id)}).status_code == 200
     assert (
         client.get(f"{endpoint}/{uuid4()}/changes", params={"revision_id": current}).status_code
         == 404
@@ -598,10 +837,7 @@ def test_task_and_detail_diffs_exclude_siblings_and_identically_named_tasks(
             execution_id=turn.writer.scope.execution_id,
         ),
     )
-    targets = (
-        JdSourceTarget(SourceTargetKind.TASK, task.task_id),
-        JdSourceTarget(SourceTargetKind.DETAIL, detail.detail_id, task_id=task.task_id),
-    )
+    targets = (JdSourceTarget(SourceTargetKind.TASK, task.task_id),)
     for target in targets:
         current = client.portal.call(
             jd.edit,
@@ -629,7 +865,7 @@ def test_task_and_detail_diffs_exclude_siblings_and_identically_named_tasks(
                 {
                     "action": "revise_detail",
                     "detail_id": str(sibling.detail_id),
-                    "text": "不可展示其他成果",
+                    "text": "同項另一新成果",
                 },
             ],
         ),
@@ -662,9 +898,9 @@ def test_task_and_detail_diffs_exclude_siblings_and_identically_named_tasks(
         assert "不可展示" not in markdown
         assert "同名另一任務的原文" not in markdown
     assert "-同名任務" in results["task"] and "+本項改名" in results["task"]
-    assert "成果" not in results["task"]
-    assert "-本筆原成果" in results["detail"] and "+本筆新成果" in results["detail"]
-    assert "本項改名" not in results["detail"]
+    assert "本筆原成果" in results["task"] and "本筆新成果" in results["task"]
+    assert "同項另一新成果" in results["task"]
+    assert set(results) == {"task"}
 
 
 def test_explicit_alignment_advances_the_jd_diff_baseline(client: TestClient) -> None:

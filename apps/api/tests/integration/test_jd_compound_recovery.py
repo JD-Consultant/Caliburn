@@ -23,10 +23,14 @@ from caliburn.features.job_description.capabilities import (
 )
 from caliburn.features.job_description.collaborators import CreateCollaborator, EditJdCollaborators
 from caliburn.features.job_description.compound_edits import (
-    AddedDetailSources,
     BoundItemSources,
     BoundProfileSources,
     BoundTaskCapability,
+    CompoundJdEdit,
+    CreateItemWithSources,
+    CreateTaskWithSources,
+    ReviseItemWithSources,
+    ReviseProfileWithSources,
 )
 from caliburn.features.job_description.conditions import (
     ConditionKind,
@@ -40,6 +44,7 @@ from caliburn.features.job_description.models import (
     SetProfileField,
 )
 from caliburn.features.job_description.navigation import jd_read_ref
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
 from caliburn.features.job_description.sources import (
     AddJdSource,
     AlignJdSource,
@@ -57,21 +62,21 @@ from caliburn.features.job_description.tasks import (
     TaskField,
 )
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
-from caliburn.workflows.jd_candidates import (
-    JdCandidateWorkflow,
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.compound_writes import (
+    PreparedJdEdit,
+    execute_prepared_jd_edit,
 )
-from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow, PreparedItemCreation
-from caliburn.workflows.jd_item_revision import JdItemRevisionWorkflow, PreparedItemRevision
-from caliburn.workflows.jd_profile_writes import JdProfileWriteWorkflow, PreparedProfileWrite
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection, resolve_jd_source
-from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow, PreparedTaskWrite
+from caliburn.workflows.job_description.item_creation import JdItemCreationWorkflow
+from caliburn.workflows.job_description.item_revision import JdItemRevisionWorkflow
+from caliburn.workflows.job_description.profile_writes import JdProfileWriteWorkflow
+from caliburn.workflows.job_description.sources import resolve_jd_source
+from caliburn.workflows.job_description.task_writes import JdTaskWriteWorkflow
 from tests.integration.test_jd_item_creation import start_turn, transact
 
 pytestmark = pytest.mark.postgres
 
-type PreparedCompound = (
-    PreparedProfileWrite | PreparedTaskWrite | PreparedItemCreation | PreparedItemRevision
-)
+type PreparedCompound = PreparedJdEdit[CompoundJdEdit]
 type CompoundWorkflow = (
     JdProfileWriteWorkflow | JdTaskWriteWorkflow | JdItemCreationWorkflow | JdItemRevisionWorkflow
 )
@@ -124,54 +129,65 @@ def _case(
             candidates.edit, writer, initial.scope, command_type(uuid4(), revision, change)
         ).revision_id
     preview = client.portal.call(candidates.read, writer.scope)
-    source = transact(
-        client, lambda s: resolve_jd_source(s, binding, CurrentInputSourceSelection())
-    )
+    source = transact(client, lambda s: resolve_jd_source(s, binding, InterviewSourceSelection(2)))
     common = (uuid4(), initial.scope, revision)
     task, capability = preview.work.tasks[0], preview.work.capabilities[0]
     if kind == "profile":
         workflow = JdProfileWriteWorkflow(sessions)
-        prepared = PreparedProfileWrite(
-            *common,
-            (
-                SetProfileField(ProfileField.JOB_TITLE, "新職稱"),
-                SetProfileField(ProfileField.PURPOSE, "新目的"),
-            ),
-            (
-                BoundProfileSources(ProfileField.JOB_TITLE, (AddJdSource(source),)),
-                BoundProfileSources(ProfileField.PURPOSE, (AddJdSource(source),)),
+        prepared = PreparedJdEdit(
+            initial.scope,
+            ReviseProfileWithSources(
+                common[0],
+                common[2],
+                (
+                    SetProfileField(ProfileField.JOB_TITLE, "新職稱"),
+                    SetProfileField(ProfileField.PURPOSE, "新目的"),
+                ),
+                (
+                    BoundProfileSources(ProfileField.JOB_TITLE, (AddJdSource(source),)),
+                    BoundProfileSources(ProfileField.PURPOSE, (AddJdSource(source),)),
+                ),
             ),
         )
     elif kind == "task":
         workflow = JdTaskWriteWorkflow(sessions)
-        prepared = PreparedTaskWrite(
-            *common,
-            CreateTask(None, "新任務", "做新頁面", ("可用頁面",), ("交付標準",)),
-            (source,),
-            ((source,), (source,)),
-            (BoundTaskCapability(capability.capability_id, (source,)),),
+        prepared = PreparedJdEdit(
+            initial.scope,
+            CreateTaskWithSources(
+                common[0],
+                common[2],
+                CreateTask(None, "新任務", "做新頁面", ("可用頁面",), ("交付標準",)),
+                (source,),
+                (BoundTaskCapability(capability.capability_id),),
+            ),
         )
     elif kind == "item_creation":
         workflow = JdItemCreationWorkflow(sessions)
-        prepared = PreparedItemCreation(*common, CreateArea("新職責", "新範圍"), (source,))
+        prepared = PreparedJdEdit(
+            initial.scope,
+            CreateItemWithSources(common[0], common[2], CreateArea("新職責", "新範圍"), (source,)),
+        )
     else:
         workflow = JdItemRevisionWorkflow(sessions)
-        prepared = PreparedItemRevision(
-            *common,
-            ReviseTask(
-                task.task_id,
+        prepared = PreparedJdEdit(
+            initial.scope,
+            ReviseItemWithSources(
+                common[0],
+                common[2],
+                ReviseTask(
+                    task.task_id,
+                    (
+                        SetTaskField(TaskField.TITLE, "新任務名稱"),
+                        AddTaskDetail(DetailKind.OUTCOME, "可用頁面"),
+                    ),
+                ),
+                (SetTaskCapability(task.task_id, capability.capability_id, True),),
                 (
-                    SetTaskField(TaskField.TITLE, "新任務名稱"),
-                    AddTaskDetail(DetailKind.OUTCOME, "可用頁面"),
+                    BoundItemSources(
+                        JdSourceTarget(SourceTargetKind.TASK, task.task_id), (AddJdSource(source),)
+                    ),
                 ),
             ),
-            (SetTaskCapability(task.task_id, capability.capability_id, True),),
-            (
-                BoundItemSources(
-                    JdSourceTarget(SourceTargetKind.TASK, task.task_id), (AddJdSource(source),)
-                ),
-            ),
-            (AddedDetailSources(DetailKind.OUTCOME, (source,)),),
         )
     return writer, candidates, workflow, prepared
 
@@ -199,7 +215,7 @@ def test_one_tool_saves_one_final_revision_and_replays_original_result_after_lat
     checkpoint = snapshot_jd_write(prepared)
     assert set(checkpoint) == {"kind", "payload"}
     before = _counts(database_connection, file_id)
-    result = client.portal.call(workflow.execute, writer, prepared)
+    result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     preview = client.portal.call(candidates.read, writer.scope)
     after = _counts(database_connection, file_id)
     assert after[0] - before[0] == 1
@@ -229,12 +245,22 @@ def test_one_tool_saves_one_final_revision_and_replays_original_result_after_lat
     later = _later_edit(client, writer, candidates)
     counts = _counts(database_connection, file_id)
     # 已提交但呼叫方未保存回覆：以原 checkpoint 重入仍取得同一建立身分／效果。
-    assert client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint)) == result
+    assert (
+        client.portal.call(
+            execute_prepared_jd_edit, workflow.sessions, writer, restore_jd_write(checkpoint)
+        )
+        == result
+    )
     assert client.portal.call(candidates.read, writer.scope).position == later
     assert _counts(database_connection, file_id) == counts
     with pytest.raises(JdCommandConflictError):
         client.portal.call(
-            workflow.execute, writer, replace(prepared, expected_revision_id=later.revision_id)
+            execute_prepared_jd_edit,
+            workflow.sessions,
+            writer,
+            replace(
+                prepared, command=replace(prepared.command, expected_revision_id=later.revision_id)
+            ),
         )
 
 
@@ -260,15 +286,17 @@ def test_unknown_commit_replays_persisted_result_without_duplicate_or_rewind(
     with monkeypatch.context() as patch:
         patch.setattr(workflow.sessions, "begin", lose_commit_acknowledgement)
         with pytest.raises(ConnectionError, match="after database commit"):
-            client.portal.call(workflow.execute, writer, prepared)
+            client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     metadata = database_connection.execute(
         "SELECT result_payload FROM jd_operations WHERE job_file_id = %s AND command_id = %s",
-        (writer.scope.job_file_id, prepared.command_id),
+        (writer.scope.job_file_id, prepared.command.command_id),
     ).fetchone()[0]
     committed_revision = client.portal.call(candidates.read, writer.scope).position.revision_id
     later = _later_edit(client, writer, candidates)
     counts = _counts(database_connection, writer.scope.job_file_id)
-    replayed = client.portal.call(workflow.execute, writer, restore_jd_write(checkpoint))
+    replayed = client.portal.call(
+        execute_prepared_jd_edit, workflow.sessions, writer, restore_jd_write(checkpoint)
+    )
     assert _counts(database_connection, writer.scope.job_file_id) == counts
     assert replayed.revision_id == committed_revision
     assert replayed.effect == metadata["effect"]
@@ -302,17 +330,17 @@ def test_late_source_failure_rolls_back_every_revision_selection_and_operation(
     with monkeypatch.context() as patch:
         patch.setattr(source_persistence, "insert_source_references", fail_after_insert)
         with pytest.raises(ConnectionError, match="acknowledgement"):
-            client.portal.call(workflow.execute, writer, prepared)
+            client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope).position == position
     assert _counts(database_connection, writer.scope.job_file_id) == before
-    client.portal.call(workflow.execute, writer, prepared)
+    client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
 
 
 def test_text_change_plus_explicit_alignment_uses_final_revision_as_reviewed_base(
     client: TestClient,
 ) -> None:
     writer, candidates, workflow, prepared = _case(client, "profile")
-    client.portal.call(workflow.execute, writer, prepared)
+    client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     preview = client.portal.call(candidates.read, writer.scope)
     references = transact(
         client,
@@ -321,18 +349,23 @@ def test_text_change_plus_explicit_alignment_uses_final_revision_as_reviewed_bas
         ),
     )
     title = next(r for r in references if r.target.field == ProfileField.JOB_TITLE)
-    revised = PreparedProfileWrite(
-        uuid4(),
+    revised = PreparedJdEdit(
         prepared.candidate,
-        preview.position.revision_id,
-        (SetProfileField(ProfileField.JOB_TITLE, "修訂職稱"),),
-        (
-            BoundProfileSources(
-                ProfileField.JOB_TITLE, (AlignJdSource(title.citation_id, title.source),)
+        ReviseProfileWithSources(
+            uuid4(),
+            preview.position.revision_id,
+            (SetProfileField(ProfileField.JOB_TITLE, "修訂職稱"),),
+            (
+                BoundProfileSources(
+                    ProfileField.JOB_TITLE, (AlignJdSource(title.citation_id, title.source),)
+                ),
             ),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, revised).effect == "updated"
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, revised).effect
+        == "updated"
+    )
     preview = client.portal.call(candidates.read, writer.scope)
     references = transact(
         client,
@@ -349,26 +382,37 @@ def test_unchanged_compound_records_original_effect_without_new_revision(
     client, database_connection
 ):
     writer, candidates, workflow, prepared = _case(client, "profile")
-    client.portal.call(workflow.execute, writer, prepared)
+    client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     position = client.portal.call(candidates.read, writer.scope).position
-    unchanged = replace(prepared, command_id=uuid4(), expected_revision_id=position.revision_id)
+    unchanged = replace(
+        prepared,
+        command=replace(
+            prepared.command, command_id=uuid4(), expected_revision_id=position.revision_id
+        ),
+    )
     before = _counts(database_connection, writer.scope.job_file_id)
-    assert client.portal.call(workflow.execute, writer, unchanged).effect == "unchanged"
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, unchanged).effect
+        == "unchanged"
+    )
     after = _counts(database_connection, writer.scope.job_file_id)
     assert after[0] == before[0]
     assert after[1] == before[1] + 1
     assert after[2:] == before[2:]
     later = _later_edit(client, writer, candidates)
-    assert client.portal.call(workflow.execute, writer, unchanged).effect == "unchanged"
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, unchanged).effect
+        == "unchanged"
+    )
     assert client.portal.call(candidates.read, writer.scope).position == later
 
 
 def test_formal_completion_adopts_compound_and_undo_restores_original_base(
     client: TestClient,
 ) -> None:
-    from caliburn.workflows.jd_task_writes import CreateTaskInput, TaskDetailInput
-    from caliburn.workflows.jd_undo import JdUndoWorkflow
-    from caliburn.workflows.memory_reads import PublishedMemoryRead
+    from caliburn.workflows.job_description.task_writes import CreateTaskInput, TaskDetailInput
+    from caliburn.workflows.job_description.undo import JdUndoWorkflow
+    from caliburn.workflows.work_memory.reads import PublishedMemoryRead
     from tests.integration.test_consultant_completion import complete
     from tests.integration.test_consultant_completion import start_turn as start_completion_turn
 
@@ -378,7 +422,7 @@ def test_formal_completion_adopts_compound_and_undo_restores_original_base(
     tasks = JdTaskWriteWorkflow(sessions)
     file_id = turn.writer.scope.job_file_id
 
-    async def prepare() -> PreparedTaskWrite:
+    async def prepare() -> PreparedJdEdit[CreateTaskWithSources]:
         return await tasks.prepare(
             PublishedMemoryRead(turn.writer.scope, None, 1),
             command_id=uuid4(),
@@ -386,13 +430,13 @@ def test_formal_completion_adopts_compound_and_undo_restores_original_base(
                 None,
                 "完成工具操作",
                 "保存任務與來源",
-                outcomes=(TaskDetailInput("最終成果", (CurrentInputSourceSelection(),)),),
-                sources=(CurrentInputSourceSelection(),),
+                outcomes=(TaskDetailInput("最終成果"),),
+                sources=(InterviewSourceSelection(2),),
             ),
         )
 
     prepared = client.portal.call(prepare)
-    client.portal.call(tasks.execute, turn.writer, prepared)
+    client.portal.call(execute_prepared_jd_edit, tasks.sessions, turn.writer, prepared)
     final = client.portal.call(candidates.read, turn.writer.scope).position
     complete(client, replace(turn, candidate=final))
     official = transact(client, lambda s: work_queries.read_work(s, file_id))
@@ -428,17 +472,16 @@ def test_owner_returns_original_created_item_and_final_revision_after_later_edit
     from caliburn.features.job_files import service as job_files
 
     writer, candidates, workflow, prepared = _case(client, "task")
-    assert isinstance(prepared, PreparedTaskWrite)
-    result = client.portal.call(workflow.execute, writer, prepared)
+    assert isinstance(prepared.command, CreateTaskWithSources)
+    result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     original_revision = client.portal.call(candidates.read, writer.scope).position.revision_id
     later = _later_edit(client, writer, candidates)
     command = CreateTaskWithSources(
-        prepared.command_id,
-        prepared.expected_revision_id,
-        prepared.task,
-        prepared.task_sources,
-        prepared.detail_sources,
-        prepared.capabilities,
+        prepared.command.command_id,
+        prepared.command.expected_revision_id,
+        prepared.command.task,
+        prepared.command.task_sources,
+        prepared.command.capabilities,
     )
 
     async def replay(session: AsyncSession) -> JdCompoundEditResult:
@@ -455,6 +498,6 @@ def test_owner_returns_original_created_item_and_final_revision_after_later_edit
     assert original.revision_id == original_revision
     assert original.effect == "created" and isinstance(original.created_item, WorkTask)
     assert original == result
-    assert original.created_item.title == prepared.task.title
+    assert original.created_item.title == prepared.command.task.title
     assert len(original.created_item.details) == 2
     assert client.portal.call(candidates.read, writer.scope).position == later

@@ -16,7 +16,11 @@ function isCommand(value: unknown): value is typeof command {
   );
 }
 
-afterEach(() => sessionStorage.clear());
+afterEach(() => {
+  sessionStorage.clear();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 function renderPending<T>(hook: () => T) {
   const client = new QueryClient();
@@ -40,6 +44,7 @@ test('a known ACK while mounted refreshes the cache once and tells the editor on
         }),
         execute: () => Promise.resolve(),
         refresh,
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,
@@ -66,6 +71,7 @@ test.each(['refresh', 'storage', 'newer'] as const)(
         {
           store,
           execute: () => Promise.reject(new Error('terminal')),
+          correlation: (original) => (original ? { commandId: original.command_id } : {}),
           classifyRejection: () => ({ reason: 'deleted' as const, refresh: true }),
           refresh: () => {
             if (failure === 'refresh') throw new Error('refresh unavailable');
@@ -115,6 +121,7 @@ test('a known ACK after unmount retires the command and refreshes the cache, but
         }),
         execute: () => deferred,
         refresh,
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,
@@ -151,6 +158,7 @@ test('an unknown result after unmount preserves the original command for recover
         }),
         execute: () => deferred,
         refresh,
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,
@@ -183,6 +191,7 @@ test('an old editor ACK does not clear a newer command in the same storage slot'
         }),
         execute: () => deferred,
         refresh: () => {},
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       () => {},
@@ -217,6 +226,7 @@ test('an old ACK while mounted preserves the newer command and does not close it
         }),
         execute: () => deferred,
         refresh,
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,
@@ -252,6 +262,7 @@ test('a cache refresh failure cannot change an accepted write into an unknown re
         refresh: () => {
           throw new Error('Synthetic cache refresh failure');
         },
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,
@@ -279,6 +290,7 @@ test('a screen callback failure leaves the accepted result visible and blocks an
         }),
         execute: () => Promise.resolve('saved'),
         refresh: () => {},
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       () => {
@@ -310,6 +322,7 @@ test('a command replaced while accepted data refreshes cannot close the newer ed
         }),
         execute: () => Promise.resolve(),
         refresh,
+        correlation: (original) => (original ? { commandId: original.command_id } : {}),
         classifyRejection: () => null,
       },
       onSaved,

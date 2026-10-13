@@ -18,11 +18,13 @@ class SetProfileText(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["set_field"]
+    action: Literal["set_field"] = Field(
+        ..., description="set_field：用 value 完整取代所選欄位文字，來源另列動作。"
+    )
     field: ProfileField
     value: StrictStr = Field(
         ...,
-        description="此欄完整的新文字；只更改文字，既有來源保留，來源變動另列。",
+        description="該欄完整的新文字，不是差異片段；須含非空白內容且不含 NUL。",
         min_length=1,
     )
 
@@ -31,7 +33,10 @@ class ClearProfileText(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["clear_field"]
+    action: Literal["clear_field"] = Field(
+        ...,
+        description="clear_field：把所選欄位設為 null；既有引用保留，必要的來源移除另列。",
+    )
     field: ProfileField
 
 
@@ -41,12 +46,12 @@ class RemoveProfileSource(BaseModel):
     )
     action: Literal["remove_source"] = Field(
         ...,
-        description="移除此欄的整筆引用，不是只排除原文中被更正的一句。局部更正後，仍須留下共同支持本欄保留事實的依據；失效、重複或已有充分替代的引用可移除。",
+        description="移除 citation_ref 指定的整筆引用；不改 JD 正文，也不刪除訪談或 Memory 正文。",
     )
     field: ProfileField
     citation_ref: StrictStr = Field(
         ...,
-        description="read_jd 返回、屬於此欄的既有引用定位；不是訪談序號或 Memory 標題。",
+        description="取自已取得且仍有效的 read_jd(view=profile) 結果中，supporting_sources[field] 的 citation_ref；必須屬於本次 field，不是來源序號、標題或其他欄的引用。",
         min_length=1,
     )
 
@@ -57,27 +62,29 @@ class AlignProfileSource(BaseModel):
     )
     action: Literal["confirm_reference_alignment"] = Field(
         ...,
-        description="明確宣告已重評此筆引用仍支持所選欄位的目前內容，並完成必要修訂。不是確認其他引用或整欄完成；僅讀過 diff、或此筆支持關係仍有未解衝突時不確認。",
+        description="核清人工改稿或來源更新後，確認這筆仍保留的引用支持目前內容，更新其核對基準；正文無需修改時也可使用。Memory 對齊本輪固定發布版本中的同一物件，訪談仍指同一原話。顧問自己的編修不必再確認；更換來源用 add_source 與 remove_source，未核清不用此動作。",
     )
     field: ProfileField
     citation_ref: StrictStr = Field(
-        ..., description="read_jd 返回、這次確實完成核對的既有引用定位。", min_length=1
+        ...,
+        description="取自已取得且仍有效的 read_jd(view=profile) 結果中，supporting_sources[field] 的 citation_ref；必須屬於本次 field，不是來源序號、標題或其他欄的引用。",
+        min_length=1,
     )
-
-
-class CurrentInputSource(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    kind: Literal["current_input"]
 
 
 class InterviewSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Literal["interview"]
-    interview_sequence: StrictInt = Field(..., ge=1, le=9007199254740991)
+    kind: Literal["interview"] = Field(
+        ..., description="固定為 interview，引用指定序號的訪談原話。"
+    )
+    interview_sequence: StrictInt = Field(
+        ...,
+        description="直接支持內容的已讀訪談序號：歷史原話使用 context 的 historical_interview.messages 或 read_interview 結果中對應原文的 interview_sequence；本次員工原話使用本次 input 提供的 interview_sequence，不自行推算。",
+        ge=1,
+        le=9007199254740991,
+    )
 
 
 class Kind(StrEnum):
@@ -89,8 +96,15 @@ class MemorySource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    kind: Kind
-    target_title: StrictStr = Field(..., min_length=1)
+    kind: Kind = Field(
+        ...,
+        description="來源類別：work_situation 是已發布工作情境；work_understanding 是已發布工作理解。",
+    )
+    target_title: StrictStr = Field(
+        ...,
+        description="所選類別中、已讀正文的完整 title，原樣取自本輪可見的工作情境／工作理解結果。App 以它定位本輪固定發布版本中的物件；不填 JD 名稱、歷史舊名或自行摘要的標題。",
+        min_length=1,
+    )
 
 
 class AddProfileSource(BaseModel):
@@ -99,10 +113,13 @@ class AddProfileSource(BaseModel):
     )
     action: Literal["add_source"] = Field(
         ...,
-        description="增加支持此欄內容的直接依據，不替換既有來源。綜合目的可由多則原話共同支持。",
+        description="增加一筆直接支持所選內容的已讀來源；重加同一來源不會更新既有引用的版本或核對狀態，也不移除其他引用。",
     )
     field: ProfileField
-    source: CurrentInputSource | InterviewSource | MemorySource
+    source: InterviewSource | MemorySource = Field(
+        ...,
+        description="要加入此欄的已讀訪談或 Memory 來源；依類別填訪談序號或正文完整標題，App 綁定合法範圍與版本。",
+    )
 
 
 class ReviseJdProfileArguments(BaseModel):
@@ -117,6 +134,6 @@ class ReviseJdProfileArguments(BaseModel):
         | AlignProfileSource
     ] = Field(
         ...,
-        description="只列本次要執行的變更；未列的欄位與來源保留。文字修改與來源增刪是不同動作，不必為更新文字重建整組來源。",
+        description="本次欄位與來源動作。未列出的文字及引用保留；每個文字欄位只設定或清空一次，每筆既有引用只移除或確認一次，同一來源不要重複新增。",
         min_length=1,
     )

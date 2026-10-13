@@ -23,10 +23,10 @@ from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.work_memory import read_queries
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings, ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
-from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.transport.model_tools.memory_write_checkpoint import MEMORY_CHECKPOINT_TYPES
+from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 from tests.fixtures.response_loop import response_at
 from tests.integration.test_memory_batch_orchestration import complete_turn, start_turn
 

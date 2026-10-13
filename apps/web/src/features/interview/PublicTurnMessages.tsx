@@ -1,6 +1,6 @@
 /** Public commentary stays nonformal; only the active Turn may add transient display. */
 import { Alert, Box, Typography } from '@mui/material';
-import type { PublicCommentary } from '../../shared/api/generated/consultant-turn';
+import type { PublicCommentary } from '../../shared/api/generated/http/types.gen';
 import { useConsultantActivityStream } from './use-consultant-activity-stream';
 import { ReasoningSummaries } from './ReasoningSummaries';
 

@@ -116,7 +116,6 @@ class CompactionState(TypedDict, total=False):
     compaction_attempt_id: UUID
     adopted: bool
     preparation_policy: HistoryPreparationPolicy | None
-    needs_compaction: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -329,10 +328,7 @@ async def _run_context_boundary_once(
         policy = state["preparation_policy"]
         if policy is None:
             raise ValueError("History assessment needs its saved preparation policy")
-        return {
-            "needs_compaction": policy["compact_requested"]
-            or state["input_count"]["input_tokens"] >= policy["threshold_tokens"]
-        }
+        return {}
 
     async def retain_history(
         state: CompactionState, runtime: Runtime[CompactionRuntime]
@@ -396,7 +392,15 @@ async def _run_context_boundary_once(
     def route_history(
         state: CompactionState,
     ) -> Literal["request_compaction", "retain_history"]:
-        return "request_compaction" if state["needs_compaction"] else "retain_history"
+        policy = state["preparation_policy"]
+        if policy is None:
+            raise ValueError("History routing needs its saved preparation policy")
+        return (
+            "request_compaction"
+            if policy["compact_requested"]
+            or state["input_count"]["input_tokens"] >= policy["threshold_tokens"]
+            else "retain_history"
+        )
 
     builder.add_conditional_edges(START, start_boundary)
     builder.add_edge("count_history", "assess_history")

@@ -21,8 +21,15 @@ test('an outside spelling maps to one canonical identity, or to none', () => {
     '',
     ' ' + lower,
     lower + ' ',
+    lower + '\n',
+    lower + '\r\n',
     lower.slice(1),
     'g'.repeat(36),
   ])
     expect(canonicalUuid(invalid)).toBeNull();
+});
+
+test('owned identity rejects a trailing line break', () => {
+  expect(isCanonicalUuid(`${lower}\n`)).toBe(false);
+  expect(isCanonicalUuid(`${lower}\r\n`)).toBe(false);
 });

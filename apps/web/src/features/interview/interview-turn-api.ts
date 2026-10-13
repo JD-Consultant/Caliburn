@@ -1,18 +1,27 @@
+import { isSubmitInterviewInput } from '../../shared/api/generated/http/validators.js';
 /** Scoped polling and original input commands; browser hints carry IDs only. */
 import { queryOptions, skipToken } from '@tanstack/react-query';
-import { createSchemaValidator } from '../../shared/api/schema-policy';
-import acceptedSchema from '../../../../api/contracts/http/accepted-interview-input.schema.json' with { type: 'json' };
-import submitSchema from '../../../../api/contracts/http/submit-interview-input.schema.json' with { type: 'json' };
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
-import type { AcceptedInterviewInput } from '../../shared/api/generated/accepted-interview-input';
-import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
-import { isCanonicalUuid } from '../../shared/api/uuid';
-import { ApiError, requestJson } from '../../shared/api/http';
-import { isConsultantTurn, isCurrentConsultantTurn } from '../../shared/api/validation';
 
-const validator = createSchemaValidator();
-const isAcceptedInput = validator.compile<AcceptedInterviewInput>(acceptedSchema);
-export const isSubmitInterviewInput = validator.compile<SubmitInterviewInput>(submitSchema);
+import type {
+  ConsultantTurn,
+  CurrentConsultantTurn,
+  AcceptedInterviewInput,
+  SubmitInterviewInput,
+} from '../../shared/api/generated/http/types.gen';
+
+import { isCanonicalUuid } from '../../shared/api/uuid';
+import { ApiError, scope } from '../../shared/api/http';
+import {
+  submitInterviewInput as submit,
+  pauseConsultantTurn,
+  cancelConsultantTurn,
+  resumeConsultantTurn,
+  readConsultantTurnByCommand,
+  readConsultantTurn,
+  readCurrentConsultantTurn,
+} from '../../shared/api/generated/http/sdk.gen';
+
+export { isSubmitInterviewInput };
 
 export interface TurnHint {
   command_id: string;
@@ -199,20 +208,17 @@ export async function submitInterviewInput(
 ): Promise<AcceptedInterviewInput> {
   if (!isSubmitInterviewInput(command))
     throw new ApiError('請填寫有內容的訪談文字。', { status: 422 });
-  const accepted = await requestJson(
-    `/api/job-files/${encodeURIComponent(jobFileId)}/inputs`,
-    isAcceptedInput,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(command),
+  return submit({
+    path: { job_file_id: jobFileId },
+    body: command,
+    throwOnError: true,
+    meta: {
       correlation: { jobFileId, commandId: command.command_id },
+      scope: scope<AcceptedInterviewInput>(
+        (value) => value.job_file_id === jobFileId && value.command_id === command.command_id,
+      ),
     },
-  );
-  if (accepted.job_file_id !== jobFileId || accepted.command_id !== command.command_id) {
-    throw new ApiError('收到的輸入結果不屬於本次請求，尚未採用。');
-  }
-  return accepted;
+  }).then(({ data }) => data);
 }
 
 export function isTerminalTurn(status: ConsultantTurn['status']): boolean {
@@ -226,32 +232,39 @@ export async function controlConsultantTurn(
   executionId: string,
   control: ConsultantControl,
 ): Promise<ConsultantTurn> {
-  const turn = await requestJson(
-    `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/${encodeURIComponent(executionId)}/${control}`,
-    isConsultantTurn,
-    { method: 'POST', cache: 'no-store', correlation: { jobFileId, executionId } },
-  );
-  if (turn.job_file_id !== jobFileId || turn.execution_id !== executionId) {
-    throw new ApiError('收到的控制結果不屬於這次訪談，尚未採用。');
-  }
-  return turn;
+  const execute = {
+    pause: pauseConsultantTurn,
+    cancel: cancelConsultantTurn,
+    resume: resumeConsultantTurn,
+  }[control];
+  return execute({
+    path: { job_file_id: jobFileId, execution_id: executionId },
+    cache: 'no-store',
+    throwOnError: true,
+    meta: {
+      correlation: { jobFileId, executionId },
+      scope: scope<ConsultantTurn>(
+        (value) => value.job_file_id === jobFileId && value.execution_id === executionId,
+      ),
+    },
+  }).then(({ data }) => data);
 }
 
 export function consultantTurnByCommandQuery(jobFileId: string, commandId: string | null) {
   return queryOptions({
     queryKey: ['consultant-turn-by-command', jobFileId, commandId],
     queryFn: commandId
-      ? async ({ signal }) => {
-          const turn = await requestJson(
-            `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/by-command/${encodeURIComponent(commandId)}`,
-            isConsultantTurn,
-            { signal, cache: 'no-store' },
-          );
-          if (turn.job_file_id !== jobFileId) {
-            throw new ApiError('收到的處理狀態不屬於這次訪談，尚未採用。');
-          }
-          return turn;
-        }
+      ? ({ signal }) =>
+          readConsultantTurnByCommand({
+            path: { job_file_id: jobFileId, command_id: commandId },
+            signal,
+            cache: 'no-store',
+            throwOnError: true,
+            meta: {
+              correlation: { jobFileId, commandId },
+              scope: scope<ConsultantTurn>((value) => value.job_file_id === jobFileId),
+            },
+          }).then(({ data }) => data)
       : skipToken,
     retry: false,
     staleTime: 0,
@@ -265,17 +278,19 @@ export function consultantTurnQuery(jobFileId: string, executionId: string | nul
   return queryOptions({
     queryKey: ['consultant-turn', jobFileId, executionId],
     queryFn: executionId
-      ? async ({ signal }) => {
-          const turn = await requestJson(
-            `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/${encodeURIComponent(executionId)}`,
-            isConsultantTurn,
-            { signal, cache: 'no-store' },
-          );
-          if (turn.job_file_id !== jobFileId || turn.execution_id !== executionId) {
-            throw new ApiError('收到的處理狀態不屬於這次訪談，尚未採用。');
-          }
-          return turn;
-        }
+      ? ({ signal }) =>
+          readConsultantTurn({
+            path: { job_file_id: jobFileId, execution_id: executionId },
+            signal,
+            cache: 'no-store',
+            throwOnError: true,
+            meta: {
+              correlation: { jobFileId, executionId },
+              scope: scope<ConsultantTurn>(
+                (value) => value.job_file_id === jobFileId && value.execution_id === executionId,
+              ),
+            },
+          }).then(({ data }) => data)
       : skipToken,
     retry: false,
     staleTime: 0,
@@ -292,17 +307,19 @@ export function consultantTurnQuery(jobFileId: string, executionId: string | nul
 export function currentConsultantTurnQuery(jobFileId: string) {
   return queryOptions({
     queryKey: ['current-consultant-turn', jobFileId],
-    queryFn: async ({ signal }) => {
-      const current = await requestJson(
-        `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/current`,
-        isCurrentConsultantTurn,
-        { signal, cache: 'no-store' },
-      );
-      if (current.turn && current.turn.job_file_id !== jobFileId) {
-        throw new ApiError('收到的處理狀態不屬於這份職務檔案，尚未採用。');
-      }
-      return current;
-    },
+    queryFn: ({ signal }) =>
+      readCurrentConsultantTurn({
+        path: { job_file_id: jobFileId },
+        signal,
+        cache: 'no-store',
+        throwOnError: true,
+        meta: {
+          correlation: { jobFileId },
+          scope: scope<CurrentConsultantTurn>(
+            (value) => value.turn === null || value.turn.job_file_id === jobFileId,
+          ),
+        },
+      }).then(({ data }) => data),
     retry: false,
     staleTime: 0,
     gcTime: 0,

@@ -10,7 +10,8 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
-from caliburn.agent_execution.tool_steps import PausedResponseLoop, run_response_loop
+from caliburn.agent_execution.response_runtime import PausedResponseLoop
+from caliburn.agent_execution.tool_steps import _completed_step_items
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -19,7 +20,8 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
     StaleWriterError,
 )
-from caliburn.workflows.execution_controls import ConsultantExecutionControls
+from caliburn.workflows.executions.controls import ConsultantExecutionControls
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 
 pytestmark = pytest.mark.postgres
@@ -44,6 +46,11 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
                 await executions.admit_execution(session, scope)
                 writer = await executions.claim_writer(session, scope, writer_id=uuid4())
             binding = ConsultantExecutionControls(database.sessions, writer)
+
+            async def ensure_active():
+                async with database.sessions.begin() as session:
+                    await executions.lock_active_writer(session, writer)
+
             provider = CapacityProbe([100, 100], final=False)
 
             async def model(request, request_id, input_tokens: int):
@@ -60,7 +67,7 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
             options = dict(
                 thread_id=str(scope.execution_id),
                 runtime=replace(
-                    provider.runtime(), request_model=model, ensure_active=binding.ensure_active
+                    provider.runtime(), request_model=model, ensure_active=ensure_active
                 ),
                 controls=binding.loop_controls(),
                 max_tool_calls=2,
@@ -116,7 +123,11 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
                 assert not isinstance(result, PausedResponseLoop)
                 assert result["next_action"] == "deliver_answer"
                 assert result["completed_steps"] == 2
-                assert provider.model_requests[1]["input"] == paused.state["input_items"]
+                assert provider.model_requests[1]["input"] == _completed_step_items(
+                    paused.state["request_snapshot"],
+                    paused.state["response_snapshot"],
+                    paused.state["tool_results"],
+                )
                 async with database.sessions.begin() as session:
                     info = await executions.read_execution(session, scope)
                     assert info.status == ExecutionStatus.ACTIVE  # Graph END is not a Turn commit.

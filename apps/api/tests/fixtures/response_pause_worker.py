@@ -6,15 +6,12 @@ import os
 import sys
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from response_capacity import CapacityProbe, request_fixture
 
 from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
-from caliburn.agent_execution.tool_steps import (
-    PausedResponseLoop,
-    ResponseLoopControls,
-    run_response_loop,
-)
+from caliburn.agent_execution.response_runtime import PausedResponseLoop, ResponseLoopControls
+from tests.fixtures.native_response_runtime import run_response_loop
+from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 
 
 async def run(mode: str, thread_id: str) -> None:
@@ -55,7 +52,9 @@ async def run(mode: str, thread_id: str) -> None:
                 saver, request=None, resume_interrupt_id=paused.interrupt_id, **options
             )
             assert not isinstance(resumed, PausedResponseLoop)
-            assert resumed["input_items"] == paused.state["input_items"]
+            assert resumed["request_snapshot"] == paused.state["request_snapshot"]
+            assert resumed["response_snapshot"] == paused.state["response_snapshot"]
+            assert resumed["tool_results"] == paused.state["tool_results"]
             assert resumed["completed_steps"] == 1
             assert resumed["next_action"] == "deliver_answer"
             assert await run_response_loop(saver, request=None, **options) == resumed

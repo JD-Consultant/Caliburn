@@ -17,12 +17,14 @@ export interface JdProfileMap {
   organization_unit: string | null;
   reports_to: string | null;
   job_purpose_preview?: string;
+  needs_recheck: boolean;
 }
 export interface JdAreaMap {
   read_ref: string;
   title: string | null;
   scope_preview?: string;
   work_tasks: JdTaskMap[];
+  needs_recheck: boolean;
 }
 export interface JdTaskMap {
   read_ref: string;
@@ -30,12 +32,15 @@ export interface JdTaskMap {
   work_preview?: string;
   outcome_count: number;
   requirement_count: number;
+  needs_recheck: boolean;
 }
 export interface JdNamedMapItem {
   read_ref: string;
   name: string | null;
+  needs_recheck: boolean;
 }
 export interface JdConditionMapItem {
   read_ref: string;
   description_preview: string;
+  needs_recheck: boolean;
 }

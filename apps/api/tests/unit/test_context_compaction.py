@@ -137,7 +137,7 @@ async def test_cancel_after_compact_accounts_but_never_adopts_or_returns_c():
 async def test_loop_adopts_c_recounts_and_never_recompacts_an_unchanged_window(after_tokens):
     from caliburn.agent_execution.context_compaction import run_context_compaction
     from caliburn.agent_execution.request_capacity import RequestCapacityError
-    from caliburn.agent_execution.tool_steps import run_response_loop
+    from tests.fixtures.native_response_runtime import run_response_loop
 
     saver = InMemorySaver()
     events = []
@@ -221,7 +221,7 @@ async def test_empty_compaction_cannot_replace_nonempty_history():
 
 async def test_grown_window_can_compact_again_after_another_complete_step():
     from caliburn.agent_execution.context_compaction import run_context_compaction
-    from caliburn.agent_execution.tool_steps import run_response_loop
+    from tests.fixtures.native_response_runtime import run_response_loop
 
     probe = CapacityProbe([100, 272000, 100, 272000, 100], final=False)
     saver = InMemorySaver()
@@ -262,7 +262,7 @@ async def test_grown_window_can_compact_again_after_another_complete_step():
 
 
 async def test_inactive_work_after_count_never_sends_boundary_compaction():
-    from caliburn.agent_execution.tool_steps import run_response_loop
+    from tests.fixtures.native_response_runtime import run_response_loop
 
     probe = CapacityProbe([100, 272000], final=False)
 
@@ -287,7 +287,7 @@ async def test_inactive_work_after_count_never_sends_boundary_compaction():
 
 async def test_cancelled_parent_resume_can_account_its_saved_child_c_without_adopting():
     from caliburn.agent_execution.context_compaction import run_context_compaction
-    from caliburn.agent_execution.tool_steps import run_response_loop
+    from tests.fixtures.native_response_runtime import run_response_loop
 
     saver = InMemorySaver()
     events = []
@@ -329,7 +329,7 @@ async def test_cancelled_parent_resume_can_account_its_saved_child_c_without_ado
 async def test_empty_response_does_not_make_unchanged_c_eligible_for_compaction_again():
     from caliburn.agent_execution.context_compaction import run_context_compaction
     from caliburn.agent_execution.request_capacity import RequestCapacityError
-    from caliburn.agent_execution.tool_steps import run_response_loop
+    from tests.fixtures.native_response_runtime import run_response_loop
 
     saver = InMemorySaver()
     events = []

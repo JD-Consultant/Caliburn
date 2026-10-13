@@ -1,22 +1,19 @@
 """Input acceptance only; no public endpoint grants formal source eligibility."""
 
 from collections.abc import Callable
-from dataclasses import asdict
 from enum import StrEnum
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from caliburn.contracts.generated.accepted_interview_input import AcceptedInterviewInput
-from caliburn.contracts.generated.submit_interview_input import SubmitInterviewInput
 from caliburn.features.executions.models import ExecutionBusyError, ExecutionKind, ExecutionScope
 from caliburn.features.interviews.models import InputCommandConflictError
 from caliburn.features.interviews.models import SubmitInterviewInput as InputCommand
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.transport.http.contracts import canonical_body
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.interview_inputs import InterviewInputWorkflow
+from caliburn.transport.http.models.consultant import AcceptedInterviewInput, SubmitInterviewInput
+from caliburn.workflows.consultant_turns.inputs import InterviewInputWorkflow
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
 
 router = APIRouter(prefix="/api/job-files", tags=["interviews"])
 
@@ -58,10 +55,11 @@ ConsultantDispatch = Annotated[
     status_code=202,
     response_model=AcceptedInterviewInput,
     responses={200: {"model": AcceptedInterviewInput}},
+    operation_id="submit_interview_input",
 )
 async def submit_interview_input(
     job_file_id: UUID,
-    body: Annotated[SubmitInterviewInput, canonical_body(SubmitInterviewInput)],
+    body: SubmitInterviewInput,
     response: Response,
     workflow: InterviewInputs,
     dispatch: ConsultantDispatch,
@@ -86,4 +84,4 @@ async def submit_interview_input(
     except ExecutionBusyError as error:
         raise HTTPException(status_code=409, detail={"code": "consultant_turn_active"}) from error
     response.status_code = 202 if result.is_new else 200
-    return AcceptedInterviewInput.model_validate(asdict(result.accepted))
+    return AcceptedInterviewInput.model_validate(result.accepted, from_attributes=True)

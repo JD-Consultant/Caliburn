@@ -8,7 +8,7 @@ import pytest
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.work_memory.consolidation_models import MemoryConsolidationIntent
 from caliburn.transport.model_tools.memory_consolidation import MemoryConsolidationTools
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 
 
 class RecordingRequests(MemoryConsolidationWorkflow):

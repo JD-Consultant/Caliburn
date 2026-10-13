@@ -71,10 +71,17 @@ class PreparationProbe:
 async def test_below_threshold_preserves_history_without_compaction():
     probe = PreparationProbe()
     args = probe.options()
-    result = await prepare_context_history(InMemorySaver(), **args)
+    saver = InMemorySaver()
+    result = await prepare_context_history(saver, **args)
     assert result == args["history_request"].create_payload()["input"]
     assert len(probe.count_requests) == 1
     assert probe.compact_requests == []
+    assert all(
+        [
+            "needs_compaction" not in saved.checkpoint["channel_values"]
+            async for saved in saver.alist({"configurable": {"thread_id": args["thread_id"]}})
+        ]
+    )
 
 
 @pytest.mark.parametrize(

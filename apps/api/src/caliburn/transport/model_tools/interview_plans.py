@@ -82,19 +82,36 @@ def interview_plan_definitions() -> list[FunctionToolParam]:
     return [
         function_definition(
             "read_interview_plan",
-            "按需讀目前完整 Markdown 工作計畫；null 尚未建立，空字串是刻意清空。"
-            "已有全文及成功修改效果足以掌握目前範圍時，不必為確認重讀。"
-            "內容供同一顧問安排方向、焦點與剩餘訪談／分析／JD 編修核對，不是員工事實或完成判定。",
+            (
+                "需要掌握目前完整工作計畫、補回只有局部差異的內容，或計畫編輯因定"
+                "位不符被拒絕時使用。若 context 已提供 consultant_interview_plan "
+                "的 plan 全文，且後續成功修改的效果仍足以掌握目前正文，就沿用，不"
+                "必為確認而重讀。傳空物件 {}；App 綁定職務與本輪可見計畫。成功回 "
+                "JSON 的 plan：字串是目前完整 Markdown 正文，null 表示尚未建立，"
+                "空字串表示刻意清空；這兩種空值都不能證明沒有未完工作。計畫供接續"
+                "訪談、分析、編修與核對，是工作安排資料，不是員工事實或完成判定；"
+                "本工具不編輯計畫。\n拒絕回 JSON：status=rejected 表示本次未取得"
+                "完整結果；code、message 說明原因，next_action 指出可行處理。依提"
+                "示處理，不把拒絕當空內容或已讀。 完整計畫超量時由 App 處理，不提"
+                "供截斷正文。"
+            ),
             "read-interview-plan-arguments",
         ),
         function_definition(
             "edit_interview_plan",
-            "有實質變動才用一份 V4A diff 合併相關修改，最多 16,000 字元、32 hunks。"
-            "用同份 Markdown 維持目前焦點與工作方向，保留有範圍的進度、重要未完工作及必要線索。"
-            "未知釐清後仍需入稿就改為待整理／核對，保住其他方向與精確未知；"
-            "移除完成微步驟、過時及重複內容，不抄整份 Memory 或完成流水帳。"
-            "空正文用明確 EOF 新增；成功回實際前後差異或 unchanged，差異不是下次 V4A 輸入。"
-            "成功只保存本輪候選，不表示整輪採用或分析完成。" + _BODY_DIFF_GUIDANCE,
+            (
+                "目前焦點或剩餘工作有實質變動時，用一份正文 V4A diff 修改同一份 "
+                "Markdown 工作計畫。以已取得的 consultant_interview_plan 訊息之 "
+                "plan、read_interview_plan 全文及後續成功修改為基底；無法掌握目前"
+                "全文時才補讀。plan=null 表示尚未建立，空字串表示空白，皆可按空正"
+                "文建立；刪除全部正文可清空既有計畫。只傳 diff，不傳完整 plan 或"
+                "版本。整份 diff 全成或全拒；輸入 diff 與修改後正文各最多 16,000 "
+                '字元，最多 32 個 hunk。成功回 {"status":"updated","diff":...}，'
+                "diff 是實際前後文字的 unified diff，供核對效果，不能原樣作下一次"
+                ' V4A 輸入；未改變回 {"status":"unchanged"}。僅更新本輪候選。格式'
+                "或來源匹配被拒時，依回傳原因修正：已掌握正文可直接修格式，缺少目"
+                "前內容再補讀；多處匹配增加真實上下文，超量縮小修改。"
+            ),
             "edit-interview-plan-arguments",
         ),
     ]

@@ -1,4 +1,4 @@
-"""Run the two locked generators against one schema source, or check for drift."""
+"""Generate tool contracts and OpenAPI HTTP clients, or check for drift."""
 
 import argparse
 import difflib
@@ -19,20 +19,28 @@ def contract_resources(schemas: list[Path]) -> dict[Path, str]:
     outputs = {}
     manifest = {}
     for schema in schemas:
-        family = schema.parent.name
         text = schema.read_text(encoding="utf-8", newline="")
         title = json.loads(text)["title"]
         module = schema.name.removesuffix(".schema.json").replace("-", "_")
-        prefix = "tools." if family == "tools" else ""
-        qualified = f"caliburn.contracts.generated.{prefix}{module}.{title}"
-        manifest[qualified] = f"{family}/{schema.name}"
-        outputs[root / family / schema.name] = text
+        qualified = f"caliburn.contracts.generated.tools.{module}.{title}"
+        manifest[qualified] = f"tools/{schema.name}"
+        outputs[root / "tools" / schema.name] = text
     outputs[root / "schema-manifest.json"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     return outputs
 
 
-def write_outputs(outputs: dict[Path, str], *, check: bool) -> bool:
+def write_outputs(
+    outputs: dict[Path, str], *, check: bool, managed_directory: Path | None = None
+) -> bool:
     matches = True
+    if managed_directory is not None:
+        for stale in sorted(managed_directory.rglob("*")):
+            if stale.is_file() and stale not in outputs:
+                if check:
+                    matches = False
+                    print(f"Unexpected generated file: {stale}")
+                else:
+                    stale.unlink()
     for target, content in outputs.items():
         if check:
             newline = "" if target.suffix == ".json" else None
@@ -96,11 +104,7 @@ def stage_contract_schemas(
 
 
 def generate(check: bool, schema_names: list[str] | None = None) -> bool:
-    schemas = [
-        schema
-        for family in ("http", "tools")
-        for schema in sorted((API_ROOT / "contracts" / family).glob("*.schema.json"))
-    ]
+    schemas = sorted((API_ROOT / "contracts/tools").glob("*.schema.json"))
     all_schemas = schemas
     if schema_names is not None:
         available = {schema.name for schema in schemas}
@@ -114,7 +118,7 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
         matches = write_outputs(contract_resources(all_schemas), check=check)
         for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
-            output_directory = Path("tools") if schema.parent.name == "tools" else Path()
+            output_directory = Path("tools")
             python_output = Path(directory) / output_directory / f"{stem.replace('-', '_')}.py"
             python_output.parent.mkdir(parents=True, exist_ok=True)
             subprocess.run(
@@ -165,7 +169,32 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
                 WEB_ROOT / "src/shared/api/generated" / output_directory / f"{stem}.ts": typescript,
             }
             matches = write_outputs(outputs, check=check) and matches
-    return matches
+    openapi = subprocess.run(
+        [sys.executable, str(API_ROOT / "scripts/export_http_openapi.py")],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    validators = subprocess.run(
+        ["node", str(WEB_ROOT / "scripts/generate-http-contracts.mjs")],
+        input=openapi.stdout,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    return (
+        write_outputs(
+            {
+                WEB_ROOT / "src/shared/api/generated" / filename: content
+                for filename, content in json.loads(validators.stdout).items()
+            },
+            check=check,
+            managed_directory=WEB_ROOT / "src/shared/api/generated/http",
+        )
+        and matches
+    )
 
 
 if __name__ == "__main__":
@@ -174,7 +203,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--schema",
         action="append",
-        help="Generate only this schema filename; repeat to select more.",
+        help=(
+            "Select a tool schema filename; repeat to select more. "
+            "Always generate all HTTP clients."
+        ),
     )
     arguments = parser.parse_args()
     sys.exit(0 if generate(arguments.check, arguments.schema) else 1)

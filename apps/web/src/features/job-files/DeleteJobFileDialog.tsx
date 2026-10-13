@@ -11,7 +11,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type { JobFile } from '../../shared/api/generated/http/types.gen';
 import { ApiError } from '../../shared/api/http';
 import { deleteJobFile } from './job-file-api';
 

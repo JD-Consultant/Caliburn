@@ -1,6 +1,6 @@
 /** Ordered usage links, not copies of shared capability text. */
 import { Box, Link, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { Capability, JdWorkView } from '../../shared/api/generated/http/types.gen';
 import type { WorkIntent } from './jd-work-api';
 import { IconAction } from '../../shared/ui/IconAction';
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';

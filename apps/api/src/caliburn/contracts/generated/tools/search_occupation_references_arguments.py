@@ -10,7 +10,7 @@ class SearchOccupationReferencesArguments(BaseModel):
     )
     query: StrictStr = Field(
         ...,
-        description="只描述員工已確認實際負責的主要工作，保留必要脈絡；排除顧問問題、未做或尚未確認的工作。",
+        description="以自然語言描述員工已確認實際負責的主要工作，保留辨認工作所需的對象、行動與範圍。排除顧問問題、明確未做及尚未確認的工作；不是只填職稱或公版 ID。必須有非空白內容，最多 12,000 字元。",
         max_length=12000,
         min_length=1,
         pattern="[^\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]",

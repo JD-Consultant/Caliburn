@@ -15,7 +15,7 @@ from evaluations import authorized_consultant_comparison as authorized
 from evaluations import consultant_comparison as comparison
 
 
-@pytest.mark.parametrize("failure_stage", ["refresh", "read", "save"])
+@pytest.mark.parametrize("failure_stage", ["read", "save"])
 @pytest.mark.parametrize("entry", ["scripted", "authorized"])
 def test_candidate_result_is_saved_before_diagnostics(monkeypatch, tmp_path, failure_stage, entry):
     case_path = tmp_path / "case.json"
@@ -63,10 +63,13 @@ def test_candidate_result_is_saved_before_diagnostics(monkeypatch, tmp_path, fai
         lambda *args, **kwargs: SimpleNamespace(router=SimpleNamespace(lifespan_context=lifespan)),
     )
     monkeypatch.setattr(comparison, "drive_case", drive_case)
-    monkeypatch.setattr(
-        comparison, "refresh_diagnostics", lambda *args, **kwargs: observe("refresh")
-    )
-    monkeypatch.setattr(comparison, "read_diagnostics", lambda *args, **kwargs: observe("read"))
+
+    async def read_diagnostics(*args, **kwargs):
+        assert kwargs["full"] is True
+        assert kwargs["limit"] is None
+        return observe("read")
+
+    monkeypatch.setattr(comparison, "read_diagnostics", read_diagnostics)
     monkeypatch.setattr(comparison, "save_new", save)
     monkeypatch.setattr(comparison, "save_source_snapshot", lambda _: {})
     monkeypatch.setattr(
@@ -116,10 +119,7 @@ def test_candidate_result_is_saved_before_diagnostics(monkeypatch, tmp_path, fai
     assert failure == {"stage": failure_stage, "error_type": "RuntimeError"}
     assert not (candidate / "failure.json").exists()
     assert not (candidate / "diagnostics.json").exists()
-    assert (
-        observed
-        == ["refresh", "read", "save"][: ["refresh", "read", "save"].index(failure_stage) + 1]
-    )
+    assert observed == ["read", "save"][: ["read", "save"].index(failure_stage) + 1]
 
 
 @pytest.mark.parametrize("cancellation", ["raw", "scope"])

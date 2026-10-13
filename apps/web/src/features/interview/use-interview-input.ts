@@ -1,8 +1,11 @@
 /** Input admission and the local draft; recovery persists IDs only under the file's Web Lock. */
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
-import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
+import type {
+  ConsultantTurn,
+  SubmitInterviewInput,
+} from '../../shared/api/generated/http/types.gen';
+
 import { ApiError } from '../../shared/api/http';
 import {
   clearTurnHint,

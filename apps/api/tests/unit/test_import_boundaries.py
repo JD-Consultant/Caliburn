@@ -99,13 +99,15 @@ def write_module(directory: Path, module: str, code: str) -> None:
             "Domain values",
         ),
         ({"features.work_memory.stage_changes": "import openai"}, "Domain values"),
+        ({"features.work_memory.stage_changes": "import langchain"}, "Domain values"),
+        ({"features.work_memory.stage_changes": "import langchain_core"}, "Domain values"),
         ({"features.job_description.item_results": "import fastapi"}, "Domain values"),
         (
             {"features.job_description.service": "from caliburn.contracts import validation"},
             "features: dependencies point",
         ),
         (
-            {"workflows.memory_batch": "from caliburn.contracts import generated"},
+            {"workflows.work_memory.batch": "from caliburn.contracts import generated"},
             "workflows: dependencies point",
         ),
         ({"adapters.database": "from caliburn import settings"}, "adapters: dependencies point"),
@@ -120,8 +122,16 @@ def write_module(directory: Path, module: str, code: str) -> None:
             "Product layers do not import",
         ),
         (
-            {"workflows.memory_batch": "from caliburn.diagnostics import inspection"},
+            {"workflows.work_memory.batch": "from caliburn.diagnostics import inspection"},
             "Product layers do not import",
+        ),
+        (
+            {
+                "diagnostics.projection": (
+                    "from caliburn.features.job_description import task_persistence"
+                )
+            },
+            "job_description: persistence belongs",
         ),
         (
             {"agents.job_consultant.prompt": "from ..work_situation_analyst import prompt"},
@@ -149,14 +159,20 @@ def test_policy_allows_owned_persistence_workflows_and_shared_role_assembly(
     package_tree: Path,
 ) -> None:
     imports = {
-        "transport.http.jd": "from caliburn.workflows import jd_reads",
-        "workflows.jd_reads": "from caliburn.features.job_description import task_persistence",
+        "transport.http.jd": "from caliburn.workflows.job_description import reads",
+        "workflows.job_description.reads": (
+            "from caliburn.features.job_description import task_persistence"
+        ),
         "features.job_description.service": "from . import task_persistence",
         "features.job_description.task_persistence": "import sqlalchemy",
         "transport.model_tools.memory_reads": "from caliburn.contracts import validation",
         "agents.work_situation_analyst.runner": "from ..memory_analysis import runner",
         "agents.work_understanding_analyst.runner": "from ..memory_analysis import runner",
-        "diagnostics.projection": "from caliburn.features.executions import history_models",
+        "diagnostics.projection": (
+            "from caliburn.features.executions import history_models\n"
+            "from caliburn.features.job_description import work_queries"
+        ),
+        "features.job_description.work_queries": "from . import task_persistence",
     }
     for module, code in imports.items():
         write_module(package_tree, module, code)
@@ -177,10 +193,18 @@ def test_policy_inventory_covers_split_values_and_private_persistence() -> None:
     }
     for path in (SOURCE / "features").rglob("*.py"):
         module = "caliburn." + ".".join(path.relative_to(SOURCE).with_suffix("").parts)
-        if path.stem == "models" or path.stem.endswith(("_models", "_changes")):
+        if path.stem == "models" or path.stem.endswith(("_models", "_changes", "_comparison")):
             assert module in pure_modules, f"Declare the domain boundary for {module}"
         if path.stem == "persistence" or path.stem.endswith("_persistence"):
             assert module in protected_modules, f"Declare the persistence owner for {module}"
+
+
+def test_policy_rejects_a_cycle_inside_the_workflow_layer(package_tree: Path) -> None:
+    write_module(package_tree, "workflows.job_description.reads", "from . import sources")
+    write_module(package_tree, "workflows.job_description.sources", "from . import reads")
+    result = run_linter(package_tree)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "Package siblings remain acyclic throughout the App" in result.stdout
 
 
 def test_graph_includes_every_product_module() -> None:

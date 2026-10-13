@@ -26,7 +26,7 @@ services:
     init: true
     environment:
       CALIBURN_DATABASE_URL: postgresql://caliburn:${CALIBURN_POSTGRES_PASSWORD:?Set a URL-safe database password before starting Compose}@postgres:5432/caliburn
-      CALIBURN_DATABASE_SCHEMA: caliburn
+      CALIBURN_DATABASE_SCHEMA: ${CALIBURN_DATABASE_SCHEMA:-caliburn}
       CALIBURN_DEV_ORIGIN: http://127.0.0.1:${CALIBURN_APP_PORT:-8100}
     env_file:
       - path: ${CALIBURN_OPENAI_ENV_FILE:-./apps/api/.env}

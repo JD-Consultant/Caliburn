@@ -21,7 +21,6 @@ from caliburn.agent_execution.context_compaction import (
     PreparationCountSaveError,
     prepare_context_history,
 )
-from caliburn.agents.job_consultant.context_binding import capture_turn_context
 from caliburn.features.executions import history
 from caliburn.features.executions.history_models import (
     AgentRole,
@@ -30,9 +29,8 @@ from caliburn.features.executions.history_models import (
 )
 from caliburn.features.executions.models import ExecutionStatus, ExecutionWriter
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_context import ConsultantContextWorkflow
-from caliburn.workflows.context_history import RoleContextHistory
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.executions.context_history import RoleContextHistory
 from tests.fixtures.response_capacity import synthetic_capacity_limits
 from tests.integration.test_occupation_reference_workflow import new_writer
 from tests.unit.test_context_preparation import PreparationProbe
@@ -84,7 +82,7 @@ async def prepare(work: RoleContextHistory, request: ResponseRequest) -> NativeI
 
 
 @pytest.mark.parametrize("adoption_interrupted", [False, True])
-def test_saved_template_survives_upgrade_before_or_after_adoption_and_before_context_capture(
+def test_saved_preparation_template_survives_reentry_before_or_after_adoption(
     client: TestClient,
     database_settings: DatabaseSettings,
     monkeypatch: pytest.MonkeyPatch,
@@ -110,17 +108,7 @@ def test_saved_template_survives_upgrade_before_or_after_adoption_and_before_con
         async with saved_history(client, database_settings, writer) as rebuilt:
             restored = await rebuilt.resolve_template(new)
             assert restored.create_payload() == old.create_payload()
-            prepared = await prepare(rebuilt, restored)
-            context = await capture_turn_context(
-                rebuilt,
-                data=ConsultantContextWorkflow(client.app.state.database.sessions),
-                template=restored,
-                prepared_history=prepared,
-            )
-            payload = context.request.create_payload()
-            assert payload["instructions"] == "Original role instructions"
-            assert [item["name"] for item in payload["tools"]] == ["original_read"]
-            assert len(payload["input"]) == 2
+            await prepare(rebuilt, restored)
             assert new.create_payload()["instructions"] == "New role instructions with references"
 
     client.portal.call(scenario)
@@ -228,7 +216,7 @@ def test_reused_prepared_base_cannot_accept_unverified_handoff_instructions_or_t
 
     async def scenario() -> None:
         async with saved_history(client, database_settings, replacement) as work:
-            prepared = await prepare(work, current)
+            await prepare(work, current)
             async with client.app.state.database.sessions() as session:
                 binding = await history.read_context_history(session, replacement.scope, work.role)
             assert binding is not None and binding.prepared is not None
@@ -271,15 +259,7 @@ def test_reused_prepared_base_cannot_accept_unverified_handoff_instructions_or_t
             else:
                 raise AssertionError("A reused base accepted unverified instructions and tools")
             resolved = await work.resolve_template(current)
-            context = await capture_turn_context(
-                work,
-                data=ConsultantContextWorkflow(client.app.state.database.sessions),
-                template=resolved,
-                prepared_history=prepared,
-            )
-            actual = context.request.create_payload()
-            assert actual["instructions"] == "Current legitimate instructions"
-            assert [item["name"] for item in actual["tools"]] == ["current_read"]
+            assert resolved.create_payload() == current.create_payload()
 
     client.portal.call(scenario)
 

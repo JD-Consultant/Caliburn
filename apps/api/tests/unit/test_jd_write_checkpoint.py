@@ -8,36 +8,43 @@ from pydantic import ValidationError
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.candidates import JdCandidateScope
+from caliburn.features.job_description.compound_edits import (
+    CreateTaskWithSources,
+    ReviseProfileWithSources,
+)
 from caliburn.features.job_description.models import ProfileField, SetProfileField
 from caliburn.features.job_description.sources import AddJdSource, InterviewSource
 from caliburn.features.job_description.tasks import CreateTask
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
-from caliburn.workflows.jd_profile_writes import BoundProfileSources, PreparedProfileWrite
-from caliburn.workflows.jd_task_writes import PreparedTaskWrite
+from caliburn.workflows.job_description.compound_writes import PreparedJdEdit
+from caliburn.workflows.job_description.profile_writes import BoundProfileSources
 
 
 @pytest.mark.parametrize("kind", ["profile", "task"])
 def test_bound_write_survives_official_serializer_without_custom_constructors(kind: str) -> None:
     scope = ExecutionScope(uuid4(), uuid4(), ExecutionKind.CONSULTANT_TURN)
-    candidate = JdCandidateScope(scope.execution_id, uuid4())
+    candidate = JdCandidateScope(scope.execution_id)
     source = InterviewSource(uuid4())
     if kind == "profile":
-        command = PreparedProfileWrite(
-            uuid4(),
+        command = PreparedJdEdit(
             candidate,
-            uuid4(),
-            (SetProfileField(ProfileField.JOB_TITLE, "前端工程師"),),
-            (BoundProfileSources(ProfileField.JOB_TITLE, (AddJdSource(source),)),),
+            ReviseProfileWithSources(
+                uuid4(),
+                uuid4(),
+                (SetProfileField(ProfileField.JOB_TITLE, "前端工程師"),),
+                (BoundProfileSources(ProfileField.JOB_TITLE, (AddJdSource(source),)),),
+            ),
         )
     else:
-        command = PreparedTaskWrite(
-            uuid4(),
+        command = PreparedJdEdit(
             candidate,
-            uuid4(),
-            CreateTask(None, "盤點", "核對庫存", ("差異表",), ()),
-            (source,),
-            ((source,),),
-            (),
+            CreateTaskWithSources(
+                uuid4(),
+                uuid4(),
+                CreateTask(None, "盤點", "核對庫存", ("差異表",), ()),
+                (source,),
+                (),
+            ),
         )
     serializer = create_graph_serializer()
     saved = serializer.dumps_typed(snapshot_jd_write(command))
@@ -57,10 +64,10 @@ def test_malformed_saved_command_is_rejected_before_effects() -> None:
 def test_lifecycle_prepared_facts_survive_native_serializer(operation):
     from caliburn.features.job_description.areas import DeleteArea, EditJdAreas
     from caliburn.features.job_description.tasks import MoveTask
-    from caliburn.workflows.jd_item_deletion import PreparedItemDeletion
-    from caliburn.workflows.jd_item_movement import PreparedItemMovement
+    from caliburn.workflows.job_description.item_deletion import PreparedItemDeletion
+    from caliburn.workflows.job_description.item_movement import PreparedItemMovement
 
-    candidate = JdCandidateScope(uuid4(), uuid4())
+    candidate = JdCandidateScope(uuid4())
     command_id, revision_id, item_id = uuid4(), uuid4(), uuid4()
     command = (
         PreparedItemDeletion(

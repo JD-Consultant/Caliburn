@@ -19,8 +19,10 @@ from caliburn.features.interviews.models import SubmitInterviewInput
 from caliburn.features.job_files import service as job_files
 from caliburn.features.job_files.models import CreateJobFile
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.interview_completion import record_formal_interview
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 
 pytestmark = pytest.mark.postgres
 
@@ -41,7 +43,7 @@ def test_shutdown_preserves_active_batch_and_restart_resumes_same_scope(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_supervisor import MemorySupervisor
+        from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
         async with database.sessions.begin() as session:
             created = await job_files.create_job_file(
@@ -103,7 +105,7 @@ def test_returned_or_failed_runner_is_not_poll_retry(
 ) -> None:
     # Use the same real discovery/admission setup via a completed synthetic turn.
     async def scenario(database: Database) -> None:
-        from caliburn.workflows.memory_supervisor import MemorySupervisor
+        from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
         async with database.sessions.begin() as session:
             created = await job_files.create_job_file(

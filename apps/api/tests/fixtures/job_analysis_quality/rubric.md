@@ -1,4 +1,4 @@
-# T14 小型工作分析品質資料集 v3
+# 小型工作分析品質素材：固定案例與多階段旅程
 
 這是 **13 個全合成案例的評測素材與待人工校準 rubric**，不是模型通過紀錄。11 個 development、2 個 holdout_candidate；保留候選未用來調整 prompt，但編寫者已看過，不能稱盲測、獨立樣本或代表真實流量。v1 的九例未改 prompt；v2 新增兩例並小幅澄清 B1 背景取捨指引，當時只有離線契約驗證。v3 將真模型旅程發現的跨輪來源選擇問題縮小為兩個回歸素材；原旅程、候選對照與實際保存結果見 T17 證據，不等於這十三例皆已跑模型或通過。
 
@@ -6,6 +6,8 @@
 
 - [cases.json](cases.json)：情境輸入與前置草稿；只有各例的 `input` 可交給既有流程作測試資料。`id`／`split`／`risks` 是評測 metadata，不傳模型。
 - [oracles.json](oracles.json)：**reviewer only**。有根據、必保留／不得斷言、A／B1／B2 各自正反例、hard failures 與允許的其他解法；絕不混進模型 context。
+- [journeys.json](journeys.json)：另存四組多階段全合成旅程。員工輸入、人工 JD 材料與發布觀察有各自階段，既有十三例的形狀及 runner 保留；新旅程不由該 runner 自動消費。
+- [journey-oracles.json](journey-oracles.json)：另檔的 reviewer only 候選錨點，列每個觀察階段的材料依據、整份 JD／B1／B2／Plan 預期及 `not_observed`。不送模型，不是模型已通過或專家已校準的答案。
 - 本文件：如何準備、觀察、評分及解讀。沿既有 pytest、角色 runner、Memory parent 與資料 owner，不增加模型評測平台或產品契約。
 - 每批比較另保留實際版本、命令、結果及未驗邊界；本資料集本身不是驗收通過證據。
 
@@ -24,7 +26,7 @@
 | `daily_vs_month_end_recount_scope` | 每日現場複點泛化成全職位本人不複點，吞掉月底本人先複點 | 同任務分條件或分項；共用 collaborator 不必複製 |
 | `shared_work_background_is_not_per_case_profile` | 全部情境只剩動作，漏掉已知角色／服務範圍；或每案強塞相同 profile | 適當情境承接共用背景，各案保留必要局部範圍即可 |
 | `unconfirmed_background_is_not_a_profile_blank` | 用稱呼猜正式職稱、用工作交接猜匯報或單位 | 背景未知可保留，已知工作照常承接，不造必填 profile |
-| `historical_fact_keeps_historical_source` | 本輪寫入的舊事實錯指 current_input，或猜正式序號 | 延後寫入仍回指歷史原話；多來源按支持範圍選擇 |
+| `historical_fact_keeps_historical_source` | 本輪寫入的舊事實錯指本輪序號，或猜來源序號 | 延後寫入仍回指歷史原話；多來源按支持範圍選擇 |
 | `current_correction_keeps_other_sources` | 只更正主管卻把職稱／單位來源也改成本輪；新主管仍引舊說法 | 各欄分別處理，局部更正不污染其餘來源 |
 | `known_work_does_not_need_forced_rewrite` | 為展示動作重複新增／逼問，或刪掉已確認期限 | 不改準確現稿；保留有據數字 |
 | `one_off_event_does_not_change_regular_scope` | 顧問假設蓋過更正，一次清窗升為每日或被完全抹除 | 保留案例但不升成固定 JD 責任 |
@@ -39,12 +41,27 @@
 2. `formal_interview.sequence` 是合成歷史的定位，不是讓模型產生的 ID。用既有 interview／completion 測試機制建立前置狀態，保留說話者與問句；App 實際回傳的 identity／sequence 要建立對照，不能直接寫資料庫冒充成功訪談。
 3. `seed_work_situations` 是刻意提供的舊情境 fixture，參數沿既有 create-work-situation 契約；以既有候選／發布 owner 建立前置狀態。它們不是待評模型已產生的好結果。新舊矛盾由原話與更正判讀，不能假設種子永遠正確。
 4. `jd_draft` 是前置文件敘述，不是新增 API wire schema。沿現有 JD owner 建立有意義的項目／細節；標記 human 的項目用人工編輯路徑保留 pending。`source_sequences` 只描述它掛著哪些來源，**不保證內容受支持**；manual 案例特意掛了不支持核准權／KPI 的原話。
-5. **A** 使用正式舊歷史、目前可見 map、現有 JD 按需讀取與 `current_input`。當次輸入仍 pending，不能預填正式序號；預期答案、判準、未發生的下一輪不能洩漏。不要把 `input` 整包 JSON 直接冒充 A runtime 的正式投影。
+5. **A** 使用正式舊歷史、目前可見 map、現有 JD 按需讀取與本輪 input。App 會在本輪 JSON input 提供 H+1 序號，供模型引用；輸入仍 pending，成功完成後才成為正式訪談，取消不消耗序號。測試沿實際投影取得序號，不自行猜造；預期答案、判準、未發生的下一輪不能洩漏。不要把 `input` 整包 JSON 直接冒充 A runtime 的正式投影。
 6. A 成功完成後，**B1** 沿 parent 所固定的合法 `(K,F]` 與必要前問、情境 map 開始；不提供 JD 稿、理解正文或 oracle。**B2** 由實際 B1 結果取得兩層 map、既有 diff 與按需原話；不替 B1 塞 oracle 的理想結果，也不讓 B2 修改情境。
-7. 逐階段記錄：A 原回答＋實際 JD 候選／正式結果與來源；B1 情境正文／引用；B2 理解正文／情境關係及必要的 situation-only gap；parent 真正發布結果。只看最後答覆、Graph END 或 `complete` 不算已保存／發布。
+7. 逐階段記錄：A 原回答＋實際 JD 候選／正式結果與來源、同份 Plan；B1 情境正文／引用；B2 理解正文／情境關係；parent 真正發布結果。只看最後答覆、Graph END 或 `complete` 不算已保存／發布。A 回查原話救回遺漏，不能代替 B1 完整承接或 B2 必要正文。
 8. 若只單獨評 A 或 B1／B2，明示 seed 前置狀態及未觀察階段。不得以單角色案例宣稱整條旅程成功。各角色有多種合法工具路徑，不鎖 write 數、唯一序列或每例固定幾輪。
 
 現成接線範例在 `tests/integration/test_consultant_runner.py`、`test_memory_analysis_runners.py`、`test_memory_parent_roles.py`、`test_consultant_memory_http_journey.py`。這些既有 synthetic transport 測試是機制證據；換真 provider 必須另有本次授權、配置及費用界線，不能把它們預寫的回應當自然品質成果。本切片沒有另寫 provider runner／retry／評測服務。
+
+### 四組旅程的消費方式
+
+`journeys[].stages` 按材料出現順序排列；只有 `employee_input.text` 作該次員工輸入，顧問回答由實際流程產生，不預寫。階段 `id`、`kind`、發布 `label` 都是觀察 metadata，不是模型指令、訪談序號或發布身分。`memory_publication_observation.through_input_stage` 表示應觀察哪次輸入後的整理，沿 A 真正請求、成功完成及 B1→B2→發布核對；無請求或未發布就記 `not_observed`，不能由 harness 代造批次。
+
+`manual_jd_edit.edits` 的 `section`、`target_cue`、`content` 是人工改稿材料，以語意核對實際已返回的 JD 定位後走既有人工 owner；不傳模型工具答案，不猜固定標題，不建通用 selector。沒有唯一目標或所需前置結果，該項如實未觀察，不捏造模型產物。其效果在下一 A 的完整人工最終差異中出現。
+
+私有 oracle 的 `expectations[].after_stage` 指觀察時點，`basis` 是同旅程 `stage_id.text` 或 `stage_id.edits.N.content`；只可指當時已出現的材料，人工文字本身仍不是員工事實。`whole_jd` 要核整份成品，`memory.B1/B2` 分別核原件，`plan` 核真剩餘工作。中間狀態若未保存則 `not_observed`；同輪已直接完工，不能要求先新增待辦再刪除來製造證據。
+
+| journey id | 必須辨別的效果 |
+| --- | --- |
+| `memory_correction_consolidation` | M1 本人核准→後續只提報／主管核准→M2；保留其他期限及工作，下一 A 核清相關內容後採充分 Memory，逐筆處理仍有用途的原話 |
+| `unanchored_background_and_shared_ks` | 尚無具體任務的已知背景／共通條件／K/S 不沉沒；後續多工作用途共用定義，未知不補猜 |
+| `manual_cross_section_changes` | 人工跨欄改稿後員工轉題，首輪仍由既有 Memory＋完整 net 辨別影響；後輪補救不能回填前輪通過 |
+| `answered_but_not_drafted` | 答案已知就不重問，未入稿／核對仍是工作，實際完成才移除；直接同輪完成的中間 Plan 狀態如實未觀察 |
 
 ## 人工 rubric：先判有沒有根據，再判寫得好不好
 
@@ -61,9 +78,10 @@
 | 內容粒度／精簡 | 讀得出工作、對象、判斷、結果及必要邊界；可查下層細節 | 工具名當任務、通用職業句、逐案重複，或把整段原話重抄成理解 |
 | 引用與效果 | 真實支持主張的來源位於正確 owner，實際產物與宣稱一致 | 只說「已改」；錯原話、錯案、引用洗白、B2 繞情境直接建正式訪談關係 |
 | A 引導 | 回應當前資訊，對有影響缺口中立追問；已知可回查，答不出可保留 | 誘導答案、反覆逼猜、固定空格問卷、每輪硬改或永不敢寫 |
-| B1／B2 分工 | B1 保留情境與合法原話；B2 提煉必要範圍，僅必要情境問題回交 | B1 看理解／B2 改情境，傳私人推理，為完成形式無限互審 |
+| B1／B2 分工與完整性 | B1 整合有效片段及背景、規則／方法／工具、數值期限；B2 提煉有用理解並保留必要條件，疑問按需回查或如實保留 | B1 丟已知期限／背景；B2 抹必要條件、回交 B1 或改情境；傳私人推理或強造每案理解 |
+| Plan 接續 | 已答問題不重問，待編修／核對保留，完成微步驟移除；其他方向與精確未知有去處 | 空計畫當完成證明，已答仍待問，未入稿卻刪掉工作，複製全稿或逐筆來源旗標 |
 
-**不得平均掉的錯誤：**無據的責任／標準、錯案或錯範圍更正、關鍵有效工作遺失、錯誤引用／資格、未知升確定，以及宣稱未實際保存／發布的效果。任何此類錯誤，案例即為 fail；文字流暢、欄位全滿、較少 tokens 或其他例高分不能抵銷。`oracles.hard_failures` 補各例精確反例。
+**不得平均掉的錯誤：**無據的責任／標準／性別推論、錯案或錯範圍更正、關鍵有效工作遺失、錯誤引用／資格、未知升確定，以及宣稱未實際保存／發布的效果。任何此類錯誤，案例即為 fail；文字流暢、欄位全滿、較少 tokens 或其他例高分不能抵銷。兩份私有 oracle 的 `hard_failures` 補各例精確反例。
 
 `partial`：沒有上述重大錯誤，但省略一項必要辨識細節或引導仍不清；引用可回查不能自動補足理解正文必要邊界。純措辭風格差異只記 minor，允許語意等價答案。B `complete` 是本階段完成，並不承諾所有未知消失或整份 JD 已完善。
 

@@ -1,14 +1,16 @@
 """A's existing tools at the shared Graph's prepare/execute boundary."""
 
+from collections.abc import Awaitable, Callable
 from uuid import UUID
 
+from langchain_core.tools import BaseTool
 from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
 
+from caliburn.agent_execution.native_agent import NativeToolBinding, native_tool
 from caliburn.transport.model_tools.context_compaction import (
     ContextCompactionTools,
     context_compaction_definitions,
 )
-from caliburn.transport.model_tools.contracts import reject_tool_call
 from caliburn.transport.model_tools.interview_plans import (
     InterviewPlanTools,
     interview_plan_definitions,
@@ -76,85 +78,62 @@ class ConsultantTools:
         self.occupation_references = occupation_references
         self.interview_plans = interview_plans
 
-    @property
-    def names(self) -> tuple[str, ...]:
-        return (
-            *self.memory_reads.names,
-            *self.jd_reads.names,
-            *self.jd_changes.names,
-            *self.jd_writes.names,
-            *self.consolidation.names,
-            *self.compaction.names,
-            *(self.interview_plans.names if self.interview_plans is not None else ()),
-            *(self.occupation_references.names if self.occupation_references is not None else ()),
-        )
+    def standard_tools(self, ensure_active: Callable[[], Awaitable[None]]) -> list[BaseTool]:
+        """交標準 registry 管理名稱；原工具仍擁有正式准入與命令 codec。"""
+        tools: list[BaseTool] = []
 
-    def definitions(self) -> list[FunctionToolParam]:
-        return [
-            *self.memory_reads.definitions(),
-            *self.jd_reads.definitions(),
-            *self.jd_changes.definitions(),
-            *self.jd_writes.definitions(),
-            *self.consolidation.definitions(),
-            *self.compaction.definitions(),
-            *(self.interview_plans.definitions() if self.interview_plans is not None else []),
-            *(
-                self.occupation_references.definitions()
-                if self.occupation_references is not None
-                else []
-            ),
-        ]
+        def add(definitions: list[FunctionToolParam], binding: NativeToolBinding) -> None:
+            for definition in definitions:
+                tools.append(native_tool(definition, binding, ensure_active))
 
-    async def prepare(
-        self, call: ResponseFunctionToolCall, operation_id: UUID
-    ) -> str | dict[str, object]:
-        """Return a read observation or a JSON-only command for the Graph to save."""
-        if call.name in self.memory_reads.names:
-            return await self.memory_reads.invoke(call.name, call.arguments)
-        if call.name in self.jd_reads.names:
-            return await self.jd_reads.invoke(call.name, call.arguments)
-        if call.name in self.jd_changes.names:
-            return await self.jd_changes.invoke(call.name, call.arguments)
-        if call.name in self.jd_writes.names:
+        async def no_command(prepared: object) -> str:
+            raise ValueError("A read observation cannot be executed as a command")
+
+        def read_binding(invoke: Callable[[str, str], Awaitable[str]]) -> NativeToolBinding:
+            async def read(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
+                return await invoke(call.name, call.arguments)
+
+            return NativeToolBinding(read, no_command)
+
+        for reads in (self.memory_reads, self.jd_reads, self.jd_changes):
+            add(reads.definitions(), read_binding(reads.invoke))
+
+        async def prepare_jd(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
             prepared = await self.jd_writes.prepare(call.name, call.arguments, operation_id)
             return prepared if isinstance(prepared, str) else snapshot_jd_write(prepared)
-        if call.name in self.consolidation.names:
-            return self.consolidation.prepare(call.arguments, operation_id)
-        if call.name in self.compaction.names:
-            return self.compaction.prepare(call.arguments)
-        if self.interview_plans is not None:
-            if call.name in self.interview_plans.read_names:
-                return await self.interview_plans.invoke(call.name, call.arguments)
-            if call.name in self.interview_plans.write_names:
-                return await self.interview_plans.prepare(call.name, call.arguments, operation_id)
-        if self.occupation_references is not None:
-            if call.name in self.occupation_references.read_names:
-                return await self.occupation_references.invoke(call.name, call.arguments)
-            if call.name in self.occupation_references.write_names:
-                return await self.occupation_references.prepare(
-                    call.name,
-                    call.arguments,
-                    operation_id,
-                )
-        return reject_tool_call(
-            "scope_not_allowed", "本角色沒有這項工具。", "使用本角色已提供的具名工具。"
-        )
 
-    async def execute(self, prepared: object) -> str:
-        """Validate the saved command before dispatch; native call/result pairing stays in Graph."""
-        if isinstance(prepared, dict) and prepared.get("kind") == "memory_consolidation":
-            return await self.consolidation.execute(prepared)
-        if isinstance(prepared, dict) and prepared.get("kind") == "context_compaction":
-            return await self.compaction.execute(prepared)
-        if isinstance(prepared, dict) and prepared.get("kind") == "interview_plan_edit":
-            if self.interview_plans is None:
-                raise ValueError("The saved Turn does not permit interview plan edits")
-            return await self.interview_plans.execute(prepared)
-        if (
-            isinstance(prepared, dict)
-            and prepared.get("kind") == "occupation_reference_state_change"
-        ):
-            if self.occupation_references is None:
-                raise ValueError("The saved Turn does not permit occupation reference changes")
-            return await self.occupation_references.execute(prepared)
-        return await self.jd_writes.execute(restore_jd_write(prepared))
+        async def execute_jd(prepared: object) -> str:
+            return await self.jd_writes.execute(restore_jd_write(prepared))
+
+        add(self.jd_writes.definitions(), NativeToolBinding(prepare_jd, execute_jd))
+
+        async def consolidate(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
+            return self.consolidation.prepare(call.arguments, operation_id)
+
+        async def compact(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
+            return self.compaction.prepare(call.arguments)
+
+        add(
+            self.consolidation.definitions(),
+            NativeToolBinding(consolidate, self.consolidation.execute),
+        )
+        add(self.compaction.definitions(), NativeToolBinding(compact, self.compaction.execute))
+
+        def write_binding(
+            prepare: Callable[[str, str, UUID], Awaitable[str | dict[str, object]]],
+            execute: Callable[[object], Awaitable[str]],
+        ) -> NativeToolBinding:
+            async def prepare_call(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
+                return await prepare(call.name, call.arguments, operation_id)
+
+            return NativeToolBinding(prepare_call, execute)
+
+        for owner in (self.interview_plans, self.occupation_references):
+            if owner is None:
+                continue
+            for definition in owner.definitions():
+                if definition["name"] in owner.read_names:
+                    add([definition], read_binding(owner.invoke))
+                else:
+                    add([definition], write_binding(owner.prepare, owner.execute))
+        return tools

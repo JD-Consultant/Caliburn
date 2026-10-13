@@ -10,6 +10,6 @@ class ReadMemoryObjectArguments(BaseModel):
     )
     target_title: StrictStr = Field(
         ...,
-        description="Copy target_title exactly from this layer's map or a readable reference. Preserve whitespace, case and Unicode; this is a title choice, not an internal ID or version. If unavailable, reread the map.",
+        description="使用工作情境工具時，原樣複製仍有效的 work_situation_map.items[].target_title、read_work_situation_map 的 target_title，或可讀情境引用提供的 target_title；使用工作理解工具時，從 work_understanding_map.items[].target_title、read_work_understanding_map 或可讀理解引用取得。保留空白、大小寫與 Unicode。這是對應層的情境或理解標題，不是內部 ID、版本或歷史名稱；找不到目前標題時重讀對應層導覽。",
         min_length=1,
     )

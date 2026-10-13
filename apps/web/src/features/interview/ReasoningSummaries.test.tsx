@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -49,7 +50,7 @@ test('展開歷史才查原 Turn 的摘要，收合後仍能重新讀取，不�
     expect(path).toBe(`/api/job-files/${fileId}/consultant-turns/${executionId}`);
     return Promise.resolve(Response.json(savedTurn));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   mount();
   expect(fetch).not.toHaveBeenCalled();
   const toggle = screen.getByRole('button', { name: '處理紀錄' });
@@ -67,8 +68,7 @@ test('展開歷史才查原 Turn 的摘要，收合後仍能重新讀取，不�
 
 test('摘要讀取失敗不偽裝空白；可單獨重試且公開訊息仍可讀', async () => {
   let unavailable = true;
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) =>
       Promise.resolve(
         path.endsWith('/reasoning-summaries')
@@ -92,8 +92,7 @@ test('摘要讀取失敗不偽裝空白；可單獨重試且公開訊息仍可�
 });
 
 test('不接受帶私有欄位的摘要歷史，不輸出其值', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) =>
       Promise.resolve(
         Response.json(

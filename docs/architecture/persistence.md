@@ -18,7 +18,7 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 | JD 正式稿、候選、依據、改動結果 | JD 業務；候選可預覽／恢復，完成才正式採用，歷史依據可回查 | PostgreSQL 業務保存。UI、工具與 PDF 由其投影，不另存可編輯全文副本 |
 | Memory 候選、物件修訂、發布快照 | Memory 業務；同批共用工作稿，正式快照不可變 | PostgreSQL 業務保存。B1／B2 checkpoint 保存候選位置／操作參照，不另維護第二份全文候選 |
 | JD 工作計畫 Plan | Plan 業務；本輪安排可修改，只有 Turn 完成且正式訪談成立，才可供後輪採用 | 正文與原操作結果由業務保存，工具及 UI 讀同份資料。接續全文、空值與保存格式沿 [Plan 保存與採用](persistence.md#plan-從本輪候選到後輪可採用) |
-| 原生模型接續、執行位置、控制狀態 | 執行責任；完整 items／配對、原基準與可恢復邊界 | LangGraph 持久 checkpointer。歷史查詢用框架介面；按需產生的診斷副本不作恢復或業務權威 |
+| 原生模型接續、執行位置、控制狀態 | 執行責任；完整 items／配對、原基準與可恢復邊界 | LangGraph 持久 checkpointer。可採用歷史沿框架與完成資格讀取；Debug 按同一唯讀快照組裝原件，不另存正文副本 |
 | 公開中間訊息、可讀推理摘要、已完成答覆 | 公開交流與完成判定責任；已保存的公開內容可回看，正式答覆可靠保存 | 正式答覆在 A 完成交易成為訪談原文；中間訊息與可讀摘要由 checkpoint 中已保存的完整原生回應投影，不另建摘要表、不授訪談序號。只公開允許的正文與順序，原始內部推理及加密接續資料不公開 |
 | 原業務操作結果 | 執行原操作的資料模組；能確認操作是否已成立及當時結果 | 與操作效果在同一次短交易保存；工具回傳依此產生模型可見的結果，不另存一份可能與原結果矛盾的紀錄 |
 | 導覽、diff、待核對、UI 進度 | 各領域由固定依據推導 | 優先即時投影；有量測瓶頸才加快取，鍵包含來源位置，失效／重建規則同時寫明 |
@@ -71,11 +71,15 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 
 [圖源](../diagrams/architecture/persistence/plan-adoption.mmd) · [SVG](../diagrams/architecture/persistence/plan-adoption.svg)
 
-新 Turn 捕捉初始 Context 時，在同一短交易固定 Memory、訪談上界與 Plan 基底；候選 current 可以修改，並不立即取得後輪採用資格。查後輪基底時，只從同一檔案、completed execution、相符正式交換，且員工訊息序號不超過固定 frontier F 的候選中選最新一筆；本輪不因後來完成的工作變更基底。
+新 Turn 捕捉初始 Context 時，在同一短交易固定 Memory、訪談上界與 Plan 基底；候選 current 可以修改，並不立即取得後輪採用資格。查後輪基底時，只從同一檔案、completed execution、相符正式交換，且員工訊息序號不超過固定正式訪談上界的候選中選最新一筆；本輪不因後來完成的工作變更基底。
+
+A 首次或 Memory 換版的新窗口提供此合法 Plan；同版新 Turn 延續原生歷史，加入完整人工最終差異（有變動時）及本次 JSON input，工具仍操作各輪合法候選。原生壓縮採用完整 C 後不另外補入 Plan／App 導覽；輪前準備完成才附加本輪差異及 input。同輪暫停或故障恢復沿固定 capture 及已保存進度，不刷新基底。窗口接線由[Agent 執行](../implementation/agent-execution.md#31-跨工作的合法歷史選用)維護。
 
 null 表示尚未建立，空字串表示刻意清空，兩者都不得被較舊的非空正文蓋回。A 共同完成交易核對最終 Plan 位置後才授予跨輪資格；取消或失敗不採用。
 
-原操作成功時查回原正文與位置；提交結果未知時先核對原結果，不能重套 patch。工具與 UI 讀同份正文，沒有另一份可編輯正式 Plan。
+固定正文由 `interview_plan_bodies` 保存；每次 start／apply 的 operation 保留自己的 revision 與原結果，透過同檔案 body ID 引用正文。沿用前輪基底或正文未變時共用原 body；真正修改才建立新 body，不追 diff 鏈或做全庫文字去重。nullable body ID 表示尚未建立，空字串有自己的正文列。
+
+原操作成功時查回原正文與位置；提交結果未知時先核對原結果，不能重套 patch，也不把較新 current 倒退。工具與 UI 讀同份正文，沒有另一份可編輯正式 Plan。
 
 保存與讀取由 [Plan feature](../../apps/api/src/caliburn/features/interview_plans/)、[採用查詢](../../apps/api/src/caliburn/workflows/interview_plan_queries.py)及[工作流](../../apps/api/src/caliburn/workflows/interview_plans.py)負責。
 

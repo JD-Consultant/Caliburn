@@ -16,10 +16,10 @@ from psycopg.errors import ConnectionFailure
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.agent_execution.context_compaction import CompactionRuntime, prepare_context_history
 from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy
-from caliburn.agent_execution.tool_steps import ResponseStepRuntime, run_response_loop
 from caliburn.features.executions import budgets, service
 from caliburn.settings import DatabaseSettings
-from tests.fixtures.response_capacity import synthetic_capacity_limits
+from tests.fixtures.native_response_runtime import run_response_loop
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_capacity_limits
 from tests.integration.test_compaction_accounting import (
     accounting_fixture,
     admitted_executor,
@@ -123,13 +123,13 @@ def test_saved_original_survives_automatic_recovery_and_saver_reopen(
 
             else:
                 runtime = ResponseStepRuntime(
-                    executor.request_model,
-                    no_tools,
-                    no_tools,
-                    active,
-                    executor.account_response,
-                    executor.count_input,
-                    synthetic_capacity_limits(),
+                    request_model=executor.request_model,
+                    prepare_tool=no_tools,
+                    execute_tool=no_tools,
+                    ensure_active=active,
+                    account_response=executor.account_response,
+                    count_input=executor.count_input,
+                    capacity_limits=synthetic_capacity_limits(),
                 )
 
                 async def run(saver, first):

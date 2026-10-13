@@ -6,10 +6,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from caliburn.contracts.generated.create_job_file_request import CreateJobFileRequest
-from caliburn.contracts.generated.interview_history import InterviewHistory, InterviewMessage
-from caliburn.contracts.generated.job_file_list import JobFile, JobFileList
-from caliburn.contracts.generated.rename_job_file_request import RenameJobFileRequest
 from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_files.models import (
     CreateJobFile,
@@ -20,7 +16,14 @@ from caliburn.features.job_files.models import (
     RenameJobFile,
     StaleJobFileNameError,
 )
-from caliburn.transport.http.contracts import canonical_body
+from caliburn.transport.http.models.job_files import (
+    CreateJobFileRequest,
+    InterviewHistory,
+    InterviewMessage,
+    JobFile,
+    JobFileList,
+    RenameJobFileRequest,
+)
 from caliburn.workflows.job_files import JobFileWorkflow
 
 router = APIRouter(prefix="/api/job-files", tags=["job-files"])
@@ -36,7 +39,7 @@ def get_job_file_workflow(request: Request) -> JobFileWorkflow:
 JobFiles = Annotated[JobFileWorkflow, Depends(get_job_file_workflow)]
 
 
-@router.delete("/{job_file_id}", status_code=204)
+@router.delete("/{job_file_id}", status_code=204, operation_id="delete_job_file")
 async def delete_job_file(job_file_id: UUID, workflow: JobFiles) -> Response:
     try:
         await workflow.delete(job_file_id)
@@ -45,9 +48,15 @@ async def delete_job_file(job_file_id: UUID, workflow: JobFiles) -> Response:
     return Response(status_code=204)
 
 
-@router.post("", status_code=201, response_model=JobFile, responses={200: {"model": JobFile}})
+@router.post(
+    "",
+    status_code=201,
+    response_model=JobFile,
+    responses={200: {"model": JobFile}},
+    operation_id="create_job_file",
+)
 async def create_job_file(
-    body: Annotated[CreateJobFileRequest, canonical_body(CreateJobFileRequest)],
+    body: CreateJobFileRequest,
     response: Response,
     workflow: JobFiles,
 ) -> JobFile:
@@ -66,26 +75,33 @@ async def create_job_file(
             status_code=409, detail={"code": "creation_command_conflict"}
         ) from error
     response.status_code = 201 if created.is_new else 200
-    return JobFile.model_validate(asdict(created.job_file))
+    return JobFile.model_validate(created.job_file, from_attributes=True)
 
 
-@router.get("", response_model=JobFileList)
+@router.get("", response_model=JobFileList, operation_id="list_job_files")
 async def list_job_files(workflow: JobFiles) -> JobFileList:
     return JobFileList(
-        job_files=[JobFile.model_validate(asdict(file)) for file in await workflow.list_files()]
+        job_files=[
+            JobFile.model_validate(file, from_attributes=True)
+            for file in await workflow.list_files()
+        ]
     )
 
 
-@router.get("/{job_file_id}", response_model=JobFile)
+@router.get("/{job_file_id}", response_model=JobFile, operation_id="read_job_file")
 async def read_job_file(job_file_id: UUID, workflow: JobFiles) -> JobFile:
     try:
         result = await workflow.read_file(job_file_id)
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
-    return JobFile.model_validate(asdict(result))
+    return JobFile.model_validate(result, from_attributes=True)
 
 
-@router.get("/{job_file_id}/interviews", response_model=InterviewHistory)
+@router.get(
+    "/{job_file_id}/interviews",
+    response_model=InterviewHistory,
+    operation_id="read_interview_history",
+)
 async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> InterviewHistory:
     try:
         messages = await workflow.read_interviews(job_file_id)
@@ -101,10 +117,10 @@ async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> Inter
     )
 
 
-@router.post("/{job_file_id}/rename", response_model=JobFile)
+@router.post("/{job_file_id}/rename", response_model=JobFile, operation_id="rename_job_file")
 async def rename_job_file(
     job_file_id: UUID,
-    body: Annotated[RenameJobFileRequest, canonical_body(RenameJobFileRequest)],
+    body: RenameJobFileRequest,
     workflow: JobFiles,
 ) -> JobFile:
     try:
@@ -122,4 +138,4 @@ async def rename_job_file(
         raise HTTPException(status_code=409, detail={"code": "rename_command_conflict"}) from error
     except StaleJobFileNameError as error:
         raise HTTPException(status_code=409, detail={"code": "stale_job_file_name"}) from error
-    return JobFile.model_validate(asdict(result))
+    return JobFile.model_validate(result, from_attributes=True)

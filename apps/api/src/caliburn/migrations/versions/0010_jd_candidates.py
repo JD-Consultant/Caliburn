@@ -16,7 +16,6 @@ def upgrade() -> None:
         sa.Column("execution_id", sa.Uuid(), nullable=False),
         sa.Column("base_revision_id", sa.Uuid(), nullable=False),
         sa.Column("current_revision_id", sa.Uuid(), nullable=False),
-        sa.Column("generation_id", sa.Uuid(), nullable=False),
         sa.Column("status", sa.Text(), nullable=False),
         sa.Column(
             "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
@@ -42,12 +41,6 @@ def upgrade() -> None:
         ),
     )
     op.add_column("jd_operations", sa.Column("candidate_execution_id", sa.Uuid(), nullable=True))
-    op.add_column("jd_operations", sa.Column("candidate_generation_id", sa.Uuid(), nullable=True))
-    op.create_check_constraint(
-        op.f("ck_jd_operations_candidate_scope"),
-        "jd_operations",
-        "(candidate_execution_id IS NULL) = (candidate_generation_id IS NULL)",
-    )
     op.create_foreign_key(
         "fk_jd_operations_candidate",
         "jd_operations",
@@ -60,7 +53,7 @@ def upgrade() -> None:
         op.f("ck_jd_operations_kind"),
         "jd_operations",
         "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-        "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+        "'edit_collaborators', 'edit_conditions', "
         "'discard_candidate', 'adopt_candidate')",
     )
     # Existing immutable-operation and selection-insert triggers already seal every

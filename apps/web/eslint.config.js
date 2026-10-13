@@ -4,9 +4,13 @@ import tseslint from 'typescript-eslint';
 import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
+import { readdirSync } from 'node:fs';
 
-// A feature uses shared code only; pages compose features in app (code-organization.md §2.6).
-const features = ['interview', 'jd-editor', 'job-files', 'source-viewer'];
+// feature 只依賴 shared，跨 feature 由 app 組裝；實際目錄就是唯一清單。
+const features = readdirSync(new URL('./src/features/', import.meta.url), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
 
 export default defineConfig(
   globalIgnores(['dist', '.next', 'test-results', 'playwright-report', 'src/shared/api/generated']),
@@ -69,7 +73,7 @@ export default defineConfig(
         {
           patterns: [
             {
-              regex: `^(\\.\\./)+(${features.filter((other) => other !== feature).join('|')})(/|$)`,
+              regex: `^(\\.\\./)+(?:features/)?(${features.filter((other) => other !== feature).join('|')})(/|$)`,
               message: 'feature 不 import 別的 feature；跨 feature 協作由 app 組裝。',
             },
             { regex: '^(\\.\\./)+app(/|$)', message: 'feature 不依賴頁面組裝。' },

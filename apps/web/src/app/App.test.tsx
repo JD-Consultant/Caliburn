@@ -1,10 +1,11 @@
+import { stubHttp } from '../test-http';
 import { createAppQueryClient } from './query-client';
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JobFile } from '../shared/api/generated/job-file-list';
+import type { JobFile } from '../shared/api/generated/http/types.gen';
 import { isRenameJobFileRequest } from '../shared/api/validation';
 import { App } from './App';
 import { retainTurnHint } from '../features/interview/interview-turn-api';
@@ -89,7 +90,7 @@ afterEach(() => {
 });
 
 test('空清單提供建立入口，頁首只顯示產品資訊', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ job_files: [] })));
+  stubHttp(vi.fn().mockResolvedValue(Response.json({ job_files: [] })));
   renderApp();
   expect(await screen.findByRole('heading', { name: '職務檔案' })).toBeVisible();
   expect(await screen.findByText('尚無職務檔案')).toBeVisible();
@@ -102,7 +103,7 @@ test('空清單提供建立入口，頁首只顯示產品資訊', async () => {
 test('讀取失敗不是空清單，使用者可以重新讀取', async () => {
   const fetch = vi.fn().mockRejectedValueOnce(new TypeError('offline'));
   fetch.mockResolvedValue(Response.json({ job_files: [] }));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp();
   expect(await screen.findByRole('alert')).toHaveTextContent('連線未完成');
   expect(screen.queryByText('尚無職務檔案')).not.toBeInTheDocument();
@@ -112,7 +113,7 @@ test('讀取失敗不是空清單，使用者可以重新讀取', async () => {
 });
 
 test('格式不符的服務結果不可進入清單', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ job_files: [{}] })));
+  stubHttp(vi.fn().mockResolvedValue(Response.json({ job_files: [{}] })));
   renderApp();
   expect(await screen.findByRole('alert')).toHaveTextContent('資料格式不符');
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -132,7 +133,7 @@ test('建立後開啟原檔案並回讀正式開場，不生成員工輸入', as
     }
     return Promise.resolve(Response.json(firstFile));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp();
   await user.click(screen.getByRole('button', { name: '建立職務檔案' }));
   await user.type(screen.getByLabelText('職務檔案名稱', { exact: false }), firstFile.display_name);
@@ -174,7 +175,7 @@ test('同名檔案按身分切換，遲到的甲檔訪談不可顯示在乙檔',
     }
     throw new Error(`Unexpected path: ${path}`);
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp();
   await user.click(await screen.findByRole('link', { name: /開啟.*合成員工甲/ }));
   expect(await screen.findByText('正在讀取這份檔案的訪談…')).toBeVisible();
@@ -198,7 +199,7 @@ test('不存在的檔案顯示錯誤而非上一份內容或伺服器除錯文�
         { status: 404 },
       ),
     );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp(`/job-files/${firstFile.job_file_id}`);
   await waitFor(() => expect(screen.getByText('這份職務檔案已刪除')).toBeVisible());
   expect(screen.queryByText('private debug')).not.toBeInTheDocument();
@@ -207,8 +208,7 @@ test('不存在的檔案顯示錯誤而非上一份內容或伺服器除錯文�
 
 test('歷史訪談以原文字串顯示，不解析成 HTML', async () => {
   const original = '<img src=x onerror="alert(1)">\n請說明工作。';
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/consultant-turns/current'))
         return Promise.resolve(Response.json({ turn: null }));
@@ -236,7 +236,7 @@ test('列表改名只送標籤與讀取基準，保存後重讀清單', async ()
     }
     return Promise.resolve(Response.json({ job_files: [current, secondFile] }));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp();
   await user.click(await screen.findByRole('button', { name: /重新命名.*合成員工甲/ }));
   const field = screen.getByRole('textbox', { name: '職務檔案名稱' });
@@ -274,7 +274,7 @@ test('改名結果不明，關閉重開仍送原命令而不採用新基準', as
     }
     return Promise.resolve(Response.json({ job_files: [current] }));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const view = renderApp();
   await user.click(await screen.findByRole('button', { name: /重新命名/ }));
   const field = screen.getByRole('textbox', { name: '職務檔案名稱' });
@@ -306,7 +306,7 @@ test('過期改名不可自行換基準重送，先要求重讀', async () => {
     }
     return Promise.resolve(Response.json({ job_files: [current] }));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   renderApp();
   await user.click(await screen.findByRole('button', { name: /重新命名/ }));
   await user.click(screen.getByRole('button', { name: '儲存名稱' }));
@@ -318,8 +318,7 @@ test('過期改名不可自行換基準重送，先要求重讀', async () => {
 
 test('職務檔案提供 JD 基本資料讀取與人工編輯入口', async () => {
   const consoleError = vi.spyOn(console, 'error');
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/consultant-turns/current'))
         return Promise.resolve(Response.json({ turn: null }));
@@ -358,8 +357,7 @@ test('職務檔案提供 JD 基本資料讀取與人工編輯入口', async () =
 });
 
 test('PDF 下載入口使用同檔案正式稿網址並明示不含候選預覽', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/consultant-turns/current'))
         return Promise.resolve(Response.json({ turn: null }));
@@ -390,7 +388,7 @@ test('metadata 背景讀取失敗不卸載尚未送出的訪談與 JD 表單草�
       metadataUnavailable ? new Response(null, { status: 503 }) : Response.json(firstFile),
     );
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
   await user.type(await screen.findByRole('textbox', { name: '訪談內容' }), '尚未送出的原話');
   await user.click(await screen.findByRole('button', { name: '修改職務名稱' }));
@@ -423,8 +421,7 @@ test('cancelling a candidate removes only the preview and keeps the formal JD', 
     execution_id: executionId,
   });
   let cancelled = false;
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string, options?: RequestInit) => {
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
       if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(formalProfile));
@@ -511,7 +508,7 @@ test('狀態查詢失敗不沿用候選或控制；查回 failed 仍保留正式
       path.endsWith('/interviews') ? history('正式開場') : Response.json(firstFile),
     );
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
   expect(await screen.findByRole('region', { name: 'JD 候選預覽' })).toBeVisible();
   expect(screen.getByRole('button', { name: '暫停處理' })).toBeVisible();
@@ -550,8 +547,7 @@ test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不
   let statusReads = 0;
   let workReads = 0;
   const writes: string[] = [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         expect(path).toBe(`${turnUrl}/undo-jd`);
@@ -628,7 +624,7 @@ test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不
 
 test('invalid job file identity mounts no data queries', async () => {
   const fetcher = vi.fn();
-  vi.stubGlobal('fetch', fetcher);
+  stubHttp(fetcher);
   renderApp('/job-files/not-a-uuid');
   expect(await screen.findByText('找不到這份職務檔案')).toBeInTheDocument();
   expect(fetcher).not.toHaveBeenCalled();
@@ -645,7 +641,7 @@ test('confirmed missing metadata cleans only that file local recovery data', asy
       execution_id: null,
     });
   }
-  vi.stubGlobal('fetch', () =>
+  stubHttp(() =>
     Promise.resolve(Response.json({ detail: { code: 'job_file_not_found' } }, { status: 404 })),
   );
   renderApp(`/job-files/${firstFile.job_file_id}`);
@@ -684,7 +680,7 @@ test.each(['sessionStorage', 'localStorage'] as const)(
       }
       return Promise.resolve(Response.json({ job_files: exists ? [firstFile] : [] }));
     });
-    vi.stubGlobal('fetch', transport);
+    stubHttp(transport);
     const removeSession = Storage.prototype.removeItem.bind(sessionStorage);
     const removeLocal = Storage.prototype.removeItem.bind(localStorage);
     const removal = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(function (
@@ -770,7 +766,7 @@ test('confirmed DELETE cleans only that file and refreshes the active list exact
       Response.json({ job_files: deleted ? [secondFile] : [firstFile, secondFile] }),
     );
   });
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { client } = renderApp();
   // No window-focus or reconnect event belongs to this single deletion scenario.
   client.setQueryDefaults(['job-files'], { refetchOnWindowFocus: false });
@@ -788,6 +784,9 @@ test('confirmed DELETE cleans only that file and refreshes the active list exact
     'current-consultant-turn',
     'reasoning-summaries',
     'turn-jd-changes',
+    'turn-tools',
+    'published-memory',
+    'memory-object',
   ];
   for (const scope of scopes) {
     client.setQueryData([scope, firstFile.job_file_id, 'detail'], 'target data');
@@ -832,7 +831,7 @@ test('a list refresh failure after DELETE warns once without retrying deletion',
       ? Promise.reject(new TypeError('synthetic lost list response'))
       : Promise.resolve(Response.json({ job_files: [firstFile] }));
   });
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { client } = renderApp();
   client.setQueryData(['jd-work', firstFile.job_file_id], 'deleted JD');
   await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
@@ -862,7 +861,7 @@ test('a received deletion refreshes once and ignores repeated or invalid notific
   const transport = vi.fn(() =>
     Promise.resolve(Response.json({ job_files: deleted ? [secondFile] : [firstFile, secondFile] })),
   );
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { client } = renderApp();
   await screen.findByRole('link', { name: /開啟.*合成員工甲/ });
   client.setQueryData(['jd-work', firstFile.job_file_id], 'target data');
@@ -911,7 +910,7 @@ test('other metadata 404 errors do not confirm deletion or clear recovery data',
   const transport = vi.fn(() =>
     Promise.resolve(Response.json({ detail: { code: 'resource_not_found' } }, { status: 404 })),
   );
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
   client.setQueryData(['jd-work', firstFile.job_file_id], 'saved JD');
   expect(await screen.findByText(/找不到這項資料或服務/)).toBeVisible();
@@ -937,7 +936,7 @@ test('late DELETE success after unmount still cleans the file without refreshing
       ? response
       : Promise.resolve(Response.json({ job_files: [firstFile] })),
   );
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { client, unmount } = renderApp();
   await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
   await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));
@@ -980,7 +979,7 @@ test('notification failure after DELETE warns once and still cleans and refreshe
     }
     return Promise.resolve(Response.json({ job_files: deleted ? [] : [firstFile] }));
   });
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   renderApp();
   await userEvent.click(await screen.findByRole('button', { name: /刪除.*合成員工甲/ }));
   await userEvent.click(screen.getByRole('button', { name: '永久刪除' }));

@@ -1,8 +1,9 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type { JobFile } from '../../shared/api/generated/http/types.gen';
 import { RenameJobFileDialog } from './RenameJobFileDialog';
 import { pendingRename } from './job-file-commands';
 
@@ -39,13 +40,42 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+test('錯置檔案的改名回應保留原命令，正確 scope 重查後才 ACK', async () => {
+  pendingRename(file.job_file_id).retain(command);
+  const transport = vi
+    .fn()
+    .mockResolvedValueOnce(
+      Response.json({
+        ...file,
+        job_file_id: '30000000-0000-4000-8000-000000000003',
+      }),
+    )
+    .mockResolvedValue(
+      Response.json({ ...file, display_name: command.display_name, name_revision: 2 }),
+    );
+  stubHttp(transport);
+  const view = renderDialog();
+  await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('結果尚未確認');
+  expect(pendingRename(file.job_file_id).read()).toEqual(command);
+  expect(view.onClose).not.toHaveBeenCalled();
+  expect(view.invalidate).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
+  expect(view.onClose).toHaveBeenCalledOnce();
+  expect(pendingRename(file.job_file_id).read()).toBeNull();
+  expect(transport.mock.calls.map((call) => (call[1] as RequestInit).body)).toEqual([
+    JSON.stringify(command),
+    JSON.stringify(command),
+  ]);
+});
+
 test('未知改名結果仍以原命令重新確認，成功後才刷新目前名稱', async () => {
   pendingRename(file.job_file_id).retain(command);
   const fetch = vi.fn().mockRejectedValueOnce(new TypeError('lost response'));
   fetch.mockResolvedValue(
     Response.json({ ...file, display_name: command.display_name, name_revision: 2 }),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const view = renderDialog();
   await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('結果尚未確認');
@@ -78,7 +108,7 @@ test.each(['success', 'rejected'] as const)(
   '改名 ACK 儲存清理失敗時 %s 保留原識別與既有成功／拒絕效果',
   async (outcome) => {
     pendingRename(file.job_file_id).retain(command);
-    vi.stubGlobal('fetch', () =>
+    stubHttp(() =>
       Promise.resolve(
         outcome === 'success'
           ? Response.json({ ...file, display_name: command.display_name, name_revision: 2 })
@@ -108,7 +138,7 @@ test.each(['success', 'rejected', 'unknown'] as const)(
     const request = new Promise<Response>((resolve) => {
       finish = resolve;
     });
-    vi.stubGlobal('fetch', () => request);
+    stubHttp(() => request);
     const view = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
     view.unmount();
@@ -149,7 +179,7 @@ test.each(['success', 'rejected'] as const)(
     const request = new Promise<Response>((resolve) => {
       finish = resolve;
     });
-    vi.stubGlobal('fetch', () => request);
+    stubHttp(() => request);
     const view = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
     view.unmount();
@@ -186,7 +216,7 @@ test.each([
       finishSecond = resolve;
     });
     const fetch = vi.fn().mockReturnValueOnce(firstRequest).mockReturnValueOnce(secondRequest);
-    vi.stubGlobal('fetch', fetch);
+    stubHttp(fetch);
     const first = renderDialog();
     await userEvent.click(screen.getByRole('button', { name: '重新確認改名結果' }));
     first.unmount();

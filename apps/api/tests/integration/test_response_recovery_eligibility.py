@@ -14,12 +14,7 @@ from psycopg.conninfo import make_conninfo
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    ResponseStepSaveError,
-    _build_response_step,
-    run_response_step,
-)
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse, ResponseStepSaveError
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -28,6 +23,7 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.settings import DatabaseSettings
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
 from tests.fixtures.response_capacity import synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
@@ -130,9 +126,9 @@ def test_late_or_held_response_requires_current_writer_before_tools(
                     await saver.setup()
                     with pytest.raises(ExecutionStateError):
                         await run_response_step(saver, request=model_request, **options)
-                    saved = await _build_response_step(saver, max_tool_calls=16).aget_state(config)
+                    saved = await read_response_state(saver, config)
                     assert "response_snapshot" in saved.values
-                    assert saved.next == ("prepare_tool",)
+                    assert saved.next == ("NativePolicy.after_model",)
                 assert events == ["model"]
                 return
 
@@ -152,7 +148,7 @@ def test_late_or_held_response_requires_current_writer_before_tools(
                     await run_response_step(
                         saver, request=None, recovery=failure.value.recovery, **options
                     )
-                saved = await _build_response_step(saver, max_tool_calls=16).aget_state(config)
+                saved = await read_response_state(saver, config)
                 assert "response_snapshot" not in saved.values
                 assert events == ["model"]
 

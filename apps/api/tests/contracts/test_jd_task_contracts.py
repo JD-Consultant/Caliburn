@@ -8,12 +8,34 @@ import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.edit_jd_tasks_request import EditJdTasksRequest
-from caliburn.contracts.generated.jd_tasks_view import JdTasksView
 from caliburn.features.job_description.task_changes import task_edit_payload
 from caliburn.transport.http.jd_tasks import _edit_from_wire
+from caliburn.transport.http.models.jd_tasks_edits import EditJdTasksRequest
+from caliburn.transport.http.models.jd_views import JdTasksView
+from tests.fixtures.http_contracts import http_schema
 
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
+
+def test_task_tool_accepts_one_evidence_group_and_rejects_child_sources() -> None:
+    schema = json.loads(
+        (
+            Path(__file__).parents[2] / "contracts/tools/create-jd-task-arguments.schema.json"
+        ).read_text(encoding="utf-8")
+    )
+    validator = Draft202012Validator(schema)
+    payload = {
+        "parent_read_ref": None,
+        "title": "盤點",
+        "description": None,
+        "outcomes": [{"text": "差異表"}],
+        "requirements": [],
+        "required_knowledge": [],
+        "required_skills": [{"capability_read_ref": "skill_app"}],
+        "supporting_sources": [{"kind": "interview", "interview_sequence": 2}],
+    }
+    assert validator.is_valid(payload)
+    for field in ("outcomes", "required_skills"):
+        invalid = {**payload, field: [{**payload[field][0], "supporting_sources": []}]}
+        assert not validator.is_valid(invalid)
 
 
 @pytest.mark.parametrize(
@@ -76,7 +98,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
     ],
 )
 def test_task_edit_round_trip_matches_original_intention(change: dict) -> None:
-    schema = json.loads((SCHEMAS / "edit-jd-tasks-request.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(EditJdTasksRequest)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {"command_id": str(uuid4()), "expected_revision_id": str(uuid4()), "change": change}
@@ -91,7 +113,7 @@ def test_task_edit_round_trip_matches_original_intention(change: dict) -> None:
 
 
 def test_task_view_exposes_detail_identity_not_internal_revision() -> None:
-    schema = json.loads((SCHEMAS / "jd-tasks-view.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(JdTasksView)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {

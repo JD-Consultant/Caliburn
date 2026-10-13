@@ -38,8 +38,8 @@ from caliburn.features.work_memory.read_models import MemoryReadView
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import (
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import (
     CandidateMemoryRead,
     MemoryReadWorkflow,
     PublishedMemoryRead,

@@ -8,7 +8,7 @@
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && node --test --test-isolation=none scripts/import-boundaries.test.mjs",
     "test:proxy": "node --test scripts/dev-proxy.test.mjs",
     "test:e2e": "playwright test",
     "lint": "eslint .",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@hey-api/openapi-ts": "0.99.0",
     "@playwright/test": "1.63.0",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

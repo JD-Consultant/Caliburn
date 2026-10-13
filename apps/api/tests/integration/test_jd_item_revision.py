@@ -14,33 +14,37 @@ from caliburn.features.job_description.capabilities import (
     EditJdCapabilities,
 )
 from caliburn.features.job_description.collaborators import CreateCollaborator, EditJdCollaborators
+from caliburn.features.job_description.compound_edits import (
+    ReviseItemWithSources,
+)
 from caliburn.features.job_description.conditions import (
     ConditionKind,
     CreateCondition,
     EditJdConditions,
 )
-from caliburn.features.job_description.navigation import jd_read_ref
-from caliburn.features.job_description.sources import InvalidJdSourceError, SourceTargetKind
-from caliburn.features.job_description.tasks import CreateTask, DetailKind, EditJdTasks
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_item_revision import (
+from caliburn.features.job_description.item_revision import (
     AddItemDetail,
     AddItemSource,
     AlignItemSource,
-    CapabilitySourceTarget,
-    DetailSourceTarget,
     ItemFieldChange,
     ItemSourceTarget,
-    JdItemRevisionWorkflow,
-    PreparedItemRevision,
     RemoveItemDetail,
     ReorderItemCapability,
     ReviseItemDetail,
     ReviseItemInput,
     SetItemCapability,
 )
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.features.job_description.navigation import jd_read_ref
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
+from caliburn.features.job_description.sources import SourceTargetKind
+from caliburn.features.job_description.tasks import CreateTask, DetailKind, EditJdTasks
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.compound_writes import (
+    PreparedJdEdit,
+    execute_prepared_jd_edit,
+)
+from caliburn.workflows.job_description.item_revision import JdItemRevisionWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.fixtures.consultant_turn import start_consultant_turn as start
 from tests.fixtures.consultant_turn import transact
 
@@ -82,7 +86,11 @@ def revise(client, writer, intent):
         )
 
     prepared = client.portal.call(prepare)
-    return workflow, prepared, client.portal.call(workflow.execute, writer, prepared)
+    return (
+        workflow,
+        prepared,
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared),
+    )
 
 
 def sources(client, writer, preview):
@@ -100,7 +108,7 @@ def test_task_revision_preserves_identity_precise_evidence_and_original_replay(c
     writer, candidates, before = setup_item(client)
     task = before.work.tasks[0]
     first, second = before.work.capabilities
-    source = CurrentInputSourceSelection()
+    source = InterviewSourceSelection(2)
     workflow, prepared, result = revise(
         client,
         writer,
@@ -109,12 +117,11 @@ def test_task_revision_preserves_identity_precise_evidence_and_original_replay(c
             (
                 ItemFieldChange("description", "新描述"),
                 ReviseItemDetail(jd_read_ref(task.details[0]), "修訂成果"),
-                AddItemDetail(DetailKind.REQUIREMENT, "需求", (source,)),
-                AddItemDetail(DetailKind.OUTCOME, "成果", (source,)),
-                SetItemCapability(jd_read_ref(first), True, (source,)),
+                AddItemDetail(DetailKind.REQUIREMENT, "需求"),
+                AddItemDetail(DetailKind.OUTCOME, "成果"),
+                SetItemCapability(jd_read_ref(first), True),
                 SetItemCapability(jd_read_ref(second), True),
                 AddItemSource(ItemSourceTarget(), source),
-                AddItemSource(DetailSourceTarget(jd_read_ref(task.details[0])), source),
             ),
         ),
     )
@@ -126,30 +133,30 @@ def test_task_revision_preserves_identity_precise_evidence_and_original_replay(c
     assert revised.details[0].detail_id == task.details[0].detail_id
     assert [d.text for d in revised.details] == ["修訂成果", "成果", "需求"]
     refs = sources(client, writer, after)
-    assert len(refs) == 5
+    assert len(refs) == 1
     assert {r.target.kind for r in refs} == {
         SourceTargetKind.TASK,
-        SourceTargetKind.DETAIL,
-        SourceTargetKind.TASK_CAPABILITY,
     }
     assert all(not r.needs_review for r in refs)
     # A later edit must not turn original replay into current-head interpretation.
     revise(client, writer, ReviseItemInput(jd_read_ref(task), (ItemFieldChange("title", "後續"),)))
     later = client.portal.call(candidates.read, writer.scope)
-    checkpoint = TypeAdapter(PreparedItemRevision)
+    checkpoint = TypeAdapter(PreparedJdEdit[ReviseItemWithSources])
     restored = checkpoint.validate_json(checkpoint.dump_json(prepared), strict=True)
     assert restored == prepared
-    assert client.portal.call(workflow.execute, writer, restored) == result
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, restored) == result
+    )
     assert client.portal.call(candidates.read, writer.scope).position == later.position
 
 
-def test_text_and_alignment_apply_to_final_content_then_unlink_cleans_only_relation(
+def test_outcome_and_alignment_apply_to_final_task_then_unlink_preserves_evidence(
     client: TestClient,
 ):
     writer, candidates, before = setup_item(client)
     task = before.work.tasks[0]
     first, second = before.work.capabilities
-    source = CurrentInputSourceSelection()
+    source = InterviewSourceSelection(2)
     revise(
         client,
         writer,
@@ -157,7 +164,7 @@ def test_text_and_alignment_apply_to_final_content_then_unlink_cleans_only_relat
             jd_read_ref(task),
             (
                 AddItemSource(ItemSourceTarget(), source),
-                SetItemCapability(jd_read_ref(first), True, (source,)),
+                SetItemCapability(jd_read_ref(first), True),
                 SetItemCapability(jd_read_ref(second), True),
             ),
         ),
@@ -166,7 +173,7 @@ def test_text_and_alignment_apply_to_final_content_then_unlink_cleans_only_relat
     citation = next(
         r for r in sources(client, writer, before) if r.target.kind == SourceTargetKind.TASK
     )
-    revise(
+    workflow, prepared, result = revise(
         client,
         writer,
         ReviseItemInput(
@@ -174,14 +181,18 @@ def test_text_and_alignment_apply_to_final_content_then_unlink_cleans_only_relat
             (
                 AlignItemSource(ItemSourceTarget(), f"citation_{citation.citation_id.hex}"),
                 ItemFieldChange("description", "已重評的文字"),
+                ReviseItemDetail(jd_read_ref(task.details[0]), "已重評的成果"),
                 ReorderItemCapability(jd_read_ref(second), "first"),
             ),
         ),
     )
     after = client.portal.call(candidates.read, writer.scope)
     refs = sources(client, writer, after)
-    assert not next(r for r in refs if r.citation_id == citation.citation_id).needs_review
-    assert next(r for r in refs if r.target.kind == SourceTargetKind.TASK_CAPABILITY).needs_review
+    aligned = next(r for r in refs if r.citation_id == citation.citation_id)
+    assert not aligned.needs_review
+    assert aligned.reviewed_revision_id == after.position.revision_id
+    assert after.work.tasks[0].details[0].text == "已重評的成果"
+    assert len(refs) == 1
     assert [link.capability_id for link in after.work.task_links] == [
         second.capability_id,
         first.capability_id,
@@ -194,14 +205,21 @@ def test_text_and_alignment_apply_to_final_content_then_unlink_cleans_only_relat
     after = client.portal.call(candidates.read, writer.scope)
     assert len(after.work.capabilities) == 2
     assert len(sources(client, writer, after)) == 1
+    assert not sources(client, writer, after)[0].needs_review
+    assert sources(client, writer, after)[0].reviewed_revision_id == after.position.revision_id
+    # 原確認命令重播不得採用後續 unlink 的內容作為核對基底。
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared) == result
+    )
+    assert client.portal.call(candidates.read, writer.scope).position == after.position
+    assert sources(client, writer, after)[0].reviewed_revision_id == after.position.revision_id
 
 
 def test_late_domain_rejection_rolls_back_text_and_rejects_conflicting_effects(client: TestClient):
     writer, candidates, before = setup_item(client)
     task = before.work.tasks[0]
-    source = CurrentInputSourceSelection()
-    # Existing-but-unlinked relation: shape and source are valid, the final source owner is not.
-    with pytest.raises(InvalidJdSourceError):
+    # 不合法的能力定位不得留下同包文字修改。
+    with pytest.raises(ValueError):
         revise(
             client,
             writer,
@@ -209,19 +227,13 @@ def test_late_domain_rejection_rolls_back_text_and_rejects_conflicting_effects(c
                 jd_read_ref(task),
                 (
                     ItemFieldChange("description", "不得留下"),
-                    AddItemSource(
-                        CapabilitySourceTarget(jd_read_ref(before.work.capabilities[0])), source
-                    ),
+                    SetItemCapability("skill_missing", True),
                 ),
             ),
         )
     assert client.portal.call(candidates.read, writer.scope).position == before.position
     for changes in (
         (ItemFieldChange("title", "甲"), ItemFieldChange("title", "乙")),
-        (
-            RemoveItemDetail(jd_read_ref(task.details[0])),
-            AddItemSource(DetailSourceTarget(jd_read_ref(task.details[0])), source),
-        ),
         (
             SetItemCapability(jd_read_ref(before.work.capabilities[0]), True),
             SetItemCapability(jd_read_ref(before.work.capabilities[0]), False),
@@ -267,7 +279,7 @@ def test_other_item_families_route_to_existing_owners_and_detail_delete_is_local
                 jd_read_ref(item),
                 (
                     ItemFieldChange(field, value),
-                    AddItemSource(ItemSourceTarget(), CurrentInputSourceSelection()),
+                    AddItemSource(ItemSourceTarget(), InterviewSourceSelection(2)),
                 ),
             ),
         )

@@ -1,17 +1,14 @@
 """Collaborator DTO generation preserves values, null semantics and strict nested shapes."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.edit_jd_collaborators_request import EditJdCollaboratorsRequest
-from caliburn.contracts.generated.jd_collaborators_view import JdCollaboratorsView
-
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
+from caliburn.transport.http.models.jd_collaborators_edits import EditJdCollaboratorsRequest
+from caliburn.transport.http.models.jd_views import JdCollaboratorsView
+from tests.fixtures.http_contracts import http_schema
 
 
 @pytest.mark.parametrize(
@@ -41,9 +38,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
     ],
 )
 def test_edit_round_trip_and_rejected_extra_keys(change: dict) -> None:
-    schema = json.loads(
-        (SCHEMAS / "edit-jd-collaborators-request.schema.json").read_text(encoding="utf-8")
-    )
+    schema = http_schema(EditJdCollaboratorsRequest)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {"command_id": str(uuid4()), "expected_revision_id": str(uuid4()), "change": change}
@@ -56,7 +51,7 @@ def test_edit_round_trip_and_rejected_extra_keys(change: dict) -> None:
 
 
 def test_collaborator_view_does_not_expose_internal_content_revision() -> None:
-    schema = json.loads((SCHEMAS / "jd-collaborators-view.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(JdCollaboratorsView)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {

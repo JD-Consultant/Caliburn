@@ -10,13 +10,11 @@ import httpx2
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
+from caliburn.agent_execution.response_runtime import ReceivedModelResponseCancelledError
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponseCancelledError,
-    run_response_step,
-)
 from caliburn.features.executions.budget_models import BudgetExceededError, BudgetLimit
-from caliburn.workflows import model_requests
+from caliburn.workflows.executions import model_requests
+from tests.fixtures.native_response_runtime import run_response_step
 from tests.fixtures.response_capacity import synthetic_response_runtime
 from tests.unit.test_response_streaming import client_for, request, terminal, wire_events
 

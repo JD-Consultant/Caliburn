@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
-from caliburn.features.job_description import area_service
+from caliburn.features.job_description import revision_editing
 from caliburn.features.job_description.areas import EditJdAreas
 
 pytestmark = pytest.mark.postgres
@@ -398,7 +398,7 @@ def test_manual_area_edit_rejected_during_consultant_but_other_file_can_continue
 def test_rollback_keeps_head_content_selections_and_operations_together(
     client: TestClient, database_connection: psycopg.Connection, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    edit_areas = area_service.edit_areas
+    edit_areas = revision_editing.apply_content_edit
 
     async def fail_after_write(
         session: AsyncSession, job_file_id: UUID, request: EditJdAreas
@@ -410,7 +410,7 @@ def test_rollback_keeps_head_content_selections_and_operations_together(
     original = client.get(url).json()
     request = create_command(original["revision_id"])
     with monkeypatch.context() as patch:
-        patch.setattr(area_service, "edit_areas", fail_after_write)
+        patch.setattr(revision_editing, "apply_content_edit", fail_after_write)
         with pytest.raises(RuntimeError, match="Injected"):
             client.post(url, json=request)
     assert client.get(url).json() == original

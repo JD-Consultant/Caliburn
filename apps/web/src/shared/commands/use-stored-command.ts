@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import type { PendingCommandStore } from './pending-command';
 import { reportDiagnostic } from '../diagnostics';
+import type { DiagnosticScope } from '../diagnostics';
 
 type Acknowledgement = 'cleared' | 'changed' | 'unavailable';
 export interface CommandRejection<Reason = 'refused'> {
@@ -17,6 +18,7 @@ export type CommandOutcome<R, Reason = 'refused'> =
 
 export interface StoredCommand<C, R, Reason = 'refused'> {
   store: PendingCommandStore<C>;
+  correlation: (command: C | null) => DiagnosticScope;
   execute: (command: C) => Promise<R>;
   classifyRejection: (error: unknown, command: C) => CommandRejection<Reason> | null;
   refresh: () => void | Promise<unknown>;
@@ -27,30 +29,41 @@ interface LocalCommand<C> {
   issue: 'restore' | 'invalid' | 'retain' | 'display' | null;
 }
 
-function restore<C>(store: PendingCommandStore<C>): LocalCommand<C> {
+function restore<C>(store: PendingCommandStore<C>, correlation: DiagnosticScope): LocalCommand<C> {
   try {
     return { pending: store.read(), issue: null };
   } catch {
-    reportDiagnostic({ event: 'command_failure', kind: 'storage' });
+    reportDiagnostic({ ...correlation, event: 'command_failure', kind: 'storage' });
     return { pending: null, issue: 'restore' };
   }
 }
 
-function acknowledge<C>(store: PendingCommandStore<C>, command: C): Acknowledgement {
+function acknowledge<C>(
+  store: PendingCommandStore<C>,
+  command: C,
+  correlation: DiagnosticScope,
+): Acknowledgement {
   try {
     return store.acknowledge(command);
   } catch {
-    reportDiagnostic({ event: 'command_failure', kind: 'storage' });
+    reportDiagnostic({ ...correlation, event: 'command_failure', kind: 'storage' });
     return 'unavailable';
   }
 }
 
-async function refresh<C, R, Reason>(definition: StoredCommand<C, R, Reason>): Promise<boolean> {
+async function refresh<C, R, Reason>(
+  definition: StoredCommand<C, R, Reason>,
+  command: C,
+): Promise<boolean> {
   try {
     await definition.refresh();
     return false;
   } catch {
-    reportDiagnostic({ event: 'command_failure', kind: 'refresh' });
+    reportDiagnostic({
+      ...definition.correlation(command),
+      event: 'command_failure',
+      kind: 'refresh',
+    });
     return true;
   }
 }
@@ -68,19 +81,19 @@ async function execute<C, R, Reason>({
   } catch (error) {
     const rejection = definition.classifyRejection(error, command);
     if (!rejection) return { status: 'unknown' };
-    const refreshFailed = rejection.refresh ? await refresh(definition) : false;
+    const refreshFailed = rejection.refresh ? await refresh(definition, command) : false;
     return {
       status: 'rejected',
       reason: rejection.reason,
       refreshFailed,
-      acknowledgement: acknowledge(definition.store, command),
+      acknowledgement: acknowledge(definition.store, command, definition.correlation(command)),
     };
   }
   // A local cleanup or cache error cannot turn the known server result into uncertainty.
-  const refreshFailed = await refresh(definition);
+  const refreshFailed = await refresh(definition, command);
   // Refresh may await another response. Compare the slot after that wait so a later
   // command cannot be mistaken for the one this attempt is allowed to retire.
-  const acknowledgement = acknowledge(definition.store, command);
+  const acknowledgement = acknowledge(definition.store, command, definition.correlation(command));
   return { status: 'accepted', data, acknowledgement, refreshFailed };
 }
 
@@ -88,7 +101,7 @@ export function useStoredCommand<C, R, Reason = 'refused'>(
   definition: StoredCommand<C, R, Reason>,
   onAccepted?: (data: R) => void,
 ): StoredCommandState<C, R, Reason> {
-  const [local, setLocal] = useState(() => restore(definition.store));
+  const [local, setLocal] = useState(() => restore(definition.store, definition.correlation(null)));
   const inFlight = useRef(false);
   const mutation = useMutation({ mutationFn: execute<C, R, Reason>, retry: false });
   const outcome = mutation.data;
@@ -109,7 +122,11 @@ export function useStoredCommand<C, R, Reason = 'refused'>(
     try {
       definition.store.retain(command);
     } catch {
-      reportDiagnostic({ event: 'command_failure', kind: 'storage' });
+      reportDiagnostic({
+        ...definition.correlation(command),
+        event: 'command_failure',
+        kind: 'storage',
+      });
       setLocal({ ...local, issue: 'retain' });
       return;
     }
@@ -133,7 +150,11 @@ export function useStoredCommand<C, R, Reason = 'refused'>(
               try {
                 onAccepted?.(result.data);
               } catch {
-                reportDiagnostic({ event: 'command_failure', kind: 'display' });
+                reportDiagnostic({
+                  ...definition.correlation(command),
+                  event: 'command_failure',
+                  kind: 'display',
+                });
                 setLocal((current) => ({ ...current, issue: 'display' }));
               }
             }
@@ -146,7 +167,7 @@ export function useStoredCommand<C, R, Reason = 'refused'>(
   }
 
   function reload(): boolean {
-    const next = restore(definition.store);
+    const next = restore(definition.store, definition.correlation(null));
     setLocal(next);
     mutation.reset();
     return next.pending === null && next.issue === null;

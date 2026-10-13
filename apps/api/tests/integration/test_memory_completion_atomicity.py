@@ -18,9 +18,9 @@ from caliburn.features.executions.history_models import (
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.work_memory import candidate_queries, consolidation_requests
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.workflows.memory_analysis.results import AnalysisComplete, MemoryAnalysisResult
-from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.results import AnalysisComplete, MemoryAnalysisResult
 from tests.integration.test_memory_batch_orchestration import (
     complete_turn,
     execute,
@@ -60,7 +60,7 @@ def test_missing_role_preparation_rolls_back_publication_and_completion(
             if role == missing_role:
                 root = context_thread_id(writer.scope, role, HistoryWindowKind.COMPLETED_WORK)
                 context = ContextPosition(
-                    stage_thread_id(root, stage.generation_id, stage.stage_id),
+                    stage_thread_id(root, stage.stage_id),
                     "completed",
                     HistoryWindowKind.COMPLETED_WORK,
                 )

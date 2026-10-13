@@ -5,9 +5,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
-from caliburn.contracts.generated.interview_plan_view import InterviewPlanView
 from caliburn.features.interview_plans.models import PlanStateError
 from caliburn.features.job_files.models import JobFileNotFoundError
+from caliburn.transport.http.models.consultant import InterviewPlanView
 from caliburn.workflows.interview_plans import InterviewPlanReadWorkflow
 
 router = APIRouter(prefix="/api/job-files", tags=["interviews"])
@@ -23,7 +23,11 @@ def get_interview_plan_read_workflow(request: Request) -> InterviewPlanReadWorkf
 InterviewPlans = Annotated[InterviewPlanReadWorkflow, Depends(get_interview_plan_read_workflow)]
 
 
-@router.get("/{job_file_id}/interview-plan", response_model=InterviewPlanView)
+@router.get(
+    "/{job_file_id}/interview-plan",
+    response_model=InterviewPlanView,
+    operation_id="read_adopted_interview_plan",
+)
 async def read_adopted_interview_plan(
     job_file_id: UUID, response: Response, workflow: InterviewPlans
 ) -> InterviewPlanView:

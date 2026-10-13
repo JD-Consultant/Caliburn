@@ -1,5 +1,5 @@
 /** Display vocabulary only; the generated schema owns the allowed wire values. */
-import type { ConditionKind } from '../../shared/api/generated/edit-jd-conditions-request';
+import type { ConditionKind } from '../../shared/api/generated/http/types.gen';
 
 export const conditionLabels: Record<ConditionKind, string> = {
   work_environment: '工作環境',

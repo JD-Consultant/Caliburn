@@ -7,7 +7,6 @@ from openai.types.responses import FunctionToolParam
 
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.planning_instructions import (
-    FOCUS_INSTRUCTIONS,
     INTERVIEW_PLAN_INSTRUCTIONS,
 )
 from caliburn.agents.job_consultant.reference_instructions import OCCUPATION_REFERENCE_INSTRUCTIONS
@@ -19,7 +18,6 @@ class ConsultantPrompts:
     """具名提示的值；替換單一段落不需要複製整個 Agent 或改 module global。"""
 
     professional_method: str = CONSULTANT_INSTRUCTIONS
-    focus: str = FOCUS_INSTRUCTIONS
     interview_plan: str = INTERVIEW_PLAN_INSTRUCTIONS
     occupation_references: str = OCCUPATION_REFERENCE_INSTRUCTIONS
 
@@ -56,7 +54,7 @@ class ConsultantConfiguration:
         self, *, interview_plans_enabled: bool, occupation_references_enabled: bool
     ) -> str:
         """能力開關由組裝根提供；關閉能力時不送出相應操作指示。"""
-        sections = [self.prompts.professional_method, self.prompts.focus]
+        sections = [self.prompts.professional_method]
         if interview_plans_enabled:
             sections.append(self.prompts.interview_plan)
         if occupation_references_enabled:

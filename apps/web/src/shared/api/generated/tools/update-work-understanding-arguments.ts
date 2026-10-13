@@ -102,7 +102,7 @@ export interface MemoryTextChange {
 export interface MemoryBodyChange {
   field: 'body';
   /**
-   * V4A body-update hunks with enough real context for one qualified location; no file paths, Add File or Delete File operations. The editor validates all hunks, uniqueness and resulting content.
+   * 對目前 body 的 V4A 正文修改字串。每個 hunk 以獨立一行 @@ 開始；正文行第一個字元用 + 新增、- 刪除或一個空白保留上下文，其後才是正文原字元。刪除與上下文須使用目前正文的完整行；以實際換行為界，句號及畫面折行不會另成一行。保留足以唯一定位的真實上下文，hunks 按原文先後排列。不包含 Markdown 圍欄、SEARCH/REPLACE 標記、數字行號 unified diff 標頭、檔名或檔案 wrapper。@@ 及 *** End of File 是控制行，不加正文前綴；後者只在需限定文末時使用，並須結束整份 diff。新增空行是只含 + 的行；Markdown 原有的 - 是正文，不能丟掉。JSON 解碼後須為真正多行，不能仍是反斜線加 n 的單行字串。
    */
   diff: string;
 }

@@ -1,9 +1,10 @@
+import { stubHttp } from '../test-http';
 /** Saved plan selection and terminal refresh, exercised through the real pane and query cache. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../shared/api/generated/http/types.gen';
 import { InterviewPane } from './InterviewPane';
 import { consultantTurnQuery, retainTurnHint } from '../features/interview/interview-turn-api';
 
@@ -37,8 +38,7 @@ function renderPane(client = new QueryClient({ defaultOptions: { queries: { retr
 
 function stubServer(plan: string | null, turn: ConsultantTurn | null = null) {
   const state = { plan, turn };
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/interview-plan'))
         return Promise.resolve(Response.json({ job_file_id: fileId, plan: state.plan }));
@@ -76,7 +76,7 @@ test('a terminal refresh without adopted cache reports unavailable instead of in
   });
   stubServer(null, terminal);
   const existingFetch = globalThis.fetch;
-  vi.stubGlobal('fetch', (path: RequestInfo | URL, options?: RequestInit) =>
+  stubHttp((path: RequestInfo | URL, options?: RequestInit) =>
     typeof path === 'string' && path.endsWith('/interview-plan')
       ? new Promise<Response>(() => undefined)
       : existingFetch(path, options),
@@ -131,7 +131,7 @@ test.each(['completed', 'cancelled', 'failed'] as const)(
     );
     let unavailable = true;
     const previousFetch = globalThis.fetch;
-    vi.stubGlobal('fetch', (path: RequestInfo | URL, options?: RequestInit) => {
+    stubHttp((path: RequestInfo | URL, options?: RequestInit) => {
       const url = typeof path === 'string' ? path : path instanceof URL ? path.href : path.url;
       return url.endsWith('/interview-plan') && unavailable
         ? Promise.resolve(new Response(null, { status: 503 }))

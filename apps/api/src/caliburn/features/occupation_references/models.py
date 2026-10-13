@@ -35,7 +35,6 @@ class OccupationReferenceState:
 @dataclass(frozen=True, slots=True)
 class ReferenceStatePosition:
     execution_id: UUID
-    generation_id: UUID
     revision_id: UUID
     state: OccupationReferenceState
 

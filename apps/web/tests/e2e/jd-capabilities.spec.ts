@@ -6,7 +6,7 @@ import {
   isJdWorkView,
   isJobFile,
 } from '../../src/shared/api/validation';
-import type { JdWorkView } from '../../src/shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../src/shared/api/generated/http/types.gen';
 
 async function readWork(request: APIRequestContext, fileId: string): Promise<JdWorkView> {
   const response = await request.get(`/api/job-files/${fileId}/jd/work`);

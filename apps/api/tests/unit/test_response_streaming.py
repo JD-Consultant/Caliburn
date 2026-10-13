@@ -16,11 +16,10 @@ from caliburn.adapters import openai_responses as adapter
 from caliburn.adapters.response_serialization import snapshot_response
 from caliburn.adapters.response_streaming import (
     ResponseStreamCancelledError,
-    ResponseStreamCleanupError,
 )
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
-from caliburn.agent_execution.tool_steps import ResponseStepSaveError, run_response_step
-from caliburn.workflows import model_requests
+from caliburn.workflows.executions import model_requests
+from tests.fixtures.native_response_runtime import run_response_step
 from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
@@ -173,6 +172,24 @@ async def test_native_terminal_is_preserved_and_only_commentary_is_projected(sta
 
 
 @pytest.mark.asyncio
+async def test_terminal_ordinary_cleanup_returns_original_with_safe_diagnostic(caplog):
+    raw = terminal()
+    captured = []
+    wire = WireStream(wire_events(raw), close_error=OSError("PRIVATE_CLEANUP_PAYLOAD"))
+    async with client_for(wire, captured) as client:
+        result = await adapter.create_response(client, request(stream=True))
+    assert snapshot_response(result) == raw
+    assert wire.closed
+    assert len(captured) == 1
+    warning = next(
+        record for record in caplog.records if record.message == "response.stream_cleanup_failed"
+    )
+    assert warning.response_id == raw["id"]
+    assert warning.failure_kind == "OSError"
+    assert "PRIVATE_CLEANUP_PAYLOAD" not in caplog.text
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("cancelled", [False, True])
 async def test_terminal_cleanup_failure_hands_back_original_and_does_not_resend(cancelled):
     raw = terminal()
@@ -180,10 +197,13 @@ async def test_terminal_cleanup_failure_hands_back_original_and_does_not_resend(
     failure = asyncio.CancelledError() if cancelled else OSError("synthetic close failure")
     wire = WireStream(wire_events(raw), close_error=failure)
     async with client_for(wire, captured) as client:
-        error_type = ResponseStreamCancelledError if cancelled else ResponseStreamCleanupError
-        with pytest.raises(error_type) as caught:
-            await adapter.create_response(client, request(stream=True))
-    assert snapshot_response(caught.value.response) == raw
+        if cancelled:
+            with pytest.raises(ResponseStreamCancelledError) as caught:
+                await adapter.create_response(client, request(stream=True))
+            result = caught.value.response
+        else:
+            result = await adapter.create_response(client, request(stream=True))
+    assert snapshot_response(result) == raw
     assert len(captured) == 1
 
 
@@ -211,6 +231,16 @@ async def test_eof_without_terminal_never_manufactures_a_response():
 
 
 @pytest.mark.asyncio
+async def test_cleanup_failure_without_terminal_is_still_a_failure():
+    captured = []
+    wire = WireStream(wire_events(terminal())[:-1], close_error=OSError("synthetic cleanup"))
+    async with client_for(wire, captured) as client:
+        with pytest.raises(OSError):
+            await adapter.create_response(client, request(stream=True))
+    assert len(captured) == 1
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("cancelled", [False, True])
 async def test_executor_handoff_attaches_original_attempt_without_failure_retry(
     monkeypatch, cancelled
@@ -232,15 +262,14 @@ async def test_executor_handoff_attaches_original_attempt_without_failure_retry(
         executor = model_requests.ModelRequestExecutor(
             Mock(), Mock(), client, accounting, on_commentary=updates.append
         )
-        error_type = (
-            model_requests.ReceivedModelResponseCancelledError
-            if cancelled
-            else model_requests.ReceivedModelResponseError
-        )
-        with pytest.raises(error_type) as caught:
-            await executor.request_model(request(stream=True), uuid4(), 100)
-    assert caught.value.received.attempt_id == attempt_id
-    assert snapshot_response(caught.value.received.response) == raw
+        if cancelled:
+            with pytest.raises(model_requests.ReceivedModelResponseCancelledError) as caught:
+                await executor.request_model(request(stream=True), uuid4(), 100)
+            received = caught.value.received
+        else:
+            received = await executor.request_model(request(stream=True), uuid4(), 100)
+    assert received.attempt_id == attempt_id
+    assert snapshot_response(received.response) == raw
     assert len(captured) == 1
     assert updates[-1].text == "正在核對"
     assert reserve.await_count == 1
@@ -374,10 +403,7 @@ async def test_text_for_a_mismatched_output_index_is_not_public():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("cancelled", [False, True])
-async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
-    monkeypatch, cancelled
-):
+async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cancellation(monkeypatch):
     raw = terminal()
     attempt_id = uuid4()
     captured = []
@@ -391,7 +417,7 @@ async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_reserve_request", reserve)
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_record_failure", record)
     no_effects = AsyncMock(side_effect=AssertionError("Cleanup must stop before tools/accounting"))
-    failure = asyncio.CancelledError() if cancelled else OSError("synthetic cleanup")
+    failure = asyncio.CancelledError()
     async with client_for(WireStream(wire_events(raw), close_error=failure), captured) as client:
         executor = model_requests.ModelRequestExecutor(
             Mock(), Mock(), client, Mock(model=None, reserve_response_cost=lambda *_: Decimal("1"))
@@ -403,9 +429,7 @@ async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
             account_response=no_effects,
             ensure_active=AsyncMock(),
         )
-        with pytest.raises(
-            ResultSaveCancelledError if cancelled else ResponseStepSaveError
-        ) as caught:
+        with pytest.raises(ResultSaveCancelledError) as caught:
             await run_response_step(
                 saver,
                 thread_id="wire-to-original",
@@ -413,7 +437,7 @@ async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
                 runtime=runtime,
                 max_tool_calls=16,
             )
-    stop = caught.value.save_error if cancelled else caught.value
+    stop = caught.value.save_error
     assert stop.recovery.update["response_snapshot"] == raw
     assert stop.recovery.update["response_attempt_id"] == attempt_id
     saved = await saver.aget_tuple({"configurable": {"thread_id": "wire-to-original"}})

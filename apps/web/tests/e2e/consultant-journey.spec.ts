@@ -106,7 +106,7 @@ function watchBrowserErrors(page: Page): string[] {
 test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後相同，變更與 PDF 可讀', async ({
   page,
   fileId,
-}) => {
+}, testInfo) => {
   const errors = watchBrowserErrors(page);
   const started = (await scriptState(page.request)).responses;
   await page.goto(`/job-files/${fileId}`);
@@ -136,6 +136,19 @@ test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後�
   await expect(changes.getByText(/李主任/)).toBeVisible();
   await changes.getByRole('button', { name: '關閉' }).click();
 
+  await page.getByRole('button', { name: '查看這輪工具紀錄' }).click();
+  const tools = page.getByRole('dialog', { name: '這輪工具紀錄' });
+  await tools.getByText('revise_jd_profile', { exact: true }).click();
+  await expect(tools.getByText('已保存回傳', { exact: true })).toBeVisible();
+  await expect(tools.locator('pre').first()).toContainText('前端工程師');
+  await expect(tools.locator('pre').last()).not.toBeEmpty();
+  expect(await tools.innerText()).not.toContain('synthetic-opaque');
+  await page.screenshot({ path: testInfo.outputPath('completed-turn-tools.png') });
+  await page.keyboard.press('Escape');
+  await expect(tools).not.toBeVisible();
+  await expect(page.getByRole('button', { name: '查看這輪工具紀錄' })).toBeFocused();
+  expect((await scriptState(page.request)).responses - started).toBe(2);
+
   // The formal version downloads through the page's own export link as a real PDF.
   const downloading = page.waitForEvent('download');
   await page.getByRole('link', { name: '匯出目前 JD（PDF）' }).click();
@@ -154,6 +167,32 @@ test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後�
   expect(visible).not.toContain('synthetic-opaque');
   expect(visible).not.toContain('revise_jd_profile');
   expect(errors).toEqual([]);
+});
+
+test('工具紀錄讀取失敗後重試，保留鍵盤焦點且不重跑模型', async ({ page, fileId }) => {
+  await page.goto(`/job-files/${fileId}`);
+  await send(page, '職稱：前端工程師；主管：李主任');
+  await expect(page.getByText(/已記下：前端工程師、李主任/)).toBeVisible();
+  await expect(badge(page, '已完成並保存')).toBeVisible();
+  const responses = (await scriptState(page.request)).responses;
+  let failed = false;
+  await page.route('**/consultant-turns/*/tools', async (route) => {
+    if (!failed) {
+      failed = true;
+      await route.fulfill({ status: 503, json: { detail: 'synthetic_read_failure' } });
+    } else await route.continue();
+  });
+  await page.getByRole('button', { name: '處理紀錄', exact: true }).click();
+  await page.getByRole('button', { name: '查看這輪工具紀錄' }).click();
+  const dialog = page.getByRole('dialog', { name: '這輪工具紀錄' });
+  await expect(dialog.getByRole('alert')).toBeVisible();
+  const retry = dialog.getByRole('button', { name: '重新讀取工具紀錄' });
+  await retry.click();
+  await expect(dialog.getByText('revise_jd_profile', { exact: true })).toBeVisible();
+  await expect(retry).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  expect((await scriptState(page.request)).responses).toBe(responses);
 });
 
 test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回同一處理，暫停停妥後續作，不重送輸入', async ({

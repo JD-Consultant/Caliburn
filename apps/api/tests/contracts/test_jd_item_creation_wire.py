@@ -12,13 +12,12 @@ from caliburn.features.job_description.areas import CreateArea, InvalidAreaChang
 from caliburn.features.job_description.capabilities import CapabilityKind, CreateCapability
 from caliburn.features.job_description.collaborators import CreateCollaborator
 from caliburn.features.job_description.conditions import ConditionKind, CreateCondition
-from caliburn.features.job_description.sources import MemorySourceLayer
-from caliburn.transport.model_tools.jd_item_creation_wire import parse_item_creation
-from caliburn.workflows.jd_sources import (
-    CurrentInputSourceSelection,
+from caliburn.features.job_description.source_intents import (
     InterviewSourceSelection,
     MemorySourceSelection,
 )
+from caliburn.features.job_description.sources import MemorySourceLayer
+from caliburn.transport.model_tools.jd_item_creation_wire import parse_item_creation
 
 
 def schema() -> dict:
@@ -79,7 +78,7 @@ def test_all_source_choices_map_without_model_ids_or_qualification_bypass() -> N
                     "title": "網站交付",
                     "scope_text": None,
                     "supporting_sources": [
-                        {"kind": "current_input"},
+                        {"kind": "interview", "interview_sequence": 2},
                         {"kind": "interview", "interview_sequence": 3},
                         {"kind": "work_situation", "target_title": " 網站頁面交付 "},
                         {"kind": "work_understanding", "target_title": "網站前端交付"},
@@ -89,7 +88,7 @@ def test_all_source_choices_map_without_model_ids_or_qualification_bypass() -> N
         )
     )
     assert parsed.sources == (
-        CurrentInputSourceSelection(),
+        InterviewSourceSelection(2),
         InterviewSourceSelection(3),
         MemorySourceSelection(MemorySourceLayer.WORK_SITUATION, " 網站頁面交付 "),
         MemorySourceSelection(MemorySourceLayer.WORK_UNDERSTANDING, "網站前端交付"),
@@ -126,7 +125,9 @@ def test_wire_rejects_other_kinds_missing_fields_cross_variant_fields_and_app_id
         {
             "item": {
                 **item,
-                "supporting_sources": [{"kind": "current_input", "source_id": "forged"}],
+                "supporting_sources": [
+                    {"kind": "interview", "interview_sequence": 2, "source_id": "forged"}
+                ],
             }
         },
         *[

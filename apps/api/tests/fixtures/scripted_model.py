@@ -68,12 +68,14 @@ class ScriptedModel:
             )
         if not request.url.path.endswith("/responses"):
             return _error(404, "not_found", "This path is not scripted")
-        text, tool_steps = _current_input(payload["input"])
+        text, tool_steps, interview_sequence = _current_input(payload["input"])
         if REJECT_MARKER in text:
             return _error(400, "invalid_request", "Synthetic known rejection")
         self._sequence += 1
         self.responses_sent += 1
-        raw = _raw_response(self._sequence, self._output(self._sequence, text, tool_steps))
+        raw = _raw_response(
+            self._sequence, self._output(self._sequence, text, tool_steps, interview_sequence)
+        )
         if not payload.get("stream"):
             return httpx2.Response(200, json=raw)
         hold = _holds(text, tool_steps)
@@ -83,7 +85,9 @@ class ScriptedModel:
             stream=_EventStream(self._events(raw, hold)),
         )
 
-    def _output(self, number: int, text: str, tool_steps: int) -> list[dict[str, Any]]:
+    def _output(
+        self, number: int, text: str, tool_steps: int, interview_sequence: int
+    ) -> list[dict[str, Any]]:
         reasoning = {
             "id": f"rs_{number}",
             "type": "reasoning",
@@ -104,7 +108,11 @@ class ScriptedModel:
                 for field, value in fields.items()
                 for change in (
                     {"action": "set_field", "field": field, "value": value},
-                    {"action": "add_source", "field": field, "source": {"kind": "current_input"}},
+                    {
+                        "action": "add_source",
+                        "field": field,
+                        "source": {"kind": "interview", "interview_sequence": interview_sequence},
+                    },
                 )
             ]
             return [
@@ -222,14 +230,17 @@ def _answer(fields: dict[str, str]) -> str:
     return f"已記下：{'、'.join(fields.values())}。{QUESTION_TEXT}"
 
 
-def _current_input(input_items: list[dict[str, Any]]) -> tuple[str, int]:
-    """The newest plain user text is the employee's input; tool outputs after it are Steps."""
+def _current_input(input_items: list[dict[str, Any]]) -> tuple[str, int, int]:
+    """Read the numbered employee input; tool outputs after it are Steps."""
     for index in range(len(input_items) - 1, -1, -1):
         item = input_items[index]
         if item.get("role") == "user" and isinstance(item.get("content"), str):
             later = input_items[index + 1 :]
-            return item["content"], sum(
-                1 for entry in later if entry.get("type") == "function_call_output"
+            current = json.loads(item["content"])
+            return (
+                current["text"],
+                sum(1 for entry in later if entry.get("type") == "function_call_output"),
+                current["interview_sequence"],
             )
     raise ValueError("The scripted provider needs a user message")
 

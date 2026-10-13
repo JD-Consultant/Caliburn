@@ -39,7 +39,7 @@ class MemoryBodyAppliedChange(BaseModel):
     field: Literal["body"]
     diff: StrictStr = Field(
         ...,
-        description="Observed difference formed from actual before/after body content, including the applied location and necessary context. Not an unconditional echo of requested hunks or another command.",
+        description="Observed difference formed from actual before/after body content, including the applied location and necessary context. This display diff is not executable V4A input and cannot be directly submitted as the next update; it is not an echo of requested hunks.",
         min_length=1,
     )
 

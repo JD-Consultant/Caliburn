@@ -1,10 +1,11 @@
+import { stubHttp } from '../../test-http';
 import { StrictMode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
-import type { ReasoningSummary } from '../../shared/api/generated/reasoning-summary';
+import type { ConsultantTurn, ReasoningSummary } from '../../shared/api/generated/http/types.gen';
+
 import { InterviewComposer } from './InterviewComposer';
 import { HistoricalTurnMessages } from './HistoricalTurnMessages';
 import { consultantTurnQuery, readTurnHint, retainTurnHint } from './interview-turn-api';
@@ -81,7 +82,7 @@ function mount(
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>(async (path) =>
     Response.json(path.endsWith('/reasoning-summaries') ? await readSummaries() : read()),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const content = (id: string) => (
     <QueryClientProvider client={client}>
       {strict ? (

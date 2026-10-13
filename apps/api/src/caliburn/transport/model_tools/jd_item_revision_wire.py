@@ -2,14 +2,10 @@
 
 from caliburn.contracts.generated.tools import revise_jd_item_arguments as wire
 from caliburn.contracts.validation import parse_contract
-from caliburn.features.job_description.sources import MemorySourceLayer
-from caliburn.features.job_description.tasks import DetailKind
-from caliburn.workflows.jd_item_revision import (
+from caliburn.features.job_description.item_revision import (
     AddItemDetail,
     AddItemSource,
     AlignItemSource,
-    CapabilitySourceTarget,
-    DetailSourceTarget,
     ItemFieldChange,
     ItemRevisionChange,
     ItemSourceSelection,
@@ -21,12 +17,13 @@ from caliburn.workflows.jd_item_revision import (
     ReviseItemInput,
     SetItemCapability,
 )
-from caliburn.workflows.jd_sources import (
-    CurrentInputSourceSelection,
+from caliburn.features.job_description.source_intents import (
     InterviewSourceSelection,
     JdSourceSelection,
     MemorySourceSelection,
 )
+from caliburn.features.job_description.sources import MemorySourceLayer
+from caliburn.features.job_description.tasks import DetailKind
 
 
 def parse_item_revision(arguments: str) -> ReviseItemInput:
@@ -44,7 +41,6 @@ def parse_item_revision(arguments: str) -> ReviseItemInput:
                 AddItemDetail(
                     DetailKind(change.kind.value),
                     change.text,
-                    tuple(_source(source) for source in change.supporting_sources),
                 )
             )
         elif isinstance(change, wire.ReviseTaskDetail):
@@ -56,7 +52,6 @@ def parse_item_revision(arguments: str) -> ReviseItemInput:
                 SetItemCapability(
                     change.capability_read_ref,
                     True,
-                    tuple(_source(source) for source in change.supporting_sources),
                 )
             )
         elif isinstance(change, wire.UnlinkCapability):
@@ -89,17 +84,10 @@ def parse_item_revision(arguments: str) -> ReviseItemInput:
 
 def _source(value: wire.Source) -> JdSourceSelection:
     source = value.root
-    if isinstance(source, wire.CurrentInputSource):
-        return CurrentInputSourceSelection()
     if isinstance(source, wire.InterviewSource):
         return InterviewSourceSelection(source.interview_sequence)
     return MemorySourceSelection(MemorySourceLayer(source.kind.value), source.target_title)
 
 
 def _target(value: wire.SourceTarget) -> ItemSourceSelection:
-    target = value.root
-    if isinstance(target, wire.ItemTarget):
-        return ItemSourceTarget()
-    if isinstance(target, wire.DetailTarget):
-        return DetailSourceTarget(target.detail_read_ref)
-    return CapabilitySourceTarget(target.capability_read_ref)
+    return ItemSourceTarget()

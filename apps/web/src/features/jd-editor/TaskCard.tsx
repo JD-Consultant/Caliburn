@@ -1,7 +1,7 @@
 /** One task with its outcomes, requirements and knowledge/skill links; intents go up unchanged. */
 import { useRef } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
+import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/http/types.gen';
 import { IconAction } from '../../shared/ui/IconAction';
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
 import { FoldToggle } from './FoldToggle';

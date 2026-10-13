@@ -12,7 +12,6 @@ from caliburn.agents.job_consultant.configuration import (
 )
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.planning_instructions import (
-    FOCUS_INSTRUCTIONS,
     INTERVIEW_PLAN_INSTRUCTIONS,
 )
 from caliburn.agents.job_consultant.reference_instructions import OCCUPATION_REFERENCE_INSTRUCTIONS
@@ -22,7 +21,7 @@ from caliburn.agents.job_consultant.tools import consultant_tool_definitions
 @pytest.mark.parametrize("plans", [False, True])
 @pytest.mark.parametrize("references", [False, True])
 def test_default_configuration_preserves_current_instruction_bundle(plans, references):
-    expected = CONSULTANT_INSTRUCTIONS + "\n\n" + FOCUS_INSTRUCTIONS
+    expected = CONSULTANT_INSTRUCTIONS
     if plans:
         expected += "\n\n" + INTERVIEW_PLAN_INSTRUCTIONS
     if references:
@@ -39,10 +38,12 @@ def test_two_candidates_keep_prompts_and_nested_tool_contracts_independent():
     defaults = ConsultantConfiguration()
     left = replace(
         defaults,
-        prompts=replace(ConsultantPrompts(), focus="候選甲：先問具體事件。"),
+        prompts=replace(ConsultantPrompts(), professional_method="候選甲：先問具體事件。"),
         tool_descriptions=(ToolDescriptionOverride("read_jd", "候選甲：讀取現行 JD。"),),
     )
-    right = replace(defaults, prompts=replace(ConsultantPrompts(), focus="候選乙：先核對範圍。"))
+    right = replace(
+        defaults, prompts=replace(ConsultantPrompts(), professional_method="候選乙：先核對範圍。")
+    )
     original = consultant_tool_definitions()
     first = left.describe_tools(original)
     second = right.describe_tools(original)
@@ -52,10 +53,10 @@ def test_two_candidates_keep_prompts_and_nested_tool_contracts_independent():
         tool for tool in second if tool["name"] == "read_jd"
     )
     assert first != second
-    assert right.prompts.focus == "候選乙：先核對範圍。"
-    assert defaults.prompts.focus == FOCUS_INSTRUCTIONS
+    assert right.prompts.professional_method == "候選乙：先核對範圍。"
+    assert defaults.prompts.professional_method == CONSULTANT_INSTRUCTIONS
     with pytest.raises(FrozenInstanceError):
-        left.prompts.focus = "不可修改"
+        left.prompts.professional_method = "不可修改"
 
 
 def test_tool_variant_cannot_silently_target_a_missing_or_duplicate_tool():

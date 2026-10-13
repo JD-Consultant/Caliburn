@@ -10,8 +10,8 @@ from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.interviews.models import SubmitInterviewInput
 from caliburn.transport.http.consultant_turns import get_consultant_status_workflow
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.status import ConsultantStatusWorkflow
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 from tests.integration.test_jd_capabilities import create_capability, edit
 

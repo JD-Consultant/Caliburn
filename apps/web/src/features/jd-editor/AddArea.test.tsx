@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 /** A responsibility is added where it will appear (Things, Notion, Linear): a row at the end of the list becomes a field. */
@@ -5,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 import { JdWorkEditor } from './JdWorkEditor';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
@@ -55,7 +56,7 @@ function stubServer(view: JdWorkView = empty, answer?: Answer) {
     saved = true;
     return Promise.resolve(Response.json({ revision_id: revision, areas: created.areas }));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return {
     writes: () =>
       fetch.mock.calls

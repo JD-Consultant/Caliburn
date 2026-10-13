@@ -2,7 +2,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Chip, Tab, Tabs, Typography } from '@mui/material';
-import type { Reference } from '../../shared/api/generated/jd-sources-view';
+import type { Reference } from '../../shared/api/generated/http/types.gen';
 import { IconAction } from '../../shared/ui/IconAction';
 import { ArrowBackIcon, CloseIcon, RefreshIcon } from '../../shared/ui/icons';
 import { describeSourceError, jdSourcesQuery } from './source-api';
@@ -122,9 +122,10 @@ function SourceSheet({
       : view.references
     : [];
   const [only] = shown;
+  const listKey = view ? `${view.revision_id}:${String(sources.dataUpdatedAt)}` : '';
   // A new read of the list starts the sheet over; a filter that leaves one source opens it at once.
   const { selected, returnTo, open, back } = useSourceSelection(
-    view ? `${view.revision_id}:${String(sources.dataUpdatedAt)}` : '',
+    listKey,
     onlyCitationIds && shown.length === 1 && only
       ? { citationId: only.citation_id, view: 'content' }
       : null,
@@ -161,7 +162,7 @@ function SourceSheet({
           view &&
           (reference && selected ? (
             <SourceDetailView
-              key={reference.citation_id}
+              key={`${listKey}:${reference.citation_id}`}
               scope={{ jobFileId, revisionId: view.revision_id, citationId: reference.citation_id }}
               reference={reference}
               view={selected.view}

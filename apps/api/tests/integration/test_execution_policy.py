@@ -13,7 +13,7 @@ from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import BudgetConflictError, ExecutionBudget
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.settings import ModelSettings
-from caliburn.workflows.model_runtime import fix_execution_policy
+from caliburn.workflows.executions.model_runtime import fix_execution_policy
 
 pytestmark = pytest.mark.postgres
 

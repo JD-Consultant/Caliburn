@@ -12,8 +12,8 @@ from caliburn.adapters.response_serialization import NativeItems, NativeSnapshot
 from caliburn.features.executions.history_models import stage_thread_id
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.memory_context import (
+from caliburn.workflows.executions.context_history import RoleContextHistory
+from caliburn.workflows.work_memory.context import (
     MemoryAnalysisContextData,
     MemoryAnalysisContextWorkflow,
 )
@@ -76,7 +76,7 @@ async def capture_analysis_context(
     builder.add_edge(START, "capture")
     builder.add_edge("capture", END)
     graph = builder.compile(checkpointer=history.checkpointer)
-    thread_id = stage_thread_id(history.response_thread_id, stage.generation_id, stage.stage_id)
+    thread_id = stage_thread_id(history.response_thread_id, stage.stage_id)
     config: RunnableConfig = {
         "configurable": {
             "thread_id": f"{thread_id}:context",

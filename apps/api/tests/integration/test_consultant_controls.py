@@ -15,7 +15,7 @@ from psycopg.conninfo import make_conninfo
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.process_lock import PostgresProcessLock
-from caliburn.agent_execution.tool_steps import PausedResponseLoop
+from caliburn.agent_execution.response_runtime import PausedResponseLoop
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.features.executions import budgets
 from caliburn.features.executions import service as executions
@@ -29,9 +29,9 @@ from caliburn.features.executions.models import (
 from caliburn.features.job_description import candidate_service
 from caliburn.features.job_description.candidates import CandidateStateError
 from caliburn.settings import DatabaseSettings, ModelSettings
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.consultant_controls import ConsultantControlWorkflow
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.controls import ConsultantControlWorkflow
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
 from tests.fixtures.response_loop import response_at
 from tests.integration.test_consultant_completion import complete, start_turn
 from tests.integration.test_execution_control import admit_scope
@@ -172,7 +172,7 @@ def test_resume_original_interrupt_without_new_model_request_or_budget(
     pause_before_completion: bool,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from caliburn.workflows.consultant_controls import run_consultant_with_controls
+    from caliburn.workflows.consultant_turns.controls import run_consultant_with_controls
 
     created = client.post(
         "/api/job-files",
@@ -183,6 +183,9 @@ def test_resume_original_interrupt_without_new_model_request_or_budget(
         },
     ).json()
     file_id = UUID(created["job_file_id"])
+    from tests.integration.test_jd_manual_changes import manual_profile
+
+    manual_profile(client, file_id, "purpose", "暫停仍保留的人工使命")
     accepted = client.post(
         f"/api/job-files/{file_id}/inputs",
         json={
@@ -316,6 +319,8 @@ def test_resume_original_interrupt_without_new_model_request_or_budget(
                 assert after == before
                 assert usage_after == usage_before
                 assert len(sent) == 1
+                assert "人工最終差異" in sent[0]["input"][-2]["content"]
+                assert "暫停仍保留的人工使命" in sent[0]["input"][-2]["content"]
             finally:
                 returned.set()
                 if resume_task is not None:

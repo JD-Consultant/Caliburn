@@ -13,7 +13,7 @@ export interface CreateWorkUnderstandingArguments {
    */
   description: string;
   /**
-   * Complete initial Markdown body, with known facts and unknowns distinguished. References belong in the separate reference collection, not the body.
+   * Complete initial Markdown understanding useful without reading every situation. Preserve necessary scope, responsibility, conditions, rules, methods and exact values/deadlines; distinguish unknowns. Do not require one understanding per situation or JD item. References belong in the separate reference collection, not the body.
    */
   body: string;
   /**

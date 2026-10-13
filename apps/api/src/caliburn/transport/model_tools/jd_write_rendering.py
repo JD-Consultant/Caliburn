@@ -5,8 +5,8 @@ from caliburn.features.job_description.item_results import (
     JdItemDeletionResult,
     JdItemMovementResult,
 )
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.navigation import jd_read_ref
-from caliburn.workflows.jd_model_references import JdModelReferences
 
 type JdWriteResult = JdCompoundEditResult | JdItemDeletionResult | JdItemMovementResult
 

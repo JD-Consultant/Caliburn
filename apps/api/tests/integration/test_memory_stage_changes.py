@@ -16,12 +16,12 @@ from caliburn.features.work_memory.candidates import (
     MemoryPermissionError,
     ReviseMemoryObject,
 )
+from caliburn.features.work_memory.handoff_queries import read_situation_handoff_snapshot
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.features.work_memory.stage_changes import build_situation_handoff_changes
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_stage_changes import read_situation_handoff_snapshot
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres

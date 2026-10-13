@@ -8,7 +8,7 @@ import pytest
 
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
-from caliburn.workflows.execution_failures import run_with_failure_boundary
+from caliburn.workflows.executions.failure_boundary import run_with_failure_boundary
 
 
 async def test_execution_boundary_exposes_scope_in_safe_log_context(caplog):

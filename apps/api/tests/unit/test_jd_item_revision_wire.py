@@ -5,20 +5,20 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from caliburn.features.job_description.tasks import DetailKind
-from caliburn.transport.model_tools.jd_item_revision_wire import parse_item_revision
-from caliburn.workflows.jd_item_revision import (
+from caliburn.features.job_description.item_revision import (
     AddItemDetail,
     AddItemSource,
-    CapabilitySourceTarget,
     ItemFieldChange,
+    ItemSourceTarget,
     ReorderItemCapability,
     SetItemCapability,
 )
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
+from caliburn.features.job_description.tasks import DetailKind
+from caliburn.transport.model_tools.jd_item_revision_wire import parse_item_revision
 
 
-def test_revision_wire_keeps_full_text_and_precise_relation_source():
+def test_revision_wire_keeps_full_text_and_shared_task_source():
     intent = parse_item_revision(
         json.dumps(
             {
@@ -30,15 +30,13 @@ def test_revision_wire_keeps_full_text_and_precise_relation_source():
                         "action": "add_detail",
                         "kind": "requirement",
                         "text": "完整要求",
-                        "supporting_sources": [],
                     },
                     {
                         "action": "add_source",
                         "target": {
-                            "kind": "capability_relation",
-                            "capability_read_ref": "skill_app",
+                            "kind": "item",
                         },
-                        "source": {"kind": "current_input"},
+                        "source": {"kind": "interview", "interview_sequence": 2},
                     },
                     {
                         "action": "set_capability",
@@ -59,7 +57,7 @@ def test_revision_wire_keeps_full_text_and_precise_relation_source():
         ItemFieldChange("description", "完整新值"),
         ItemFieldChange("title", None),
         AddItemDetail(DetailKind.REQUIREMENT, "完整要求"),
-        AddItemSource(CapabilitySourceTarget("skill_app"), CurrentInputSourceSelection()),
+        AddItemSource(ItemSourceTarget(), InterviewSourceSelection(2)),
         SetItemCapability("knowledge_app", False),
         ReorderItemCapability("skill_app", "after", "skill_neighbor"),
     )

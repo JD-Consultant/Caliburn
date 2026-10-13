@@ -1,16 +1,14 @@
 """Typed job-wide condition HTTP intents; no storage or transaction logic."""
 
-from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
-from caliburn.contracts.generated import edit_jd_conditions_request as wire
-from caliburn.contracts.generated.jd_conditions_view import Condition, JdConditionsView, Kind
 from caliburn.features.job_description import conditions
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.transport.http.contracts import canonical_body
 from caliburn.transport.http.jd_dependencies import JdEditing
+from caliburn.transport.http.models import jd_conditions_edits as wire
+from caliburn.transport.http.models.jd_views import Condition, JdConditionsView
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
 
@@ -24,7 +22,7 @@ def _change_from_wire(
     match change:
         case wire.CreateCondition():
             return conditions.CreateCondition(
-                conditions.ConditionKind(change.kind.value),
+                change.kind,
                 change.text,
             )
         case wire.ReviseCondition():
@@ -33,7 +31,7 @@ def _change_from_wire(
                 tuple(
                     conditions.ConditionTextChange(item.value)
                     if isinstance(item, wire.ConditionTextChange)
-                    else conditions.ConditionKindChange(conditions.ConditionKind(item.value.value))
+                    else conditions.ConditionKindChange(item.value)
                     for item in change.changes
                 ),
             )
@@ -49,7 +47,7 @@ def conditions_view(result: conditions.JdConditionsRevision) -> JdConditionsView
         conditions=[
             Condition(
                 condition_id=condition.condition_id,
-                kind=Kind(condition.kind.value),
+                kind=condition.kind,
                 text=condition.text,
             )
             for condition in result.conditions
@@ -57,7 +55,7 @@ def conditions_view(result: conditions.JdConditionsRevision) -> JdConditionsView
     )
 
 
-@router.get("/conditions", response_model=JdConditionsView)
+@router.get("/conditions", response_model=JdConditionsView, operation_id="read_jd_conditions")
 async def read_conditions(job_file_id: UUID, workflow: JdEditing) -> JdConditionsView:
     try:
         return conditions_view(await workflow.read_conditions(job_file_id))
@@ -65,10 +63,10 @@ async def read_conditions(job_file_id: UUID, workflow: JdEditing) -> JdCondition
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
 
 
-@router.post("/conditions", response_model=JdConditionsView)
+@router.post("/conditions", response_model=JdConditionsView, operation_id="edit_jd_conditions")
 async def edit_conditions(
     job_file_id: UUID,
-    body: Annotated[wire.EditJdConditionsRequest, canonical_body(wire.EditJdConditionsRequest)],
+    body: wire.EditJdConditionsRequest,
     workflow: JdEditing,
 ) -> JdConditionsView:
     try:

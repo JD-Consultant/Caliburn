@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import type { RefObject } from 'react';
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 import { isEditJdTasksRequest } from '../../shared/api/validation';
 import { AddIcon } from '../../shared/ui/icons';
 import { UNASSIGNED, areaChoices } from './area-choice';

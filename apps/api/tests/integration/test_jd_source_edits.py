@@ -19,7 +19,7 @@ from caliburn.features.job_description.sources import (
     ReviseJdSources,
     SourceTargetKind,
 )
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
 from tests.fixtures.consultant_turn import start_consultant_turn as start
 from tests.fixtures.consultant_turn import transact
 
@@ -82,8 +82,8 @@ def test_candidate_source_edit_replay_content_change_and_explicit_alignment(
         ),
     )
     pending = references(client, writer, reverted.revision_id)[0]
-    assert pending.needs_review
-    assert pending.reviewed_revision_id == basis.reviewed_revision_id
+    assert not pending.needs_review
+    assert pending.reviewed_revision_id == reverted.revision_id
     assert client.portal.call(workflow.edit, writer, initial.scope, add) == linked
     assert client.portal.call(workflow.read, writer.scope).position == reverted
     duplicate = client.portal.call(
@@ -93,7 +93,7 @@ def test_candidate_source_edit_replay_content_change_and_explicit_alignment(
         ReviseJdSources(uuid4(), reverted.revision_id, target, (AddJdSource(source),)),
     )
     assert duplicate.revision_id == reverted.revision_id
-    assert references(client, writer, duplicate.revision_id)[0].needs_review
+    assert not references(client, writer, duplicate.revision_id)[0].needs_review
     aligned = client.portal.call(
         workflow.edit,
         writer,
@@ -103,6 +103,7 @@ def test_candidate_source_edit_replay_content_change_and_explicit_alignment(
         ),
     )
     assert not references(client, writer, aligned.revision_id)[0].needs_review
+    assert aligned == reverted
     assert (
         references(client, writer, aligned.revision_id)[0].reviewed_revision_id
         == aligned.revision_id

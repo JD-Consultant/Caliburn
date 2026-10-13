@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import { availableParallelism } from 'node:os';
 import process from 'node:process';
 import { defineConfig } from 'vitest/config';
 
@@ -17,6 +18,8 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
+    // 限制同時建立的 UI 環境，保留每檔隔離與既有測試時間限制。
+    maxWorkers: Math.min(4, availableParallelism()),
     setupFiles: ['./src/test-setup.ts'],
     restoreMocks: true,
   },

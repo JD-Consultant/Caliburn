@@ -2,6 +2,7 @@
 
 import json
 from collections.abc import Awaitable, Callable
+from functools import partial
 from uuid import UUID, uuid4
 
 import pytest
@@ -11,24 +12,29 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description import source_persistence
+from caliburn.features.job_description.compound_edits import ReviseProfileWithSources
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.models import ProfileField, SetProfileField
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
 from caliburn.features.job_description.source_persistence import read_source_references
 from caliburn.features.job_description.sources import InvalidJdSourceError, JdSourceReference
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow
-from caliburn.workflows.jd_item_deletion import JdItemDeletionWorkflow
-from caliburn.workflows.jd_item_movement import JdItemMovementWorkflow
-from caliburn.workflows.jd_item_revision import JdItemRevisionWorkflow
-from caliburn.workflows.jd_profile_writes import (
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.compound_writes import (
+    PreparedJdEdit,
+    execute_prepared_jd_edit,
+)
+from caliburn.workflows.job_description.item_creation import JdItemCreationWorkflow
+from caliburn.workflows.job_description.item_deletion import JdItemDeletionWorkflow
+from caliburn.workflows.job_description.item_movement import JdItemMovementWorkflow
+from caliburn.workflows.job_description.item_revision import JdItemRevisionWorkflow
+from caliburn.workflows.job_description.profile_writes import (
     AddProfileSource,
     AlignProfileSource,
     JdProfileWriteWorkflow,
-    PreparedProfileWrite,
 )
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection
-from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.task_writes import JdTaskWriteWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 
 pytestmark = pytest.mark.postgres
 
@@ -70,6 +76,8 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
         JdTaskWriteWorkflow(client.app.state.database.sessions),
         binding,
         writer,
+        references=JdModelReferences(client.app.state.database.sessions, scope.job_file_id),
+        execute_edit=partial(execute_prepared_jd_edit, client.app.state.database.sessions),
         creations=JdItemCreationWorkflow(client.app.state.database.sessions),
         revisions=JdItemRevisionWorkflow(client.app.state.database.sessions),
         deletions=JdItemDeletionWorkflow(client.app.state.database.sessions),
@@ -86,7 +94,7 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
             changes=(SetProfileField(ProfileField.JOB_TITLE, text),),
             sources=(AlignProfileSource(ProfileField.JOB_TITLE, "citation_missing"),)
             if missing
-            else (AddProfileSource(ProfileField.JOB_TITLE, CurrentInputSourceSelection()),),
+            else (AddProfileSource(ProfileField.JOB_TITLE, InterviewSourceSelection(2)),),
         )
 
     prepared = client.portal.call(
@@ -99,14 +107,15 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
                     {
                         "action": "add_source",
                         "field": "job_title",
-                        "source": {"kind": "current_input"},
+                        "source": {"kind": "interview", "interview_sequence": 2},
                     },
                 ]
             }
         ),
         uuid4(),
     )
-    assert isinstance(prepared, PreparedProfileWrite)
+    assert isinstance(prepared, PreparedJdEdit)
+    assert isinstance(prepared.command, ReviseProfileWithSources)
     original_insert = source_persistence.insert_source_references
 
     async def fail_after_source_write(
@@ -131,7 +140,10 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
         client, lambda s: read_source_references(s, file_id, changed.position.revision_id)
     )
     assert len(sources) == 1 and not sources[0].needs_review
-    assert client.portal.call(workflow.execute, writer, prepared).effect == "updated"
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared).effect
+        == "updated"
+    )
     assert client.portal.call(candidates.read, scope).position == changed.position
     with pytest.raises(InvalidJdSourceError):
         client.portal.call(lambda: prepare("不能留下的變更", missing=True))

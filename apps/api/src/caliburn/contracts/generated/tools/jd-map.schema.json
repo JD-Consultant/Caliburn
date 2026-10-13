@@ -4,62 +4,209 @@
   "description": "Complete navigation of the App-bound visible JD. Previews are excerpts, not edit bases or instructions. Empty collections are complete empty results. read_ref selects an item, never grants permission or selects a version.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["profile", "responsibility_areas", "unassigned_work_tasks", "required_knowledge", "required_skills", "main_collaborators", "job_wide_conditions"],
+  "required": [
+    "profile",
+    "responsibility_areas",
+    "unassigned_work_tasks",
+    "required_knowledge",
+    "required_skills",
+    "main_collaborators",
+    "job_wide_conditions"
+  ],
   "properties": {
-    "profile": {"$ref": "#/$defs/JdProfileMap"},
-    "responsibility_areas": {"type": "array", "items": {"$ref": "#/$defs/JdAreaMap"}},
-    "unassigned_work_tasks": {"type": "array", "items": {"$ref": "#/$defs/JdTaskMap"}},
-    "required_knowledge": {"type": "array", "items": {"$ref": "#/$defs/JdNamedMapItem"}},
-    "required_skills": {"type": "array", "items": {"$ref": "#/$defs/JdNamedMapItem"}},
-    "main_collaborators": {"type": "array", "items": {"$ref": "#/$defs/JdNamedMapItem"}},
-    "job_wide_conditions": {"type": "array", "items": {"$ref": "#/$defs/JdConditionMapItem"}}
+    "profile": {
+      "$ref": "#/$defs/JdProfileMap"
+    },
+    "responsibility_areas": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdAreaMap"
+      }
+    },
+    "unassigned_work_tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdTaskMap"
+      }
+    },
+    "required_knowledge": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdNamedMapItem"
+      }
+    },
+    "required_skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdNamedMapItem"
+      }
+    },
+    "main_collaborators": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdNamedMapItem"
+      }
+    },
+    "job_wide_conditions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/JdConditionMapItem"
+      }
+    }
   },
   "$defs": {
     "JdProfileMap": {
-      "type": "object", "additionalProperties": false,
-      "required": ["job_title", "organization_unit", "reports_to"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "job_title",
+        "organization_unit",
+        "reports_to",
+        "needs_recheck"
+      ],
       "properties": {
-        "job_title": {"type": ["string", "null"]},
-        "organization_unit": {"type": ["string", "null"]},
-        "reports_to": {"type": ["string", "null"]},
-        "job_purpose_preview": {"type": "string"}
+        "job_title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "organization_unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reports_to": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "job_purpose_preview": {
+          "type": "string"
+        },
+        "needs_recheck": {
+          "type": "boolean"
+        }
       }
     },
     "JdTaskMap": {
-      "type": "object", "additionalProperties": false,
-      "required": ["read_ref", "title", "outcome_count", "requirement_count"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_ref",
+        "title",
+        "outcome_count",
+        "requirement_count",
+        "needs_recheck"
+      ],
       "properties": {
-        "read_ref": {"type": "string", "minLength": 1},
-        "title": {"type": ["string", "null"]},
-        "work_preview": {"type": "string"},
-        "outcome_count": {"type": "integer", "maximum": 9007199254740991, "minimum": 0},
-        "requirement_count": {"type": "integer", "maximum": 9007199254740991, "minimum": 0}
+        "read_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "work_preview": {
+          "type": "string"
+        },
+        "outcome_count": {
+          "type": "integer",
+          "maximum": 9007199254740991,
+          "minimum": 0
+        },
+        "requirement_count": {
+          "type": "integer",
+          "maximum": 9007199254740991,
+          "minimum": 0
+        },
+        "needs_recheck": {
+          "type": "boolean"
+        }
       }
     },
     "JdAreaMap": {
-      "type": "object", "additionalProperties": false,
-      "required": ["read_ref", "title", "work_tasks"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_ref",
+        "title",
+        "work_tasks",
+        "needs_recheck"
+      ],
       "properties": {
-        "read_ref": {"type": "string", "minLength": 1},
-        "title": {"type": ["string", "null"]},
-        "scope_preview": {"type": "string"},
-        "work_tasks": {"type": "array", "items": {"$ref": "#/$defs/JdTaskMap"}}
+        "read_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_preview": {
+          "type": "string"
+        },
+        "work_tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JdTaskMap"
+          }
+        },
+        "needs_recheck": {
+          "type": "boolean"
+        }
       }
     },
     "JdNamedMapItem": {
-      "type": "object", "additionalProperties": false,
-      "required": ["read_ref", "name"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_ref",
+        "name",
+        "needs_recheck"
+      ],
       "properties": {
-        "read_ref": {"type": "string", "minLength": 1},
-        "name": {"type": ["string", "null"]}
+        "read_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "needs_recheck": {
+          "type": "boolean"
+        }
       }
     },
     "JdConditionMapItem": {
-      "type": "object", "additionalProperties": false,
-      "required": ["read_ref", "description_preview"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_ref",
+        "description_preview",
+        "needs_recheck"
+      ],
       "properties": {
-        "read_ref": {"type": "string", "minLength": 1},
-        "description_preview": {"type": "string"}
+        "read_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description_preview": {
+          "type": "string"
+        },
+        "needs_recheck": {
+          "type": "boolean"
+        }
       }
     }
   }

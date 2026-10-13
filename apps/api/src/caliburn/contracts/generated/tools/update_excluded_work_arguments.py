@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictStr
 class AddItem(RootModel[StrictStr]):
     root: StrictStr = Field(
         ...,
+        description="一筆完整範圍文字，須含非空白內容且不含 NUL；系統保留原文字，不自動修剪空白。",
         min_length=1,
         pattern="[^\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]",
     )
@@ -15,6 +16,7 @@ class AddItem(RootModel[StrictStr]):
 class RemoveItem(RootModel[StrictStr]):
     root: StrictStr = Field(
         ...,
+        description="一筆完整範圍文字，須含非空白內容且不含 NUL；系統保留原文字，不自動修剪空白。",
         min_length=1,
         pattern="[^\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]",
     )
@@ -26,9 +28,9 @@ class UpdateExcludedWorkArguments(BaseModel):
     )
     add: list[AddItem] = Field(
         ...,
-        description="員工明確表示沒做或不負責的工作範圍；未知、沒回答或拒答不能當作沒做。不用公版職稱或任務代碼代替實際範圍。",
+        description="新增的工作範圍文字，依員工明確表示沒做或不負責的內容填寫；沒有新增時填 []。完整文字去重，不得與 remove 有相同文字。",
     )
     remove: list[RemoveItem] = Field(
         ...,
-        description="員工更正後解除的舊排除範圍，使用 state 中的完整精確文字。不得與 add 重疊；兩欄不能同時為空。",
+        description="要解除的舊範圍，逐筆原樣取自目前 state 的 excluded_work；須完整精確命中，不能只填關鍵字。沒有移除時填 []；add 與 remove 不可同時為空。",
     )

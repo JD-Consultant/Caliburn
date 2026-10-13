@@ -16,7 +16,10 @@ from caliburn.features.executions.budget_models import (
     BudgetExceededError,
     BudgetLimit,
 )
-from caliburn.workflows.model_requests import ModelRequestAccounting, ModelUsageUnavailableError
+from caliburn.workflows.executions.model_requests import (
+    ModelRequestAccounting,
+    ModelUsageUnavailableError,
+)
 from tests.integration.test_compaction_accounting import admitted_executor
 from tests.integration.test_compaction_accounting import file_id as file_id
 from tests.integration.test_compaction_accounting import runner as runner

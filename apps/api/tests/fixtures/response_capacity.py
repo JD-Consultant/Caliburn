@@ -1,6 +1,7 @@
 """Explicit synthetic counting for tests focused on other execution boundaries."""
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
 
@@ -8,7 +9,17 @@ import pytest
 from openai.types.responses import Response
 
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.agent_execution.tool_steps import ReceivedModelResponse, ResponseStepRuntime
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
+from caliburn.agent_execution.response_runtime import ResponseStepRuntime as NativeResponseRuntime
+
+
+@dataclass(frozen=True, slots=True)
+class ResponseStepRuntime(NativeResponseRuntime):
+    """測例 I/O double 的工具綁定；正式 runtime 不再擁有 dispatch。"""
+
+    prepare_tool: object = None
+    execute_tool: object = None
+    inactive_errors: tuple[type[Exception], ...] = (PermissionError,)
 
 
 def synthetic_capacity_limits():
@@ -67,6 +78,7 @@ class CapacityProbe:
         self.model_requests.append(request.create_payload())
         self.model_input_tokens.append(input_tokens)
         payload = json.loads(Path(__file__).with_name("native-response.json").read_text("utf-8"))
+        payload["id"] = f"response_{len(self.model_requests)}"
         payload["output"] = payload["output"][:2]
         payload["output"][1]["phase"] = (
             "final_answer" if self.final or len(self.model_requests) > 1 else "commentary"

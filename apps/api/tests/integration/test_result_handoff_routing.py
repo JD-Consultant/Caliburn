@@ -16,7 +16,7 @@ from caliburn.agent_execution.context_compaction import (
     CompactionSaveError,
     PreparationCountSaveError,
 )
-from caliburn.agent_execution.tool_steps import InputCountSaveError, ResponseStepSaveError
+from caliburn.agent_execution.response_runtime import InputCountSaveError, ResponseStepSaveError
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
@@ -26,8 +26,8 @@ from caliburn.features.executions import budgets
 from caliburn.features.executions.models import ExecutionStateError
 from caliburn.features.job_description import service as jd_service
 from caliburn.settings import ModelSettings
-from caliburn.workflows.memory_batch import MemoryBatchWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.batch import MemoryBatchWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
 from tests.fixtures.response_loop import response_at
 from tests.integration.test_memory_batch_orchestration import complete_turn, start_turn
 from tests.unit.test_context_compaction import COMPACTED

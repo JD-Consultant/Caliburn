@@ -28,13 +28,13 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.occupation_references import service as references
 from caliburn.settings import ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
+from caliburn.transport.model_tools.memory_write_checkpoint import MEMORY_CHECKPOINT_TYPES
 from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
     occupation_reference_definitions,
 )
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.response_loop import response_at
 from tests.integration.test_occupation_reference_workflow import new_writer
 from tests.unit.test_occupation_reference_client import (

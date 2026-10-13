@@ -10,7 +10,7 @@ export function SourceChanges({ scope }: { scope: SourceScope }) {
   return (
     <div className="source-body">
       <p className="source-note">
-        JD 比較此項目上次核對時與目前正式稿；來源比較原引用與讀取當時最新已發布的
+        JD 比較此項目上次核對時與所選正式修訂；來源比較原引用與讀取當時最新已發布的
         Memory。閱讀不會解除待核對。
       </p>
       {changes.isFetching ? (
@@ -20,6 +20,13 @@ export function SourceChanges({ scope }: { scope: SourceScope }) {
       ) : (
         changes.data && (
           <>
+            {changes.data.source_version && changes.data.comparison_version && (
+              <p className="source-note">
+                原引用 Memory 涵蓋至訪談序號 {changes.data.source_version.covered_through_sequence}
+                ； 本次比較 Memory 涵蓋至訪談序號{' '}
+                {changes.data.comparison_version.covered_through_sequence}。
+              </p>
+            )}
             <ChangeSection title="JD 內容變更" markdown={changes.data.jd_markdown} />
             {changes.data.source_markdown !== null && (
               <ChangeSection title="來源變更" markdown={changes.data.source_markdown} />

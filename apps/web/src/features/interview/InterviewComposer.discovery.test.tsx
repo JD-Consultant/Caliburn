@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** Recover a server-owned Turn without fabricating or re-sending its input command. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
@@ -72,7 +73,7 @@ test.each(['active', 'paused'] as const)(
         ),
       ),
     );
-    vi.stubGlobal('fetch', fetch);
+    stubHttp(fetch);
     openComposer();
     expect(await screen.findByText(active.input_text)).toBeVisible();
     expect(
@@ -93,8 +94,7 @@ test('holds submission while discovery is unresolved, without discarding the dra
   let finish: (response: Response) => void = () => {
     throw new Error('request not started');
   };
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(
       () =>
         new Promise<Response>((resolve) => {
@@ -117,7 +117,7 @@ test('failed discovery is not idle; explicit read-only retry can recover', async
     .fn<typeof globalThis.fetch>()
     .mockResolvedValueOnce(new Response(null, { status: 503 }))
     .mockImplementation(() => Promise.resolve(Response.json({ turn: null })));
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   openComposer();
   await userEvent.click(await screen.findByRole('button', { name: '重新查詢進行中處理' }));
   await waitFor(() => expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled());
@@ -133,7 +133,7 @@ test('a retained unknown command is resolved only by command, never erased by cu
         : Response.json({ detail: { code: 'consultant_turn_not_found' } }, { status: 404 }),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   openComposer();
   expect(await screen.findByText(/尚未查到原請求的受理結果/)).toBeVisible();
   expect(readTurnHint(fileId)).toEqual({ command_id: commandId, execution_id: null });
@@ -156,7 +156,7 @@ test('follows another tab replacing a finished Turn hint without a second query 
       ),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   openComposer();
   expect(await screen.findByText(/這次處理已取消/)).toBeVisible();
   act(() => {
@@ -188,7 +188,7 @@ test('discovered work can finish, retain its terminal result, then start a fresh
       ),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const { client } = openComposer();
   expect(await screen.findByText(active.input_text)).toBeVisible();
   turn = { ...active, status: 'cancelled', allowed_controls: [] };
@@ -206,12 +206,11 @@ test('discovered work can finish, retain its terminal result, then start a fresh
 });
 
 test('discovery rejects another file and does not expose its input', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() => Promise.resolve(Response.json({ turn: { ...active, job_file_id: commandId } }))),
   );
   openComposer();
-  expect(await screen.findByText(/處理狀態不屬於這份職務檔案/)).toBeVisible();
+  expect(await screen.findByText(/資料格式不符，尚未採用這份結果/)).toBeVisible();
   expect(screen.queryByText(active.input_text)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: '送出訪談' })).toBeDisabled();
 });

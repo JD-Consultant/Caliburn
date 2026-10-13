@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 import { refreshFormalJd, refreshCompletedInterview } from './workspace-refresh';
 import { StrictMode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -102,8 +103,7 @@ test.each([false, true])(
   async (strict) => {
     let completed = false;
     const oldReads: (() => void)[] = [];
-    vi.stubGlobal(
-      'fetch',
+    stubHttp(
       vi.fn((path: string) => {
         if (!completed && (path.includes('/jd/') || path.endsWith('/interviews'))) {
           return new Promise<Response>((resolve) =>
@@ -147,7 +147,7 @@ test('failed completion refresh reports saved data separately, retries only by r
         : Response.json(readBody(path, completed)),
     ),
   );
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   const client = renderWorkspace(true);
   await screen.findByText('舊職稱');
   completed = true;

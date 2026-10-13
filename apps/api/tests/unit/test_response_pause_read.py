@@ -2,11 +2,9 @@
 
 from langgraph.checkpoint.memory import InMemorySaver
 
-from caliburn.agent_execution.tool_steps import (
-    PausedResponseLoop,
-    read_response_pause,
-    run_response_loop,
-)
+from caliburn.agent_execution.response_runtime import PausedResponseLoop
+from caliburn.agent_execution.tool_steps import read_response_pause
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 from tests.unit.test_response_pause import PauseProbe
 

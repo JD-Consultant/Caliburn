@@ -8,19 +8,26 @@ import pytest
 from openai.types.responses import ResponseFunctionToolCall
 
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.agents.memory_analysis.tools import MemoryAnalysisTools
 from caliburn.features.work_memory.candidates import CreateMemoryObject, MemoryBatchPosition
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.transport.model_tools.memory_analysis import (
+from caliburn.transport.model_tools.memory_write_checkpoint import (
     MEMORY_CHECKPOINT_TYPES,
-    MemoryAnalysisTools,
+    PreparedMemoryToolCall,
 )
-from caliburn.transport.model_tools.memory_writes import PreparedMemoryToolCall
-from caliburn.workflows.memory_analysis.results import AnalysisComplete, parse_outcome
+from caliburn.workflows.work_memory.results import AnalysisComplete, parse_outcome
+from tests.fixtures.native_tools import ensure_active, invoke_tool
 
 
 def prepared() -> PreparedMemoryToolCall:
-    stage = MemoryBatchPosition(*(uuid4() for _ in range(4)), MemoryLayer.WORK_SITUATION, uuid4())
+    stage = MemoryBatchPosition(
+        job_file_id=uuid4(),
+        execution_id=uuid4(),
+        stage_id=uuid4(),
+        phase=MemoryLayer.WORK_SITUATION,
+        position_id=uuid4(),
+    )
     return PreparedMemoryToolCall(
         CreateMemoryObject(uuid4(), stage, stage.phase, MemoryContent("盤點", "月末核對", "原文")),
         '{"status":"created"}',
@@ -32,14 +39,29 @@ async def test_existing_contracts_route_reads_and_writes_without_call_id_as_oper
     reads, writes = Mock(), Mock()
     reads.names = ("read_work_situation_map", "read_interview")
     writes.names = ("create_work_situation",)
-    reads.definitions.return_value = [{"name": "read_work_situation_map"}]
-    writes.definitions.return_value = [{"name": "create_work_situation"}]
+    reads.definitions.return_value = [
+        {
+            "type": "function",
+            "name": "read_interview",
+            "description": "synthetic",
+            "parameters": {"type": "object", "properties": {}},
+        }
+    ]
+    writes.definitions.return_value = [
+        {
+            "type": "function",
+            "name": "create_work_situation",
+            "description": "synthetic",
+            "parameters": {"type": "object", "properties": {}},
+        }
+    ]
     reads.invoke = AsyncMock(return_value='{"items":[]}')
     command = prepared()
     writes.prepare = AsyncMock(return_value=command)
     writes.execute = AsyncMock(return_value=command.success_output)
     tools = MemoryAnalysisTools(reads, writes)
-    assert tools.definitions() == reads.definitions() + writes.definitions()
+    standard = tools.standard_tools(ensure_active)
+    assert [tool.name for tool in standard] == ["read_interview", "create_work_situation"]
     operation_id = uuid4()
     call = ResponseFunctionToolCall(
         type="function_call",
@@ -47,13 +69,16 @@ async def test_existing_contracts_route_reads_and_writes_without_call_id_as_oper
         name="read_interview",
         arguments="{}",
     )
-    assert await tools.prepare(call, operation_id) == '{"items":[]}'
+    output, _, _ = await invoke_tool(standard, call, operation_id)
+    assert output == '{"items":[]}'
     call.name = "create_work_situation"
-    assert await tools.prepare(call, operation_id) == command
-    writes.prepare.assert_awaited_once_with(call.name, "{}", command_id=operation_id)
-    call.name = "update_work_understanding"
-    assert '"scope_not_allowed"' in await tools.prepare(call, operation_id)
-    assert await tools.execute(command) == command.success_output
+    output, saved, derived_id = await invoke_tool(
+        standard, call, operation_id, MEMORY_CHECKPOINT_TYPES
+    )
+    assert saved == command
+    assert output == command.success_output
+    writes.prepare.assert_awaited_once_with(call.name, "{}", command_id=derived_id)
+    assert "update_work_understanding" not in {tool.name for tool in standard}
 
 
 @pytest.mark.asyncio

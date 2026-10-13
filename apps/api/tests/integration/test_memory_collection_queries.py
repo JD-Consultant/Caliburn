@@ -14,11 +14,11 @@ from caliburn.features.work_memory.candidates import (
     DeleteMemoryObject,
     ReviseMemoryObject,
 )
+from caliburn.features.work_memory.handoff_queries import read_situation_handoff_snapshot
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revision_service import read_fixed_headers, write_object_revision
 from caliburn.features.work_memory.revisions import MemoryRevisionReference
 from caliburn.features.work_memory.stage_changes import build_situation_handoff_changes
-from caliburn.workflows.memory_stage_changes import read_situation_handoff_snapshot
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_memory_revisions import source_window as source_window
 from tests.integration.test_memory_stage_changes import (

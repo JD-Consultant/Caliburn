@@ -12,7 +12,7 @@ from caliburn.features.occupation_references.models import (
 )
 
 
-def candidate_heads_projection(job_file_id: UUID) -> Select[UUID, UUID, UUID]:
+def candidate_heads_projection(job_file_id: UUID) -> Select[UUID, UUID]:
     return persistence.candidate_heads_projection(job_file_id)
 
 
@@ -20,10 +20,9 @@ async def read_head_state(
     session: AsyncSession,
     job_file_id: UUID,
     execution_id: UUID,
-    generation_id: UUID,
     revision_id: UUID,
 ) -> OccupationReferenceState:
     operation = await persistence.read_revision(session, job_file_id, execution_id, revision_id)
-    if operation is None or operation.result_generation_id != generation_id:
+    if operation is None:
         raise ReferenceStateError("The candidate's saved reference position is unavailable")
     return persistence.state_value(operation.state)

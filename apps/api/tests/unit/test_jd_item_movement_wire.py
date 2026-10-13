@@ -5,9 +5,7 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from caliburn.features.job_description.tasks import DetailKind
-from caliburn.transport.model_tools.jd_item_movement_wire import parse_item_movement
-from caliburn.workflows.jd_item_movement import (
+from caliburn.features.job_description.item_movement import (
     CurrentItemContainer,
     ItemPosition,
     MoveItemInput,
@@ -15,6 +13,8 @@ from caliburn.workflows.jd_item_movement import (
     MovementTextChange,
     TaskParentDestination,
 )
+from caliburn.features.job_description.tasks import DetailKind
+from caliburn.transport.model_tools.jd_item_movement_wire import parse_item_movement
 
 
 def test_move_wire_distinguishes_unassigned_from_current_container():

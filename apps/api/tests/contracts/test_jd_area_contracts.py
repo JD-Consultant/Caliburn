@@ -1,17 +1,14 @@
 """Area DTO generation preserves values, null semantics and strict nested shapes."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.edit_jd_areas_request import EditJdAreasRequest
-from caliburn.contracts.generated.jd_areas_view import JdAreasView
-
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
+from caliburn.transport.http.models.jd_areas_edits import EditJdAreasRequest
+from caliburn.transport.http.models.jd_views import JdAreasView
+from tests.fixtures.http_contracts import http_schema
 
 
 @pytest.mark.parametrize(
@@ -33,7 +30,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
     ],
 )
 def test_edit_round_trip_and_rejected_extra_keys(change: dict) -> None:
-    schema = json.loads((SCHEMAS / "edit-jd-areas-request.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(EditJdAreasRequest)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {"command_id": str(uuid4()), "expected_revision_id": str(uuid4()), "change": change}
@@ -46,7 +43,7 @@ def test_edit_round_trip_and_rejected_extra_keys(change: dict) -> None:
 
 
 def test_area_view_does_not_expose_internal_content_revision() -> None:
-    schema = json.loads((SCHEMAS / "jd-areas-view.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(JdAreasView)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {

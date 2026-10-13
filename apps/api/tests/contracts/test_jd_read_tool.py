@@ -2,6 +2,7 @@
 
 import json
 from importlib.resources import files
+from unittest.mock import create_autospec
 from uuid import UUID
 
 import pytest
@@ -12,18 +13,20 @@ from caliburn.contracts.generated.tools.read_jd_arguments import View
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.candidate_service import JdCandidatePreview
 from caliburn.features.job_description.candidates import JdCandidatePosition, JdCandidateScope
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.model_tools.jd_reads import JdReadTools, jd_read_definitions
-from caliburn.workflows.jd_reads import JdReadWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 
 
 def make_tools(*, limit: int = 1_000_000) -> JdReadTools:
     scope = ExecutionScope(UUID(int=1), UUID(int=2), ExecutionKind.CONSULTANT_TURN)
     return JdReadTools(
-        JdReadWorkflow(async_sessionmaker()),
+        create_autospec(JdReadWorkflow, instance=True, spec_set=True),
         PublishedMemoryRead(scope, None, 1),
+        references=JdModelReferences(async_sessionmaker(), scope.job_file_id),
         max_result_characters=limit,
     )
 
@@ -84,7 +87,7 @@ async def test_empty_collections_full_markdown_capacity_and_storage_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     tools = make_tools()
-    scope = JdCandidateScope(tools.binding.scope.execution_id, UUID(int=3))
+    scope = JdCandidateScope(tools.binding.scope.execution_id)
     candidate = JdCandidatePreview(
         JdCandidatePosition(scope, UUID(int=4), UUID(int=4)),
         JdProfile(purpose="原文🙂"),
@@ -111,7 +114,9 @@ async def test_empty_collections_full_markdown_capacity_and_storage_failure(
             assert json.loads(output)["purpose"] == "原文🙂"
         else:
             assert json.loads(output) == {"items": []}
-    tiny = JdReadTools(tools.reader, tools.binding, max_result_characters=1)
+    tiny = JdReadTools(
+        tools.reader, tools.binding, references=tools.references, max_result_characters=1
+    )
     assert (
         json.loads(await tiny.invoke("read_jd", '{"view":"full","read_ref":null}'))["code"]
         == "read_limit_exceeded"

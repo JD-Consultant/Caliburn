@@ -3,13 +3,20 @@
 %%{init: {"flowchart": {"wrappingWidth": 280, "nodeSpacing": 32, "rankSpacing": 36}}}%%
 flowchart TD
     H([新工作開始]) --> B[以角色已採用的歷史位置<br/>只綁定一次原基底]
-    B --> P{已是準備好的基底？}
-    P -->|是| R[/從固定 checkpoint<br/>讀回完整窗口/]
-    P -->|否| C[[輪前歷史準備<br/>§5.2]]
-    C --> R
-    R --> A[短交易核資格並採用準備位置]
-    A --> I[固定新工作資料<br/>組裝一次本次輸入]
+    B --> K{工作角色}
+    K -->|A| T[固定本輪資料並保存 capture<br/>Memory、H、JD／Plan 基底<br/>完整人工最終差異及 input]
+    T --> N{首次窗口或<br/>Memory snapshot 已改變？}
+    N -->|是| E[/選空模型歷史<br/>不壓縮將捨棄的舊窗口/]
+    N -->|否| R[/從固定 checkpoint<br/>讀回合法原生歷史/]
+    K -->|B1／B2| R
+    E --> C[[輪前歷史準備 §5.2<br/>保留／原生壓縮，或沿用 prepared]]
+    R --> C
+    C --> A[短交易核資格並採用準備位置<br/>prepared 不含本輪差異／input]
+    A --> V{工作角色}
+    V -->|A| I[組裝 A 首請求<br/>新窗基底資料／同版原生歷史<br/>→ 完整人工最終差異（若有）<br/>→ 有序號 input]
+    V -->|B1／B2| J[固定新工作資料<br/>組裝 B 本次輸入]
     I --> G[[模型與工具迴圈<br/>§4.4]]
+    J --> G
     G --> Q{本次工作結果}
     Q -->|取消／失去資格| X([本工作退出<br/>原準備基底仍有效])
     Q -->|完整結果且具完成資格| F[[正式產品完成交易<br/>persistence §3]]

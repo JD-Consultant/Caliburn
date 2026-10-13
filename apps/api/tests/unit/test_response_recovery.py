@@ -10,14 +10,10 @@ from openai.types.responses import Response
 
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse, ResponseStepSaveError
 from caliburn.agent_execution.response_steps import UnsupportedModelResponseError
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    ResponseStepRuntime,
-    ResponseStepSaveError,
-    run_response_step,
-)
-from tests.fixtures.response_capacity import synthetic_response_runtime
+from tests.fixtures.native_response_runtime import run_response_step
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_response_runtime
 
 
 async def ensure_active() -> None:
@@ -238,13 +234,9 @@ async def test_reused_recovery_handoff_does_not_reclassify_later_failure(fail_gu
     with pytest.raises(ConnectionError, match="tool owner"):
         await run_response_step(saver, request=None, recovery=failure.value.recovery, **options)
     if fail_guard:
-        checks = 0
 
         async def require_current_writer():
-            nonlocal checks
-            checks += 1
-            if checks > 1:
-                raise PermissionError("synthetic writer changed before tool")
+            raise PermissionError("synthetic writer changed before tool")
 
         options["runtime"] = replace(options["runtime"], ensure_active=require_current_writer)
     expected = PermissionError if fail_guard else ConnectionError

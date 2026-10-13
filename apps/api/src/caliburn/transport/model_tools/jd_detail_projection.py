@@ -19,7 +19,7 @@ from caliburn.features.job_description.sources import (
 )
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
 from caliburn.features.job_description.work_models import JdWorkRevision
-from caliburn.workflows.jd_reads import JdSourceReading
+from caliburn.workflows.job_description.reads import JdSourceReading
 
 
 class InvalidJdReadSelectionError(ValueError):
@@ -65,20 +65,9 @@ def jd_read_source_targets(
     targets = []
     for item in items:
         targets.append(_item_source_target(item, work))
-        if isinstance(item, WorkTask):
-            targets.extend(_item_source_target(detail, work) for detail in item.details)
+        if isinstance(item, Capability):
             targets.extend(
-                JdSourceTarget(
-                    SourceTargetKind.TASK_CAPABILITY, link.capability_id, task_id=link.task_id
-                )
-                for link in work.task_links
-                if link.task_id == item.task_id
-            )
-        elif isinstance(item, Capability):
-            targets.extend(
-                JdSourceTarget(
-                    SourceTargetKind.TASK_CAPABILITY, link.capability_id, task_id=link.task_id
-                )
+                JdSourceTarget(SourceTargetKind.TASK, link.task_id)
                 for link in work.task_links
                 if link.capability_id == item.capability_id
             )
@@ -115,22 +104,22 @@ def project_jd_item(
                 title=item.title,
                 description=item.description,
                 outcomes=[
-                    _detail(detail, work, sources)
-                    for detail in item.details
-                    if detail.kind == DetailKind.OUTCOME
+                    _detail(detail) for detail in item.details if detail.kind == DetailKind.OUTCOME
                 ],
                 requirements=[
-                    _detail(detail, work, sources)
+                    _detail(detail)
                     for detail in item.details
                     if detail.kind == DetailKind.REQUIREMENT
                 ],
-                required_knowledge=_task_capabilities(
-                    item, work, CapabilityKind.KNOWLEDGE, sources
-                ),
-                required_skills=_task_capabilities(item, work, CapabilityKind.SKILL, sources),
+                required_knowledge=_task_capabilities(item, work, CapabilityKind.KNOWLEDGE),
+                required_skills=_task_capabilities(item, work, CapabilityKind.SKILL),
             )
         case TaskDetail():
-            result.update(kind=item.kind.value, text=item.text)
+            target = _item_source_target(item, work)
+            assert target.item_id is not None
+            result.update(
+                kind=item.kind.value, text=item.text, task_read_ref=f"task_{target.item_id.hex}"
+            )
         case Capability():
             result.update(
                 kind=item.kind.value,
@@ -146,18 +135,15 @@ def project_jd_item(
     return result
 
 
-def _detail(
-    item: TaskDetail, work: JdWorkRevision, sources: tuple[JdSourceReading, ...]
-) -> dict[str, JsonValue]:
+def _detail(item: TaskDetail) -> dict[str, JsonValue]:
     return {
         "read_ref": jd_read_ref(item),
         "text": item.text,
-        "supporting_sources": _source_items(_item_source_target(item, work), sources),
     }
 
 
 def _task_capabilities(
-    task: WorkTask, work: JdWorkRevision, kind: CapabilityKind, sources: tuple[JdSourceReading, ...]
+    task: WorkTask, work: JdWorkRevision, kind: CapabilityKind
 ) -> list[JsonValue]:
     capabilities = {item.capability_id: item for item in work.capabilities}
     result: list[JsonValue] = []
@@ -166,14 +152,11 @@ def _task_capabilities(
             continue
         item = capabilities[link.capability_id]
         if item.kind == kind:
-            target = JdSourceTarget(
-                SourceTargetKind.TASK_CAPABILITY, item.capability_id, task_id=task.task_id
-            )
             result.append(
                 {
                     "read_ref": jd_read_ref(item),
                     "name": item.name,
-                    "supporting_sources": _source_items(target, sources),
+                    "description": item.description,
                 }
             )
     return result
@@ -188,9 +171,7 @@ def _capability_uses(
     result: list[JsonValue] = []
     for task in work.tasks:
         if task.task_id in task_ids:
-            target = JdSourceTarget(
-                SourceTargetKind.TASK_CAPABILITY, item.capability_id, task_id=task.task_id
-            )
+            target = JdSourceTarget(SourceTargetKind.TASK, task.task_id)
             result.append(
                 {
                     "read_ref": jd_read_ref(task),
@@ -210,9 +191,7 @@ def _item_source_target(item: JdReadTarget, work: JdWorkRevision) -> JdSourceTar
         case TaskDetail():
             for task in work.tasks:
                 if any(detail.detail_id == item.detail_id for detail in task.details):
-                    return JdSourceTarget(
-                        SourceTargetKind.DETAIL, item.detail_id, task_id=task.task_id
-                    )
+                    return JdSourceTarget(SourceTargetKind.TASK, task.task_id)
             raise InvalidJdReadSelectionError("The detail is not in this JD revision")
         case Capability():
             return JdSourceTarget(SourceTargetKind.CAPABILITY, item.capability_id)
@@ -228,19 +207,29 @@ def _source_items(target: JdSourceTarget, sources: tuple[JdSourceReading, ...]) 
         reference = reading.reference
         if reference.target != target:
             continue
-        item: dict[str, JsonValue] = {"citation_ref": f"citation_{reference.citation_id.hex}"}
+        item: dict[str, JsonValue] = {
+            "citation_ref": f"citation_{reference.citation_id.hex}",
+            "needs_recheck": reading.needs_recheck,
+            "jd_changed": reading.jd_changed,
+            "source_changed": reading.source_changed,
+        }
         if isinstance(reference.source, InterviewSource):
-            if reading.interview_sequence is None:
-                item["kind"] = "current_input"
-            else:
-                item.update(kind="interview", interview_sequence=reading.interview_sequence)
+            assert reading.interview_sequence is not None
+            item.update(kind="interview", interview_sequence=reading.interview_sequence)
         else:
             item["kind"] = reference.source.layer.value
             if reading.target_title is not None:
                 item["target_title"] = reading.target_title
             if reading.historical_title is not None:
                 item["historical_title"] = reading.historical_title
-        if reference.needs_review or reading.needs_recheck:
-            item["needs_recheck"] = True
+            for key, version in (
+                ("source_version", reading.source_version),
+                ("comparison_version", reading.comparison_version),
+            ):
+                if version is not None:
+                    # 只呈涵蓋界線；固定版本由 App 綁定，不增加模型定位。
+                    item[key] = {
+                        "covered_through_sequence": version.covered_through_sequence,
+                    }
         result.append(item)
     return result

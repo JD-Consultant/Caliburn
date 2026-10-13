@@ -21,8 +21,8 @@ from caliburn.features.job_files.models import (
     JobFileNotFoundError,
     RenameJobFile,
 )
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 
 
 class JobFileWorkflow:

@@ -1,17 +1,14 @@
 """Condition contracts reject unknown kinds and preserve explicit field changes."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import ValidationError
 
-from caliburn.contracts.generated.edit_jd_conditions_request import EditJdConditionsRequest
-from caliburn.contracts.generated.jd_conditions_view import JdConditionsView
-
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
+from caliburn.transport.http.models.jd_conditions_edits import EditJdConditionsRequest
+from caliburn.transport.http.models.jd_views import JdConditionsView
+from tests.fixtures.http_contracts import http_schema
 
 
 @pytest.mark.parametrize(
@@ -33,9 +30,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
     ],
 )
 def test_request_round_trip_and_unknown_keys_rejected(change: dict) -> None:
-    schema = json.loads(
-        (SCHEMAS / "edit-jd-conditions-request.schema.json").read_text(encoding="utf-8")
-    )
+    schema = http_schema(EditJdConditionsRequest)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {"command_id": str(uuid4()), "expected_revision_id": str(uuid4()), "change": change}
@@ -48,7 +43,7 @@ def test_request_round_trip_and_unknown_keys_rejected(change: dict) -> None:
 
 
 def test_view_contains_no_internal_content_revision() -> None:
-    schema = json.loads((SCHEMAS / "jd-conditions-view.schema.json").read_text(encoding="utf-8"))
+    schema = http_schema(JdConditionsView)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     payload = {

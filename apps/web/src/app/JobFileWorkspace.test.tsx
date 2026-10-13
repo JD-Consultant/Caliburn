@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 import { createAppQueryClient } from './query-client';
 /** Workspace behavior: JD read-only lock, Turn state badge and narrow-screen pane switching. */
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -5,7 +6,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JobFile } from '../shared/api/generated/job-file-list';
+import type { JobFile } from '../shared/api/generated/http/types.gen';
 import { retainTurnHint } from '../features/interview/interview-turn-api';
 import { App } from './App';
 
@@ -80,8 +81,7 @@ test.each([true, false])(
         execution_id: executionId,
       });
     let cancelled = false;
-    vi.stubGlobal(
-      'fetch',
+    stubHttp(
       vi.fn((path: string, options?: RequestInit) => {
         if (path.endsWith('/cancel') && options?.method === 'POST') cancelled = true;
         if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
@@ -128,8 +128,7 @@ test('a paused Turn keeps the JD read-only and says why', async () => {
     command_id: '60000000-0000-4000-8000-000000000006',
     execution_id: executionId,
   });
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
       if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
@@ -145,8 +144,7 @@ test('a paused Turn keeps the JD read-only and says why', async () => {
 });
 
 test('narrow-screen tabs switch panes without unmounting either one', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/consultant-turns/current'))
         return Promise.resolve(Response.json({ turn: null }));
@@ -175,8 +173,7 @@ test('narrow-screen tabs switch panes without unmounting either one', async () =
 
 test('unknown discovery keeps the formal JD readable but not editable until a successful check', async () => {
   let discoveryFailed = true;
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string) => {
       if (path.endsWith('/consultant-turns/current'))
         return Promise.resolve(
@@ -220,7 +217,7 @@ function stubUnknownStatusSwitch() {
     if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
     return Promise.resolve(Response.json(file));
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return { fetch, state };
 }
 

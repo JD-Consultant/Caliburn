@@ -1,6 +1,6 @@
 /** Shared definitions and reverse usage derive from the same fixed JD projection. */
 import { Box, Button, Link, Stack, Typography } from '@mui/material';
-import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { Capability, JdWorkView } from '../../shared/api/generated/http/types.gen';
 import type { WorkIntent } from './jd-work-api';
 import type { WorkDialogContent } from './WorkDialog';
 import { FoldableSection } from './FoldableSection';

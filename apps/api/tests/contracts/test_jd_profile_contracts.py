@@ -1,24 +1,20 @@
 """Profile wire and generated models agree on explicit set/clear and fixed read shape."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 from pydantic import BaseModel, ValidationError
 
-from caliburn.contracts.generated.jd_profile_view import JdProfileView
-from caliburn.contracts.generated.revise_jd_profile_request import ReviseJdProfileRequest
-
-SCHEMAS = Path(__file__).parents[2] / "contracts/http"
+from caliburn.transport.http.models.jd_profile_edits import ReviseJdProfileRequest
+from caliburn.transport.http.models.jd_views import JdProfileView
+from tests.fixtures.http_contracts import http_schema
 
 
 @pytest.mark.parametrize(
-    ("name", "model", "payload"),
+    ("model", "payload"),
     [
         (
-            "jd-profile-view",
             JdProfileView,
             {
                 "revision_id": str(uuid4()),
@@ -31,7 +27,6 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
             },
         ),
         (
-            "revise-jd-profile-request",
             ReviseJdProfileRequest,
             {
                 "command_id": str(uuid4()),
@@ -44,10 +39,8 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
         ),
     ],
 )
-def test_profile_contract_round_trip(
-    name: str, model: type[BaseModel], payload: dict[str, object]
-) -> None:
-    schema = json.loads((SCHEMAS / f"{name}.schema.json").read_text(encoding="utf-8"))
+def test_profile_contract_round_trip(model: type[BaseModel], payload: dict[str, object]) -> None:
+    schema = http_schema(model)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     validator.validate(payload)

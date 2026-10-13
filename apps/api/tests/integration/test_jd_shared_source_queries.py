@@ -29,20 +29,30 @@ from caliburn.features.work_memory.candidates import (
     MemoryPermissionError,
     ReviseMemoryObject,
 )
-from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
+from caliburn.features.work_memory.models import (
+    MemoryContent,
+    MemoryContentChanges,
+    ReferenceChanges,
+)
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_evidence import JdEvidenceWorkflow, MemoryEvidence
-from caliburn.workflows.jd_source_queries import (
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.evidence import JdEvidenceWorkflow, MemoryEvidence
+from caliburn.workflows.job_description.source_queries import (
     read_fixed_memory_source,
     read_memory_source_changes,
-    read_memory_source_titles,
+    read_memory_source_metadata_batch,
 )
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 
 pytestmark = pytest.mark.postgres
+
+
+async def read_memory_source_titles(session, *, source, **scope):
+    metadata = await read_memory_source_metadata_batch(session, sources=(source,), **scope)
+    item = metadata[source]
+    return item.target_title, item.historical_title, item.source_changed
 
 
 def test_interview_overview_reads_one_header_batch_without_original_bodies(
@@ -229,6 +239,147 @@ def test_shared_queries_read_fixed_source_without_an_active_turn_or_writes(
         assert change.before_interviews == change.after_interviews == (2,)
 
     transact(client, read)
+
+
+def test_new_snapshot_with_same_revisions_does_not_recheck(
+    client: TestClient,
+    comparison: SourceComparison,
+) -> None:
+    file_id = comparison.job_file_id
+    new_input = complete(client, start_turn(client, file_id=file_id)).employee_input
+
+    async def publish_and_read():
+        sessions = client.app.state.database.sessions
+        memory = MemoryCandidateWorkflow(sessions)
+        scope = ExecutionScope(file_id, uuid4(), ExecutionKind.MEMORY_BATCH)
+        async with sessions.begin() as session:
+            current = await candidate_queries.read_snapshot_object(
+                session,
+                file_id,
+                comparison.snapshot_id,
+                comparison.source.object_id,
+            )
+            await executions.admit_execution(session, scope)
+            writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+        stage = await memory.start(writer, new_input.source_id)
+        assert stage is not None
+        phase = await memory.handoff(writer, stage, uuid4())
+        snapshot = await publish_memory_owner_fixture(sessions, writer, phase, uuid4())
+        source = replace(
+            comparison.source, snapshot_id=comparison.snapshot_id, revision_id=current.revision_id
+        )
+        async with sessions() as session:
+            metadata = await read_memory_source_metadata_batch(
+                session,
+                job_file_id=file_id,
+                sources=(source,),
+                snapshot_id=snapshot.snapshot_id,
+                interview_through_sequence=snapshot.covered_through_sequence,
+            )
+        item = metadata[source]
+        assert not item.source_changed
+        assert item.comparison_version.revision_id == item.source_version.revision_id
+        assert item.comparison_version.snapshot_id != item.source_version.snapshot_id
+        assert (
+            item.comparison_version.covered_through_sequence
+            > item.source_version.covered_through_sequence
+        )
+
+    client.portal.call(publish_and_read)
+
+
+def test_source_diff_uses_union_of_direct_situations_without_claiming_global_deletion(
+    client: TestClient,
+    comparison: SourceComparison,
+) -> None:
+    file_id = comparison.job_file_id
+    first_input = complete(client, start_turn(client, file_id=file_id)).employee_input
+    second_input = complete(client, start_turn(client, file_id=file_id)).employee_input
+
+    async def read():
+        sessions = client.app.state.database.sessions
+        memory = MemoryCandidateWorkflow(sessions)
+
+        async def batch(source_id):
+            scope = ExecutionScope(file_id, uuid4(), ExecutionKind.MEMORY_BATCH)
+            async with sessions.begin() as session:
+                await executions.admit_execution(session, scope)
+                writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+            return writer, await memory.start(writer, source_id)
+
+        writer, stage = await batch(first_input.source_id)
+        phase = await memory.handoff(writer, stage, uuid4())
+        root = await memory.edit(
+            writer,
+            CreateMemoryObject(
+                uuid4(),
+                phase,
+                MemoryLayer.WORK_UNDERSTANDING,
+                MemoryContent("範圍管理", "依據", "理解正文不變"),
+                reference_ids=frozenset({comparison.source.object_id}),
+            ),
+        )
+        original = await publish_memory_owner_fixture(sessions, writer, root.position, uuid4())
+        writer, stage = await batch(second_input.source_id)
+        new_child = await memory.edit(
+            writer,
+            CreateMemoryObject(
+                uuid4(),
+                stage,
+                MemoryLayer.WORK_SITUATION,
+                MemoryContent("補貨", "新情境", "另一項依據"),
+                reference_ids=frozenset({second_input.source_id}),
+            ),
+        )
+        phase = await memory.handoff(writer, new_child.position, uuid4())
+        updated = await memory.edit(
+            writer,
+            ReviseMemoryObject(
+                uuid4(),
+                phase,
+                MemoryLayer.WORK_UNDERSTANDING,
+                root.object_id,
+                reference_changes=ReferenceChanges(
+                    add=frozenset({new_child.object_id}),
+                    remove=frozenset({comparison.source.object_id}),
+                ),
+            ),
+        )
+        latest = await publish_memory_owner_fixture(sessions, writer, updated.position, uuid4())
+        async with sessions() as session:
+            fixed_root = await candidate_queries.read_snapshot_object(
+                session, file_id, original.snapshot_id, root.object_id
+            )
+            source = MemorySource(
+                MemorySourceLayer.WORK_UNDERSTANDING,
+                original.snapshot_id,
+                root.object_id,
+                fixed_root.revision_id,
+            )
+            reference = replace(comparison.reference(), source=source)
+            result = await read_memory_source_changes(
+                session,
+                job_file_id=file_id,
+                reference=reference,
+                snapshot_id=latest.snapshot_id,
+                interview_through_sequence=latest.covered_through_sequence,
+            )
+            old_child = await candidate_queries.read_snapshot_object(
+                session, file_id, latest.snapshot_id, comparison.source.object_id
+            )
+        assert result.changes[0].before.content == result.changes[0].after.content
+        assert len(result.changes) == 3
+        removed = next(change for change in result.changes[1:] if change.after is None)
+        added = next(change for change in result.changes[1:] if change.before is None)
+        assert removed.before.object_id == old_child.object_id
+        assert added.after.object_id == new_child.object_id
+        from caliburn.transport.jd_source_markdown import project_jd_source_changes
+
+        rendered = project_jd_source_changes(result)
+        assert "移除直接情境引用（不據此推論物件全域刪除）" in rendered
+        assert "新增直接情境引用（不代表新建物件）" in rendered
+
+    client.portal.call(read)
 
 
 @pytest.mark.parametrize("invalid", ["revision", "layer", "job_file", "interview_boundary"])

@@ -1,30 +1,16 @@
 """Public status admits only the defined controls, without formal or internal identities."""
 
-import json
-from pathlib import Path
 from uuid import uuid4
 
-from jsonschema import Draft202012Validator, FormatChecker
-from referencing import Registry, Resource
+import pytest
+from pydantic import ValidationError
+
+from caliburn.transport.http.models.consultant import ConsultantTurn
+from tests.fixtures.http_contracts import http_validator
 
 
 def test_consultant_status_schema_rejects_private_or_invented_state() -> None:
-    schema = json.loads(
-        (Path(__file__).parents[2] / "contracts/http/consultant-turn.schema.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    Draft202012Validator.check_schema(schema)
-    registry = Registry().with_resources(
-        (path.name, Resource.from_contents(json.loads(path.read_text(encoding="utf-8"))))
-        for path in (Path(__file__).parents[2] / "contracts/http").glob("*.schema.json")
-    )
-    plan_path = Path(__file__).parents[2] / "contracts/tools/interview-plan.schema.json"
-    registry = registry.with_resource(
-        "../tools/interview-plan.schema.json",
-        Resource.from_contents(json.loads(plan_path.read_text(encoding="utf-8"))),
-    )
-    validator = Draft202012Validator(schema, format_checker=FormatChecker(), registry=registry)
+    validator = http_validator(ConsultantTurn)
     original = {
         "job_file_id": str(uuid4()),
         "execution_id": str(uuid4()),
@@ -65,3 +51,5 @@ def test_consultant_status_schema_rejects_private_or_invented_state() -> None:
         },
     ):
         assert not validator.is_valid(original | invalid)
+        with pytest.raises(ValidationError):
+            ConsultantTurn.model_validate(original | invalid)

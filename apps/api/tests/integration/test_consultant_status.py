@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
@@ -12,17 +13,84 @@ from caliburn.features.executions.models import (
     ExecutionScope,
     ExecutionStatus,
 )
+from caliburn.features.interview_plans import service as plans
+from caliburn.features.interview_plans.models import PlanEdit
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews import service as interview_service
-from caliburn.features.interviews.models import SubmitInterviewInput
+from caliburn.features.interviews.models import StoredInterviewInput, SubmitInterviewInput
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
-from caliburn.workflows.consultant_status import (
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_turns.status import (
     ConsultantStatusWorkflow,
     ConsultantTurnUnavailableError,
 )
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.interview_plans import InterviewPlanWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
 
 pytestmark = pytest.mark.postgres
+
+
+@pytest.mark.parametrize("entry", ["execution", "current", "command"])
+def test_status_keeps_one_snapshot_when_cancel_commits_during_read(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, entry: str
+) -> None:
+    created = client.post(
+        "/api/job-files",
+        json={"command_id": str(uuid4()), "display_name": "一致狀態", "employee_name": "合成人"},
+    )
+    file_id = UUID(created.json()["job_file_id"])
+    command_id = uuid4()
+
+    async def scenario() -> None:
+        sessions = client.app.state.database.sessions
+        accepted = await client.app.state.interview_input_workflow.accept(
+            SubmitInterviewInput(file_id, command_id, "取消前的原輸入")
+        )
+        scope = ExecutionScope(
+            file_id, accepted.accepted.execution_id, ExecutionKind.CONSULTANT_TURN
+        )
+        async with sessions.begin() as session:
+            writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+            plan = await plans.start_candidate(session, file_id, scope.execution_id, None)
+        await JdCandidateWorkflow(sessions).start(writer)
+        plan_result = await InterviewPlanWorkflow(sessions).apply(
+            writer, PlanEdit(uuid4(), plan.position, "合成修改", "本輪待採用計畫", "已修改")
+        )
+        completion = ConsultantCompletionWorkflow(sessions)
+        original_read = interviews.read_execution_input
+        cancelled = False
+
+        async def read_then_cancel(
+            session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
+        ) -> StoredInterviewInput:
+            nonlocal cancelled
+            original = await original_read(
+                session, job_file_id=job_file_id, execution_id=execution_id
+            )
+            if not cancelled:
+                cancelled = True
+                await completion.stop(writer, ExecutionStatus.CANCELLED)
+            return original
+
+        monkeypatch.setattr(interviews, "read_execution_input", read_then_cancel)
+        workflow = ConsultantStatusWorkflow(sessions)
+        if entry == "execution":
+            projected = await workflow.read(file_id, scope.execution_id)
+        elif entry == "current":
+            projected = await workflow.read_current(file_id)
+        else:
+            projected = await workflow.read_by_command(file_id, command_id)
+
+        assert projected is not None
+        assert projected.status == ExecutionStatus.ACTIVE
+        assert projected.candidate is not None
+        assert projected.plan_preview == plan_result.snapshot
+        latest = await workflow.read(file_id, scope.execution_id)
+        assert latest.status == ExecutionStatus.CANCELLED
+        assert latest.candidate is None
+        assert latest.plan_preview is None
+
+    client.portal.call(scenario)
 
 
 def test_status_keeps_original_input_nonformal_and_scopes_execution(client: TestClient) -> None:

@@ -5,7 +5,7 @@
  */
 import { useEffect, useId, useRef } from 'react';
 import { Button, Chip } from '@mui/material';
-import type { Reference } from '../../shared/api/generated/jd-sources-view';
+import type { Reference } from '../../shared/api/generated/http/types.gen';
 import { ChevronRightIcon } from '../../shared/ui/icons';
 import { changeLabel } from './source-labels';
 import { SourceKindIcon } from './SourceKindIcon';

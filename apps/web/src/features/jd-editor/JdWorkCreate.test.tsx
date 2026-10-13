@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 /** New items still come from a form (Linear keeps creation apart from in-place editing); edits do not. */
@@ -6,7 +7,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { JdWorkEditor } from './JdWorkEditor';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const revision = '20000000-0000-4000-8000-000000000002';
@@ -53,7 +54,7 @@ function stubServer() {
       ),
     );
   });
-  vi.stubGlobal('fetch', fetch);
+  stubHttp(fetch);
   return {
     writes: () =>
       fetch.mock.calls

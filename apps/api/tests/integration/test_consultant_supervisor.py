@@ -17,7 +17,7 @@ from caliburn.features.executions.models import (
 from caliburn.features.job_files.models import CreateJobFile
 from caliburn.features.job_files.service import create_job_file
 from caliburn.settings import DatabaseSettings
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
 
 pytestmark = pytest.mark.postgres
 

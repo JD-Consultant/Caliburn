@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** 以 HTTP 替身驗證刪除確認、正式成功、拒絕與同目標重試；不接真實資料。 */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
@@ -50,9 +51,30 @@ async function openDelete() {
   return screen.getByRole('dialog', { name: /刪除職務檔案/ });
 }
 
+test.each([
+  [
+    '200 HTML',
+    () => new Response('<html>not deleted</html>', { headers: { 'Content-Type': 'text/html' } }),
+  ],
+  ['200 JSON', () => Response.json({ deleted: false })],
+  ['202 empty', () => new Response(null, { status: 202 })],
+])('非契約刪除回應 %s 不通知刪除、不移除清單快取', async (_name, response) => {
+  stubHttp((_url, options) =>
+    options?.method === 'DELETE'
+      ? Promise.resolve(response())
+      : Promise.resolve(Response.json({ job_files: [target, other] })),
+  );
+  const { client, onDeleted } = renderList();
+  const dialog = await openDelete();
+  await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent('刪除結果尚未確認');
+  expect(onDeleted).not.toHaveBeenCalled();
+  expect(client.getQueryData(['job-files'])).toEqual({ job_files: [target, other] });
+});
+
 test('取消預設聚焦，確認清楚指出檔名與不可復原範圍；取消不刪除或導航', async () => {
   const transport = vi.fn(() => Promise.resolve(Response.json({ job_files: [target, other] })));
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   renderList();
   const dialog = await openDelete();
   expect(within(dialog).getByText(/庫存管理/)).toBeVisible();
@@ -82,7 +104,7 @@ test('收到204前保留列與停用確認，成功只通知必要 callback 並�
     }
     return Promise.resolve(Response.json({ job_files: [target, other] }));
   });
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { onDeleted } = renderList();
   let completeCallback: () => void = () => {
     throw new Error('Callback has not started');
@@ -122,8 +144,7 @@ test('收到204前保留列與停用確認，成功只通知必要 callback 並�
 });
 
 test('409 job_file_busy 說明先完成或取消工作，保留檔案且不通知刪除', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((_url: string, options?: RequestInit) =>
       Promise.resolve(
         options?.method === 'DELETE'
@@ -155,7 +176,7 @@ test('網路結果不明不移除列，同一目標手動重試可接受不存�
     }
     return Promise.resolve(Response.json({ job_files: attempts === 2 ? [] : [target] }));
   });
-  vi.stubGlobal('fetch', transport);
+  stubHttp(transport);
   const { onDeleted } = renderList();
   const dialog = await openDelete();
   await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
@@ -173,8 +194,7 @@ test('網路結果不明不移除列，同一目標手動重試可接受不存�
 });
 
 test('503保留列，不顯示任意服務內部錯誤內容', async () => {
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((_url: string, options?: RequestInit) =>
       Promise.resolve(
         options?.method === 'DELETE'
@@ -197,8 +217,7 @@ test('503保留列，不顯示任意服務內部錯誤內容', async () => {
 
 test('新增刪除操作後仍能在清單改名而不進入檔案', async () => {
   let renamed = false;
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((_url: string, options?: RequestInit) => {
       if (options?.method === 'POST') renamed = true;
       const file = { ...target, display_name: renamed ? '倉儲工作' : target.display_name };

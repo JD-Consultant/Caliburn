@@ -10,7 +10,12 @@ from caliburn.features.job_description.sources import JdSourceReference, carry_s
 
 
 async def inherited_source_references(
-    session: AsyncSession, job_file_id: UUID, before_revision_id: UUID, after_revision_id: UUID
+    session: AsyncSession,
+    job_file_id: UUID,
+    before_revision_id: UUID,
+    after_revision_id: UUID,
+    *,
+    review_changed_content: bool = False,
 ) -> tuple[JdSourceReference, ...]:
     references = await source_persistence.read_source_references(
         session, job_file_id, before_revision_id
@@ -25,4 +30,5 @@ async def inherited_source_references(
         references,
         source_target_contents(before_profile.profile, before_work),
         source_target_contents(after_profile.profile, after_work),
+        review_changed_content=review_changed_content,
     )

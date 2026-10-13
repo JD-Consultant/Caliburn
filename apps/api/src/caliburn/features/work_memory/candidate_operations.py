@@ -21,7 +21,6 @@ def position_fields(position: MemoryBatchPosition) -> dict[str, str]:
     return {
         "job_file_id": str(position.job_file_id),
         "execution_id": str(position.execution_id),
-        "generation_id": str(position.generation_id),
         "stage_id": str(position.stage_id),
         "phase": position.phase.value,
         "position_id": str(position.position_id),
@@ -32,7 +31,6 @@ def result_position(payload: dict[str, object]) -> MemoryBatchPosition:
     return MemoryBatchPosition(
         stored_uuid(payload, "job_file_id"),
         stored_uuid(payload, "execution_id"),
-        stored_uuid(payload, "generation_id"),
         stored_uuid(payload, "stage_id"),
         MemoryLayer(stored_text(payload, "phase")),
         stored_uuid(payload, "position_id"),

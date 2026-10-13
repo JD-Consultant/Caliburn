@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -18,8 +19,7 @@ afterEach(() => {
 test('each historical consultant reply expands its own original turn without a browser recovery hint', async () => {
   localStorage.clear();
   const reads: string[] = [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string, options?: RequestInit) => {
       expect(options?.method).not.toBe('POST');
       if (path === `/api/job-files/${fileId}/interviews`)

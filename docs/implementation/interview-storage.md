@@ -53,7 +53,7 @@
 
 複合 FK `(job_file_id, source_id)` 防止把甲檔案的原文編入乙檔案；`source_id` 與正式序號是不同身分。這樣分開保存，承接既定的「原文保存不等於正式可用」；沒有新增可自行編輯的對話副本。
 
-App 開場在建立時取得序號 1。已接受員工輸入進原文與提交關係，暫不授予正式資格。A 完成 workflow 在共同完成交易中呼叫 §8 的序號分配介面；沒有任意新增正式訊息的對外 API。單獨停止執行資格不能代替整個 Turn 的候選／context 回退。
+App 開場在建立時取得序號 1。已接受員工輸入進原文與提交關係，暫不授予正式資格。模型執行前，App 以 capture 固定正式上界 H，將本次原話投影為含 `interview_sequence: H+1`、`speaker: employee` 與原文 `text` 的 JSON input，隨 captured request 保存；同輪恢復沿用此固定輸入，JD 可以此號引用原話。A 完成 workflow 在共同完成交易中呼叫 §8 的序號分配介面；沒有任意新增正式訊息的對外 API。單獨停止執行資格不能代替整個 Turn 的候選／context 回退。
 
 ## 2. 建立與重送
 
@@ -86,8 +86,8 @@ App 開場在建立時取得序號 1。已接受員工輸入進原文與提交�
 | 各 feature `persistence.py` | 自己的表及參數化 SQL；不讀另一 feature 的私有 persistence |
 | 各 feature `queries.py` | 對外 typed 查詢投影；無寫入副作用 |
 | `workflows/job_files.py` | 跨領域短交易及每次獨立 session |
-| `workflows/interview_inputs.py` | 同次保存原輸入、原接受結果及 A 准入；不直接啟動模型 |
-| `workflows/interview_completion.py` | 核對 A／writer、鎖定檔案後參與正式化；由 A 完成 workflow 開交易並一併採用 JD／背景意圖，不自行完成整輪 |
+| `workflows/consultant_turns/inputs.py` | 同次保存原輸入、原接受結果及 A 准入；不直接啟動模型 |
+| `workflows/consultant_turns/completion.py` | 核對 A／writer、鎖定檔案後參與正式化；由 A 完成 workflow 開交易並一併採用 JD／背景意圖，不自行完成整輪 |
 | `features/executions/service.py` | 同範圍准入、writer CAS／fencing、暫停與終態資格；不是 Graph 游標或程序存活偵測 |
 | `transport/http/job_files.py`、`interview_inputs.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
 | `bootstrap.py`／`adapters/database.py` | lifespan 組裝／關閉 engine、啟動檢查 migration head；不保存業務內容 |
@@ -102,7 +102,7 @@ App 開場在建立時取得序號 1。已接受員工輸入進原文與提交�
 
 遷移與連線都固定同一 search path；migration 額外核對 `current_schema()`。版本表使用該 default schema，避免同時配置顯式 `version_table_schema` 後，autogenerate 將同一張表再次視為一般表。正式環境的帳號／權限與備份須按[操作手冊](../operations/README.md)配置，不能由隔離測試推定任意部署皆安全。
 
-Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
+HTTP 唯一來源在 [Pydantic models](../../apps/api/src/caliburn/transport/http/models/job_files.py)；FastAPI 導出 OpenAPI，再生成 Web 型別與驗證函式。同義值共用型別，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
 
 ## 5. 官方機制與本案取捨
 
@@ -113,7 +113,7 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／Type
 
 ## 6. 輸入接受、重送與新提交
 
-[InterviewInputWorkflow](../../apps/api/src/caliburn/workflows/interview_inputs.py)在一個短交易內依序執行：
+[InterviewInputWorkflow](../../apps/api/src/caliburn/workflows/consultant_turns/inputs.py)在一個短交易內依序執行：
 
 1. 鎖定職務檔案列。
 2. 查原命令。
@@ -160,9 +160,9 @@ terminal 結果不可反向改為 active；原結果查回不授予新的寫入�
 
 ## 8. 正式答覆與序號：參與完成交易，不自成完成 API
 
-`record_formal_interview(session, writer, reply_text=...)` 是 [A 完成交易的訪談參與介面](../../apps/api/src/caliburn/workflows/interview_completion.py)，不擁有 session／COMMIT，不呼叫模型，也不自行把 execution 標成 completed。
+`ConsultantCompletionWorkflow.complete` 在 [A 完成模組](../../apps/api/src/caliburn/workflows/consultant_turns/completion.py)的同一交易內呼叫私有訪談 participant。participant 不擁有 session／COMMIT，不呼叫模型，也不自行把 execution 標成 completed。
 
-調用者必須已辨認完整正式答覆，不把進度文字、工具請求或串流片段交入；A 完成 workflow 在同一交易採用 JD、來源並確立背景要求資格，再裁決完成，不能把本介面另包成獨立正式化 endpoint。
+調用者必須已辨認完整正式答覆，不把進度文字、工具請求或串流片段交入；A 完成 workflow 在同一交易採用 JD、來源並確立背景要求資格，再裁決完成，不能把 participant 另包成獨立正式化 endpoint。
 
 參與介面依序執行：
 
@@ -170,6 +170,8 @@ terminal 結果不可反向改為 active；原結果查回不授予新的寫入�
 2. 未完成原結果則鎖當前 writer，確認仍 active；paused、cancelled、failed、過期 writer、錯誤檔案及 Memory 不可授予正式訪談資格。
 3. 由提交關係取得原員工來源，完整文字不再複製。以該檔案現有正式最大序號加一，分配員工及完整答覆兩個序號；分配受同一檔案列鎖保護，不使用 `nextval` 或奇偶推斷說話者。
 4. 同交易保存答覆原文、兩則正式資格與答覆—原提交關係；後續任何完成效果失敗，這些寫入一起回滾。下一次合法提交不消耗被回滾的序號。
+
+同檔案只允許一個 active／paused A，因此從 capture 到正式完成，正式上界不會被另一輪 A 推進；完成時員工取得的號碼就是模型 input 已提供的 H+1。取消／失敗不耗正式號，下一個新 Turn 可重用該號；JD 來源仍以各輪不可變原話身分區別，不會把取消原文當成後來同號原文。
 
 新增的關係只保存來源 ID，不另存答覆正文或建立通用 receipt。原交流返回員工／顧問的固定來源與序號；背景整理的固定取材上界由其中 `employee_input.interview_sequence` 取得，**不是** 顧問答覆或當下全檔最大序號。
 
@@ -182,10 +184,10 @@ terminal 結果不可反向改為 active；原結果查回不授予新的寫入�
 此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[Memory 選讀與來源](memory-tools.md)，是閱讀記號，不是模型須填的參數：
 
 - **K**：本工作固定採用的已發布 Memory 所涵蓋的訪談上界；首次無 Memory 為 0。
-- **H**：A 開始前已成立的正式歷史上界，不含本次尚未正式編號的輸入。
+- **H**：A 開始前已成立的正式歷史上界，不含本次已標示 H+1、但尚未取得正式資格的輸入。
 - **F**：B 批次的固定取材上界，取自觸發要求的 A Turn 成功完成後，其最後員工輸入的正式序號；不含後面的顧問答覆。
 
-例如 K=30、H=39，A 的近期歷史 `(K,H]` 就是正式序號 31–39，另加本次輸入；B 若固定 F=38，B1 必處理的是 31–38，不能加顧問答覆 39。補前問及按需回查仍沿來源契約，不改這些固定界線。
+例如 K=30、H=39，A 首次／換版窗口的原話範圍 `(K,H]` 就是正式序號 31–39，另加標示 40 的本次 input；B 若固定 F=38，B1 必處理的是 31–38，不能加顧問答覆 39。A 同版新 Turn 沿原生歷史加本次 input，不重貼原話範圍。按需歷史查詢仍受固定 H／F 約束；本輪 H+1 已隨 input 提供，不加入歷史工具的可讀範圍。
 
 [訪談 queries](../../apps/api/src/caliburn/features/interviews/queries.py)提供內部 typed 介面；不把 scope 放進模型可填參數，也不新增搜尋／第二套原話儲存：
 
@@ -199,7 +201,7 @@ terminal 結果不可反向改為 active；原結果查回不授予新的寫入�
 
 所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的資料保存模組。即使後面又有正式訪談，原 scope 不會擴張。
 
-直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
+直接指定訊息／範圍不補前問；`read_recent_interviews` 才按來源契約補一則，沒有歷史時不捏造。A 重建窗口使用嚴格 `(K,H]` 範圍查詢，不補插已涵蓋的顧問／App 訊息；首次 K=0 時 App 開場自然在範圍內。B 的近期投影規則不變。查詢不按字數截斷或把 role 轉成新發話。
 
 A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工作恢復沿原範圍。模型可見投影與錯誤由[工具邊界](memory-tools.md)負責，完整請求容量由[模型外送](model-requests.md#4-固定請求計數與容量准入)核對。來源查詢不自行刷新角色基準。
 
@@ -211,7 +213,7 @@ UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 c
 
 ## 10. 列表改名：名稱新鮮度與原操作結果
 
-改名只改職務檔案的顯示標籤，同名仍可存在；stable ID、員工姓名、訪談與 JD 不受影響。HTTP 用 `POST /api/job-files/{job_file_id}/rename`，參數由[唯一 schema](../../apps/api/contracts/http/rename-job-file-request.schema.json)定義；這不是 Memory 的 title 解析，也不把 UI 修訂參數搬進模型工具。
+改名只改職務檔案的顯示標籤，同名仍可存在；stable ID、員工姓名、訪談與 JD 不受影響。HTTP 用 `POST /api/job-files/{job_file_id}/rename`，參數由 [RenameJobFileRequest](../../apps/api/src/caliburn/transport/http/models/job_files.py) 定義；這不是 Memory 的 title 解析，也不把 UI 修訂參數搬進模型工具。
 
 `JobFileWorkflow.rename` 依序處理：
 

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import type { RefObject } from 'react';
 import { Stack, TextField } from '@mui/material';
-import type { Capability } from '../../shared/api/generated/jd-work-view';
+import type { Capability } from '../../shared/api/generated/http/types.gen';
 import { isEditJdCapabilitiesRequest } from '../../shared/api/validation';
 import type { WorkCommand } from './jd-work-api';
 

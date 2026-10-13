@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { formalJdQueries } from './jd-queries';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 /** The four supporting sections fold to their heading and count (Notion toggles, GOV.UK accordion); the section bar opens them. */
@@ -5,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/http/types.gen';
 import { JdOutline } from './JdOutline';
 import { JdWorkEditor } from './JdWorkEditor';
 
@@ -80,10 +81,7 @@ const workJd: JdWorkView = {
 function renderEditor(withOutline = false, view: JdWorkView = jd) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => Promise.resolve(Response.json(view))),
-  );
+  stubHttp(vi.fn(() => Promise.resolve(Response.json(view))));
   return render(
     <QueryClientProvider client={client}>
       {withOutline && <JdOutline />}

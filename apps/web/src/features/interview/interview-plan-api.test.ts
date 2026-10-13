@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 /** Terminal reads prove adoption through the shared cache while transport failures remain errors. */
 import { QueryClient } from '@tanstack/react-query';
 import { waitFor } from '@testing-library/react';
@@ -18,8 +19,7 @@ function client() {
 function deferredFetch() {
   const calls: { signal: AbortSignal | null | undefined; resolve: (response: Response) => void }[] =
     [];
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     (_path: string, options?: RequestInit) =>
       new Promise<Response>((resolve) => {
         calls.push({ signal: options?.signal, resolve });
@@ -80,8 +80,7 @@ test.each([
       job_file_id: fileId,
       plan: '上一採用版',
     });
-    vi.stubGlobal(
-      'fetch',
+    stubHttp(
       vi
         .fn()
         .mockResolvedValueOnce(Response.json(invalid))

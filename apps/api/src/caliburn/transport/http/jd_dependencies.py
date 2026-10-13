@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, Request
 
 from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
-from caliburn.workflows.jd_editing import JdEditingWorkflow
+from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
 
 
 async def get_jd_workflow(request: Request) -> AsyncIterator[JdEditingWorkflow]:

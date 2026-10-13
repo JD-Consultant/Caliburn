@@ -7,14 +7,14 @@ import pytest
 
 from caliburn.features.executions import budgets
 from caliburn.features.executions.budget_models import BudgetExceededError, BudgetLimit
-from caliburn.workflows.model_requests import PriorOutboundAttemptError
+from caliburn.workflows.executions.model_requests import PriorOutboundAttemptError
 from tests.integration.test_outbound_retry import request_fixture, retry_executor
 
 pytestmark = pytest.mark.postgres
 
 
 @pytest.mark.parametrize("kind", ["model", "count", "compact"])
-def test_deadline_uses_persisted_policy_and_does_not_readmit_unknown_attempt(
+def test_deadline_uses_persisted_policy_and_blocks_another_outbound(
     database_settings, database_connection, kind
 ):
     file_id = uuid4()
@@ -54,9 +54,20 @@ def test_deadline_uses_persisted_policy_and_does_not_readmit_unknown_attempt(
                 )
             assert len(attempts) == 1
             assert attempts[0].failure is None
-            with pytest.raises(PriorOutboundAttemptError):
-                await send()
+            if kind == "count":
+                # 未保存計數可重算，但原 deadline 仍先阻止新外送。
+                with pytest.raises(BudgetExceededError) as readmission:
+                    await send()
+                assert readmission.value.limit == BudgetLimit.DEADLINE
+            else:
+                with pytest.raises(PriorOutboundAttemptError):
+                    await send()
             assert calls == 1
+            async with executor.sessions() as session:
+                assert (
+                    await budgets.read_request_attempts(session, executor.writer.scope, request_id)
+                    == attempts
+                )
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

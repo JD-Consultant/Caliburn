@@ -61,7 +61,6 @@ def source_change_payload(command: ReviseJdSources) -> dict[str, object]:
             "kind": target.kind.value,
             "item_id": str(target.item_id) if target.item_id is not None else None,
             "field": target.field.value if target.field is not None else None,
-            "task_id": str(target.task_id) if target.task_id is not None else None,
         },
         "changes": changes,
     }

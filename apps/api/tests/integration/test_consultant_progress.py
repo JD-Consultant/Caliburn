@@ -18,7 +18,7 @@ from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.interviews.models import SubmitInterviewInput
 from caliburn.settings import DatabaseSettings
 from caliburn.transport.http.consultant_turns import get_consultant_status_workflow
-from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
+from caliburn.workflows.consultant_turns.status import ConsultantStatusWorkflow
 from tests.fixtures.response_loop import response_at
 
 pytestmark = pytest.mark.postgres

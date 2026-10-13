@@ -4,6 +4,8 @@
 
 基線為 PostgreSQL、LangGraph 與 OpenAI direct Responses。機制調整須有具體證據並同步契約與測試；涉及產品效果、來源權責或恢復保證時，依[貢獻指南](../../CONTRIBUTING.md#變更範圍與審查)確認範圍。
 
+**Agent 生態：**採 LangChain／LangGraph，以 `create_agent` 的公開 model／middleware 接縫承接模型與工具路由，原生 items／compact、取消恢復及完整 Debug 由既有責任保留。App 明確關閉框架雲端 tracing；Agent Server、LangSmith 與 Deep Agents 沒有隨套件依賴自動啟用。[LangChain Agent](https://docs.langchain.com/oss/python/langchain/agents)、[middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)。
+
 先查[工具鏈](#1-首選工具鏈)，變更前核對[機制風險](#2-有具體風險的機制先驗再擴大)；目前限制值見[運作參數](#3-運作參數不是無限值也不是已核准費用)，選型邊界見[未採用項目](#4-明確不採用)。產品層的架構理由見[設計取捨](../architecture/design-decisions.md)。
 
 ## 1. 首選工具鏈
@@ -15,7 +17,7 @@
 | Python 與套件 | CPython 3.14 系列、uv＋單一 API lock | 版本限制與鎖定值由 `apps/api/pyproject.toml`、`uv.lock` 維護；升級須核對相依及 Windows wheels。[官方支援表](https://devguide.python.org/versions/) |
 | API | FastAPI＋Pydantic 2＋Uvicorn | typed HTTP 邊界、依賴注入及模組 router；不再加第二套 Django／Node 業務後端。[官方模組化](https://fastapi.tiangolo.com/tutorial/bigger-applications/) |
 | DB | PostgreSQL 18 受支援穩定 patch；SQLAlchemy 2＋psycopg 3；Alembic | 關聯式 JD、約束、短交易；ORM／Core 均可在 feature persistence 內使用，不建通用 DB 引擎。每個 async task 自己的 session，不共享 mutable AsyncSession。[SQLAlchemy](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)、[PG 隔離](https://www.postgresql.org/docs/current/transaction-iso.html) |
-| Graph | LangGraph Graph API＋官方 PostgreSQL checkpointer | 持久節點、私有子圖、恢復機制；不使用 LangChain Agent／Message adapter。框架傳遞相依中的 langchain-core 不等於本產品使用它管理對話。[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[Subgraphs](https://docs.langchain.com/oss/python/langgraph/use-subgraphs) |
+| Agent／Graph | LangChain create_agent＋LangGraph＋官方 PostgreSQL checkpointer | A／B 共用模型與工具路由；messages 只保存框架路由投影，原生 request／response 仍為接續權威。工具固定命令經同步子圖的 prepare 保存 ACK 後才執行；Functional API 的 task 返回不當作相同屏障。[Agents](https://docs.langchain.com/oss/python/langchain/agents)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) |
 
 #### 執行政策與運算
 
@@ -33,7 +35,8 @@
 |---|---|---|
 | Web | React＋TypeScript strict＋Vite；React Router 僅管理路由；TanStack Query 管 server state | 本機 SPA 無 SEO／SSR 需求；相比 Next.js 不引入第二套 server action／業務層。React 官方列出這些成熟選項，不代表官方建議所有專案優先採用 SPA。[React](https://react.dev/learn/build-a-react-app-from-scratch)、[Vite](https://vite.dev/guide/) |
 | UI 元件 | MUI Core；原生受控欄位 | 使用既有表單、Dialog、鍵盤可操作元件，不從底層重造 widget；不選付費 Data Grid 或全文富文字編輯器，JD 是分欄編輯。[MUI](https://mui.com/material-ui/getting-started/) |
-| 跨語言契約 | JSON Schema SSOT；datamodel-code-generator 產 Python，json-schema-to-typescript 產 TS；FastAPI 再產 OpenAPI | 兩個鎖定生成器讀同一 schema，不是兩份規格。前者不產 TS；型別生成也不代替執行時驗證。[Python 生成器](https://datamodel-code-generator.koxudaxi.dev/)、[TS 生成器](https://github.com/bcherny/json-schema-to-typescript)、[契約策略](../standards/contract-strategy.md) |
+| HTTP 契約 | Pydantic → FastAPI OpenAPI → Hey API SDK／TypeScript＋Ajv standalone | 同一來源包含路由與型別，Web 不手寫第二份 shape 或 endpoint；仍核回應 scope。[Hey API](https://heyapi.dev/docs/openapi/typescript/plugins/sdk)、[Ajv](https://ajv.js.org/standalone.html)、[契約策略](../standards/contract-strategy.md) |
+| 工具契約 | JSON Schema → datamodel-code-generator Python／json-schema-to-typescript TS | 原 Schema 同時供 provider 定義及 runtime guard；生成型別不取代准入。[Python 生成器](https://datamodel-code-generator.koxudaxi.dev/)、[TS 生成器](https://github.com/bcherny/json-schema-to-typescript) |
 | PDF | Python Playwright＋Chromium；受控 HTML／print CSS 模板 | 後端從正式 JD 投影，固定字型、禁止遠端資源與腳本；可用瀏覽器版面測試驗證。代價是 Chromium 體積與字型安裝；不把瀏覽器列印對話框當匯出完成。[官方 page.pdf](https://playwright.dev/python/docs/api/class-page#page-pdf) |
 
 ### 測試與靜態品質
@@ -89,11 +92,11 @@ A／B1／B2 的輪前與輪中留量門檻、時點及回退依[共用執行與�
 | 工具與壓縮 | 工具 call 不另算模型步數，模型修正參數則是新迭代／操作；工具數與 logical compaction 各有上限，見[多 Step 接續](agent-execution.md#44-有界多-step-接續)及[壓縮採用](agent-execution.md#51-完整-c-保存採用與中途接續) |
 | 整體限制 | 總外送、deadline、timeout、輸出留量及金額各自限制不同資源。正常產品與付費評測的金額政策見[用途界線](model-requests.md#7-產品與付費驗證的金額界線)，不互相套用 |
 
-數值來源為 [ModelSettings](../../apps/api/src/caliburn/settings.py)、[共用 runtime](../../apps/api/src/caliburn/workflows/model_runtime.py)、[重試政策](../../apps/api/src/caliburn/agent_execution/response_retries.py)與角色 runner。API 逾時不等於未計費；create／count／compact 的 attempts 共用工作外送紀錄。品質、錯誤率、token、延遲及費用分別觀察，不把更高上限當作更佳效果。執行與容量的測試責任見[驗證對照](verification-plan.md)。
+數值來源為 [ModelSettings](../../apps/api/src/caliburn/settings.py)、[共用 runtime](../../apps/api/src/caliburn/workflows/executions/model_runtime.py)、[重試政策](../../apps/api/src/caliburn/agent_execution/response_retries.py)與角色 runner。API 逾時不等於未計費；create／count／compact 的 attempts 共用工作外送紀錄。品質、錯誤率、token、延遲及費用分別觀察，不把更高上限當作更佳效果。執行與容量的測試責任見[驗證對照](verification-plan.md)。
 
 ## 4. 明確不採用
 
-正式 App 未選用微服務、Redis／Kafka／Celery、Git／event-sourcing 版本框架、通用 rule engine、第二套 LangChain／Agents SDK loop、全域前端 Redux 狀態或每層一個 package。App 本身不做向量搜尋；明示接入的獨立 RAG 使用 Qdrant，責任與部署見[RAG 架構](../architecture/rag-pipeline.md)。
+正式 App 未選用微服務、Redis／Kafka／Celery、Git／event-sourcing 版本框架、通用 rule engine、平行的第二套 Agent loop、全域前端 Redux 狀態或每層一個 package。App 本身不做向量搜尋；明示接入的獨立 RAG 使用 Qdrant，責任與部署見[RAG 架構](../architecture/rag-pipeline.md)。
 
 這是目前選型，不是永久技術禁令。MCP、插件、觀測／評測平台或不同框架可依實際收益重新比較，也不因候選平台內部使用某套件就一律排除。評估時一併考慮成熟度、整合、測試、查閱及運維成本，方法依[貢獻指南](../../CONTRIBUTING.md#驗證與提交)。
 

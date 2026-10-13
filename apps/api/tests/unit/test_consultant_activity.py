@@ -4,7 +4,10 @@ from uuid import uuid4
 
 import pytest
 
-from caliburn.workflows.consultant_activity import ConsultantActivityHub, PublicCommentaryUpdate
+from caliburn.workflows.consultant_turns.activity import (
+    ConsultantActivityHub,
+    PublicCommentaryUpdate,
+)
 
 
 def test_app_exposes_only_the_current_activity_stream():
@@ -61,7 +64,7 @@ async def test_detach_and_no_subscriber_publish_do_not_replay_or_retain() -> Non
 
 
 async def test_subscriber_capacity_is_released_and_oversized_updates_are_dropped() -> None:
-    from caliburn.workflows.public_text_stream import PublicStreamCapacityError
+    from caliburn.workflows.consultant_turns.activity import PublicStreamCapacityError
 
     hub = ConsultantActivityHub(max_subscribers=1, max_update_chars=8)
     file_id, execution_id = uuid4(), uuid4()

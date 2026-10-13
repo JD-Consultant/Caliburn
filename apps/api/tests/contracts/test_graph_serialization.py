@@ -1,5 +1,9 @@
 """Checkpoint allowlists must block unknown constructors before tool execution."""
 
+import base64
+import json
+import subprocess
+import sys
 from dataclasses import dataclass, fields, is_dataclass
 from typing import ClassVar
 from uuid import UUID
@@ -20,7 +24,7 @@ from caliburn.features.work_memory.models import (
     ReferenceChanges,
 )
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.transport.model_tools.memory_writes import PreparedMemoryToolCall
+from caliburn.transport.model_tools.memory_write_checkpoint import PreparedMemoryToolCall
 
 # The caller owns these exact payload types; the adapter has no domain registry.
 MEMORY_TYPES = (
@@ -54,7 +58,6 @@ def position(request: pytest.FixtureRequest) -> MemoryBatchPosition:
     return MemoryBatchPosition(
         job_file_id=UUID(int=1),
         execution_id=UUID(int=2),
-        generation_id=UUID(int=3),
         stage_id=UUID(int=4),
         phase=MemoryLayer(request.param),
         position_id=UUID(int=5),
@@ -216,3 +219,36 @@ def test_pickle_checkpoints_are_not_loaded() -> None:
 
     with pytest.raises(NotImplementedError, match="Unknown serialization type: pickle"):
         serializer.loads_typed(("pickle", b"N."))
+
+
+def test_fresh_process_restores_new_memory_codec_with_exact_nested_types(prepared_call) -> None:
+    serializer = create_graph_serializer(allowed_types=MEMORY_TYPES)
+    kind, payload = serializer.dumps_typed(prepared_call)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import base64,json,sys; "
+            "from caliburn.adapters.graph_checkpointer import create_graph_serializer; "
+            "from caliburn.transport.model_tools.memory_write_checkpoint import "
+            "MEMORY_CHECKPOINT_TYPES,require_prepared_memory_call; "
+            "p=json.load(sys.stdin); "
+            "value=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES).loads_typed("
+            "(p['kind'],base64.b64decode(p['payload']))); "
+            "require_prepared_memory_call(value); "
+            "print(json.dumps([type(value).__module__,str(value.command.command_id),"
+            "str(value.command.position.stage_id),value.success_output]))",
+        ],
+        input=json.dumps({"kind": kind, "payload": base64.b64encode(payload).decode("ascii")}),
+        text=True,
+        capture_output=True,
+        encoding="utf-8",
+        timeout=30,
+        check=True,
+    )
+    assert json.loads(result.stdout) == [
+        "caliburn.transport.model_tools.memory_write_checkpoint",
+        str(prepared_call.command.command_id),
+        str(prepared_call.command.position.stage_id),
+        prepared_call.success_output,
+    ]

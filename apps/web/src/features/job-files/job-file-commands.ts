@@ -1,8 +1,11 @@
 /** File command payloads, rejection policy and recovery slots. */
 import type { QueryClient } from '@tanstack/react-query';
-import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
-import type { RenameJobFileRequest } from '../../shared/api/generated/rename-job-file-request';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type {
+  CreateJobFileRequest,
+  RenameJobFileRequest,
+  JobFile,
+} from '../../shared/api/generated/http/types.gen';
+
 import { ApiError } from '../../shared/api/http';
 import { refreshQueries } from '../../shared/api/refresh-queries';
 import { isCreateJobFileRequest, isRenameJobFileRequest } from '../../shared/api/validation';
@@ -38,6 +41,7 @@ export function creationCommand(
 ): StoredCommand<CreateJobFileRequest, JobFile, CreationRejection> {
   return {
     store: pendingCreation,
+    correlation: (command) => (command ? { commandId: command.command_id } : {}),
     execute: createJobFile,
     classifyRejection: (error: unknown) => {
       if (!(error instanceof ApiError)) return null;
@@ -57,6 +61,10 @@ export function renameCommand(
 ): StoredCommand<RenameJobFileRequest, JobFile> {
   return {
     store: pendingRename(jobFileId),
+    correlation: (command) => ({
+      jobFileId,
+      ...(command ? { commandId: command.command_id } : {}),
+    }),
     execute: (command: RenameJobFileRequest) => renameJobFile(jobFileId, command),
     classifyRejection: (error: unknown) =>
       error instanceof ApiError &&

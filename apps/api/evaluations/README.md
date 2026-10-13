@@ -17,7 +17,7 @@ uv run --locked python -m evaluations.consultant_comparison evaluations/consulta
 | `case.name`、`employee_name`、`inputs` | 同一案例的名稱、合成受訪者及依序送出的固定輸入 |
 | `case.criteria` | 留給評閱者的判準；不送進受測 Agent |
 | `candidates[].name` | 唯一候選名稱，也是輸出子目錄 |
-| `prompts` | 替換 `professional_method`、`focus`、`interview_plan` 或 `occupation_references` 區段；省略者沿正式預設 |
+| `prompts` | 替換 `professional_method`、`interview_plan` 或 `occupation_references` 區段；省略者沿正式預設 |
 | `tool_descriptions` | 按正式工具名稱覆寫說明；不改 schema 或 handler |
 | `interview_plans_enabled` | 比較是否提供 Plan 能力，預設開啟 |
 | `jd_read_max_result_characters` | 比較 JD 工具既有回傳容量；必須為正整數，不靜默截斷結果 |
@@ -43,7 +43,7 @@ uv run --locked python -m evaluations.consultant_comparison evaluations/consulta
 - `diagnostics.json`：其後擷取的原始模型請求、工具參數／結果與捕捉綁定。擷取失敗則留下 `diagnostics-failure.json` 的階段及安全錯誤種類，正式結果仍保留；CLI 回非零、程式化入口回 `CandidateRun.diagnostics_available=False`，停止這批比較而不重送模型。
 - 失敗時的 `failure.json`：錯誤類別。原件保留，入口停止，不自動追加輸入或重跑。
 
-manifest 與 App 使用首次等待前固定的同一候選。實際發送內容以 `diagnostics.json` 為準；缺少診斷須明列觀測未完成；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)，不必建立另一套 UI。
+manifest 與 App 使用首次等待前固定的同一候選。實際發送內容以 `diagnostics.json` 為準；缺少診斷須明列觀測未完成；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/operations/README.md#查閱-ai-執行原件)，不必建立另一套 UI。
 
 ## 使用真 provider
 

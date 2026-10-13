@@ -1,6 +1,6 @@
 """複合 JD 編輯先使用既有純規則算出最終內容與來源，再交保存邊界。"""
 
-from dataclasses import dataclass, replace
+from dataclasses import replace
 
 from caliburn.features.job_description.area_changes import apply_area_change
 from caliburn.features.job_description.areas import CreateArea, ResponsibilityArea, ReviseArea
@@ -26,13 +26,13 @@ from caliburn.features.job_description.compound_edits import (
     ItemContentRevision,
     ItemCreation,
     JdEditEffect,
-    ReviseItemWithSources,
     ReviseProfileWithSources,
 )
 from caliburn.features.job_description.condition_changes import apply_condition_change
 from caliburn.features.job_description.conditions import (
     JobCondition,
 )
+from caliburn.features.job_description.edit_changes import JdEditChanges
 from caliburn.features.job_description.models import JdProfile, apply_profile_changes
 from caliburn.features.job_description.source_changes import apply_source_changes
 from caliburn.features.job_description.source_targets import source_target_contents
@@ -47,17 +47,8 @@ from caliburn.features.job_description.sources import (
     carry_source_references,
 )
 from caliburn.features.job_description.task_changes import apply_task_edit
-from caliburn.features.job_description.tasks import CreateTask, DetailKind, ReviseTask, WorkTask
+from caliburn.features.job_description.tasks import CreateTask, ReviseTask, WorkTask
 from caliburn.features.job_description.work_models import JdWorkRevision
-
-
-@dataclass(frozen=True, slots=True)
-class CompoundChanges:
-    profile: JdProfile
-    work: JdWorkRevision
-    references: tuple[JdSourceReference, ...]
-    changed_content: CompoundItem | None
-    created_item: CompoundItem | None
 
 
 def apply_content_change(
@@ -96,57 +87,6 @@ def item_source_target(item: CompoundItem) -> JdSourceTarget:
             return JdSourceTarget(SourceTargetKind.CONDITION, item_id=item.condition_id)
 
 
-def task_source_groups(
-    task: WorkTask, command: CreateTaskWithSources
-) -> tuple[BoundItemSources, ...]:
-    if len(task.details) != len(command.detail_sources):
-        raise ValueError("Task details must match their bound evidence")
-    targets = (
-        (item_source_target(task), command.task_sources),
-        *(
-            (JdSourceTarget(SourceTargetKind.DETAIL, d.detail_id, task_id=task.task_id), sources)
-            for d, sources in zip(task.details, command.detail_sources, strict=True)
-        ),
-        *(
-            (
-                JdSourceTarget(
-                    SourceTargetKind.TASK_CAPABILITY, c.capability_id, task_id=task.task_id
-                ),
-                c.sources,
-            )
-            for c in command.capabilities
-        ),
-    )
-    return tuple(
-        BoundItemSources(target, tuple(AddJdSource(s) for s in sources))
-        for target, sources in targets
-    )
-
-
-def added_detail_sources(
-    before: JdWorkRevision, after: JdWorkRevision, command: ReviseItemWithSources
-) -> tuple[BoundItemSources, ...]:
-    if not command.added_details:
-        return ()
-    if not isinstance(command.content, ReviseTask):
-        raise TypeError("Added detail evidence requires a task revision")
-    original = next(t for t in before.tasks if t.task_id == command.content.task_id)
-    revised = next(t for t in after.tasks if t.task_id == original.task_id)
-    previous_ids = {d.detail_id for d in original.details}
-    new = tuple(d for d in revised.details if d.detail_id not in previous_ids)
-    choices = tuple(c for kind in DetailKind for c in command.added_details if c.kind == kind)
-    if len(new) != len(choices):
-        raise ValueError("Added detail result does not match its bound evidence")
-    return tuple(
-        BoundItemSources(
-            JdSourceTarget(SourceTargetKind.DETAIL, d.detail_id, task_id=original.task_id),
-            tuple(AddJdSource(s) for s in c.sources),
-        )
-        for d, c in zip(new, choices, strict=True)
-        if c.sources
-    )
-
-
 def compound_effect(command: CompoundJdEdit, *, changed: bool) -> JdEditEffect:
     if not changed:
         return "unchanged"
@@ -169,7 +109,7 @@ def apply_compound_changes(
     work: JdWorkRevision,
     references: tuple[JdSourceReference, ...],
     command: CompoundJdEdit,
-) -> CompoundChanges:
+) -> JdEditChanges:
     before_profile, before_work = profile, work
     changed_content = created = None
     groups: tuple[BoundItemSources, ...]
@@ -207,11 +147,19 @@ def apply_compound_changes(
                 SetTaskCapability(created.task_id, link.capability_id, True),
             )
             work = replace(work, task_links=links)
-        groups = tuple(g for g in task_source_groups(created, command) if g.changes)
+        groups = (
+            (
+                BoundItemSources(
+                    item_source_target(created), tuple(AddJdSource(s) for s in command.task_sources)
+                ),
+            )
+            if command.task_sources
+            else ()
+        )
     else:
         if command.content is not None:
             work, changed_content = apply_content_change(work, command.content)
-        groups = (*command.sources, *added_detail_sources(before_work, work, command))
+        groups = command.sources
         for change in command.capabilities:
             _, links, _ = apply_capability_change(
                 work.capabilities, work.task_links, tuple(t.task_id for t in work.tasks), change
@@ -219,7 +167,10 @@ def apply_compound_changes(
             work = replace(work, task_links=links)
     targets = source_target_contents(profile, work)
     references = carry_source_references(
-        references, source_target_contents(before_profile, before_work), targets
+        references,
+        source_target_contents(before_profile, before_work),
+        targets,
+        review_changed_content=True,
     )
     for group in groups:
         if group.target not in targets:
@@ -230,4 +181,4 @@ def apply_compound_changes(
                 command.command_id, command.expected_revision_id, group.target, group.changes
             ),
         )
-    return CompoundChanges(profile, work, references, changed_content, created)
+    return JdEditChanges(profile, work, references, changed_content, created)

@@ -8,12 +8,12 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
-from caliburn.workflows.jd_model_references import JdModelReferences
-from caliburn.workflows.jd_reads import JdReadWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.reads import JdReadWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.integration.test_jd_item_revision import setup_item
 from tests.integration.test_jd_source_tool_actions import invoke, source_tools
 
@@ -32,6 +32,7 @@ def reader_for(client, writer):
     return JdReadTools(
         JdReadWorkflow(client.app.state.database.sessions),
         PublishedMemoryRead(writer.scope, None, 1),
+        references=JdModelReferences(client.app.state.database.sessions, writer.scope.job_file_id),
     )
 
 
@@ -56,7 +57,7 @@ def test_short_map_item_citation_roundtrip_preserves_original_identity(client: T
                     {
                         "action": "add_source",
                         "target": {"kind": "item"},
-                        "source": {"kind": "current_input"},
+                        "source": {"kind": "interview", "interview_sequence": 2},
                     },
                 ],
             },
@@ -217,7 +218,6 @@ def test_nested_locators_move_and_link_without_rewriting_text(client):
                         "action": "set_capability",
                         "capability_read_ref": skill_ref,
                         "relationship": "link",
-                        "supporting_sources": [],
                     },
                 ],
             },
@@ -257,7 +257,6 @@ def test_nested_locators_move_and_link_without_rewriting_text(client):
     assert detail["outcomes"][0] == {
         "read_ref": outcome_ref,
         "text": "修訂成果",
-        "supporting_sources": [],
     }
     assert detail["required_skills"][0]["read_ref"] == skill_ref
 

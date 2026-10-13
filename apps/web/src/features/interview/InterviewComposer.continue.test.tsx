@@ -1,3 +1,4 @@
+import { stubHttp } from '../../test-http';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,7 +7,7 @@ import { InterviewComposer } from './InterviewComposer';
 import { InterviewHistory } from './InterviewHistory';
 import { consultantTurnQuery, readTurnHint, retainTurnHint } from './interview-turn-api';
 import { interviewHistoryQuery } from './interview-api';
-import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import type { ConsultantTurn } from '../../shared/api/generated/http/types.gen';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const executionId = '20000000-0000-4000-8000-000000000002';
@@ -47,7 +48,7 @@ afterEach(() => {
 test('waiting for the file lock protects the next input after a completed turn', async () => {
   await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const posts: { command_id: string; text: string }[] = [];
-  vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+  stubHttp((path: string, options?: RequestInit) => {
     if (options?.method === 'POST') {
       if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
       const command = JSON.parse(options.body) as { command_id: string; text: string };
@@ -114,7 +115,7 @@ test.each(['retained', 'discovered'] as const)(
       await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
     }
     const active = { ...completed, status: 'active', allowed_controls: ['pause', 'cancel'] };
-    vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+    stubHttp((path: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
         const command = JSON.parse(options.body) as { command_id: string; text: string };
@@ -164,7 +165,7 @@ test.each(['retained', 'discovered'] as const)(
 test('a next-answer draft survives a completed-status refetch without being resent', async () => {
   await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const requests: string[] = [];
-  vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+  stubHttp((path: string, options?: RequestInit) => {
     requests.push(options?.method ?? 'GET');
     return Promise.resolve(Response.json(path.endsWith('/reasoning-summaries') ? [] : completed));
   });
@@ -181,7 +182,7 @@ test('a next-answer draft survives a completed-status refetch without being rese
 test('completed turns leave no footer process links even before their formal reply loads', async () => {
   await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const reads: string[] = [];
-  vi.stubGlobal('fetch', (path: string) => {
+  stubHttp((path: string) => {
     reads.push(path);
     return Promise.resolve(Response.json(path.endsWith('/reasoning-summaries') ? [] : completed));
   });
@@ -212,7 +213,7 @@ test('completed turns leave no footer process links even before their formal rep
 
 test('completion confirmed by another page retires an uncertain command before the next answer', async () => {
   const posts: { command_id: string; text: string }[] = [];
-  vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+  stubHttp((path: string, options?: RequestInit) => {
     if (options?.method === 'POST') {
       if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
       const command = JSON.parse(options.body) as { command_id: string; text: string };
@@ -263,7 +264,7 @@ test('history retry restores the completed reply and its process after the next 
     ...completed,
     commentary: [{ response_id: 'response-1', message_id: 'message-1', text: '已核對上一輪職責' }],
   };
-  vi.stubGlobal('fetch', (path: string, options?: RequestInit) => {
+  stubHttp((path: string, options?: RequestInit) => {
     if (options?.method === 'POST') {
       if (typeof options.body !== 'string') throw new Error('Expected a JSON request body');
       const command = JSON.parse(options.body) as { command_id: string };

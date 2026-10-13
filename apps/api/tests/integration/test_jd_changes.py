@@ -15,6 +15,7 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.job_description import source_persistence
+from caliburn.features.job_description.model_references import JdModelReferences
 from caliburn.features.job_description.models import ProfileField
 from caliburn.features.job_description.navigation import JdReadTargetNotFoundError
 from caliburn.features.job_description.sources import (
@@ -34,11 +35,14 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_changes import JdChangesWorkflow, UnsupportedJdSourceKindError
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.source_changes import (
+    JdChangesWorkflow,
+    UnsupportedJdSourceKindError,
+)
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 
@@ -147,6 +151,7 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
     )
     citation = f"citation_{references[0].citation_id.hex}"
     reader = JdChangesWorkflow(client.app.state.database.sessions)
+    locators = JdModelReferences(client.app.state.database.sessions, file_id)
     result = client.portal.call(reader.read_source, binding, citation)
     assert result.changes[0].before.content == result.changes[0].after.content
     assert len(result.changes) == 2
@@ -166,7 +171,9 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
     assert "可讀 target_title：庫存管理" in output
     assert "未解除待核對" in output
     limited = client.portal.call(
-        partial(read_jd_source_changes, reader, binding, citation, max_result_characters=5)
+        partial(
+            read_jd_source_changes, reader, binding, citation, locators, max_result_characters=5
+        )
     )
     assert limited.startswith("rejected: read_limit_exceeded")
     assert "每月盤點" not in limited
@@ -225,7 +232,7 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
     assert "同一物件已不在本 Turn 固定 Memory" in project_jd_source_changes(return_to_late)
     assert "不得替代舊身分" not in project_jd_source_changes(return_to_late)
     unavailable = client.portal.call(
-        read_jd_source_changes, reader, replace(binding, snapshot_id=uuid4()), citation
+        read_jd_source_changes, reader, replace(binding, snapshot_id=uuid4()), citation, locators
     )
     assert unavailable.startswith("rejected: source_not_available")
     outside_frontier = client.portal.call(
@@ -233,6 +240,7 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
         reader,
         replace(binding, interview_through_sequence=1),
         citation,
+        locators,
     )
     assert outside_frontier.startswith("rejected: scope_not_allowed")
 
@@ -242,10 +250,10 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
     with monkeypatch.context() as patch:
         patch.setattr(candidate_queries, "read_snapshot", failed_storage)
         with pytest.raises(OSError, match="storage failed"):
-            client.portal.call(read_jd_source_changes, reader, binding, citation)
+            client.portal.call(read_jd_source_changes, reader, binding, citation, locators)
 
 
-def test_interview_diff_points_to_qualified_sequence_or_current_input_and_never_forges_diff(
+def test_interview_diff_points_to_historical_sequence_or_numbered_input_and_never_forges_diff(
     client: TestClient,
 ) -> None:
     previous = start_turn(client)
@@ -283,16 +291,23 @@ def test_interview_diff_points_to_qualified_sequence_or_current_input_and_never_
     )
     binding = PublishedMemoryRead(turn.writer.scope, None, 3)
     reader = JdChangesWorkflow(sessions)
+    locators = JdModelReferences(sessions, turn.writer.scope.job_file_id)
     for reference in references:
         message = (
-            "正式序號 2" if reference.source.source_id == formal.source_id else "current_input"
+            "正式序號 2"
+            if reference.source.source_id == formal.source_id
+            else "本次 input 的訪談序號 4"
         )
         with pytest.raises(UnsupportedJdSourceKindError, match=message):
             client.portal.call(reader.read_source, binding, f"citation_{reference.citation_id.hex}")
         from caliburn.transport.model_tools.jd_changes import read_jd_source_changes
 
         rejection = client.portal.call(
-            read_jd_source_changes, reader, binding, f"citation_{reference.citation_id.hex}"
+            read_jd_source_changes,
+            reader,
+            binding,
+            f"citation_{reference.citation_id.hex}",
+            locators,
         )
         assert rejection.startswith("rejected: source_kind_not_supported")
         assert message in rejection

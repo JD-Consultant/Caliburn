@@ -7,6 +7,7 @@ import { describeReadError } from '../../shared/api/http';
 import { consultantTurnQuery } from './interview-turn-api';
 import { PublicCommentaryContent } from './PublicTurnMessages';
 import { ReasoningSummaries } from './ReasoningSummaries';
+import { TurnTools } from './TurnTools';
 
 interface HistoryTurnProps {
   jobFileId: string;
@@ -75,6 +76,7 @@ function HistoryTurnContent({ jobFileId, executionId, renderTurnActions }: Histo
         <summary>處理過程</summary>
         <PublicCommentaryContent messages={turn.data.commentary} />
       </Box>
+      <TurnTools jobFileId={jobFileId} executionId={executionId} />
       {renderTurnActions && (
         <Box component="section" aria-label="JD 操作" sx={{ mt: 1 }}>
           {renderTurnActions(executionId)}

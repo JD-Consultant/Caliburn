@@ -4,7 +4,7 @@ import traceback
 
 import pytest
 
-from caliburn.workflows.memory_analysis.results import AnalysisOutcomeError, parse_outcome
+from caliburn.workflows.work_memory.results import AnalysisOutcomeError, parse_outcome
 
 
 @pytest.mark.parametrize(

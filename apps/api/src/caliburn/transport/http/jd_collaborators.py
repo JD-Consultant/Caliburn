@@ -1,16 +1,14 @@
 """Typed collaborator HTTP intents; no storage or transaction logic."""
 
-from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
-from caliburn.contracts.generated import edit_jd_collaborators_request as wire
-from caliburn.contracts.generated.jd_collaborators_view import Collaborator, JdCollaboratorsView
 from caliburn.features.job_description import collaborators
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.transport.http.contracts import canonical_body
 from caliburn.transport.http.jd_dependencies import JdEditing
+from caliburn.transport.http.models import jd_collaborators_edits as wire
+from caliburn.transport.http.models.jd_views import Collaborator, JdCollaboratorsView
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
 
@@ -24,16 +22,16 @@ def _change_from_wire(
     match change:
         case wire.CreateCollaborator():
             return collaborators.CreateCollaborator(
-                change.name.root if change.name else None,
-                change.scope_text.root if change.scope_text else None,
+                change.name,
+                change.scope_text,
             )
         case wire.ReviseCollaborator():
             return collaborators.ReviseCollaborator(
                 change.collaborator_id,
                 tuple(
                     collaborators.CollaboratorFieldChange(
-                        collaborators.CollaboratorField(item.field.value),
-                        item.value.root if item.value else None,
+                        item.field,
+                        item.value,
                     )
                     for item in change.changes
                 ),
@@ -60,7 +58,9 @@ def collaborators_view(result: collaborators.JdCollaboratorsRevision) -> JdColla
     )
 
 
-@router.get("/collaborators", response_model=JdCollaboratorsView)
+@router.get(
+    "/collaborators", response_model=JdCollaboratorsView, operation_id="read_jd_collaborators"
+)
 async def read_collaborators(job_file_id: UUID, workflow: JdEditing) -> JdCollaboratorsView:
     try:
         return collaborators_view(await workflow.read_collaborators(job_file_id))
@@ -68,12 +68,12 @@ async def read_collaborators(job_file_id: UUID, workflow: JdEditing) -> JdCollab
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
 
 
-@router.post("/collaborators", response_model=JdCollaboratorsView)
+@router.post(
+    "/collaborators", response_model=JdCollaboratorsView, operation_id="edit_jd_collaborators"
+)
 async def edit_collaborators(
     job_file_id: UUID,
-    body: Annotated[
-        wire.EditJdCollaboratorsRequest, canonical_body(wire.EditJdCollaboratorsRequest)
-    ],
+    body: wire.EditJdCollaboratorsRequest,
     workflow: JdEditing,
 ) -> JdCollaboratorsView:
     try:

@@ -1,9 +1,10 @@
-"""Only plan-owned SQL: nullable full bodies, immutable operations and candidate pointers."""
+"""Plan-owned immutable bodies and operations, with mutable candidate pointers."""
 
 from uuid import UUID
 
 from sqlalchemy import (
     CheckConstraint,
+    ForeignKey,
     ForeignKeyConstraint,
     Index,
     Select,
@@ -17,9 +18,25 @@ from sqlalchemy.orm import Mapped, mapped_column
 from caliburn.adapters.database import Base
 
 
+class PlanBodyRecord(Base):
+    __tablename__ = "interview_plan_bodies"
+
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
+    body_id: Mapped[UUID] = mapped_column(primary_key=True)
+    body: Mapped[str] = mapped_column(Text)
+
+
 class PlanOperationRecord(Base):
     __tablename__ = "interview_plan_operations"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["job_file_id", "body_id"],
+            ["interview_plan_bodies.job_file_id", "interview_plan_bodies.body_id"],
+            name="fk_plan_operation_body",
+            ondelete="CASCADE",
+        ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
@@ -47,6 +64,11 @@ class PlanOperationRecord(Base):
         ),
         CheckConstraint("expected_revision_id <> revision_id", name="plan_operation_predecessor"),
         Index(
+            "ix_interview_plan_operations_body",
+            "job_file_id",
+            "body_id",
+        ),
+        Index(
             "ix_interview_plan_operations_expected",
             "job_file_id",
             "execution_id",
@@ -60,7 +82,7 @@ class PlanOperationRecord(Base):
     kind: Mapped[str] = mapped_column(Text)
     expected_revision_id: Mapped[UUID | None]
     revision_id: Mapped[UUID]
-    body: Mapped[str | None] = mapped_column(Text)
+    body_id: Mapped[UUID | None]
     intent_digest: Mapped[str | None] = mapped_column(Text)
     result_text: Mapped[str | None] = mapped_column(Text)
 
@@ -134,7 +156,7 @@ def candidate_plan_heads_projection(job_file_id: UUID) -> Select[UUID, UUID, str
         select(
             PlanCandidateRecord.execution_id,
             PlanOperationRecord.revision_id,
-            PlanOperationRecord.body,
+            PlanBodyRecord.body,
         )
         .select_from(PlanCandidateRecord)
         .join(
@@ -143,5 +165,21 @@ def candidate_plan_heads_projection(job_file_id: UUID) -> Select[UUID, UUID, str
             & (PlanOperationRecord.execution_id == PlanCandidateRecord.execution_id)
             & (PlanOperationRecord.revision_id == PlanCandidateRecord.current_revision_id),
         )
+        .outerjoin(
+            PlanBodyRecord,
+            (PlanBodyRecord.job_file_id == PlanOperationRecord.job_file_id)
+            & (PlanBodyRecord.body_id == PlanOperationRecord.body_id),
+        )
         .where(PlanCandidateRecord.job_file_id == job_file_id)
     )
+
+
+async def read_body(session: AsyncSession, job_file_id: UUID, body_id: UUID) -> str:
+    return (
+        await session.execute(
+            select(PlanBodyRecord.body).where(
+                PlanBodyRecord.job_file_id == job_file_id,
+                PlanBodyRecord.body_id == body_id,
+            )
+        )
+    ).scalar_one()

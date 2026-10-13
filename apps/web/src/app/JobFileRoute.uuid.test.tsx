@@ -1,3 +1,4 @@
+import { stubHttp } from '../test-http';
 /**
  * A typed or pasted route may spell a UUID in capitals; the app must still address one job file.
  * These cases run the real route, query keys, Web Lock/hint storage and command recovery.
@@ -7,7 +8,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { JobFile } from '../shared/api/generated/job-file-list';
+import type { JobFile } from '../shared/api/generated/http/types.gen';
 import { readTurnHint, retainTurnHint } from '../features/interview/interview-turn-api';
 import { App } from './App';
 import { createAppQueryClient } from './query-client';
@@ -63,8 +64,7 @@ interface Backend {
 
 function stubBackend(options: Partial<Backend> = {}): Backend {
   const backend: Backend = { paths: [], turnOwner: lower, inputs: 'accept', ...options };
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn((path: string, init?: RequestInit) => {
       backend.paths.push(path);
       if (path.endsWith('/inputs') && init?.method === 'POST') {
@@ -188,14 +188,13 @@ test('a recovered Turn that belongs to another job file is still rejected', asyn
       `/api/job-files/${lower}/consultant-turns/by-command/${commandId}`,
     ),
   );
-  expect(await screen.findByText(/不屬於這次訪談/)).toBeVisible();
+  expect(await screen.findByText(/資料格式不符，尚未採用這份結果/)).toBeVisible();
   expect(readTurnHint(lower)).toEqual({ command_id: commandId, execution_id: null });
 });
 
 test('a deleted file clears the same recovery scope whichever spelling opened it', async () => {
   await retainTurnHint(lower, { command_id: commandId, execution_id: null });
-  vi.stubGlobal(
-    'fetch',
+  stubHttp(
     vi.fn(() =>
       Promise.resolve(Response.json({ detail: { code: 'job_file_not_found' } }, { status: 404 })),
     ),

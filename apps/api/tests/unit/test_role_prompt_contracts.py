@@ -12,12 +12,12 @@ from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.agents.job_consultant import runner as consultant_runner
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.planning_instructions import (
-    FOCUS_INSTRUCTIONS,
     INTERVIEW_PLAN_INSTRUCTIONS,
 )
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
 from caliburn.agents.memory_analysis import runner as analysis_runner
+from caliburn.agents.memory_analysis.tools import memory_analysis_tool_definitions
 from caliburn.agents.work_situation_analyst.instructions import SITUATION_INSTRUCTIONS
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.instructions import UNDERSTANDING_INSTRUCTIONS
@@ -26,9 +26,8 @@ from caliburn.features.executions.models import ExecutionKind, ExecutionScope, E
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import ModelSettings
-from caliburn.transport.model_tools.memory_analysis import memory_analysis_tool_definitions
-from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.memory_analysis.results import AnalysisComplete, parse_outcome
+from caliburn.workflows.executions.context_history import RoleContextHistory
+from caliburn.workflows.work_memory.results import AnalysisComplete, parse_outcome
 
 
 class CapturedPreparationError(Exception):
@@ -68,6 +67,7 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
 
     # Only database/history I/O is replaced. Actual role assembly and definitions run.
     monkeypatch.setattr(RoleContextHistory, "prepare_history", capture)
+    monkeypatch.setattr(consultant_runner, "capture_turn_context", capture)
     monkeypatch.setattr(consultant_runner, "fix_execution_policy", AsyncMock())
     monkeypatch.setattr(ConsultantRunner, "_recover_completed", AsyncMock(return_value=None))
     monkeypatch.setattr(analysis_runner, "fix_execution_policy", AsyncMock())
@@ -95,14 +95,13 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
             await runner.run(writer)
         else:
             stage = MemoryBatchPosition(
-                scope.job_file_id, scope.execution_id, uuid4(), uuid4(), layer, uuid4()
+                scope.job_file_id, scope.execution_id, uuid4(), layer, uuid4()
             )
             kwargs = {"situation_changes": []} if layer == MemoryLayer.WORK_UNDERSTANDING else {}
             await runner.run(writer, stage, **kwargs)
     payload = captured.value.payload
     expected = instructions
     if layer is None:
-        expected += "\n\n" + FOCUS_INSTRUCTIONS
         if plans_enabled:
             expected += "\n\n" + INTERVIEW_PLAN_INSTRUCTIONS
     assert payload["instructions"] == expected
@@ -114,14 +113,6 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         names = {definition["name"] for definition in payload["tools"]}
         assert ("read_interview_plan" in names) == plans_enabled
         assert ("edit_interview_plan" in names) == plans_enabled
-        assert "read_interview_plan" not in FOCUS_INSTRUCTIONS
-        assert "edit_interview_plan" not in FOCUS_INSTRUCTIONS
-    if layer == MemoryLayer.WORK_SITUATION:
-        # Literal input contract at the real consumer boundary, not a quality grader.
-        # Dropping either selection or anti-duplication guidance must be visible here.
-        assert "保留有助辨認本人角色、服務範圍或責任界線的已知工作背景" in payload["instructions"]
-        assert "共用背景不必每案重複完整職務資料" in payload["instructions"]
-        assert "未說明的背景仍是未知，不為填滿職務資料而補造" in payload["instructions"]
     if layer is not None:
         # Required analysis boundary reaches the real role assembly. Natural adherence
         # is evaluated separately; these literals do not grade employee facts.
@@ -180,21 +171,3 @@ def test_consultant_can_read_both_layers_but_cannot_write_private_memory() -> No
         name.startswith(("create_work_", "update_work_", "delete_work_")) for name in names
     )
     assert all(definition["strict"] for definition in definitions)
-
-
-@pytest.mark.parametrize(
-    "requirement",
-    [
-        "什麼情況會被退回或最容易出錯",  # probe the aspects an interview rarely volunteers
-        "頻率與旺季",
-        "環境、體力、證照等要求",
-        "不憑職稱或行業常識推定",
-        "員工說出主要工作後就可由已知內容",  # the purpose is written early, then corrected
-        "不寫未確認的績效目標",
-        "同一最終目的不代表同一任務",  # task granularity, from the JD writing guide
-        "兩者不重抄任務敘述，沒有新資訊就留空",
-    ],
-)
-def test_consultant_guidance_keeps_the_guide_derived_requirements(requirement: str) -> None:
-    """Adopted after the Q1–Q3 comparison (T14 evidence); a later edit must drop them on purpose."""
-    assert requirement in CONSULTANT_INSTRUCTIONS

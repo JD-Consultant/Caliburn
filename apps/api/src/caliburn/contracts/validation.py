@@ -1,12 +1,11 @@
-"""Canonical JSON Schema admits input; generated DTOs only convert accepted values."""
+"""工具先依正式 JSON Schema 驗證，再轉成生成型別。"""
 
 import json
 from functools import lru_cache
 from importlib.resources import files
 from typing import Any
-from uuid import UUID
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator
 from pydantic import BaseModel, ValidationError
 from pydantic_core import PydanticCustomError
 from referencing import Registry, Resource
@@ -14,53 +13,29 @@ from referencing import Registry, Resource
 _BASE_URI = "https://caliburn.invalid/contracts/"
 
 
-def _plain_uuid(value: object) -> bool:
-    # JSON Schema 2020-12 §7.3.5: plain RFC UUID, without URN or extra separators.
-    return not isinstance(value, str) or str(UUID(value)) == value.lower()
-
-
-def _formats(value: object) -> set[str]:
-    if isinstance(value, list):
-        return set().union(*(_formats(item) for item in value))
-    if isinstance(value, dict):
-        result = set().union(*(_formats(item) for item in value.values()))
-        if isinstance(value.get("format"), str):
-            result.add(value["format"])
-        return result
-    return set()
-
-
 @lru_cache
-def _resources() -> tuple[dict[str, str], Registry[Any], FormatChecker]:
+def _resources() -> tuple[dict[str, str], Registry[Any]]:
     root = files("caliburn.contracts.generated")
     manifest: dict[str, str] = json.loads(
         root.joinpath("schema-manifest.json").read_text(encoding="utf-8")
     )
     resources = []
-    required_formats: set[str] = set()
     for path in manifest.values():
         schema = json.loads(root.joinpath(path).read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(schema)
-        required_formats.update(_formats(schema))
         resources.append((_BASE_URI + path, Resource.from_contents(schema)))
-    # Registry has no retriever: package references cannot initiate network or file I/O.
+    # 只登錄包內資源，參照不能啟動網路或檔案讀取。
     registry: Registry[Any] = Registry().with_resources(resources)
-    checker = FormatChecker()
-    checker.checks("uuid", raises=ValueError)(_plain_uuid)
-    if required_formats - checker.checkers.keys():
-        raise RuntimeError("A canonical contract format checker is unavailable")
-    return manifest, registry, checker
+    return manifest, registry
 
 
 @lru_cache
 def _validator(model: type[BaseModel]) -> Draft202012Validator:
-    manifest, registry, checker = _resources()
+    manifest, registry = _resources()
     identity = f"{model.__module__}.{model.__name__}"
     if identity not in manifest:
         raise TypeError("Only generated canonical root DTOs admit wire input")
-    return Draft202012Validator(
-        {"$ref": _BASE_URI + manifest[identity]}, registry=registry, format_checker=checker
-    )
+    return Draft202012Validator({"$ref": _BASE_URI + manifest[identity]}, registry=registry)
 
 
 def _invalid(
@@ -97,7 +72,7 @@ def validate_contract[T: BaseModel](model: type[T], value: object) -> T:
 
 
 def parse_contract[T: BaseModel](model: type[T], value: str) -> T:
-    """Tool JSON and HTTP objects share the same canonical admission policy."""
+    """模型參數僅接受標準 JSON，再依工具契約准入。"""
 
     def reject_constant(_value: str) -> None:
         raise ValueError("Non-JSON numeric constant")

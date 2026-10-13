@@ -5,13 +5,13 @@ from alembic import op
 from sqlalchemy.dialects.postgresql import JSONB
 
 revision = "0028_jd_compound_results"
-down_revision = "0027_diagnostic_request_context"
+down_revision = "0026_interview_plans"
 branch_labels = None
 depends_on = None
 
 _KINDS = (
     "'revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-    "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+    "'edit_collaborators', 'edit_conditions', "
     "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn'"
 )
 

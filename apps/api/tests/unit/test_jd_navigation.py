@@ -9,11 +9,12 @@ from caliburn.features.job_description.areas import ResponsibilityArea
 from caliburn.features.job_description.capabilities import Capability, CapabilityKind
 from caliburn.features.job_description.collaborators import Collaborator
 from caliburn.features.job_description.conditions import ConditionKind, JobCondition
-from caliburn.features.job_description.models import JdProfile
+from caliburn.features.job_description.models import JdProfile, ProfileField
 from caliburn.features.job_description.navigation import (
     JdReadTargetNotFoundError,
     resolve_jd_read_ref,
 )
+from caliburn.features.job_description.sources import JdSourceTarget, SourceTargetKind
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
 from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.transport.model_tools.jd_navigation import project_jd_map
@@ -57,7 +58,11 @@ def work() -> JdWorkRevision:
 
 
 def test_map_preserves_hierarchy_counts_and_only_navigation_content(work: JdWorkRevision) -> None:
-    result = project_jd_map(JdProfile("前端工程師", "產品團隊", "主管", "交付前端網站。"), work)
+    result = project_jd_map(
+        JdProfile("前端工程師", "產品團隊", "主管", "交付前端網站。"),
+        work,
+        pending_targets=frozenset(),
+    )
     payload = result.model_dump(mode="json", exclude_unset=True)
     assert payload == {
         "profile": {
@@ -65,6 +70,7 @@ def test_map_preserves_hierarchy_counts_and_only_navigation_content(work: JdWork
             "organization_unit": "產品團隊",
             "reports_to": "主管",
             "job_purpose_preview": "交付前端網站。",
+            "needs_recheck": False,
         },
         "responsibility_areas": [
             {
@@ -78,8 +84,10 @@ def test_map_preserves_hierarchy_counts_and_only_navigation_content(work: JdWork
                         "work_preview": "依確認稿實作頁面。",
                         "outcome_count": 2,
                         "requirement_count": 1,
+                        "needs_recheck": False,
                     }
                 ],
+                "needs_recheck": False,
             }
         ],
         "unassigned_work_tasks": [
@@ -88,34 +96,87 @@ def test_map_preserves_hierarchy_counts_and_only_navigation_content(work: JdWork
                 "title": "支援交接",
                 "outcome_count": 0,
                 "requirement_count": 0,
+                "needs_recheck": False,
             }
         ],
         "required_knowledge": [
-            {"read_ref": "knowledge_0000000000000000000000000000000b", "name": "資料介面"},
-            {"read_ref": "knowledge_0000000000000000000000000000000d", "name": "資料介面"},
+            {
+                "read_ref": "knowledge_0000000000000000000000000000000b",
+                "name": "資料介面",
+                "needs_recheck": False,
+            },
+            {
+                "read_ref": "knowledge_0000000000000000000000000000000d",
+                "name": "資料介面",
+                "needs_recheck": False,
+            },
         ],
         "required_skills": [
-            {"read_ref": "skill_0000000000000000000000000000000f", "name": "介面實作"}
+            {
+                "read_ref": "skill_0000000000000000000000000000000f",
+                "name": "介面實作",
+                "needs_recheck": False,
+            }
         ],
         "main_collaborators": [
-            {"read_ref": "collaborator_00000000000000000000000000000011", "name": "設計師"}
+            {
+                "read_ref": "collaborator_00000000000000000000000000000011",
+                "name": "設計師",
+                "needs_recheck": False,
+            }
         ],
         "job_wide_conditions": [
             {
                 "read_ref": "condition_00000000000000000000000000000013",
                 "description_preview": "測試用環境。",
+                "needs_recheck": False,
             }
         ],
     }
 
 
+def test_map_marks_only_source_owners(work: JdWorkRevision) -> None:
+    pending = frozenset(
+        {
+            JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=ProfileField.PURPOSE),
+            JdSourceTarget(SourceTargetKind.TASK, work.tasks[1].task_id),
+            JdSourceTarget(SourceTargetKind.CAPABILITY, work.capabilities[0].capability_id),
+        }
+    )
+    payload = project_jd_map(JdProfile(), work, pending_targets=pending).model_dump(
+        mode="json", exclude_unset=True
+    )
+    assert payload["profile"]["needs_recheck"] is True
+    for collection in (
+        "responsibility_areas",
+        "unassigned_work_tasks",
+        "required_knowledge",
+        "required_skills",
+        "main_collaborators",
+        "job_wide_conditions",
+    ):
+        for item in payload[collection]:
+            assert item["needs_recheck"] is (
+                item.get("read_ref") == "knowledge_0000000000000000000000000000000b"
+            )
+            assert "citation_ref" not in item
+            assert "jd_changed" not in item
+            assert "source_changed" not in item
+    task = payload["responsibility_areas"][0]["work_tasks"][0]
+    assert task["needs_recheck"] is True
+    assert "outcomes" not in task and "requirements" not in task
+
+
 def test_empty_jd_does_not_invent_work_or_preview() -> None:
     work = JdWorkRevision(UUID(int=1), (), (), (), (), (), ())
-    payload = project_jd_map(JdProfile(), work).model_dump(mode="json", exclude_unset=True)
+    payload = project_jd_map(JdProfile(), work, pending_targets=frozenset()).model_dump(
+        mode="json", exclude_unset=True
+    )
     assert payload.pop("profile") == {
         "job_title": None,
         "organization_unit": None,
         "reports_to": None,
+        "needs_recheck": False,
     }
     assert all(value == [] for value in payload.values())
 
@@ -124,24 +185,24 @@ def test_preview_is_exact_excerpt_not_summary_and_never_changes_source(
     work: JdWorkRevision,
 ) -> None:
     profile = JdProfile(purpose="前端🙂\n固定工作：每月確認！")
-    result = project_jd_map(profile, work, preview_characters=6)
+    result = project_jd_map(profile, work, preview_characters=6, pending_targets=frozenset())
     assert result.profile.job_purpose_preview == "前端🙂\n固定…"
     assert profile.purpose == "前端🙂\n固定工作：每月確認！"
     assert result.responsibility_areas[0].scope_preview == "只負責前端。"
     with pytest.raises(ValueError):
-        project_jd_map(profile, work, preview_characters=0)
+        project_jd_map(profile, work, preview_characters=0, pending_targets=frozenset())
 
 
 def test_nameless_valid_items_remain_visible_without_fabricated_names(work: JdWorkRevision) -> None:
     item = replace(work.capabilities[0], name=None)
     work = replace(work, capabilities=(item,))
-    result = project_jd_map(JdProfile(), work)
+    result = project_jd_map(JdProfile(), work, pending_targets=frozenset())
     assert result.required_knowledge[0].name is None
     assert resolve_jd_read_ref(work, result.required_knowledge[0].read_ref) == item
 
 
 def test_same_names_and_same_detail_text_do_not_merge_identity(work: JdWorkRevision) -> None:
-    result = project_jd_map(JdProfile(), work)
+    result = project_jd_map(JdProfile(), work, pending_targets=frozenset())
     first, second = result.required_knowledge
     assert first.read_ref != second.read_ref
     assert resolve_jd_read_ref(work, first.read_ref) == work.capabilities[0]
@@ -155,7 +216,11 @@ def test_same_names_and_same_detail_text_do_not_merge_identity(work: JdWorkRevis
 def test_ref_follows_same_identity_after_rename_but_not_deleted_replacement(
     work: JdWorkRevision,
 ) -> None:
-    reference = project_jd_map(JdProfile(), work).responsibility_areas[0].read_ref
+    reference = (
+        project_jd_map(JdProfile(), work, pending_targets=frozenset())
+        .responsibility_areas[0]
+        .read_ref
+    )
     renamed = replace(work.areas[0], title="正式交付", content_revision_id=UUID(int=21))
     newer = replace(work, revision_id=UUID(int=22), areas=(renamed,))
     assert resolve_jd_read_ref(newer, reference) == renamed

@@ -25,25 +25,26 @@ from caliburn.features.job_description.collaborators import CreateCollaborator
 from caliburn.features.job_description.conditions import ConditionKind, CreateCondition
 from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
 from caliburn.features.job_description.navigation import jd_read_ref, resolve_jd_read_ref
+from caliburn.features.job_description.source_intents import InterviewSourceSelection
 from caliburn.features.job_description.sources import (
     InterviewSource,
     InvalidJdSourceError,
     SourceTargetKind,
 )
-from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_item_creation import (
+from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.compound_writes import execute_prepared_jd_edit
+from caliburn.workflows.job_description.item_creation import (
     CreateItemInput,
     ItemCreation,
     JdItemCreationWorkflow,
 )
-from caliburn.workflows.jd_sources import CurrentInputSourceSelection, InterviewSourceSelection
-from caliburn.workflows.jd_task_writes import (
+from caliburn.workflows.job_description.task_writes import (
     CreateTaskInput,
     JdTaskWriteWorkflow,
     TaskCapabilityInput,
 )
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.work_memory.reads import PublishedMemoryRead
 
 pytestmark = pytest.mark.postgres
 
@@ -115,11 +116,11 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
         return await workflow.prepare(
             binding,
             command_id=uuid4(),
-            intent=CreateItemInput(item, (CurrentInputSourceSelection(),)),
+            intent=CreateItemInput(item, (InterviewSourceSelection(2),)),
         )
 
     prepared = client.portal.call(prepare)
-    first_result = client.portal.call(workflow.execute, writer, prepared)
+    first_result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     first = client.portal.call(candidates.read, writer.scope)
     first_ref = jd_read_ref(first_result.created_item)
     assert first_ref.startswith(ref_prefix)
@@ -148,7 +149,9 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
 
     # Same text in a new operation is a new identity, appended by the original owner.
     later_prepared = client.portal.call(prepare)
-    later_result = client.portal.call(workflow.execute, writer, later_prepared)
+    later_result = client.portal.call(
+        execute_prepared_jd_edit, workflow.sessions, writer, later_prepared
+    )
     assert later_result != first_result
     latest = client.portal.call(candidates.read, writer.scope)
     assert resolve_jd_read_ref(latest.work, first_ref) == original
@@ -164,11 +167,17 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
     )
     assert collection[0] == original
     assert collection[1] == resolve_jd_read_ref(latest.work, jd_read_ref(later_result.created_item))
-    assert client.portal.call(workflow.execute, writer, prepared) == first_result
+    assert (
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
+        == first_result
+    )
     assert client.portal.call(candidates.read, writer.scope) == latest
     with pytest.raises(JdCommandConflictError):
         client.portal.call(
-            workflow.execute, writer, replace(prepared, item=CreateArea("不同意圖", None))
+            execute_prepared_jd_edit,
+            workflow.sessions,
+            writer,
+            replace(prepared, command=replace(prepared.command, item=CreateArea("不同意圖", None))),
         )
     assert client.portal.call(candidates.read, writer.scope) == latest
 
@@ -188,7 +197,7 @@ def test_source_write_exception_rolls_back_content_sources_and_original_operatio
         return await workflow.prepare(
             binding,
             command_id=uuid4(),
-            intent=CreateItemInput(CreateArea("網站交付", None), (CurrentInputSourceSelection(),)),
+            intent=CreateItemInput(CreateArea("網站交付", None), (InterviewSourceSelection(2),)),
         )
 
     prepared = client.portal.call(prepare)
@@ -201,9 +210,9 @@ def test_source_write_exception_rolls_back_content_sources_and_original_operatio
     with monkeypatch.context() as patch:
         patch.setattr(source_persistence, "insert_source_references", fail_after_real_source_write)
         with pytest.raises(RuntimeError, match="synthetic failure"):
-            client.portal.call(workflow.execute, writer, prepared)
+            client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope) == before
-    result = client.portal.call(workflow.execute, writer, prepared)
+    result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     assert result.effect == "created" and isinstance(result.created_item, ResponsibilityArea)
     assert len(client.portal.call(candidates.read, writer.scope).work.areas) == 1
 
@@ -221,13 +230,13 @@ def test_cancel_and_replaced_writer_cannot_create_or_replay_a_candidate_item(
         return await workflow.prepare(
             binding,
             command_id=uuid4(),
-            intent=CreateItemInput(CreateArea("網站交付", None), (CurrentInputSourceSelection(),)),
+            intent=CreateItemInput(CreateArea("網站交付", None), (InterviewSourceSelection(2),)),
         )
 
     prepared = client.portal.call(prepare)
     other_writer, _ = start_turn(client)
     with pytest.raises(ExecutionStateError):
-        client.portal.call(workflow.execute, other_writer, prepared)
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, other_writer, prepared)
     replacement = transact(
         client,
         lambda s: executions.claim_writer(
@@ -235,14 +244,14 @@ def test_cancel_and_replaced_writer_cannot_create_or_replay_a_candidate_item(
         ),
     )
     with pytest.raises(ExecutionStateError):
-        client.portal.call(workflow.execute, writer, prepared)
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope) == before
-    result = client.portal.call(workflow.execute, replacement, prepared)
+    result = client.portal.call(execute_prepared_jd_edit, workflow.sessions, replacement, prepared)
     assert result.effect == "created" and isinstance(result.created_item, ResponsibilityArea)
     completion = ConsultantCompletionWorkflow(sessions)
     client.portal.call(completion.stop, replacement, ExecutionStatus.CANCELLED)
     with pytest.raises(ExecutionStateError):
-        client.portal.call(workflow.execute, replacement, prepared)
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, replacement, prepared)
     with pytest.raises(ExecutionStateError):
         client.portal.call(prepare)
     formal = transact(client, lambda s: work_queries.read_work(s, writer.scope.job_file_id))
@@ -273,15 +282,15 @@ def test_invalid_source_or_stale_preparation_never_partially_creates(client: Tes
         )
 
     with pytest.raises(InterviewScopeError):
-        client.portal.call(prepare, (CurrentInputSourceSelection(), InterviewSourceSelection(2)))
+        client.portal.call(prepare, (InterviewSourceSelection(2), InterviewSourceSelection(3)))
     with pytest.raises(InvalidJdSourceError):
-        client.portal.call(prepare, (CurrentInputSourceSelection(), CurrentInputSourceSelection()))
+        client.portal.call(prepare, (InterviewSourceSelection(2), InterviewSourceSelection(2)))
     assert client.portal.call(candidates.read, writer.scope) == before
     first, stale = client.portal.call(prepare), client.portal.call(prepare)
-    client.portal.call(workflow.execute, writer, first)
+    client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, first)
     latest = client.portal.call(candidates.read, writer.scope)
     with pytest.raises(StaleJdRevisionError):
-        client.portal.call(workflow.execute, writer, stale)
+        client.portal.call(execute_prepared_jd_edit, workflow.sessions, writer, stale)
     assert client.portal.call(candidates.read, writer.scope) == latest
 
 
@@ -295,7 +304,9 @@ def test_created_area_and_shared_skill_refs_work_with_existing_task_creation(
 
     async def create(item: ItemCreation):
         prepared = await items.prepare(binding, command_id=uuid4(), intent=CreateItemInput(item))
-        return jd_read_ref((await items.execute(writer, prepared)).created_item)
+        return jd_read_ref(
+            (await execute_prepared_jd_edit(items.sessions, writer, prepared)).created_item
+        )
 
     area_ref = client.portal.call(create, CreateArea("網站交付", None))
     skill_ref = client.portal.call(create, CreateCapability(CapabilityKind.SKILL, "介面實作", None))
@@ -311,7 +322,7 @@ def test_created_area_and_shared_skill_refs_work_with_existing_task_creation(
                 required_skills=(TaskCapabilityInput(skill_ref),),
             ),
         )
-        return await tasks.execute(writer, prepared)
+        return await execute_prepared_jd_edit(tasks.sessions, writer, prepared)
 
     result = client.portal.call(create_task)
     preview = client.portal.call(JdCandidateWorkflow(sessions).read, writer.scope)

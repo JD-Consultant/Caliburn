@@ -4,10 +4,10 @@
  */
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, IconButton, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import type { Target } from '../shared/api/generated/jd-sources-view';
+import { Alert, Button, IconButton, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import type { Target, ConsultantTurn } from '../shared/api/generated/http/types.gen';
 import { DownloadIcon } from '../shared/ui/icons';
-import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
+
 import { isJdReadOnlyDuring } from '../features/interview/turn-summary';
 import { EditSlots } from '../features/jd-editor/EditSlots';
 import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
@@ -98,6 +98,26 @@ export function JdPane({
       <div className="pane-scroll jd-scroll">
         {!showCandidate && <JdOutline />}
         <div className="jd-doc">
+          {sources.isError && (
+            <Alert
+              severity="warning"
+              action={
+                <Button
+                  color="inherit"
+                  disabled={sources.isFetching}
+                  onClick={() => {
+                    void sources.refetch();
+                  }}
+                >
+                  重新讀取來源
+                </Button>
+              }
+            >
+              {sources.data
+                ? '來源尚未更新，目前顯示上次讀取的引用。'
+                : '來源尚未讀取，暫時無法顯示引用。'}
+            </Alert>
+          )}
           {readOnly && (
             <Alert
               severity="info"

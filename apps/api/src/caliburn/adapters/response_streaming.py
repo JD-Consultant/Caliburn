@@ -20,14 +20,6 @@ class PublicCommentaryUpdate:
     text: str = field(repr=False)
 
 
-class ResponseStreamCleanupError(RuntimeError):
-    """A terminal original exists; reconcile it instead of repeating the provider call."""
-
-    def __init__(self, response: Response) -> None:
-        self.response = response
-        super().__init__("Stream cleanup failed after receiving the original response")
-
-
 class ResponseStreamCancelledError(CancelledError):
     """Propagate cancellation while handing the terminal original to the immediate caller."""
 
@@ -141,9 +133,13 @@ async def consume_response_stream(
             if terminal is not None:
                 raise ResponseStreamCancelledError(terminal) from None
             raise masked.__context__ from None
-        if terminal is not None:
-            raise ResponseStreamCleanupError(terminal) from None
-        raise
+        if terminal is None:
+            raise
+        # 完整原件仍交保存／內容驗證；普通 transport 收尾不授予重送資格。
+        _LOG.warning(
+            "response.stream_cleanup_failed",
+            extra={"response_id": terminal.id, "failure_kind": type(error).__name__},
+        )
     if terminal is None:
         raise ResponseStreamProtocolError("The stream ended without a terminal response")
     return terminal

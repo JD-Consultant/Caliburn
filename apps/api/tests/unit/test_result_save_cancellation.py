@@ -1,6 +1,7 @@
 """Task cancellation inside a saver must hand back the intact original, not retry it."""
 
 import asyncio
+import gc
 from dataclasses import replace
 
 import pytest
@@ -12,14 +13,18 @@ from caliburn.agent_execution.context_compaction import (
     prepare_context_history,
     run_context_compaction,
 )
+from caliburn.agent_execution.response_runtime import InputCountSaveError, ResponseStepSaveError
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
-from caliburn.agent_execution.tool_steps import (
-    InputCountSaveError,
-    ResponseStepSaveError,
-    run_response_loop,
-)
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 from tests.unit.test_context_compaction import COMPACTED, options
+
+
+@pytest.fixture(autouse=True)
+def no_unawaited_result_saves(recwarn):
+    yield
+    gc.collect()
+    assert [warning.message for warning in recwarn if warning.category is RuntimeWarning] == []
 
 
 class CancelDuringSave(InMemorySaver):

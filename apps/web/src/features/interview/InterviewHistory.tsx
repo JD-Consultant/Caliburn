@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Alert, Button } from '@mui/material';
-import type { InterviewMessage } from '../../shared/api/generated/interview-history';
+import type { InterviewMessage } from '../../shared/api/generated/http/types.gen';
 import { describeReadError } from '../../shared/api/http';
 import { ChatMarkdown } from '../../shared/ui/ChatMarkdown';
 import { interviewHistoryQuery } from './interview-api';

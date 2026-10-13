@@ -45,12 +45,9 @@ from caliburn.features.job_description.tasks import CreateTask, DeleteTask, Edit
 from caliburn.features.job_files import service as job_files
 from caliburn.features.work_memory import candidate_queries as memory
 from caliburn.transport.http.jd_undo import router
-from caliburn.transport.model_tools.jd_changes import project_jd_manual_changes
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_changes import AllManualChanges, JdChangesWorkflow
-from caliburn.workflows.jd_editing import JdEditingWorkflow
-from caliburn.workflows.jd_undo import JdUndoWorkflow
-from caliburn.workflows.memory_reads import PublishedMemoryRead
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.manual_editing import JdEditingWorkflow
+from caliburn.workflows.job_description.undo import JdUndoWorkflow
 from tests.integration.test_consultant_completion import (
     Turn,
     complete,
@@ -338,28 +335,18 @@ def test_failure_after_recording_rolls_back_all_jd_effects(
 
 def test_next_turn_can_read_undo_as_manual_effect(undo_client: TestClient) -> None:
     first = start_turn(undo_client)
-    exchange = complete(undo_client, first)
+    complete(undo_client, first)
     result = undo_client.post(url(first))
     assert result.status_code == 200
     current = start_turn(undo_client, file_id=first.writer.scope.job_file_id)
     assert current.candidate is not None
-    reader = JdChangesWorkflow(undo_client.app.state.database.sessions)
+    from caliburn.features.job_description.change_comparison import compare_jd_snapshots
+    from tests.integration.test_jd_manual_changes import endpoints
 
-    async def read():
-        return await reader.read_manual(
-            PublishedMemoryRead(
-                current.writer.scope, None, exchange.consultant_reply.interview_sequence
-            ),
-            manual_jd_start_revision_id=current.candidate.base_revision_id,
-            scope=AllManualChanges(),
-        )
-
-    changes = undo_client.portal.call(read)
-    assert len(changes.interval.operations) == 1
-    assert changes.interval.operations[0].kind == "undo_completed_turn"
-    projection = project_jd_manual_changes(changes)
-    assert "人工操作：1" in projection
-    assert "前端工程師" in projection and "刪除" in projection
+    before, after = endpoints(undo_client, current)
+    assert before.profile.job_title == "\u524d\u7aef\u5de5\u7a0b\u5e2b"
+    assert after.profile.job_title is None
+    assert compare_jd_snapshots(before, after).profile_fields == (ProfileField.JOB_TITLE,)
 
 
 @pytest.mark.parametrize("first_action", ["undo", "edit"])

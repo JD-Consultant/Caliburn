@@ -4,7 +4,7 @@
  */
 import { useRef, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
+import type { Capability, JdWorkView } from '../../shared/api/generated/http/types.gen';
 import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import type { WorkCommand } from './jd-work-api';
 import { TaskFields } from './TaskFields';

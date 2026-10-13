@@ -20,7 +20,7 @@ from caliburn.features.job_description.navigation import (
 )
 from caliburn.features.job_description.tasks import CreateTask, EditJdTasks
 from caliburn.transport.model_tools.jd_navigation import project_jd_map
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow
 
 pytestmark = pytest.mark.postgres
 
@@ -70,7 +70,7 @@ def test_candidate_map_moves_tasks_without_losing_identity_or_changing_formal_jd
         ),
     )
     before = client.portal.call(workflow.read, writer.scope)
-    first_map = project_jd_map(before.profile, before.work)
+    first_map = project_jd_map(before.profile, before.work, pending_targets=frozenset())
     task_ref = first_map.responsibility_areas[0].work_tasks[0].read_ref
     area_ref = first_map.responsibility_areas[0].read_ref
     client.portal.call(
@@ -80,7 +80,7 @@ def test_candidate_map_moves_tasks_without_losing_identity_or_changing_formal_jd
         EditJdAreas(uuid4(), task_position.revision_id, DeleteArea(area.area_id)),
     )
     after = client.portal.call(workflow.read, writer.scope)
-    second_map = project_jd_map(after.profile, after.work)
+    second_map = project_jd_map(after.profile, after.work, pending_targets=frozenset())
     assert second_map.responsibility_areas == []
     assert second_map.unassigned_work_tasks[0].read_ref == task_ref
     assert second_map.unassigned_work_tasks[0].outcome_count == 2
@@ -109,7 +109,11 @@ def test_map_ref_from_other_file_cannot_resolve_even_with_same_title(client: Tes
         )
         readers.append(client.portal.call(workflow.read, writer.scope))
     first, second = readers
-    reference = project_jd_map(first.profile, first.work).responsibility_areas[0].read_ref
+    reference = (
+        project_jd_map(first.profile, first.work, pending_targets=frozenset())
+        .responsibility_areas[0]
+        .read_ref
+    )
     with pytest.raises(JdReadTargetNotFoundError):
         resolve_jd_read_ref(second.work, reference)
 

@@ -8,6 +8,7 @@ from threading import Barrier
 from types import SimpleNamespace
 from uuid import UUID, uuid4
 
+import anyio
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
@@ -32,15 +33,15 @@ from caliburn.features.work_memory.candidates import CreateMemoryObject
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.workflows import job_files as job_file_workflows
-from caliburn.workflows.consultant_controls import ConsultantControlWorkflow
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
-from caliburn.workflows.execution_failures import run_with_failure_boundary
-from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.consultant_turns.controls import ConsultantControlWorkflow
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
+from caliburn.workflows.executions.failure_boundary import run_with_failure_boundary
+from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
+from tests.fixtures.checkpoint_originals import save_step
 from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn
-from tests.integration.test_execution_diagnostics import save_step
 
 pytestmark = pytest.mark.postgres
 
@@ -203,7 +204,7 @@ def test_late_native_write_cannot_recreate_a_deleted_file(
         ).fetchone() == (0,)
 
 
-@pytest.mark.parametrize("cancellation", ["native_exit", "write", "repeated_write"])
+@pytest.mark.parametrize("cancellation", ["native_exit", "write", "repeated_write", "scope"])
 def test_native_write_keeps_the_file_fence_after_cancellation(
     client: TestClient,
     database_connection: psycopg.Connection,
@@ -217,6 +218,7 @@ def test_native_write_keeps_the_file_fence_after_cancellation(
 
     async def scenario() -> None:
         entered, release, saved, deleting = (asyncio.Event() for _ in range(4))
+        scopes = []
 
         async def delayed_put(self, *args):
             entered.set()
@@ -237,12 +239,14 @@ def test_native_write_keeps_the_file_fence_after_cancellation(
         config = {"configurable": {"thread_id": f"{file_id}:{uuid4()}", "checkpoint_ns": ""}}
 
         async def write():
-            return await saver.aput(
-                config,
-                checkpoint,
-                {"source": "loop", "step": 0, "parents": {}},
-                checkpoint["channel_versions"],
-            )
+            with anyio.CancelScope() as scope:
+                scopes.append(scope)
+                return await saver.aput(
+                    config,
+                    checkpoint,
+                    {"source": "loop", "step": 0, "parents": {}},
+                    checkpoint["channel_versions"],
+                )
 
         delete_task = None
         exit_task = None
@@ -267,7 +271,10 @@ def test_native_write_keeps_the_file_fence_after_cancellation(
         else:
             write_task = asyncio.create_task(write())
             await asyncio.wait_for(entered.wait(), 5)
-            write_task.cancel()
+            if cancellation == "scope":
+                scopes[0].cancel()
+            else:
+                write_task.cancel()
         try:
             delete_task = asyncio.create_task(client.app.state.job_file_workflow.delete(file_id))
             await asyncio.wait_for(deleting.wait(), 5)
@@ -479,6 +486,8 @@ def test_terminal_runner_must_finish_checkpoint_cleanup_before_file_deletion(
                     controls = ConsultantControlWorkflow(database.sessions, saver, consultant)
                     cancel_task = asyncio.create_task(controls.cancel(seen[0].scope))
                 await asyncio.wait_for(cleanup_started.wait(), 5)
+                owner = memory if kind == ExecutionKind.MEMORY_BATCH else consultant
+                assert seen[0].scope in owner._attempted
                 async with database.sessions() as session:
                     assert (
                         await executions.read_execution(session, seen[0].scope)
@@ -494,6 +503,11 @@ def test_terminal_runner_must_finish_checkpoint_cleanup_before_file_deletion(
                 release_cleanup.set()
                 await asyncio.wait_for(checkpoint_saved.wait(), 5)
                 await asyncio.wait_for(asyncio.gather(*parent_tasks, return_exceptions=True), 5)
+                assert seen[0].scope not in owner._attempted
+                assert seen[0].scope not in owner.failures
+                owner.notify()
+                await (owner.scan() if kind == ExecutionKind.MEMORY_BATCH else owner._scan())
+                assert len(seen) == 1
                 if cancel_task is not None:
                     await cancel_task
                 await workflow.delete(file_id)

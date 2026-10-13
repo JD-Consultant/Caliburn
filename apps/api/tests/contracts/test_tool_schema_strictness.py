@@ -12,8 +12,8 @@ from typing import Any
 import pytest
 
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
+from caliburn.agents.memory_analysis.tools import memory_analysis_tool_definitions
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.transport.model_tools.memory_analysis import memory_analysis_tool_definitions
 
 # Conservative ceilings under OpenAI's documented structured-output limits (5,000 object
 # properties, 10 nesting levels). Verified against the provider in the bounded T16 gate.

@@ -7,22 +7,21 @@ from uuid import uuid4
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
+from caliburn.agent_execution.response_runtime import ResponseStepSaveError
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
-from caliburn.agent_execution.tool_steps import ResponseStepSaveError, run_response_step
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
-from caliburn.workflows.execution_failures import run_with_failure_boundary
-from caliburn.workflows.model_requests import (
+from caliburn.workflows.executions.failure_boundary import run_with_failure_boundary
+from caliburn.workflows.executions.model_requests import (
     ReceivedModelResponseCancelledError,
-    ReceivedModelResponseError,
 )
+from tests.fixtures.native_response_runtime import run_response_step
 from tests.fixtures.response_capacity import CapacityProbe, request_fixture
 from tests.unit.test_response_recovery import EntireResponseSaveFault
 from tests.unit.test_result_save_retries import TransientResultFault
 
 
-@pytest.mark.parametrize("cancelled", [False, True])
 @pytest.mark.parametrize("save_fails", [False, True])
-async def test_terminal_carrier_saves_or_holds_original_without_effects(cancelled, save_fails):
+async def test_terminal_cancellation_saves_or_holds_original_without_effects(save_fails):
     saver = EntireResponseSaveFault() if save_fails else InMemorySaver()
     probe = CapacityProbe([100])
     accounted = []
@@ -31,8 +30,7 @@ async def test_terminal_carrier_saves_or_holds_original_without_effects(cancelle
     async def model(request, request_id, input_tokens: int):
         nonlocal received
         received = await probe.model(request, request_id, input_tokens)
-        kind = ReceivedModelResponseCancelledError if cancelled else ReceivedModelResponseError
-        raise kind(received)
+        raise ReceivedModelResponseCancelledError(received)
 
     async def account(response):
         accounted.append(response.attempt_id)
@@ -43,9 +41,9 @@ async def test_terminal_carrier_saves_or_holds_original_without_effects(cancelle
         runtime=replace(probe.runtime(), request_model=model, account_response=account),
     )
     task = asyncio.create_task(run_response_step(saver, request=request_fixture(), **args))
-    with pytest.raises(asyncio.CancelledError if cancelled else Exception) as stopped:
+    with pytest.raises(asyncio.CancelledError) as stopped:
         await task
-    assert task.cancelled() is cancelled
+    assert task.cancelled()
     failure = (
         stopped.value.save_error
         if isinstance(stopped.value, ResultSaveCancelledError)

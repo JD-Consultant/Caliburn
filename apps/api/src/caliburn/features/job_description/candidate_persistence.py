@@ -38,7 +38,6 @@ class JdCandidateRecord(Base):
     execution_id: Mapped[UUID] = mapped_column(primary_key=True)
     base_revision_id: Mapped[UUID]
     current_revision_id: Mapped[UUID]
-    generation_id: Mapped[UUID]
     status: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

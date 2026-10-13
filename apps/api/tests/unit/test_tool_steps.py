@@ -12,13 +12,11 @@ from openai.types.responses import Response, ResponseFunctionToolCall
 
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems, snapshot_response
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
 from caliburn.agent_execution.response_steps import UnsupportedModelResponseError
-from caliburn.agent_execution.tool_steps import (
-    ReceivedModelResponse,
-    _build_response_step,
-    run_response_step,
-)
-from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
+from caliburn.agent_execution.tool_steps import _completed_step_items
+from tests.fixtures.native_response_runtime import read_response_state, run_response_step
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
 async def ensure_active() -> None:
@@ -57,7 +55,6 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
     saver = InMemorySaver(
         serde=JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
     )
-    graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "ordered-step"}}
     input_items = [{"role": "user", "content": "synthetic"}]
 
@@ -69,36 +66,35 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
-        saved = await graph.aget_state(config)
+        saved = await read_response_state(saver, config)
         assert saved.values["response_snapshot"] == snapshot_response(response)
         assert saved.values["operation_seed"] is not None
         events.append("prepare:" + call.call_id)
         return {"operation_id": str(operation_id), "call_id": call.call_id}
 
     async def execute(prepared: object) -> str:
-        saved = await graph.aget_state(config)
-        assert saved.values["prepared_tool"] == prepared
+        assert any(
+            [
+                row.checkpoint["channel_values"].get("prepared") == prepared
+                async for row in saver.alist(config)
+            ]
+        )
         assert isinstance(prepared, dict)
         events.append("execute:" + prepared["call_id"])
         return "result:" + prepared["call_id"]
 
-    result = await graph.ainvoke(
-        {
-            "request_snapshot": make_request(input_items).create_payload(),
-            "request_id": uuid4(),
-            "model_step_limit": None,
-            "tool_call_limit": 16,
-            "capacity_limits": synthetic_capacity_limits(),
-        },
-        config,
-        context=synthetic_response_runtime(
+    result = await run_response_step(
+        saver,
+        thread_id=(config)["configurable"]["thread_id"],
+        request=ResponseRequest.from_snapshot(make_request(input_items).create_payload()),
+        runtime=synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
             ensure_active=ensure_active,
             account_response=account_response,
         ),
-        durability="sync",
+        max_tool_calls=16,
     )
     assert events == [
         "model",
@@ -109,9 +105,105 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
     ]
     assert result["next_action"] == "continue"
     assert [item["call_id"] for item in result["tool_results"]] == ["call_synthetic", "second"]
-    assert result["input_items"][:1] == input_items
-    assert len(result["input_items"]) == 7
-    assert result["prepared_tool"] is None
+    items = _completed_step_items(
+        result["request_snapshot"], result["response_snapshot"], result["tool_results"]
+    )
+    assert items[:1] == input_items
+    assert len(items) == 7
+    assert "prepared_tool" not in result
+    assert "request_admission" not in result
+    assert "control_action" not in result
+
+
+class PreparedCommandSaveFault(InMemorySaver):
+    fail = True
+    after_save = False
+
+    async def aput(self, config, checkpoint, metadata, new_versions):
+        if self.fail and checkpoint["channel_values"].get("prepared") is not None:
+            if self.after_save:
+                await super().aput(config, checkpoint, metadata, new_versions)
+            raise ConnectionError("synthetic prepared Command save acknowledgement lost")
+        return await super().aput(config, checkpoint, metadata, new_versions)
+
+
+@pytest.mark.parametrize("after_save", [False, True])
+async def test_prepared_command_pending_or_saved_replays_without_reprepare_or_early_effect(
+    after_save: bool,
+) -> None:
+    saver = PreparedCommandSaveFault()
+    saver.after_save = after_save
+    config = {"configurable": {"thread_id": "prepared-command-replay"}}
+    events = []
+    commands = []
+
+    async def request(*args):
+        events.append("model")
+        return ReceivedModelResponse(model_response(), uuid4())
+
+    async def prepare(call, operation_id):
+        command = {"call_id": call.call_id, "operation_id": operation_id}
+        commands.append(command)
+        events.append("prepare:" + call.call_id)
+        return command
+
+    async def execute(command):
+        # Both the command and its dynamic destination must survive the save barrier.
+        saved = await anext(
+            row
+            async for row in saver.alist(config)
+            if row.checkpoint["channel_values"].get("prepared") == command
+        )
+        assert saved is not None
+        assert saved.checkpoint["channel_values"]["prepared"] == command
+        events.append("execute:" + command["call_id"])
+        return "saved observation"
+
+    runtime = synthetic_response_runtime(
+        request_model=request,
+        prepare_tool=prepare,
+        execute_tool=execute,
+        ensure_active=ensure_active,
+        account_response=account_response,
+    )
+    with pytest.raises(ConnectionError, match="prepared Command"):
+        await run_response_step(
+            saver,
+            thread_id=(config)["configurable"]["thread_id"],
+            request=ResponseRequest.from_snapshot(make_request([]).create_payload()),
+            runtime=runtime,
+            max_tool_calls=16,
+        )
+    assert events == ["model", "prepare:call_synthetic"]
+    original = await anext(
+        row async for row in saver.alist(config) if row.checkpoint["channel_values"].get("call")
+    )
+    assert original is not None
+    if after_save:
+        assert original.checkpoint["channel_values"]["prepared"] == commands[0]
+    else:
+        assert original.checkpoint["channel_values"].get("prepared") is None
+        assert any(
+            channel == "prepared" and value == commands[0]
+            for _, channel, value in original.pending_writes
+        )
+    saver.fail = False
+    result = await run_response_step(
+        saver,
+        thread_id=(config)["configurable"]["thread_id"],
+        request=None,
+        runtime=runtime,
+        max_tool_calls=16,
+    )
+    assert events == [
+        "model",
+        "prepare:call_synthetic",
+        "execute:call_synthetic",
+        "prepare:second",
+        "execute:second",
+    ]
+    assert result["completed_steps"] == 1
+    assert [item["call_id"] for item in result["tool_results"]] == ["call_synthetic", "second"]
 
 
 @pytest.mark.asyncio
@@ -130,7 +222,6 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
     saver = InMemorySaver(
         serde=JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
     )
-    graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "recover-second"}}
 
     async def request(
@@ -163,20 +254,21 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
         account_response=account_response,
     )
     with pytest.raises(ConnectionError):
-        await graph.ainvoke(
-            {
-                "request_snapshot": make_request([]).create_payload(),
-                "request_id": uuid4(),
-                "model_step_limit": None,
-                "tool_call_limit": 16,
-                "capacity_limits": synthetic_capacity_limits(),
-            },
-            config,
-            context=runtime,
-            durability="sync",
+        await run_response_step(
+            saver,
+            thread_id=(config)["configurable"]["thread_id"],
+            request=ResponseRequest.from_snapshot(make_request([]).create_payload()),
+            runtime=runtime,
+            max_tool_calls=16,
         )
-    assert (await graph.aget_state(config)).next == ("execute_tool",)
-    result = await graph.ainvoke(None, config, context=runtime, durability="sync")
+    assert (await read_response_state(saver, config)).next == ("tools",)
+    result = await run_response_step(
+        saver,
+        thread_id=(config)["configurable"]["thread_id"],
+        request=None,
+        runtime=runtime,
+        max_tool_calls=16,
+    )
     assert result["response_snapshot"] == snapshot_response(response)
     assert result["completed_steps"] == 1
     assert events == [
@@ -194,7 +286,6 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
 async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
     response = model_response()
     saver = InMemorySaver()
-    graph = _build_response_step(saver, max_tool_calls=16)
 
     async def request(
         model_request: ResponseRequest, request_id: UUID, input_tokens: int
@@ -207,23 +298,18 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
     async def execute(prepared: object) -> str:
         pytest.fail("A read or known rejection must not dispatch a write")
 
-    result = await graph.ainvoke(
-        {
-            "request_snapshot": make_request([]).create_payload(),
-            "request_id": uuid4(),
-            "model_step_limit": None,
-            "tool_call_limit": 16,
-            "capacity_limits": synthetic_capacity_limits(),
-        },
-        {"configurable": {"thread_id": "read-only"}},
-        context=synthetic_response_runtime(
+    result = await run_response_step(
+        saver,
+        thread_id=({"configurable": {"thread_id": "read-only"}})["configurable"]["thread_id"],
+        request=ResponseRequest.from_snapshot(make_request([]).create_payload()),
+        runtime=synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
             ensure_active=ensure_active,
             account_response=account_response,
         ),
-        durability="sync",
+        max_tool_calls=16,
     )
     assert len(result["tool_results"]) == 2
     assert result["next_action"] == "continue"
@@ -234,7 +320,6 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
     response = model_response()
     response.output[1].phase = None
     saver = InMemorySaver()
-    graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "unsupported-phase"}}
 
     async def request(
@@ -249,27 +334,22 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
         pytest.fail("Unsupported protocol cannot reach effects")
 
     with pytest.raises(UnsupportedModelResponseError):
-        await graph.ainvoke(
-            {
-                "request_snapshot": make_request([]).create_payload(),
-                "request_id": uuid4(),
-                "model_step_limit": None,
-                "tool_call_limit": 16,
-                "capacity_limits": synthetic_capacity_limits(),
-            },
-            config,
-            context=synthetic_response_runtime(
+        await run_response_step(
+            saver,
+            thread_id=(config)["configurable"]["thread_id"],
+            request=ResponseRequest.from_snapshot(make_request([]).create_payload()),
+            runtime=synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,
                 ensure_active=ensure_active,
                 account_response=account_response,
             ),
-            durability="sync",
+            max_tool_calls=16,
         )
-    saved = await graph.aget_state(config)
+    saved = await read_response_state(saver, config)
     assert saved.values["response_snapshot"] == snapshot_response(response)
-    assert saved.next == ("prepare_tool",)
+    assert saved.next == ("NativePolicy.after_model",)
 
 
 @pytest.mark.asyncio
@@ -308,7 +388,7 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
         account_response=account_response,
     )
     options = {"thread_id": "protected-entry", "runtime": runtime, "max_tool_calls": 16}
-    with pytest.raises(ValueError, match="no saved Step"):
+    with pytest.raises(ValueError, match="no saved work"):
         await run_response_step(saver, request=None, **options)
     with pytest.raises(ConnectionError):
         await run_response_step(saver, request=make_request([]), **options)

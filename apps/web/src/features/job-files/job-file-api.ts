@@ -1,47 +1,62 @@
 /** Job-file HTTP boundary. A failed creation is never retried with a new command here. */
 import { queryOptions } from '@tanstack/react-query';
-import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
-import type { JobFile } from '../../shared/api/generated/job-file-list';
-import type { RenameJobFileRequest } from '../../shared/api/generated/rename-job-file-request';
-import { requestJson } from '../../shared/api/http';
-import { isJobFile, isJobFileList } from '../../shared/api/validation';
+import type {
+  CreateJobFileRequest,
+  JobFile,
+  RenameJobFileRequest,
+} from '../../shared/api/generated/http/types.gen';
+
+import { scope } from '../../shared/api/http';
+import {
+  listJobFiles,
+  readJobFile,
+  createJobFile as create,
+  renameJobFile as rename,
+  deleteJobFile as remove,
+} from '../../shared/api/generated/http/sdk.gen';
 
 export const jobFilesQuery = queryOptions({
   queryKey: ['job-files'],
-  queryFn: ({ signal }) => requestJson('/api/job-files', isJobFileList, { signal }),
+  queryFn: ({ signal }) => listJobFiles({ signal, throwOnError: true }).then(({ data }) => data),
 });
 
 export function jobFileQuery(jobFileId: string) {
   return queryOptions({
     queryKey: ['job-file', jobFileId],
     queryFn: ({ signal }) =>
-      requestJson(`/api/job-files/${encodeURIComponent(jobFileId)}`, isJobFile, { signal }),
+      readJobFile({
+        path: { job_file_id: jobFileId },
+        signal,
+        throwOnError: true,
+        meta: {
+          correlation: { jobFileId },
+          scope: scope<JobFile>((value) => value.job_file_id === jobFileId),
+        },
+      }).then(({ data }) => data),
   });
 }
 
 export function createJobFile(command: CreateJobFileRequest): Promise<JobFile> {
-  return requestJson('/api/job-files', isJobFile, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(command),
-    correlation: { commandId: command.command_id },
-  });
+  return create({
+    body: command,
+    throwOnError: true,
+    meta: { correlation: { commandId: command.command_id } },
+  }).then(({ data }) => data);
 }
 
 export function renameJobFile(jobFileId: string, command: RenameJobFileRequest): Promise<JobFile> {
-  return requestJson(`/api/job-files/${encodeURIComponent(jobFileId)}/rename`, isJobFile, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(command),
-    correlation: { jobFileId, commandId: command.command_id },
-  });
+  return rename({
+    path: { job_file_id: jobFileId },
+    body: command,
+    throwOnError: true,
+    meta: {
+      correlation: { jobFileId, commandId: command.command_id },
+      scope: scope<JobFile>((value) => value.job_file_id === jobFileId),
+    },
+  }).then(({ data }) => data);
 }
 
-/** 共用 HTTP 邊界將空正文 204 映射為 undefined。 */
+/** 刪除的空正文結果保持 void。 */
 export function deleteJobFile(jobFileId: string): Promise<void> {
-  return requestJson(
-    `/api/job-files/${encodeURIComponent(jobFileId)}`,
-    (value): value is undefined => value === undefined,
-    { method: 'DELETE' },
-  );
+  return remove({ path: { job_file_id: jobFileId }, throwOnError: true }).then(() => undefined);
 }

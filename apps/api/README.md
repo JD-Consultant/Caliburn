@@ -61,7 +61,7 @@ uv run --project apps/api --locked alembic -c apps/api/alembic.ini upgrade head
 uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
 ```
 
-migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
+現行 `0034_jd_task_sources` 須使用空 namespace；任務來源不含 O/P 或能力關係獨立 owner，不搬移舊資料。migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
 
 日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/operations/native-development.md#更新已有安裝)。
 
@@ -94,7 +94,7 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 
 **離線回看：**只要原 DB 可用，即使未配置模型，也可透過既有 PostgreSQL checkpointer 讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；沒有模型設定時回 `503 model_not_configured`，既有命令仍可查回原結果，不為回看而重跑模型。
 
-下列入口涵蓋職務檔案、正式訪談與人工 JD 編輯。讀取入口提供目前資料或固定修訂；修改入口沿命令與讀取基底處理重送及衝突。具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成：
+下列入口涵蓋職務檔案、正式訪談與人工 JD 編輯。讀取入口提供目前資料或固定修訂；修改入口沿命令與讀取基底處理重送及衝突。具體 HTTP 型別由 `transport/http/models/` 維護，對外格式由 `/openapi.json` 發布：
 
 - `POST /api/job-files`：`command_id`、`display_name`、`employee_name`；新建立回 201，同一命令重送回原結果／200，不同輸入重用命令回 409。
 - `GET /api/job-files`、`GET /api/job-files/{job_file_id}`：清單／目前檔案 metadata。
@@ -103,10 +103,10 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 - `GET /api/job-files/{job_file_id}/jd/profile`：目前正式修訂與四欄基本資料；新檔案為 null，代表尚未提供。
 - `POST /api/job-files/{job_file_id}/jd/profile`：`command_id`、`expected_revision_id`、`changes`；明確 set／clear 指定欄位，未指定保留。成功／原命令重送回 200；舊基底、重用命令改 payload、活躍／暫停 A 的新人工修改回 409；非法欄位或重複 change 回 422。重送可返回舊操作當時的固定修訂，需最新內容另 GET；背景 Memory 不阻止人工編輯。保存／恢復界線見 [JD 保存接線](../../docs/implementation/jd-storage.md)。已接人工基本資料 UI，**不是 A 候選寫入入口**。
 - `GET /api/job-files/{job_file_id}/jd/areas`：目前正式修訂與依序排列的職責集合，無資料時 `areas: []`。`POST` 同路徑：同一命令／基底規則下，以 `change.action` 建立、修訂、刪除或排序一項職責；完整輸入以 schema 為準。刪職責將任務轉未歸屬，不刪內容；profile、其他職責與任務保留。已接人工 UI；不是模型直接修改正式 JD 的路徑。
-- `GET /api/job-files/{job_file_id}/jd/tasks`：目前正式修訂的任務集合，未歸屬在前，再依職責與組內順序；每項含獨立的成果／要求。`POST` 同路徑以 `change.action` 建立、修訂、移動、明細排序或刪除。任務及明細身分保留，兩組不能互換或跨任務移動；同任務多欄與明細調整全成或全拒。沿同一 JD command／base／人工准入規則，原結果可恢復；人工 UI 可編輯，來源另按需回查。完整參數以 `edit-jd-tasks-request.schema.json` 為準，不是模型工具參數。
-- `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
+- `GET /api/job-files/{job_file_id}/jd/tasks`：目前正式修訂的任務集合，未歸屬在前，再依職責與組內順序；每項含獨立的成果／要求。`POST` 同路徑以 `change.action` 建立、修訂、移動、明細排序或刪除。任務及明細身分保留，兩組不能互換或跨任務移動；同任務多欄與明細調整全成或全拒。沿同一 JD command／base／人工准入規則，原結果可恢復；人工 UI 可編輯，來源另按需回查。完整參數以 OpenAPI 的 `EditJdTasksRequest` 為準，不是模型工具參數。
+- `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 OpenAPI 的 `EditJdCapabilitiesRequest` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
-- `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
+- `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 OpenAPI；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
 - `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [Plan 保存與採用](../../docs/architecture/persistence.md#plan-從本輪候選到後輪可採用)；現行內容用途見 [Plan 保存與採用](../../docs/architecture/persistence.md#plan-從本輪候選到後輪可採用)。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。
 
@@ -141,7 +141,7 @@ uv run --project apps/api --locked mypy --config-file apps/api/pyproject.toml ap
 uv run --project apps/api --locked python apps/api/scripts/generate_contracts.py --check
 ```
 
-修改 `contracts/http/*.schema.json` 或 `contracts/tools/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS、HTTP／tools 包內原 schema 與 root DTO 資源索引，供 runtime guard／工具 definitions 讀取；`--check` 一起核對。HTTP 與 Tool 先驗 canonical JSON，再轉生成 DTO；整數、UUID 與 Unicode 判空政策見[契約策略](../../docs/standards/contract-strategy.md)。禁止手改 `generated/` 的型別或 JSON。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
+修改 `transport/http/models/`、HTTP 路由或 `contracts/tools/*.schema.json` 後，執行相同生成命令但不帶 `--check`。HTTP 由 Pydantic／FastAPI 導出 OpenAPI，再生成 Web SDK、型別及 Ajv standalone 驗證函式；工具沿 JSON Schema 生成 Python／TS、包內原 Schema 及資源索引。`--schema` 只限定工具 DTO，HTTP 每次完整生成；`--check` 在暫存目錄比對，不改正式產物。禁止手改 `generated/`，接受政策見[契約策略](../../docs/standards/contract-strategy.md)。工具 enum 成員採大寫避免與內建方法撞名，wire 值不改。App 自有物件拒絕額外欄位；SDK 原生 Responses items 則依接續契約保留 metadata。
 
 真 PostgreSQL 測試只接受**明確指定、loopback、名稱以 `_test` 結尾的隔離資料庫**；缺環境變數會 skip，不代表通過。測試建立隨機 schema，完成後只清理自己新建的 schema，不刪 DB。
 
@@ -167,8 +167,8 @@ SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG 
 
 ### 模型失敗診斷
 
-要在 DataGrip 直接 JOIN 查看某份檔案的 AI 輸入、工具與結果，使用按需 `scripts/refresh_execution_diagnostics.py`，再開啟 `diagnostic_execution_history`、`diagnostic_model_steps`、`diagnostic_tool_calls`。它不啟動模型，也不改原 checkpoint；完整命令、擷取新鮮度與敏感資料界線見 [runbook](../../docs/operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+使用隨套件交付的 `python -m caliburn.diagnostics` 從職務檔案總覽查到 execution／Step、暫停及後續 checkpoint 接續，明示 `--full` 可展開原請求、回應、工具及當時 Memory／JD／Plan 正文。它沿同一唯讀交易讀原件，不需 refresh、不另存副本；原生及容器命令、判讀界線見 [runbook](../../docs/operations/README.md#查閱-ai-執行原件)。
 
-後端 logger `caliburn.workflows.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/operations/README.md#一般-log-與-http-關聯)。
+後端 logger `caliburn.workflows.executions.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/operations/README.md#一般-log-與-http-關聯)。
 
 此警告不代表故障已保存、重試／回滾已完成。正文沿受控診斷查閱，不開啟原始 HTTP body、opaque reasoning 或秘密日誌。

@@ -9,6 +9,8 @@ from langgraph.checkpoint.base import ChannelVersions, Checkpoint, CheckpointMet
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from psycopg import AsyncConnection
 
+from caliburn.adapters.owned_tasks import join_owned
+
 
 class JobFilePostgresSaver(AsyncPostgresSaver):
     """Borrow the official connection/codec; add only a per-file write fence.
@@ -72,16 +74,4 @@ class JobFilePostgresSaver(AsyncPostgresSaver):
                 return await save()
 
         task = asyncio.create_task(locked_save())
-        try:
-            return await asyncio.shield(task)
-        except asyncio.CancelledError:
-            # A key-share lock cannot leave while the borrowed connection's
-            # save is still executing. Repeated cancellation grants no shortcut.
-            while not task.done():
-                try:
-                    await asyncio.wait((task,))
-                except asyncio.CancelledError:
-                    continue
-            if not task.cancelled():
-                task.exception()
-            raise
+        return await join_owned(task)

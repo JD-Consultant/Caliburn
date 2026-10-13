@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
 from caliburn.adapters.pdf_renderer import PdfRenderError
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.workflows.jd_export import JdExportWorkflow
+from caliburn.workflows.job_description.export import JdExportWorkflow
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
 
@@ -20,7 +20,12 @@ def get_jd_export_workflow(request: Request) -> JdExportWorkflow:
 
 
 @router.get(
-    "/export.pdf", response_class=Response, responses={200: {"content": {"application/pdf": {}}}}
+    "/export.pdf",
+    response_class=Response,
+    responses={
+        200: {"content": {"application/pdf": {"schema": {"type": "string", "format": "binary"}}}}
+    },
+    operation_id="export_jd_pdf",
 )
 async def export_jd_pdf(
     job_file_id: UUID,

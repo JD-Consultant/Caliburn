@@ -9,12 +9,9 @@ from caliburn.agent_execution.context_compaction import (
     prepare_context_history,
     read_prepared_history,
 )
-from caliburn.agent_execution.tool_steps import (
-    PausedResponseLoop,
-    ResponseLoopControls,
-    read_completed_response_history,
-    run_response_loop,
-)
+from caliburn.agent_execution.response_runtime import PausedResponseLoop, ResponseLoopControls
+from caliburn.agent_execution.tool_steps import read_completed_response_history
+from tests.fixtures.native_response_runtime import run_response_loop
 from tests.fixtures.response_loop import LoopProbe, initial_request, response_at
 from tests.unit.test_context_preparation import PreparationProbe
 from tests.unit.test_response_pause import PauseProbe
@@ -66,7 +63,12 @@ async def test_completed_response_exports_exact_native_history_and_does_not_exec
         max_model_steps=3,
     )
     original = await read_completed_response_history(saver, thread_id="finished")
-    assert original.items == state["input_items"]
+    assert "input_items" not in state
+    assert (
+        original.items[: len(state["request_snapshot"]["input"])]
+        == state["request_snapshot"]["input"]
+    )
+    assert len(original.items) == 10
     assert original.items[2]["encrypted_content"] == "synthetic-opaque-1"
     assert [
         item["call_id"] for item in original.items if item.get("type") == "function_call_output"
@@ -75,6 +77,12 @@ async def test_completed_response_exports_exact_native_history_and_does_not_exec
         saver, thread_id="finished", checkpoint_id=original.checkpoint_id
     )
     assert restored == original
+    original.items[0]["content"] = "caller mutation must not rewrite retained originals"
+    assert (
+        await read_completed_response_history(
+            saver, thread_id="finished", checkpoint_id=restored.checkpoint_id
+        )
+    ) == restored
     assert len(probe.requests) == 2
     assert probe.effects == ["call_1_0", "call_1_1"]
 

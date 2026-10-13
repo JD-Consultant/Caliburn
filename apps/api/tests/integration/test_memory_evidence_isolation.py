@@ -14,8 +14,8 @@ from caliburn.features.executions import memory_discovery
 from caliburn.features.work_memory import consolidation_requests
 from caliburn.features.work_memory.batch_persistence import MemoryOperationRecord
 from caliburn.features.work_memory.consolidation_models import MemoryEvidenceError
-from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.work_memory.consolidation import MemoryConsolidationWorkflow
+from caliburn.workflows.work_memory.supervisor import MemorySupervisor
 from tests.integration.test_memory_batch_orchestration import complete_turn, execute, start_turn
 
 pytestmark = pytest.mark.postgres

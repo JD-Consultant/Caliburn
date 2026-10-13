@@ -13,10 +13,7 @@ from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.settings import ModelSettings
-from caliburn.workflows.memory_analysis.results import (
-    AnalysisRecovery,
-    MemoryAnalysisResult,
-)
+from caliburn.workflows.work_memory.results import AnalysisRecovery, MemoryAnalysisResult
 
 
 @dataclass(frozen=True, slots=True)

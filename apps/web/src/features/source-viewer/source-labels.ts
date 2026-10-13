@@ -1,5 +1,5 @@
 /** Words for a source's state, shared by the list rows and the detail so both name the same reason. */
-import type { Reference } from '../../shared/api/generated/jd-sources-view';
+import type { Reference } from '../../shared/api/generated/http/types.gen';
 
 /** Why the source needs recheck; reading never clears it, and it is not a claim that the JD is wrong. */
 export function changeLabel(reference: Reference): string {

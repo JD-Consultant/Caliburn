@@ -11,7 +11,7 @@ from caliburn.adapters.process_lock import PostgresProcessLock
 from caliburn.bootstrap import create_app
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.settings import DatabaseSettings, Settings
-from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
 
 pytestmark = pytest.mark.postgres
 

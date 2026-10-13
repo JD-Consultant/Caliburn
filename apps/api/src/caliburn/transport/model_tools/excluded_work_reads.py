@@ -20,8 +20,8 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
-from caliburn.workflows.memory_reads import MemoryReadBinding
 from caliburn.workflows.occupation_reference_reads import ExcludedWorkReadWorkflow
+from caliburn.workflows.work_memory.reads import MemoryReadBinding
 
 
 def excluded_work_read_definitions() -> list[FunctionToolParam]:

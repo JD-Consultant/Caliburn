@@ -41,8 +41,10 @@ from caliburn.features.job_description.models import (
     StaleJdRevisionError,
 )
 from caliburn.features.job_description.tasks import CreateTask, EditJdTasks
-from caliburn.workflows.interview_completion import record_formal_interview
-from caliburn.workflows.jd_candidates import JdCandidateWorkflow, adopt_candidate_jd
+from caliburn.workflows.consultant_turns.completion import (
+    _record_formal_interview as record_formal_interview,
+)
+from caliburn.workflows.job_description.candidates import JdCandidateWorkflow, adopt_candidate_jd
 
 pytestmark = pytest.mark.postgres
 
@@ -96,31 +98,6 @@ def test_candidate_is_private_and_original_edit_can_be_recovered(client: TestCli
     assert formal["profile"]["job_title"] is None
 
 
-def test_restore_revokes_old_generation_and_is_itself_replayable(client: TestClient) -> None:
-    writer = start_writer(client)
-    workflow = JdCandidateWorkflow(client.app.state.database.sessions)
-    start = client.portal.call(workflow.start, writer)
-    first_command = profile_edit(start.revision_id, "安全點")
-    first = client.portal.call(workflow.edit, writer, start.scope, first_command)
-    second = client.portal.call(
-        workflow.edit, writer, start.scope, profile_edit(first.revision_id, "未完成")
-    )
-    restore_id = uuid4()
-    restored = client.portal.call(workflow.restore, writer, second, first.revision_id, restore_id)
-    assert restored.scope.generation_id != start.scope.generation_id
-    assert restored.revision_id == first.revision_id
-    with pytest.raises(CandidateStateError):
-        client.portal.call(workflow.edit, writer, start.scope, first_command)
-    newer = client.portal.call(
-        workflow.edit, writer, restored.scope, profile_edit(restored.revision_id, "接續")
-    )
-    assert (
-        client.portal.call(workflow.restore, writer, second, first.revision_id, restore_id)
-        == restored
-    )
-    assert client.portal.call(workflow.read, writer.scope).position == newer
-
-
 def test_pause_disallows_edits_but_keeps_preview(client: TestClient) -> None:
     writer = start_writer(client)
     workflow = JdCandidateWorkflow(client.app.state.database.sessions)
@@ -148,8 +125,18 @@ def test_discard_is_not_formal_undo_and_cannot_reopen(client: TestClient) -> Non
         workflow.edit, writer, start.scope, profile_edit(start.revision_id, "放棄")
     )
     operation_id = uuid4()
-    client.portal.call(workflow.discard, writer, changed, operation_id)
-    client.portal.call(workflow.discard, writer, changed, operation_id)
+    transact(
+        client,
+        lambda s: candidate_service.discard_candidate(
+            s, writer.scope.job_file_id, changed, operation_id
+        ),
+    )
+    transact(
+        client,
+        lambda s: candidate_service.discard_candidate(
+            s, writer.scope.job_file_id, changed, operation_id
+        ),
+    )
     with pytest.raises(CandidateStateError):
         client.portal.call(workflow.start, writer)
     with pytest.raises(CandidateStateError):
@@ -291,20 +278,12 @@ def test_adoption_joins_formal_interview_transaction_and_recovery(client: TestCl
     # This is a composition test, not the T08 production final/background/source workflow.
 
 
-def test_restore_cannot_select_other_turn_or_discarded_branch(client: TestClient) -> None:
+def test_candidate_cannot_edit_other_turn(client: TestClient) -> None:
     writer = start_writer(client)
     other = start_writer(client)
     workflow = JdCandidateWorkflow(client.app.state.database.sessions)
     start = client.portal.call(workflow.start, writer)
-    foreign = client.portal.call(workflow.start, other)
-    with pytest.raises(CandidateStateError):
-        client.portal.call(workflow.restore, writer, start, foreign.revision_id, uuid4())
-    first = client.portal.call(
-        workflow.edit, writer, start.scope, profile_edit(start.revision_id, "舊分支")
-    )
-    restored = client.portal.call(workflow.restore, writer, first, start.revision_id, uuid4())
-    with pytest.raises(CandidateStateError):
-        client.portal.call(workflow.restore, writer, restored, first.revision_id, uuid4())
+    client.portal.call(workflow.start, other)
     with pytest.raises(CandidateStateError):
         client.portal.call(
             workflow.edit, other, start.scope, profile_edit(start.revision_id, "別份檔案")

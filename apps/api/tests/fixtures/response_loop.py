@@ -7,8 +7,8 @@ from uuid import UUID, uuid4
 from openai.types.responses import Response, ResponseFunctionToolCall
 
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.agent_execution.tool_steps import ReceivedModelResponse, ResponseStepRuntime
-from tests.fixtures.response_capacity import synthetic_response_runtime
+from caliburn.agent_execution.response_runtime import ReceivedModelResponse
+from tests.fixtures.response_capacity import ResponseStepRuntime, synthetic_response_runtime
 
 
 def response_at(index: int, *, final: bool = False, tools: int = 0) -> Response:

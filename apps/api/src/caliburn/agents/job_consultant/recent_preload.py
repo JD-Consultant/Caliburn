@@ -68,9 +68,17 @@ def fit_recent_interview_preload(
         "from_sequence": kept[0].interview_sequence,
         "through_sequence": kept[-1].interview_sequence,
     }
-    boundary["not_preloaded"] = (
-        [{"from_sequence": unread[0], "through_sequence": unread[-1]}] if unread else []
-    )
+    omitted = boundary.get("not_preloaded", [])
+    if unread:
+        # Each fit removes a prefix of the previous suffix, so the omitted range
+        # stays contiguous across repeated attempts.
+        omitted = [
+            {
+                "from_sequence": omitted[0]["from_sequence"] if omitted else unread[0],
+                "through_sequence": unread[-1],
+            }
+        ]
+    boundary["not_preloaded"] = omitted
     fitted = {
         **data,
         "historical_interview": HistoricalInterview(
@@ -78,17 +86,18 @@ def fit_recent_interview_preload(
         ).model_dump(mode="json"),
         "interview_read_boundary": boundary,
     }
-    return [
-        *deepcopy(items[:-2]),
-        {**items[-2], "content": json.dumps(fitted, ensure_ascii=False)},
-        deepcopy(items[-1]),
-    ]
+    result: NativeItems = deepcopy(items)
+    result[0] = {
+        **items[0],
+        "content": json.dumps(fitted, ensure_ascii=False),
+    }
+    return result
 
 
 def _read_reference_data(items: NativeItems) -> tuple[dict[str, Any], HistoricalInterview]:
-    """The App data message is second to last, before the current employee input."""
+    """A new window starts with its captured App reference data."""
     try:
-        data = json.loads(items[-2]["content"])
+        data = json.loads(items[0]["content"])
         if data["data_kind"] != REFERENCE_DATA_KIND:
             raise ValueError("not A's reference data")
         boundary = data["interview_read_boundary"]

@@ -100,7 +100,7 @@ Qdrant client 1.18.0 的選用背景版本探針另建 HTTP client，未沿用�
 
 基本模式的停止命令不會停止額外的 RAG 容器，請使用對應模式的停止命令。兩種模式都不使用 `down -v`。
 
-更新完整模式時，依序執行：
+更新完整模式時，依序執行；目前保存格式須先依[更新已有安裝](README.md#更新已有安裝)明示選擇新的空 schema，較早資料不遷移。Qdrant 索引與模型快取沿既有 volume 保存：
 
 1. 在安全點停止 App／RAG，備份 PostgreSQL 與 Qdrant，再明示建置 `app ocs-indexer embedder`。
 2. 若先前已停止整套服務，先啟動並等候資料庫就緒；失敗就停止更新：

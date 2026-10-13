@@ -18,8 +18,9 @@ dependencies = [
     "httpx2==2.13.1",
     "rapidfuzz==3.14.6",
     "playwright==1.63.0",
-    "jsonschema[format-nongpl]==4.26.0",
+    "jsonschema==4.26.0",
     "anyio==4.15.1",
+    "langchain==1.4.4",
 ]
 
 [dependency-groups]
@@ -27,6 +28,7 @@ dev = [
     "datamodel-code-generator==0.83.0",
     "httpx==0.28.1",
     "import-linter==2.15",
+    "jsonschema[format-nongpl]==4.26.0",
     "mypy==2.3.1",
     "pytest==9.1.1",
     "pytest-asyncio==1.4.0",

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button } from '@mui/material';
-import type { InterviewContent } from '../../shared/api/generated/jd-source-content-view';
+import type { InterviewContent } from '../../shared/api/generated/http/types.gen';
 import { SafeMarkdown } from '../../shared/ui/SafeMarkdown';
 import { ArrowBackIcon, ChevronRightIcon } from '../../shared/ui/icons';
 import { describeSourceError, jdSourceContentQuery } from './source-api';

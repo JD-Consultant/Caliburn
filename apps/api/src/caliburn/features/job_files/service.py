@@ -12,6 +12,7 @@ from caliburn.features.job_files.models import (
     JobFileCreation,
     JobFileCreationDeletedError,
     JobFileNotFoundError,
+    RecordUsageHeartbeat,
     RenameCommandConflictError,
     RenameJobFile,
     StaleJobFileNameError,
@@ -37,6 +38,7 @@ async def create_job_file(session: AsyncSession, command: CreateJobFile) -> JobF
             name_revision=1,
             employee_name=record.employee_name,
             created_at=record.created_at,
+            active_usage_seconds=record.active_usage_seconds,
         ),
         is_new=True,
     )
@@ -76,4 +78,21 @@ async def rename_job_file(
         name_revision=result.name_revision,
         employee_name=file.employee_name,
         created_at=file.created_at,
+        active_usage_seconds=file.active_usage_seconds,
+    )
+
+
+async def record_usage_heartbeat(
+    session: AsyncSession, job_file_id: UUID, command: RecordUsageHeartbeat
+) -> JobFile:
+    record = await persistence.accumulate_usage_seconds(session, job_file_id, command)
+    if record is None:
+        raise JobFileNotFoundError("Job file not found")
+    return JobFile(
+        job_file_id=record.job_file_id,
+        display_name=record.display_name,
+        name_revision=record.name_revision,
+        employee_name=record.employee_name,
+        created_at=record.created_at,
+        active_usage_seconds=record.active_usage_seconds,
     )

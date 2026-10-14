@@ -36,6 +36,7 @@ type PositiveInteger = Annotated[
 type NonnegativeInteger = Annotated[
     int, Field(ge=0, le=9007199254740991), BeforeValidator(_json_number)
 ]
+type HeartbeatElapsedSeconds = Annotated[int, Field(ge=1, le=60), BeforeValidator(_json_number)]
 type NonemptyText = Annotated[StrictStr, Field(min_length=1)]
 type NonblankText = Annotated[StrictStr, Field(min_length=1, pattern=NONBLANK_PATTERN)]
 type DisplayName = Annotated[NonblankText, Field(max_length=200)]

@@ -95,6 +95,10 @@ import type { FieldChange } from './types.gen';
 export declare const isFieldChange: (value: unknown) => value is FieldChange;
 import type { HealthStatus } from './types.gen';
 export declare const isHealthStatus: (value: unknown) => value is HealthStatus;
+import type { HeartbeatElapsedSeconds } from './types.gen';
+export declare const isHeartbeatElapsedSeconds: (
+  value: unknown,
+) => value is HeartbeatElapsedSeconds;
 import type { HttpErrorDetail } from './types.gen';
 export declare const isHttpErrorDetail: (value: unknown) => value is HttpErrorDetail;
 import type { HttpErrorResponse } from './types.gen';
@@ -163,6 +167,10 @@ import type { PublishedMemoryObject } from './types.gen';
 export declare const isPublishedMemoryObject: (value: unknown) => value is PublishedMemoryObject;
 import type { ReasoningSummary } from './types.gen';
 export declare const isReasoningSummary: (value: unknown) => value is ReasoningSummary;
+import type { RecordUsageHeartbeatRequest } from './types.gen';
+export declare const isRecordUsageHeartbeatRequest: (
+  value: unknown,
+) => value is RecordUsageHeartbeatRequest;
 import type { Reference } from './types.gen';
 export declare const isReference: (value: unknown) => value is Reference;
 import type { RemoveDetail } from './types.gen';

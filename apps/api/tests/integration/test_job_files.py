@@ -240,3 +240,67 @@ def test_invalid_name_is_rejected_before_creation(client: TestClient, field_valu
     )
     assert response.status_code == 422
     assert client.get("/api/job-files").json() == {"job_files": []}
+
+
+def test_usage_heartbeats_accumulate_atomically_and_are_visible_on_read(
+    client: TestClient,
+) -> None:
+    job_file_id = client.post(
+        "/api/job-files",
+        json={"command_id": str(uuid4()), "display_name": "計時", "employee_name": "員工"},
+    ).json()["job_file_id"]
+    assert client.get(f"/api/job-files/{job_file_id}").json()["active_usage_seconds"] == 0
+    first = client.post(
+        f"/api/job-files/{job_file_id}/usage-heartbeat", json={"elapsed_seconds": 20}
+    )
+    assert first.status_code == 200
+    assert first.json()["active_usage_seconds"] == 20
+    second = client.post(
+        f"/api/job-files/{job_file_id}/usage-heartbeat", json={"elapsed_seconds": 15}
+    )
+    assert second.json()["active_usage_seconds"] == 35
+    assert client.get(f"/api/job-files/{job_file_id}").json()["active_usage_seconds"] == 35
+    assert client.get("/api/job-files").json()["job_files"][0]["active_usage_seconds"] == 35
+
+
+def test_concurrent_heartbeats_from_other_tabs_all_land_without_overwriting(
+    client: TestClient,
+) -> None:
+    job_file_id = client.post(
+        "/api/job-files",
+        json={"command_id": str(uuid4()), "display_name": "多分頁", "employee_name": "員工"},
+    ).json()["job_file_id"]
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        responses = list(
+            executor.map(
+                lambda _: client.post(
+                    f"/api/job-files/{job_file_id}/usage-heartbeat", json={"elapsed_seconds": 10}
+                ),
+                range(5),
+            )
+        )
+    assert all(response.status_code == 200 for response in responses)
+    assert client.get(f"/api/job-files/{job_file_id}").json()["active_usage_seconds"] == 50
+
+
+def test_usage_heartbeat_for_unknown_job_file_is_rejected(client: TestClient) -> None:
+    response = client.post(
+        f"/api/job-files/{uuid4()}/usage-heartbeat", json={"elapsed_seconds": 10}
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": {"code": "job_file_not_found"}}
+
+
+@pytest.mark.parametrize("elapsed_seconds", [0, -1, 61, "20", True])
+def test_usage_heartbeat_with_invalid_seconds_is_rejected_before_any_write(
+    client: TestClient, elapsed_seconds: object
+) -> None:
+    job_file_id = client.post(
+        "/api/job-files",
+        json={"command_id": str(uuid4()), "display_name": "邊界", "employee_name": "員工"},
+    ).json()["job_file_id"]
+    response = client.post(
+        f"/api/job-files/{job_file_id}/usage-heartbeat", json={"elapsed_seconds": elapsed_seconds}
+    )
+    assert response.status_code == 422
+    assert client.get(f"/api/job-files/{job_file_id}").json()["active_usage_seconds"] == 0

@@ -18,6 +18,7 @@ const result = {
   employee_name: command.employee_name,
   created_at: '2026-09-29T10:00:00Z',
   name_revision: 1,
+  active_usage_seconds: 0,
 };
 const clients: QueryClient[] = [];
 

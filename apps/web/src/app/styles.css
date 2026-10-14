@@ -216,6 +216,12 @@ h6 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.file-bar-usage-timer {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--cb-text-muted);
+  white-space: nowrap;
+}
 .workspace-banner {
   flex: none;
   padding: 8px 16px 0;

@@ -62,6 +62,7 @@ def test_date_time_format_is_asserted(created_at):
                 "name_revision": 1,
                 "employee_name": "員工",
                 "created_at": created_at,
+                "active_usage_seconds": 0,
             }
         ]
     }

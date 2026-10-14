@@ -109,6 +109,9 @@ import type {
   ReadTurnToolsData,
   ReadTurnToolsErrors,
   ReadTurnToolsResponses,
+  RecordJobFileUsageHeartbeatData,
+  RecordJobFileUsageHeartbeatErrors,
+  RecordJobFileUsageHeartbeatResponses,
   RenameJobFileData,
   RenameJobFileErrors,
   RenameJobFileResponses,
@@ -218,6 +221,29 @@ export const readInterviewHistory = <ThrowOnError extends boolean = false>(
     ReadInterviewHistoryErrors,
     ThrowOnError
   >({ url: '/api/job-files/{job_file_id}/interviews', ...options });
+
+/**
+ * Record Usage Heartbeat
+ */
+export const recordJobFileUsageHeartbeat = <ThrowOnError extends boolean = false>(
+  options: Options<RecordJobFileUsageHeartbeatData, ThrowOnError>,
+): RequestResult<
+  RecordJobFileUsageHeartbeatResponses,
+  RecordJobFileUsageHeartbeatErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RecordJobFileUsageHeartbeatResponses,
+    RecordJobFileUsageHeartbeatErrors,
+    ThrowOnError
+  >({
+    url: '/api/job-files/{job_file_id}/usage-heartbeat',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
 
 /**
  * Rename Job File

@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Container, Stack } from '@mui/material';
 import { useCurrentTurn } from '../features/interview/use-current-turn';
 import { jobFileQuery } from '../features/job-files/job-file-api';
+import { useUsageTimer } from '../features/job-files/use-usage-timer';
 import { ApiError, describeReadError } from '../shared/api/http';
 import { AppHeader } from './AppHeader';
 import { FileBar } from './FileBar';
@@ -86,10 +87,11 @@ function JobFileWorkspace({
   retry: ReactNode;
 }) {
   const { turn, isVerified } = useCurrentTurn(jobFileId);
+  const activeUsageSeconds = useUsageTimer(jobFileId, file.data?.active_usage_seconds ?? 0);
   if (!file.data) return null;
   return (
     <WorkspaceLayout
-      bar={<FileBar file={file.data} turn={turn} />}
+      bar={<FileBar file={file.data} turn={turn} activeUsageSeconds={activeUsageSeconds} />}
       banner={
         file.isError ? (
           <div className="workspace-banner">

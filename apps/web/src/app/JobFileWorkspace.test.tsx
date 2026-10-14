@@ -16,6 +16,7 @@ const file: JobFile = {
   employee_name: '合成員工甲',
   created_at: '2026-09-29T10:00:00Z',
   name_revision: 1,
+  active_usage_seconds: 0,
 };
 const executionId = '50000000-0000-4000-8000-000000000005';
 const profile = {

@@ -5270,8 +5270,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateArea = P));
-    function P(
+      (e.isCreateArea = Ee));
+    function Ee(
       e,
       {
         instancePath: t = '',
@@ -5283,7 +5283,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = P.evaluated;
+        c = Ee.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -5293,7 +5293,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.scope_text === void 0 && (n = 'scope_text'))
           )
             return (
-              (P.errors = [
+              (Ee.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -5309,7 +5309,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'title' && n !== 'scope_text')
                 return (
-                  (P.errors = [
+                  (Ee.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -5326,7 +5326,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (P.errors = [
+                    (Ee.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -5339,7 +5339,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'create_area')
                   return (
-                    (P.errors = [
+                    (Ee.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -5389,7 +5389,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), s++, (P.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), s++, (Ee.errors = o), !1);
                   }
                   var l = r === s;
                 } else var l = !0;
@@ -5430,7 +5430,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), s++, (P.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), s++, (Ee.errors = o), !1);
                     }
                     var l = r === s;
                   } else var l = !0;
@@ -5440,7 +5440,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (P.errors = [
+            (Ee.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -5452,15 +5452,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((P.errors = o), s === 0);
+      return ((Ee.errors = o), s === 0);
     }
-    ((P.evaluated = {
+    ((Ee.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateCapability = F));
-    function F(
+      (e.isCreateCapability = P));
+    function P(
       e,
       {
         instancePath: t = '',
@@ -5472,7 +5472,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = F.evaluated;
+        c = P.evaluated;
       (c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0));
       let l = s,
         u = !1,
@@ -5526,7 +5526,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           params: {},
           message: 'must match a schema in anyOf',
         };
-        return (o === null ? (o = [e]) : o.push(e), s++, (F.errors = o), !1);
+        return (o === null ? (o = [e]) : o.push(e), s++, (P.errors = o), !1);
       }
       if (s === 0) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
@@ -5538,7 +5538,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.description === void 0 && (n = 'description'))
           )
             return (
-              (F.errors = [
+              (P.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -5554,7 +5554,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'kind' && n !== 'name' && n !== 'description')
                 return (
-                  (F.errors = [
+                  (P.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -5571,7 +5571,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (F.errors = [
+                    (P.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -5584,7 +5584,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'create_capability')
                   return (
-                    (F.errors = [
+                    (P.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -5646,7 +5646,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), s++, (F.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), s++, (P.errors = o), !1);
                     }
                     var g = r === s;
                   } else var g = !0;
@@ -5688,7 +5688,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), s++, (F.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), s++, (P.errors = o), !1);
                       }
                       var g = r === s;
                     } else var g = !0;
@@ -5699,7 +5699,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (F.errors = [
+            (P.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -5711,15 +5711,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((F.errors = o), s === 0);
+      return ((P.errors = o), s === 0);
     }
-    ((F.evaluated = {
+    ((P.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateCollaborator = I));
-    function I(
+      (e.isCreateCollaborator = F));
+    function F(
       e,
       {
         instancePath: t = '',
@@ -5731,7 +5731,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = I.evaluated;
+        c = F.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -5741,7 +5741,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.scope_text === void 0 && (n = 'scope_text'))
           )
             return (
-              (I.errors = [
+              (F.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -5757,7 +5757,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'name' && n !== 'scope_text')
                 return (
-                  (I.errors = [
+                  (F.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -5774,7 +5774,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (I.errors = [
+                    (F.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -5787,7 +5787,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'create_collaborator')
                   return (
-                    (I.errors = [
+                    (F.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -5837,7 +5837,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), s++, (I.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), s++, (F.errors = o), !1);
                   }
                   var l = r === s;
                 } else var l = !0;
@@ -5878,7 +5878,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), s++, (I.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), s++, (F.errors = o), !1);
                     }
                     var l = r === s;
                   } else var l = !0;
@@ -5888,7 +5888,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (I.errors = [
+            (F.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -5900,15 +5900,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((I.errors = o), s === 0);
+      return ((F.errors = o), s === 0);
     }
-    ((I.evaluated = {
+    ((F.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateCondition = Ee));
-    function Ee(
+      (e.isCreateCondition = De));
+    function De(
       e,
       {
         instancePath: t = '',
@@ -5920,7 +5920,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Ee.evaluated;
+        c = De.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -5930,7 +5930,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.text === void 0 && (n = 'text'))
           )
             return (
-              (Ee.errors = [
+              (De.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -5946,7 +5946,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'kind' && n !== 'text')
                 return (
-                  (Ee.errors = [
+                  (De.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -5963,7 +5963,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (Ee.errors = [
+                    (De.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -5976,7 +5976,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'create_condition')
                   return (
-                    (Ee.errors = [
+                    (De.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -6019,7 +6019,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ee.errors = [
+            (De.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -6031,15 +6031,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ee.errors = o), s === 0);
+      return ((De.errors = o), s === 0);
     }
-    ((Ee.evaluated = {
+    ((De.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateJobFileRequest = De));
-    function L(
+      (e.isCreateJobFileRequest = Oe));
+    function I(
       e,
       {
         instancePath: t = '',
@@ -6049,7 +6049,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: o = {},
       } = {},
     ) {
-      let s = L.evaluated;
+      let s = I.evaluated;
       if (
         (s.dynamicProps && (s.props = void 0),
         s.dynamicItems && (s.items = void 0),
@@ -6057,7 +6057,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       ) {
         if (a(e) > 200)
           return (
-            (L.errors = [
+            (I.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/maxLength',
@@ -6070,7 +6070,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (a(e) < 1)
           return (
-            (L.errors = [
+            (I.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/minLength',
@@ -6083,7 +6083,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (!d.test(e))
           return (
-            (L.errors = [
+            (I.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/pattern',
@@ -6100,7 +6100,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
       } else
         return (
-          (L.errors = [
+          (I.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -6111,13 +6111,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           ]),
           !1
         );
-      return ((L.errors = null), !0);
+      return ((I.errors = null), !0);
     }
-    L.evaluated = {
+    I.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function De(
+    function Oe(
       e,
       {
         instancePath: t = '',
@@ -6129,7 +6129,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = De.evaluated;
+        l = Oe.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -6139,7 +6139,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.employee_name === void 0 && (n = 'employee_name'))
           )
             return (
-              (De.errors = [
+              (Oe.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -6155,7 +6155,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'display_name' && n !== 'employee_name')
                 return (
-                  (De.errors = [
+                  (Oe.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -6181,25 +6181,25 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
               if (u) {
                 if (e.display_name !== void 0) {
                   let n = c;
-                  L(e.display_name, {
+                  I(e.display_name, {
                     instancePath: t + '/display_name',
                     parentData: e,
                     parentDataProperty: 'display_name',
                     rootData: i,
                     dynamicAnchors: a,
-                  }) || ((o = o === null ? L.errors : o.concat(L.errors)), (c = o.length));
+                  }) || ((o = o === null ? I.errors : o.concat(I.errors)), (c = o.length));
                   var u = n === c;
                 } else var u = !0;
                 if (u) {
                   if (e.employee_name !== void 0) {
                     let n = c;
-                    L(e.employee_name, {
+                    I(e.employee_name, {
                       instancePath: t + '/employee_name',
                       parentData: e,
                       parentDataProperty: 'employee_name',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? L.errors : o.concat(L.errors)), (c = o.length));
+                    }) || ((o = o === null ? I.errors : o.concat(I.errors)), (c = o.length));
                     var u = n === c;
                   } else var u = !0;
                 }
@@ -6208,7 +6208,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (De.errors = [
+            (Oe.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -6220,15 +6220,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((De.errors = o), c === 0);
+      return ((Oe.errors = o), c === 0);
     }
-    ((De.evaluated = {
+    ((Oe.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCreateTask = R));
-    function R(
+      (e.isCreateTask = L));
+    function L(
       e,
       {
         instancePath: t = '',
@@ -6240,7 +6240,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = R.evaluated;
+        l = L.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -6253,7 +6253,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.requirements === void 0 && (n = 'requirements'))
           )
             return (
-              (R.errors = [
+              (L.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -6276,7 +6276,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'requirements'
               )
                 return (
-                  (R.errors = [
+                  (L.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -6293,7 +6293,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (R.errors = [
+                    (L.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -6306,7 +6306,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'create_task')
                   return (
-                    (R.errors = [
+                    (L.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -6356,7 +6356,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (R.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (L.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -6397,7 +6397,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (R.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (L.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -6439,7 +6439,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (R.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (L.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -6468,7 +6468,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             }
                           } else
                             return (
-                              (R.errors = [
+                              (L.errors = [
                                 {
                                   instancePath: t + '/outcomes',
                                   schemaPath: '#/properties/outcomes/type',
@@ -6507,7 +6507,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               }
                             } else
                               return (
-                                (R.errors = [
+                                (L.errors = [
                                   {
                                     instancePath: t + '/requirements',
                                     schemaPath: '#/properties/requirements/type',
@@ -6530,7 +6530,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (R.errors = [
+            (L.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -6542,15 +6542,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((R.errors = o), c === 0);
+      return ((L.errors = o), c === 0);
     }
-    ((R.evaluated = {
+    ((L.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isCurrentConsultantTurn = Oe));
-    function Oe(
+      (e.isCurrentConsultantTurn = ke));
+    function ke(
       e,
       {
         instancePath: t = '',
@@ -6562,13 +6562,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Oe.evaluated;
+        c = ke.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (e.turn === void 0 && (n = 'turn'))
             return (
-              (Oe.errors = [
+              (ke.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -6584,7 +6584,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'turn')
                 return (
-                  (Oe.errors = [
+                  (ke.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -6630,121 +6630,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   params: {},
                   message: 'must match a schema in anyOf',
                 };
-                return (o === null ? (o = [e]) : o.push(e), s++, (Oe.errors = o), !1);
-              }
-            }
-          }
-        } else
-          return (
-            (Oe.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((Oe.errors = o), s === 0);
-    }
-    ((Oe.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isDeleteArea = ke));
-    function ke(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = ke.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if ((e.action === void 0 && (n = 'action')) || (e.area_id === void 0 && (n = 'area_id')))
-            return (
-              (ke.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'area_id')
-                return (
-                  (ke.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (ke.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'delete_area')
-                  return (
-                    (ke.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'delete_area' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.area_id !== void 0) {
-                  let n = c;
-                  s(e.area_id, {
-                    instancePath: t + '/area_id',
-                    parentData: e,
-                    parentDataProperty: 'area_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
+                return (o === null ? (o = [e]) : o.push(e), s++, (ke.errors = o), !1);
               }
             }
           }
@@ -6762,14 +6648,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ke.errors = o), c === 0);
+      return ((ke.errors = o), s === 0);
     }
     ((ke.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDeleteCapability = Ae));
+      (e.isDeleteArea = Ae));
     function Ae(
       e,
       {
@@ -6786,10 +6672,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.capability_id === void 0 && (n = 'capability_id'))
-          )
+          if ((e.action === void 0 && (n = 'action')) || (e.area_id === void 0 && (n = 'area_id')))
             return (
               (Ae.errors = [
                 {
@@ -6805,7 +6688,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'capability_id')
+              if (n !== 'action' && n !== 'area_id')
                 return (
                   (Ae.errors = [
                     {
@@ -6835,14 +6718,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'delete_capability')
+                if (n !== 'delete_area')
                   return (
                     (Ae.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'delete_capability' },
+                        params: { allowedValue: 'delete_area' },
                         message: 'must be equal to constant',
                       },
                     ]),
@@ -6851,12 +6734,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.capability_id !== void 0) {
+                if (e.area_id !== void 0) {
                   let n = c;
-                  s(e.capability_id, {
-                    instancePath: t + '/capability_id',
+                  s(e.area_id, {
+                    instancePath: t + '/area_id',
                     parentData: e,
-                    parentDataProperty: 'capability_id',
+                    parentDataProperty: 'area_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
@@ -6886,7 +6769,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDeleteCollaborator = je));
+      (e.isDeleteCapability = je));
     function je(
       e,
       {
@@ -6905,7 +6788,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.collaborator_id === void 0 && (n = 'collaborator_id'))
+            (e.capability_id === void 0 && (n = 'capability_id'))
           )
             return (
               (je.errors = [
@@ -6922,7 +6805,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'collaborator_id')
+              if (n !== 'action' && n !== 'capability_id')
                 return (
                   (je.errors = [
                     {
@@ -6952,14 +6835,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'delete_collaborator')
+                if (n !== 'delete_capability')
                   return (
                     (je.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'delete_collaborator' },
+                        params: { allowedValue: 'delete_capability' },
                         message: 'must be equal to constant',
                       },
                     ]),
@@ -6968,12 +6851,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.collaborator_id !== void 0) {
+                if (e.capability_id !== void 0) {
                   let n = c;
-                  s(e.collaborator_id, {
-                    instancePath: t + '/collaborator_id',
+                  s(e.capability_id, {
+                    instancePath: t + '/capability_id',
                     parentData: e,
-                    parentDataProperty: 'collaborator_id',
+                    parentDataProperty: 'capability_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
@@ -7003,7 +6886,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDeleteCondition = Me));
+      (e.isDeleteCollaborator = Me));
     function Me(
       e,
       {
@@ -7022,7 +6905,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.condition_id === void 0 && (n = 'condition_id'))
+            (e.collaborator_id === void 0 && (n = 'collaborator_id'))
           )
             return (
               (Me.errors = [
@@ -7039,7 +6922,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'condition_id')
+              if (n !== 'action' && n !== 'collaborator_id')
                 return (
                   (Me.errors = [
                     {
@@ -7069,14 +6952,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'delete_condition')
+                if (n !== 'delete_collaborator')
                   return (
                     (Me.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'delete_condition' },
+                        params: { allowedValue: 'delete_collaborator' },
                         message: 'must be equal to constant',
                       },
                     ]),
@@ -7085,12 +6968,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.condition_id !== void 0) {
+                if (e.collaborator_id !== void 0) {
                   let n = c;
-                  s(e.condition_id, {
-                    instancePath: t + '/condition_id',
+                  s(e.collaborator_id, {
+                    instancePath: t + '/collaborator_id',
                     parentData: e,
-                    parentDataProperty: 'condition_id',
+                    parentDataProperty: 'collaborator_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
@@ -7120,7 +7003,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDeleteTask = Ne));
+      (e.isDeleteCondition = Ne));
     function Ne(
       e,
       {
@@ -7137,7 +7020,10 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
-          if ((e.action === void 0 && (n = 'action')) || (e.task_id === void 0 && (n = 'task_id')))
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.condition_id === void 0 && (n = 'condition_id'))
+          )
             return (
               (Ne.errors = [
                 {
@@ -7153,7 +7039,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'task_id')
+              if (n !== 'action' && n !== 'condition_id')
                 return (
                   (Ne.errors = [
                     {
@@ -7183,14 +7069,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'delete_task')
+                if (n !== 'delete_condition')
                   return (
                     (Ne.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'delete_task' },
+                        params: { allowedValue: 'delete_condition' },
                         message: 'must be equal to constant',
                       },
                     ]),
@@ -7199,12 +7085,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.task_id !== void 0) {
+                if (e.condition_id !== void 0) {
                   let n = c;
-                  s(e.task_id, {
-                    instancePath: t + '/task_id',
+                  s(e.condition_id, {
+                    instancePath: t + '/condition_id',
                     parentData: e,
-                    parentDataProperty: 'task_id',
+                    parentDataProperty: 'condition_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
@@ -7234,7 +7120,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDetail = Pe));
+      (e.isDeleteTask = Pe));
     function Pe(
       e,
       {
@@ -7251,7 +7137,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
-          if ((e.detail_id === void 0 && (n = 'detail_id')) || (e.text === void 0 && (n = 'text')))
+          if ((e.action === void 0 && (n = 'action')) || (e.task_id === void 0 && (n = 'task_id')))
             return (
               (Pe.errors = [
                 {
@@ -7267,9 +7153,123 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'detail_id' && n !== 'text')
+              if (n !== 'action' && n !== 'task_id')
                 return (
                   (Pe.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (Pe.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'delete_task')
+                  return (
+                    (Pe.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'delete_task' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.task_id !== void 0) {
+                  let n = c;
+                  s(e.task_id, {
+                    instancePath: t + '/task_id',
+                    parentData: e,
+                    parentDataProperty: 'task_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+              }
+            }
+          }
+        } else
+          return (
+            (Pe.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Pe.errors = o), c === 0);
+    }
+    ((Pe.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isDetail = Fe));
+    function Fe(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = Fe.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if ((e.detail_id === void 0 && (n = 'detail_id')) || (e.text === void 0 && (n = 'text')))
+            return (
+              (Fe.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'detail_id' && n !== 'text')
+                return (
+                  (Fe.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -7297,7 +7297,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   let n = c;
                   if (typeof e.text != 'string')
                     return (
-                      (Pe.errors = [
+                      (Fe.errors = [
                         {
                           instancePath: t + '/text',
                           schemaPath: '#/properties/text/type',
@@ -7315,7 +7315,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Pe.errors = [
+            (Fe.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -7327,15 +7327,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Pe.errors = o), c === 0);
+      return ((Fe.errors = o), c === 0);
     }
-    ((Pe.evaluated = {
+    ((Fe.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDetailKind = Fe));
-    function Fe(
+      (e.isDetailKind = Ie));
+    function Ie(
       e,
       {
         instancePath: t = '',
@@ -7345,13 +7345,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = Fe.evaluated;
+      let o = Ie.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'outcome' && e !== 'requirement'
-            ? ((Fe.errors = [
+            ? ((Ie.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
@@ -7361,8 +7361,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 },
               ]),
               !1)
-            : ((Fe.errors = null), !0)
-          : ((Fe.errors = [
+            : ((Ie.errors = null), !0)
+          : ((Ie.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -7374,12 +7374,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((Fe.evaluated = {
+    ((Ie.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isDisplayName = Ie));
-    function Ie(
+      (e.isDisplayName = Le));
+    function Le(
       e,
       {
         instancePath: t = '',
@@ -7389,7 +7389,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: o = {},
       } = {},
     ) {
-      let s = Ie.evaluated;
+      let s = Le.evaluated;
       if (
         (s.dynamicProps && (s.props = void 0),
         s.dynamicItems && (s.items = void 0),
@@ -7397,7 +7397,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       ) {
         if (a(e) > 200)
           return (
-            (Ie.errors = [
+            (Le.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/maxLength',
@@ -7410,7 +7410,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (a(e) < 1)
           return (
-            (Ie.errors = [
+            (Le.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/minLength',
@@ -7423,7 +7423,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (!d.test(e))
           return (
-            (Ie.errors = [
+            (Le.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/pattern',
@@ -7440,7 +7440,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
       } else
         return (
-          (Ie.errors = [
+          (Le.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -7451,14 +7451,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           ]),
           !1
         );
-      return ((Ie.errors = null), !0);
+      return ((Le.errors = null), !0);
     }
-    ((Ie.evaluated = {
+    ((Le.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isEditJdAreasRequest = Re));
-    function z(
+      (e.isEditJdAreasRequest = ze));
+    function R(
       e,
       {
         instancePath: t = '',
@@ -7470,7 +7470,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = z.evaluated;
+        l = R.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -7480,7 +7480,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (z.errors = [
+              (R.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -7496,7 +7496,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'area_id' && n !== 'changes')
                 return (
-                  (z.errors = [
+                  (R.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -7513,7 +7513,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (z.errors = [
+                    (R.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -7526,7 +7526,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'revise_area')
                   return (
-                    (z.errors = [
+                    (R.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -7559,7 +7559,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length > 2)
                           return (
-                            (z.errors = [
+                            (R.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/maxItems',
@@ -7572,7 +7572,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           );
                         if (n.length < 1)
                           return (
-                            (z.errors = [
+                            (R.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -7603,7 +7603,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                       } else
                         return (
-                          (z.errors = [
+                          (R.errors = [
                             {
                               instancePath: t + '/changes',
                               schemaPath: '#/properties/changes/type',
@@ -7623,7 +7623,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (z.errors = [
+            (R.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -7635,14 +7635,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((z.errors = o), c === 0);
+      return ((R.errors = o), c === 0);
     }
-    z.evaluated = {
+    R.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Le(
+    function Re(
       e,
       {
         instancePath: t = '',
@@ -7654,7 +7654,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Le.evaluated;
+        l = Re.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -7664,7 +7664,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_area_id === void 0 && (n = 'before_area_id'))
           )
             return (
-              (Le.errors = [
+              (Re.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -7680,7 +7680,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'area_id' && n !== 'before_area_id')
                 return (
-                  (Le.errors = [
+                  (Re.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -7697,7 +7697,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Le.errors = [
+                    (Re.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -7710,7 +7710,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_area')
                   return (
-                    (Le.errors = [
+                    (Re.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -7772,7 +7772,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Le.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Re.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -7782,7 +7782,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Le.errors = [
+            (Re.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -7794,14 +7794,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Le.errors = o), c === 0);
+      return ((Re.errors = o), c === 0);
     }
-    Le.evaluated = {
+    Re.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Re(
+    function ze(
       e,
       {
         instancePath: t = '',
@@ -7813,7 +7813,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Re.evaluated;
+        l = ze.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -7823,7 +7823,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.change === void 0 && (n = 'change'))
           )
             return (
-              (Re.errors = [
+              (ze.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -7839,7 +7839,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'change')
                 return (
-                  (Re.errors = [
+                  (ze.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -7882,50 +7882,50 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       l = !1,
                       p = null,
                       m = c;
-                    P(n, {
+                    Ee(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? P.errors : o.concat(P.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ee.errors : o.concat(Ee.errors)), (c = o.length));
                     var d = m === c;
                     if (d) {
                       ((l = !0), (p = 0));
                       var f = !0;
                     }
                     let h = c;
-                    z(n, {
+                    R(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? z.errors : o.concat(z.errors)), (c = o.length));
+                    }) || ((o = o === null ? R.errors : o.concat(R.errors)), (c = o.length));
                     var d = h === c;
                     if (d && l) ((l = !1), (p = [p, 1]));
                     else {
                       d && ((l = !0), (p = 1), f !== !0 && (f = !0));
                       let r = c;
-                      ke(n, {
+                      Ae(n, {
                         instancePath: t + '/change',
                         parentData: e,
                         parentDataProperty: 'change',
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? ke.errors : o.concat(ke.errors)), (c = o.length));
+                      }) || ((o = o === null ? Ae.errors : o.concat(Ae.errors)), (c = o.length));
                       var d = r === c;
                       if (d && l) ((l = !1), (p = [p, 2]));
                       else {
                         d && ((l = !0), (p = 2), f !== !0 && (f = !0));
                         let r = c;
-                        Le(n, {
+                        Re(n, {
                           instancePath: t + '/change',
                           parentData: e,
                           parentDataProperty: 'change',
                           rootData: i,
                           dynamicAnchors: a,
-                        }) || ((o = o === null ? Le.errors : o.concat(Le.errors)), (c = o.length));
+                        }) || ((o = o === null ? Re.errors : o.concat(Re.errors)), (c = o.length));
                         var d = r === c;
                         d && l
                           ? ((l = !1), (p = [p, 3]))
@@ -7941,7 +7941,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: { passingSchemas: p },
                         message: 'must match exactly one schema in oneOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Re.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (ze.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -7951,7 +7951,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Re.errors = [
+            (ze.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -7963,15 +7963,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Re.errors = o), c === 0);
+      return ((ze.errors = o), c === 0);
     }
-    ((Re.evaluated = {
+    ((ze.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isEditJdCapabilitiesRequest = Ue));
-    function ze(
+      (e.isEditJdCapabilitiesRequest = We));
+    function Be(
       e,
       {
         instancePath: t = '',
@@ -7983,13 +7983,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = ze.evaluated;
+        c = Be.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if ((e.field === void 0 && (n = 'field')) || (e.value === void 0 && (n = 'value')))
             return (
-              (ze.errors = [
+              (Be.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -8005,7 +8005,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'field' && n !== 'value')
                 return (
-                  (ze.errors = [
+                  (Be.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -8065,7 +8065,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), s++, (ze.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), s++, (Be.errors = o), !1);
                   }
                   var l = r === s;
                 } else var l = !0;
@@ -8074,7 +8074,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (ze.errors = [
+            (Be.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -8086,14 +8086,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ze.errors = o), s === 0);
+      return ((Be.errors = o), s === 0);
     }
-    ze.evaluated = {
+    Be.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function B(
+    function z(
       e,
       {
         instancePath: t = '',
@@ -8105,7 +8105,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = B.evaluated;
+        l = z.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -8115,7 +8115,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (B.errors = [
+              (z.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -8131,7 +8131,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'capability_id' && n !== 'changes')
                 return (
-                  (B.errors = [
+                  (z.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -8148,7 +8148,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (B.errors = [
+                    (z.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -8161,7 +8161,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'revise_capability')
                   return (
-                    (B.errors = [
+                    (z.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -8194,7 +8194,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length > 2)
                           return (
-                            (B.errors = [
+                            (z.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/maxItems',
@@ -8207,7 +8207,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           );
                         if (n.length < 1)
                           return (
-                            (B.errors = [
+                            (z.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -8223,14 +8223,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           for (let r = 0; r < e; r++) {
                             let e = c;
                             if (
-                              (ze(n[r], {
+                              (Be(n[r], {
                                 instancePath: t + '/changes/' + r,
                                 parentData: n,
                                 parentDataProperty: r,
                                 rootData: i,
                                 dynamicAnchors: a,
                               }) ||
-                                ((o = o === null ? ze.errors : o.concat(ze.errors)),
+                                ((o = o === null ? Be.errors : o.concat(Be.errors)),
                                 (c = o.length)),
                               e !== c)
                             )
@@ -8239,7 +8239,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                       } else
                         return (
-                          (B.errors = [
+                          (z.errors = [
                             {
                               instancePath: t + '/changes',
                               schemaPath: '#/properties/changes/type',
@@ -8259,7 +8259,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (B.errors = [
+            (z.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -8271,14 +8271,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((B.errors = o), c === 0);
+      return ((z.errors = o), c === 0);
     }
-    B.evaluated = {
+    z.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Be(
+    function Ve(
       e,
       {
         instancePath: t = '',
@@ -8290,7 +8290,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Be.evaluated;
+        l = Ve.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -8300,7 +8300,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_capability_id === void 0 && (n = 'before_capability_id'))
           )
             return (
-              (Be.errors = [
+              (Ve.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -8316,7 +8316,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'capability_id' && n !== 'before_capability_id')
                 return (
-                  (Be.errors = [
+                  (Ve.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -8333,7 +8333,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Be.errors = [
+                    (Ve.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -8346,7 +8346,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_capability')
                   return (
-                    (Be.errors = [
+                    (Ve.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -8408,160 +8408,10 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Be.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Ve.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (Be.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((Be.errors = o), c === 0);
-    }
-    Be.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    };
-    function Ve(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = Ve.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.task_id === void 0 && (n = 'task_id')) ||
-            (e.capability_id === void 0 && (n = 'capability_id')) ||
-            (e.linked === void 0 && (n = 'linked'))
-          )
-            return (
-              (Ve.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'task_id' && n !== 'capability_id' && n !== 'linked')
-                return (
-                  (Ve.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (Ve.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'set_task_capability')
-                  return (
-                    (Ve.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'set_task_capability' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.task_id !== void 0) {
-                  let n = c;
-                  s(e.task_id, {
-                    instancePath: t + '/task_id',
-                    parentData: e,
-                    parentDataProperty: 'task_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.capability_id !== void 0) {
-                    let n = c;
-                    s(e.capability_id, {
-                      instancePath: t + '/capability_id',
-                      parentData: e,
-                      parentDataProperty: 'capability_id',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                    var u = n === c;
-                  } else var u = !0;
-                  if (u) {
-                    if (e.linked !== void 0) {
-                      let n = c;
-                      if (typeof e.linked != 'boolean')
-                        return (
-                          (Ve.errors = [
-                            {
-                              instancePath: t + '/linked',
-                              schemaPath: '#/properties/linked/type',
-                              keyword: 'type',
-                              params: { type: 'boolean' },
-                              message: 'must be boolean',
-                            },
-                          ]),
-                          !1
-                        );
-                      var u = n === c;
-                    } else var u = !0;
-                  }
                 }
               }
             }
@@ -8607,7 +8457,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.action === void 0 && (n = 'action')) ||
             (e.task_id === void 0 && (n = 'task_id')) ||
             (e.capability_id === void 0 && (n = 'capability_id')) ||
-            (e.before_capability_id === void 0 && (n = 'before_capability_id'))
+            (e.linked === void 0 && (n = 'linked'))
           )
             return (
               (He.errors = [
@@ -8624,12 +8474,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (
-                n !== 'action' &&
-                n !== 'task_id' &&
-                n !== 'capability_id' &&
-                n !== 'before_capability_id'
-              )
+              if (n !== 'action' && n !== 'task_id' && n !== 'capability_id' && n !== 'linked')
                 return (
                   (He.errors = [
                     {
@@ -8659,9 +8504,164 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'reorder_task_capability')
+                if (n !== 'set_task_capability')
                   return (
                     (He.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'set_task_capability' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.task_id !== void 0) {
+                  let n = c;
+                  s(e.task_id, {
+                    instancePath: t + '/task_id',
+                    parentData: e,
+                    parentDataProperty: 'task_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.capability_id !== void 0) {
+                    let n = c;
+                    s(e.capability_id, {
+                      instancePath: t + '/capability_id',
+                      parentData: e,
+                      parentDataProperty: 'capability_id',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                    var u = n === c;
+                  } else var u = !0;
+                  if (u) {
+                    if (e.linked !== void 0) {
+                      let n = c;
+                      if (typeof e.linked != 'boolean')
+                        return (
+                          (He.errors = [
+                            {
+                              instancePath: t + '/linked',
+                              schemaPath: '#/properties/linked/type',
+                              keyword: 'type',
+                              params: { type: 'boolean' },
+                              message: 'must be boolean',
+                            },
+                          ]),
+                          !1
+                        );
+                      var u = n === c;
+                    } else var u = !0;
+                  }
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (He.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((He.errors = o), c === 0);
+    }
+    He.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function Ue(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = Ue.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.task_id === void 0 && (n = 'task_id')) ||
+            (e.capability_id === void 0 && (n = 'capability_id')) ||
+            (e.before_capability_id === void 0 && (n = 'before_capability_id'))
+          )
+            return (
+              (Ue.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (
+                n !== 'action' &&
+                n !== 'task_id' &&
+                n !== 'capability_id' &&
+                n !== 'before_capability_id'
+              )
+                return (
+                  (Ue.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (Ue.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'reorder_task_capability')
+                  return (
+                    (Ue.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -8736,7 +8736,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (He.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (Ue.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -8747,7 +8747,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (He.errors = [
+            (Ue.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -8759,14 +8759,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((He.errors = o), c === 0);
+      return ((Ue.errors = o), c === 0);
     }
-    He.evaluated = {
+    Ue.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Ue(
+    function We(
       e,
       {
         instancePath: t = '',
@@ -8778,7 +8778,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ue.evaluated;
+        l = We.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -8788,7 +8788,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.change === void 0 && (n = 'change'))
           )
             return (
-              (Ue.errors = [
+              (We.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -8804,7 +8804,549 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'change')
                 return (
-                  (Ue.errors = [
+                  (We.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.command_id !== void 0) {
+                let n = c;
+                s(e.command_id, {
+                  instancePath: t + '/command_id',
+                  parentData: e,
+                  parentDataProperty: 'command_id',
+                  rootData: i,
+                  dynamicAnchors: a,
+                }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                var u = n === c;
+              } else var u = !0;
+              if (u) {
+                if (e.expected_revision_id !== void 0) {
+                  let n = c;
+                  s(e.expected_revision_id, {
+                    instancePath: t + '/expected_revision_id',
+                    parentData: e,
+                    parentDataProperty: 'expected_revision_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.change !== void 0) {
+                    let n = e.change,
+                      r = c,
+                      s = c,
+                      l = !1,
+                      p = null,
+                      m = c;
+                    P(n, {
+                      instancePath: t + '/change',
+                      parentData: e,
+                      parentDataProperty: 'change',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? P.errors : o.concat(P.errors)), (c = o.length));
+                    var d = m === c;
+                    if (d) {
+                      ((l = !0), (p = 0));
+                      var f = !0;
+                    }
+                    let h = c;
+                    z(n, {
+                      instancePath: t + '/change',
+                      parentData: e,
+                      parentDataProperty: 'change',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? z.errors : o.concat(z.errors)), (c = o.length));
+                    var d = h === c;
+                    if (d && l) ((l = !1), (p = [p, 1]));
+                    else {
+                      d && ((l = !0), (p = 1), f !== !0 && (f = !0));
+                      let r = c;
+                      je(n, {
+                        instancePath: t + '/change',
+                        parentData: e,
+                        parentDataProperty: 'change',
+                        rootData: i,
+                        dynamicAnchors: a,
+                      }) || ((o = o === null ? je.errors : o.concat(je.errors)), (c = o.length));
+                      var d = r === c;
+                      if (d && l) ((l = !1), (p = [p, 2]));
+                      else {
+                        d && ((l = !0), (p = 2), f !== !0 && (f = !0));
+                        let r = c;
+                        Ve(n, {
+                          instancePath: t + '/change',
+                          parentData: e,
+                          parentDataProperty: 'change',
+                          rootData: i,
+                          dynamicAnchors: a,
+                        }) || ((o = o === null ? Ve.errors : o.concat(Ve.errors)), (c = o.length));
+                        var d = r === c;
+                        if (d && l) ((l = !1), (p = [p, 3]));
+                        else {
+                          d && ((l = !0), (p = 3), f !== !0 && (f = !0));
+                          let r = c;
+                          He(n, {
+                            instancePath: t + '/change',
+                            parentData: e,
+                            parentDataProperty: 'change',
+                            rootData: i,
+                            dynamicAnchors: a,
+                          }) ||
+                            ((o = o === null ? He.errors : o.concat(He.errors)), (c = o.length));
+                          var d = r === c;
+                          if (d && l) ((l = !1), (p = [p, 4]));
+                          else {
+                            d && ((l = !0), (p = 4), f !== !0 && (f = !0));
+                            let r = c;
+                            Ue(n, {
+                              instancePath: t + '/change',
+                              parentData: e,
+                              parentDataProperty: 'change',
+                              rootData: i,
+                              dynamicAnchors: a,
+                            }) ||
+                              ((o = o === null ? Ue.errors : o.concat(Ue.errors)), (c = o.length));
+                            var d = r === c;
+                            d && l
+                              ? ((l = !1), (p = [p, 5]))
+                              : d && ((l = !0), (p = 5), f !== !0 && (f = !0));
+                          }
+                        }
+                      }
+                    }
+                    if (l) ((c = s), o !== null && (s ? (o.length = s) : (o = null)));
+                    else {
+                      let e = {
+                        instancePath: t + '/change',
+                        schemaPath: '#/properties/change/oneOf',
+                        keyword: 'oneOf',
+                        params: { passingSchemas: p },
+                        message: 'must match exactly one schema in oneOf',
+                      };
+                      return (o === null ? (o = [e]) : o.push(e), c++, (We.errors = o), !1);
+                    }
+                    var u = r === c;
+                  } else var u = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (We.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((We.errors = o), c === 0);
+    }
+    ((We.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isEditJdCollaboratorsRequest = Ke));
+    function B(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = B.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
+            (e.changes === void 0 && (n = 'changes'))
+          )
+            return (
+              (B.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'action' && n !== 'collaborator_id' && n !== 'changes')
+                return (
+                  (B.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (B.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'revise_collaborator')
+                  return (
+                    (B.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'revise_collaborator' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.collaborator_id !== void 0) {
+                  let n = c;
+                  s(e.collaborator_id, {
+                    instancePath: t + '/collaborator_id',
+                    parentData: e,
+                    parentDataProperty: 'collaborator_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.changes !== void 0) {
+                    let n = e.changes,
+                      r = c;
+                    if (c === r) {
+                      if (Array.isArray(n)) {
+                        if (n.length > 2)
+                          return (
+                            (B.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/maxItems',
+                                keyword: 'maxItems',
+                                params: { limit: 2 },
+                                message: 'must NOT have more than 2 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        if (n.length < 1)
+                          return (
+                            (B.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/minItems',
+                                keyword: 'minItems',
+                                params: { limit: 1 },
+                                message: 'must NOT have fewer than 1 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        {
+                          let e = n.length;
+                          for (let r = 0; r < e; r++) {
+                            let e = c;
+                            if (
+                              (he(n[r], {
+                                instancePath: t + '/changes/' + r,
+                                parentData: n,
+                                parentDataProperty: r,
+                                rootData: i,
+                                dynamicAnchors: a,
+                              }) ||
+                                ((o = o === null ? he.errors : o.concat(he.errors)),
+                                (c = o.length)),
+                              e !== c)
+                            )
+                              break;
+                          }
+                        }
+                      } else
+                        return (
+                          (B.errors = [
+                            {
+                              instancePath: t + '/changes',
+                              schemaPath: '#/properties/changes/type',
+                              keyword: 'type',
+                              params: { type: 'array' },
+                              message: 'must be array',
+                            },
+                          ]),
+                          !1
+                        );
+                    }
+                    var u = r === c;
+                  } else var u = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (B.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((B.errors = o), c === 0);
+    }
+    B.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function Ge(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = Ge.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
+            (e.before_collaborator_id === void 0 && (n = 'before_collaborator_id'))
+          )
+            return (
+              (Ge.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'action' && n !== 'collaborator_id' && n !== 'before_collaborator_id')
+                return (
+                  (Ge.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (Ge.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'reorder_collaborator')
+                  return (
+                    (Ge.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'reorder_collaborator' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.collaborator_id !== void 0) {
+                  let n = c;
+                  s(e.collaborator_id, {
+                    instancePath: t + '/collaborator_id',
+                    parentData: e,
+                    parentDataProperty: 'collaborator_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.before_collaborator_id !== void 0) {
+                    let n = e.before_collaborator_id,
+                      r = c,
+                      l = c,
+                      f = !1,
+                      p = c;
+                    s(n, {
+                      instancePath: t + '/before_collaborator_id',
+                      parentData: e,
+                      parentDataProperty: 'before_collaborator_id',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                    var d = p === c;
+                    f ||= d;
+                    let m = c;
+                    if (n !== null) {
+                      let e = {
+                        instancePath: t + '/before_collaborator_id',
+                        schemaPath: '#/properties/before_collaborator_id/anyOf/1/type',
+                        keyword: 'type',
+                        params: { type: 'null' },
+                        message: 'must be null',
+                      };
+                      (o === null ? (o = [e]) : o.push(e), c++);
+                    }
+                    var d = m === c;
+                    if (((f ||= d), f)) ((c = l), o !== null && (l ? (o.length = l) : (o = null)));
+                    else {
+                      let e = {
+                        instancePath: t + '/before_collaborator_id',
+                        schemaPath: '#/properties/before_collaborator_id/anyOf',
+                        keyword: 'anyOf',
+                        params: {},
+                        message: 'must match a schema in anyOf',
+                      };
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Ge.errors = o), !1);
+                    }
+                    var u = r === c;
+                  } else var u = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (Ge.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Ge.errors = o), c === 0);
+    }
+    Ge.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function Ke(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = Ke.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.command_id === void 0 && (n = 'command_id')) ||
+            (e.expected_revision_id === void 0 && (n = 'expected_revision_id')) ||
+            (e.change === void 0 && (n = 'change'))
+          )
+            return (
+              (Ke.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'change')
+                return (
+                  (Ke.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -8872,57 +9414,29 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     else {
                       d && ((l = !0), (p = 1), f !== !0 && (f = !0));
                       let r = c;
-                      Ae(n, {
+                      Me(n, {
                         instancePath: t + '/change',
                         parentData: e,
                         parentDataProperty: 'change',
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? Ae.errors : o.concat(Ae.errors)), (c = o.length));
+                      }) || ((o = o === null ? Me.errors : o.concat(Me.errors)), (c = o.length));
                       var d = r === c;
                       if (d && l) ((l = !1), (p = [p, 2]));
                       else {
                         d && ((l = !0), (p = 2), f !== !0 && (f = !0));
                         let r = c;
-                        Be(n, {
+                        Ge(n, {
                           instancePath: t + '/change',
                           parentData: e,
                           parentDataProperty: 'change',
                           rootData: i,
                           dynamicAnchors: a,
-                        }) || ((o = o === null ? Be.errors : o.concat(Be.errors)), (c = o.length));
+                        }) || ((o = o === null ? Ge.errors : o.concat(Ge.errors)), (c = o.length));
                         var d = r === c;
-                        if (d && l) ((l = !1), (p = [p, 3]));
-                        else {
-                          d && ((l = !0), (p = 3), f !== !0 && (f = !0));
-                          let r = c;
-                          Ve(n, {
-                            instancePath: t + '/change',
-                            parentData: e,
-                            parentDataProperty: 'change',
-                            rootData: i,
-                            dynamicAnchors: a,
-                          }) ||
-                            ((o = o === null ? Ve.errors : o.concat(Ve.errors)), (c = o.length));
-                          var d = r === c;
-                          if (d && l) ((l = !1), (p = [p, 4]));
-                          else {
-                            d && ((l = !0), (p = 4), f !== !0 && (f = !0));
-                            let r = c;
-                            He(n, {
-                              instancePath: t + '/change',
-                              parentData: e,
-                              parentDataProperty: 'change',
-                              rootData: i,
-                              dynamicAnchors: a,
-                            }) ||
-                              ((o = o === null ? He.errors : o.concat(He.errors)), (c = o.length));
-                            var d = r === c;
-                            d && l
-                              ? ((l = !1), (p = [p, 5]))
-                              : d && ((l = !0), (p = 5), f !== !0 && (f = !0));
-                          }
-                        }
+                        d && l
+                          ? ((l = !1), (p = [p, 3]))
+                          : d && ((l = !0), (p = 3), f !== !0 && (f = !0));
                       }
                     }
                     if (l) ((c = s), o !== null && (s ? (o.length = s) : (o = null)));
@@ -8934,7 +9448,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: { passingSchemas: p },
                         message: 'must match exactly one schema in oneOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Ue.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Ke.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -8944,7 +9458,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ue.errors = [
+            (Ke.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -8956,14 +9470,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ue.errors = o), c === 0);
+      return ((Ke.errors = o), c === 0);
     }
-    ((Ue.evaluated = {
+    ((Ke.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isEditJdCollaboratorsRequest = Ge));
+      (e.isEditJdConditionsRequest = Je));
     function V(
       e,
       {
@@ -8982,7 +9496,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
+            (e.condition_id === void 0 && (n = 'condition_id')) ||
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
@@ -9000,7 +9514,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'collaborator_id' && n !== 'changes')
+              if (n !== 'action' && n !== 'condition_id' && n !== 'changes')
                 return (
                   (V.errors = [
                     {
@@ -9030,523 +9544,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'revise_collaborator')
-                  return (
-                    (V.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'revise_collaborator' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.collaborator_id !== void 0) {
-                  let n = c;
-                  s(e.collaborator_id, {
-                    instancePath: t + '/collaborator_id',
-                    parentData: e,
-                    parentDataProperty: 'collaborator_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.changes !== void 0) {
-                    let n = e.changes,
-                      r = c;
-                    if (c === r) {
-                      if (Array.isArray(n)) {
-                        if (n.length > 2)
-                          return (
-                            (V.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/maxItems',
-                                keyword: 'maxItems',
-                                params: { limit: 2 },
-                                message: 'must NOT have more than 2 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        if (n.length < 1)
-                          return (
-                            (V.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/minItems',
-                                keyword: 'minItems',
-                                params: { limit: 1 },
-                                message: 'must NOT have fewer than 1 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        {
-                          let e = n.length;
-                          for (let r = 0; r < e; r++) {
-                            let e = c;
-                            if (
-                              (he(n[r], {
-                                instancePath: t + '/changes/' + r,
-                                parentData: n,
-                                parentDataProperty: r,
-                                rootData: i,
-                                dynamicAnchors: a,
-                              }) ||
-                                ((o = o === null ? he.errors : o.concat(he.errors)),
-                                (c = o.length)),
-                              e !== c)
-                            )
-                              break;
-                          }
-                        }
-                      } else
-                        return (
-                          (V.errors = [
-                            {
-                              instancePath: t + '/changes',
-                              schemaPath: '#/properties/changes/type',
-                              keyword: 'type',
-                              params: { type: 'array' },
-                              message: 'must be array',
-                            },
-                          ]),
-                          !1
-                        );
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (V.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((V.errors = o), c === 0);
-    }
-    V.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    };
-    function We(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = We.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
-            (e.before_collaborator_id === void 0 && (n = 'before_collaborator_id'))
-          )
-            return (
-              (We.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'collaborator_id' && n !== 'before_collaborator_id')
-                return (
-                  (We.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (We.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'reorder_collaborator')
-                  return (
-                    (We.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'reorder_collaborator' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.collaborator_id !== void 0) {
-                  let n = c;
-                  s(e.collaborator_id, {
-                    instancePath: t + '/collaborator_id',
-                    parentData: e,
-                    parentDataProperty: 'collaborator_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.before_collaborator_id !== void 0) {
-                    let n = e.before_collaborator_id,
-                      r = c,
-                      l = c,
-                      f = !1,
-                      p = c;
-                    s(n, {
-                      instancePath: t + '/before_collaborator_id',
-                      parentData: e,
-                      parentDataProperty: 'before_collaborator_id',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                    var d = p === c;
-                    f ||= d;
-                    let m = c;
-                    if (n !== null) {
-                      let e = {
-                        instancePath: t + '/before_collaborator_id',
-                        schemaPath: '#/properties/before_collaborator_id/anyOf/1/type',
-                        keyword: 'type',
-                        params: { type: 'null' },
-                        message: 'must be null',
-                      };
-                      (o === null ? (o = [e]) : o.push(e), c++);
-                    }
-                    var d = m === c;
-                    if (((f ||= d), f)) ((c = l), o !== null && (l ? (o.length = l) : (o = null)));
-                    else {
-                      let e = {
-                        instancePath: t + '/before_collaborator_id',
-                        schemaPath: '#/properties/before_collaborator_id/anyOf',
-                        keyword: 'anyOf',
-                        params: {},
-                        message: 'must match a schema in anyOf',
-                      };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (We.errors = o), !1);
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (We.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((We.errors = o), c === 0);
-    }
-    We.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    };
-    function Ge(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = Ge.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.command_id === void 0 && (n = 'command_id')) ||
-            (e.expected_revision_id === void 0 && (n = 'expected_revision_id')) ||
-            (e.change === void 0 && (n = 'change'))
-          )
-            return (
-              (Ge.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'change')
-                return (
-                  (Ge.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.command_id !== void 0) {
-                let n = c;
-                s(e.command_id, {
-                  instancePath: t + '/command_id',
-                  parentData: e,
-                  parentDataProperty: 'command_id',
-                  rootData: i,
-                  dynamicAnchors: a,
-                }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                var u = n === c;
-              } else var u = !0;
-              if (u) {
-                if (e.expected_revision_id !== void 0) {
-                  let n = c;
-                  s(e.expected_revision_id, {
-                    instancePath: t + '/expected_revision_id',
-                    parentData: e,
-                    parentDataProperty: 'expected_revision_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.change !== void 0) {
-                    let n = e.change,
-                      r = c,
-                      s = c,
-                      l = !1,
-                      p = null,
-                      m = c;
-                    I(n, {
-                      instancePath: t + '/change',
-                      parentData: e,
-                      parentDataProperty: 'change',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? I.errors : o.concat(I.errors)), (c = o.length));
-                    var d = m === c;
-                    if (d) {
-                      ((l = !0), (p = 0));
-                      var f = !0;
-                    }
-                    let h = c;
-                    V(n, {
-                      instancePath: t + '/change',
-                      parentData: e,
-                      parentDataProperty: 'change',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? V.errors : o.concat(V.errors)), (c = o.length));
-                    var d = h === c;
-                    if (d && l) ((l = !1), (p = [p, 1]));
-                    else {
-                      d && ((l = !0), (p = 1), f !== !0 && (f = !0));
-                      let r = c;
-                      je(n, {
-                        instancePath: t + '/change',
-                        parentData: e,
-                        parentDataProperty: 'change',
-                        rootData: i,
-                        dynamicAnchors: a,
-                      }) || ((o = o === null ? je.errors : o.concat(je.errors)), (c = o.length));
-                      var d = r === c;
-                      if (d && l) ((l = !1), (p = [p, 2]));
-                      else {
-                        d && ((l = !0), (p = 2), f !== !0 && (f = !0));
-                        let r = c;
-                        We(n, {
-                          instancePath: t + '/change',
-                          parentData: e,
-                          parentDataProperty: 'change',
-                          rootData: i,
-                          dynamicAnchors: a,
-                        }) || ((o = o === null ? We.errors : o.concat(We.errors)), (c = o.length));
-                        var d = r === c;
-                        d && l
-                          ? ((l = !1), (p = [p, 3]))
-                          : d && ((l = !0), (p = 3), f !== !0 && (f = !0));
-                      }
-                    }
-                    if (l) ((c = s), o !== null && (s ? (o.length = s) : (o = null)));
-                    else {
-                      let e = {
-                        instancePath: t + '/change',
-                        schemaPath: '#/properties/change/oneOf',
-                        keyword: 'oneOf',
-                        params: { passingSchemas: p },
-                        message: 'must match exactly one schema in oneOf',
-                      };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Ge.errors = o), !1);
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (Ge.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((Ge.errors = o), c === 0);
-    }
-    ((Ge.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isEditJdConditionsRequest = qe));
-    function H(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = H.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.condition_id === void 0 && (n = 'condition_id')) ||
-            (e.changes === void 0 && (n = 'changes'))
-          )
-            return (
-              (H.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'condition_id' && n !== 'changes')
-                return (
-                  (H.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (H.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
                 if (n !== 'revise_condition')
                   return (
-                    (H.errors = [
+                    (V.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -9579,7 +9579,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length > 2)
                           return (
-                            (H.errors = [
+                            (V.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/maxItems',
@@ -9592,7 +9592,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           );
                         if (n.length < 1)
                           return (
-                            (H.errors = [
+                            (V.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -9650,14 +9650,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                                 params: { passingSchemas: p },
                                 message: 'must match exactly one schema in oneOf',
                               };
-                              return (o === null ? (o = [e]) : o.push(e), c++, (H.errors = o), !1);
+                              return (o === null ? (o = [e]) : o.push(e), c++, (V.errors = o), !1);
                             }
                             if (s !== c) break;
                           }
                         }
                       } else
                         return (
-                          (H.errors = [
+                          (V.errors = [
                             {
                               instancePath: t + '/changes',
                               schemaPath: '#/properties/changes/type',
@@ -9677,7 +9677,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (H.errors = [
+            (V.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -9689,14 +9689,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((H.errors = o), c === 0);
+      return ((V.errors = o), c === 0);
     }
-    H.evaluated = {
+    V.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Ke(
+    function qe(
       e,
       {
         instancePath: t = '',
@@ -9708,7 +9708,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ke.evaluated;
+        l = qe.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -9718,7 +9718,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_condition_id === void 0 && (n = 'before_condition_id'))
           )
             return (
-              (Ke.errors = [
+              (qe.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -9734,7 +9734,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'condition_id' && n !== 'before_condition_id')
                 return (
-                  (Ke.errors = [
+                  (qe.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -9751,7 +9751,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Ke.errors = [
+                    (qe.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -9764,7 +9764,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_condition')
                   return (
-                    (Ke.errors = [
+                    (qe.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -9826,7 +9826,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Ke.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (qe.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -9836,7 +9836,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ke.errors = [
+            (qe.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -9848,14 +9848,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ke.errors = o), c === 0);
+      return ((qe.errors = o), c === 0);
     }
-    Ke.evaluated = {
+    qe.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function qe(
+    function Je(
       e,
       {
         instancePath: t = '',
@@ -9867,7 +9867,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = qe.evaluated;
+        l = Je.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -9877,7 +9877,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.change === void 0 && (n = 'change'))
           )
             return (
-              (qe.errors = [
+              (Je.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -9893,7 +9893,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'change')
                 return (
-                  (qe.errors = [
+                  (Je.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -9936,50 +9936,50 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       l = !1,
                       p = null,
                       m = c;
-                    Ee(n, {
+                    De(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? Ee.errors : o.concat(Ee.errors)), (c = o.length));
+                    }) || ((o = o === null ? De.errors : o.concat(De.errors)), (c = o.length));
                     var d = m === c;
                     if (d) {
                       ((l = !0), (p = 0));
                       var f = !0;
                     }
                     let h = c;
-                    H(n, {
+                    V(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? H.errors : o.concat(H.errors)), (c = o.length));
+                    }) || ((o = o === null ? V.errors : o.concat(V.errors)), (c = o.length));
                     var d = h === c;
                     if (d && l) ((l = !1), (p = [p, 1]));
                     else {
                       d && ((l = !0), (p = 1), f !== !0 && (f = !0));
                       let r = c;
-                      Me(n, {
+                      Ne(n, {
                         instancePath: t + '/change',
                         parentData: e,
                         parentDataProperty: 'change',
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? Me.errors : o.concat(Me.errors)), (c = o.length));
+                      }) || ((o = o === null ? Ne.errors : o.concat(Ne.errors)), (c = o.length));
                       var d = r === c;
                       if (d && l) ((l = !1), (p = [p, 2]));
                       else {
                         d && ((l = !0), (p = 2), f !== !0 && (f = !0));
                         let r = c;
-                        Ke(n, {
+                        qe(n, {
                           instancePath: t + '/change',
                           parentData: e,
                           parentDataProperty: 'change',
                           rootData: i,
                           dynamicAnchors: a,
-                        }) || ((o = o === null ? Ke.errors : o.concat(Ke.errors)), (c = o.length));
+                        }) || ((o = o === null ? qe.errors : o.concat(qe.errors)), (c = o.length));
                         var d = r === c;
                         d && l
                           ? ((l = !1), (p = [p, 3]))
@@ -9995,7 +9995,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: { passingSchemas: p },
                         message: 'must match exactly one schema in oneOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (qe.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Je.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -10005,7 +10005,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (qe.errors = [
+            (Je.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -10017,20 +10017,20 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((qe.errors = o), c === 0);
+      return ((Je.errors = o), c === 0);
     }
-    ((qe.evaluated = {
+    ((Je.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
       (e.isEditJdTasksRequest = $e));
-    var Je = {
+    var Ye = {
       type: 'string',
       enum: ['title', 'description'],
       title: 'TaskField',
     };
-    function Ye(
+    function Xe(
       e,
       {
         instancePath: t = '',
@@ -10040,24 +10040,24 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = Ye.evaluated;
+      let o = Xe.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'title' && e !== 'description'
-            ? ((Ye.errors = [
+            ? ((Xe.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: Je.enum },
+                  params: { allowedValues: Ye.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((Ye.errors = null), !0)
-          : ((Ye.errors = [
+            : ((Xe.errors = null), !0)
+          : ((Xe.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -10069,11 +10069,11 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    Ye.evaluated = {
+    Xe.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function U(
+    function H(
       e,
       {
         instancePath: t = '',
@@ -10085,7 +10085,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = U.evaluated;
+        c = H.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -10095,7 +10095,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.value === void 0 && (n = 'value'))
           )
             return (
-              (U.errors = [
+              (H.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -10111,7 +10111,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'field' && n !== 'value')
                 return (
-                  (U.errors = [
+                  (H.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -10128,7 +10128,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (U.errors = [
+                    (H.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -10141,7 +10141,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'set_field')
                   return (
-                    (U.errors = [
+                    (H.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -10157,13 +10157,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
               if (l) {
                 if (e.field !== void 0) {
                   let n = s;
-                  Ye(e.field, {
+                  Xe(e.field, {
                     instancePath: t + '/field',
                     parentData: e,
                     parentDataProperty: 'field',
                     rootData: i,
                     dynamicAnchors: a,
-                  }) || ((o = o === null ? Ye.errors : o.concat(Ye.errors)), (s = o.length));
+                  }) || ((o = o === null ? Xe.errors : o.concat(Xe.errors)), (s = o.length));
                   var l = n === s;
                 } else var l = !0;
                 if (l) {
@@ -10203,7 +10203,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), s++, (U.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), s++, (H.errors = o), !1);
                     }
                     var l = r === s;
                   } else var l = !0;
@@ -10213,7 +10213,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (U.errors = [
+            (H.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -10225,14 +10225,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((U.errors = o), s === 0);
+      return ((H.errors = o), s === 0);
     }
-    U.evaluated = {
+    H.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function W(
+    function U(
       e,
       {
         instancePath: t = '',
@@ -10244,7 +10244,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = W.evaluated;
+        l = U.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -10254,7 +10254,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.text === void 0 && (n = 'text'))
           )
             return (
-              (W.errors = [
+              (U.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -10270,7 +10270,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'detail_id' && n !== 'text')
                 return (
-                  (W.errors = [
+                  (U.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -10287,7 +10287,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (W.errors = [
+                    (U.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -10300,7 +10300,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'revise_detail')
                   return (
-                    (W.errors = [
+                    (U.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -10343,6 +10343,122 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
+            (U.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((U.errors = o), c === 0);
+    }
+    U.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function W(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = W.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.detail_id === void 0 && (n = 'detail_id'))
+          )
+            return (
+              (W.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'action' && n !== 'detail_id')
+                return (
+                  (W.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (W.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'remove_detail')
+                  return (
+                    (W.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'remove_detail' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.detail_id !== void 0) {
+                  let n = c;
+                  s(e.detail_id, {
+                    instancePath: t + '/detail_id',
+                    parentData: e,
+                    parentDataProperty: 'detail_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+              }
+            }
+          }
+        } else
+          return (
             (W.errors = [
               {
                 instancePath: t,
@@ -10373,136 +10489,20 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       } = {},
     ) {
       let o = null,
-        c = 0,
-        l = G.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.detail_id === void 0 && (n = 'detail_id'))
-          )
-            return (
-              (G.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'detail_id')
-                return (
-                  (G.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (G.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'remove_detail')
-                  return (
-                    (G.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'remove_detail' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.detail_id !== void 0) {
-                  let n = c;
-                  s(e.detail_id, {
-                    instancePath: t + '/detail_id',
-                    parentData: e,
-                    parentDataProperty: 'detail_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-              }
-            }
-          }
-        } else
-          return (
-            (G.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((G.errors = o), c === 0);
-    }
-    G.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    };
-    function K(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
         s = 0,
-        c = K.evaluated;
+        c = G.evaluated;
       (c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0));
       let l = s,
         u = !1,
         d = null,
         f = s;
-      U(e, {
+      H(e, {
         instancePath: t,
         parentData: n,
         parentDataProperty: r,
         rootData: i,
         dynamicAnchors: a,
-      }) || ((o = o === null ? U.errors : o.concat(U.errors)), (s = o.length));
+      }) || ((o = o === null ? H.errors : o.concat(H.errors)), (s = o.length));
       var m = f === s;
       if (m) {
         ((u = !0), (d = 0));
@@ -10521,25 +10521,25 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       else {
         m && ((u = !0), (d = 1), h !== !0 && (h = !0));
         let c = s;
-        W(e, {
+        U(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? W.errors : o.concat(W.errors)), (s = o.length));
+        }) || ((o = o === null ? U.errors : o.concat(U.errors)), (s = o.length));
         var m = c === s;
         if (m && u) ((u = !1), (d = [d, 2]));
         else {
           m && ((u = !0), (d = 2), h !== !0 && (h = !0));
           let c = s;
-          G(e, {
+          W(e, {
             instancePath: t,
             parentData: n,
             parentDataProperty: r,
             rootData: i,
             dynamicAnchors: a,
-          }) || ((o = o === null ? G.errors : o.concat(G.errors)), (s = o.length));
+          }) || ((o = o === null ? W.errors : o.concat(W.errors)), (s = o.length));
           var m = c === s;
           m && u ? ((u = !1), (d = [d, 3])) : m && ((u = !0), (d = 3), h !== !0 && (h = !0));
         }
@@ -10553,15 +10553,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           params: { passingSchemas: d },
           message: 'must match exactly one schema in oneOf',
         };
-        return (o === null ? (o = [e]) : o.push(e), s++, (K.errors = o), !1);
+        return (o === null ? (o = [e]) : o.push(e), s++, (G.errors = o), !1);
       }
-      return ((K.errors = o), (c.props = h), s === 0);
+      return ((G.errors = o), (c.props = h), s === 0);
     }
-    K.evaluated = {
+    G.evaluated = {
       dynamicProps: !0,
       dynamicItems: !1,
     };
-    function Xe(
+    function Ze(
       e,
       {
         instancePath: t = '',
@@ -10573,7 +10573,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Xe.evaluated;
+        l = Ze.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -10583,7 +10583,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (Xe.errors = [
+              (Ze.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -10599,7 +10599,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'task_id' && n !== 'changes')
                 return (
-                  (Xe.errors = [
+                  (Ze.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -10616,7 +10616,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Xe.errors = [
+                    (Ze.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -10629,7 +10629,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'revise_task')
                   return (
-                    (Xe.errors = [
+                    (Ze.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -10662,7 +10662,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length < 1)
                           return (
-                            (Xe.errors = [
+                            (Ze.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -10678,14 +10678,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           for (let r = 0; r < e; r++) {
                             let e = c;
                             if (
-                              (K(n[r], {
+                              (G(n[r], {
                                 instancePath: t + '/changes/' + r,
                                 parentData: n,
                                 parentDataProperty: r,
                                 rootData: i,
                                 dynamicAnchors: a,
                               }) ||
-                                ((o = o === null ? K.errors : o.concat(K.errors)), (c = o.length)),
+                                ((o = o === null ? G.errors : o.concat(G.errors)), (c = o.length)),
                               e !== c)
                             )
                               break;
@@ -10693,7 +10693,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                       } else
                         return (
-                          (Xe.errors = [
+                          (Ze.errors = [
                             {
                               instancePath: t + '/changes',
                               schemaPath: '#/properties/changes/type',
@@ -10713,7 +10713,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Xe.errors = [
+            (Ze.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -10725,14 +10725,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Xe.errors = o), c === 0);
+      return ((Ze.errors = o), c === 0);
     }
-    Xe.evaluated = {
+    Ze.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Ze(
+    function K(
       e,
       {
         instancePath: t = '',
@@ -10744,7 +10744,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ze.evaluated;
+        l = K.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -10756,7 +10756,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (Ze.errors = [
+              (K.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -10778,7 +10778,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'changes'
               )
                 return (
-                  (Ze.errors = [
+                  (K.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -10795,7 +10795,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Ze.errors = [
+                    (K.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -10808,7 +10808,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'move_task')
                   return (
-                    (Ze.errors = [
+                    (K.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -10870,7 +10870,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Ze.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (K.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -10912,7 +10912,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (Ze.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (K.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -10926,14 +10926,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             for (let r = 0; r < e; r++) {
                               let e = c;
                               if (
-                                (K(n[r], {
+                                (G(n[r], {
                                   instancePath: t + '/changes/' + r,
                                   parentData: n,
                                   parentDataProperty: r,
                                   rootData: i,
                                   dynamicAnchors: a,
                                 }) ||
-                                  ((o = o === null ? K.errors : o.concat(K.errors)),
+                                  ((o = o === null ? G.errors : o.concat(G.errors)),
                                   (c = o.length)),
                                 e !== c)
                               )
@@ -10941,7 +10941,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             }
                           } else
                             return (
-                              (Ze.errors = [
+                              (K.errors = [
                                 {
                                   instancePath: t + '/changes',
                                   schemaPath: '#/properties/changes/type',
@@ -10963,7 +10963,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ze.errors = [
+            (K.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -10975,9 +10975,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ze.errors = o), c === 0);
+      return ((K.errors = o), c === 0);
     }
-    Ze.evaluated = {
+    K.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
@@ -11242,38 +11242,38 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       l = !1,
                       p = null,
                       m = c;
-                    R(n, {
+                    L(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? R.errors : o.concat(R.errors)), (c = o.length));
+                    }) || ((o = o === null ? L.errors : o.concat(L.errors)), (c = o.length));
                     var d = m === c;
                     if (d) {
                       ((l = !0), (p = 0));
                       var f = !0;
                     }
                     let h = c;
-                    Xe(n, {
+                    Ze(n, {
                       instancePath: t + '/change',
                       parentData: e,
                       parentDataProperty: 'change',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? Xe.errors : o.concat(Xe.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ze.errors : o.concat(Ze.errors)), (c = o.length));
                     var d = h === c;
                     if (d && l) ((l = !1), (p = [p, 1]));
                     else {
                       d && ((l = !0), (p = 1), f !== !0 && (f = !0));
                       let r = c;
-                      Ze(n, {
+                      K(n, {
                         instancePath: t + '/change',
                         parentData: e,
                         parentDataProperty: 'change',
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? Ze.errors : o.concat(Ze.errors)), (c = o.length));
+                      }) || ((o = o === null ? K.errors : o.concat(K.errors)), (c = o.length));
                       var d = r === c;
                       if (d && l) ((l = !1), (p = [p, 2]));
                       else {
@@ -11291,14 +11291,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         else {
                           d && ((l = !0), (p = 3), f !== !0 && (f = !0));
                           let r = c;
-                          Ne(n, {
+                          Pe(n, {
                             instancePath: t + '/change',
                             parentData: e,
                             parentDataProperty: 'change',
                             rootData: i,
                             dynamicAnchors: a,
                           }) ||
-                            ((o = o === null ? Ne.errors : o.concat(Ne.errors)), (c = o.length));
+                            ((o = o === null ? Pe.errors : o.concat(Pe.errors)), (c = o.length));
                           var d = r === c;
                           d && l
                             ? ((l = !1), (p = [p, 4]))
@@ -11609,7 +11609,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isHttpErrorDetail = rt));
+      (e.isHeartbeatElapsedSeconds = rt));
     function rt(
       e,
       {
@@ -11624,12 +11624,81 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if (
         (o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
+        typeof e != 'number' || e % 1 || isNaN(e) || !isFinite(e))
+      )
+        return (
+          (rt.errors = [
+            {
+              instancePath: t,
+              schemaPath: '#/type',
+              keyword: 'type',
+              params: { type: 'integer' },
+              message: 'must be integer',
+            },
+          ]),
+          !1
+        );
+      if (typeof e == 'number' && isFinite(e)) {
+        if (e > 60 || isNaN(e))
+          return (
+            (rt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/maximum',
+                keyword: 'maximum',
+                params: {
+                  comparison: '<=',
+                  limit: 60,
+                },
+                message: 'must be <= 60',
+              },
+            ]),
+            !1
+          );
+        if (e < 1 || isNaN(e))
+          return (
+            (rt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/minimum',
+                keyword: 'minimum',
+                params: {
+                  comparison: '>=',
+                  limit: 1,
+                },
+                message: 'must be >= 1',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((rt.errors = null), !0);
+    }
+    ((rt.evaluated = {
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isHttpErrorDetail = it));
+    function it(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = it.evaluated;
+      if (
+        (o.dynamicProps && (o.props = void 0),
+        o.dynamicItems && (o.items = void 0),
         e && typeof e == 'object' && !Array.isArray(e))
       ) {
         let n;
         if (e.code === void 0 && (n = 'code'))
           return (
-            (rt.errors = [
+            (it.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/required',
@@ -11643,7 +11712,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         for (let n in e)
           if (n !== 'code')
             return (
-              (rt.errors = [
+              (it.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/additionalProperties',
@@ -11656,7 +11725,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             );
         if (e.code !== void 0 && typeof e.code != 'string')
           return (
-            (rt.errors = [
+            (it.errors = [
               {
                 instancePath: t + '/code',
                 schemaPath: '#/properties/code/type',
@@ -11669,7 +11738,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
       } else
         return (
-          (rt.errors = [
+          (it.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -11680,15 +11749,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           ]),
           !1
         );
-      return ((rt.errors = null), !0);
+      return ((it.errors = null), !0);
     }
-    ((rt.evaluated = {
+    ((it.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isHttpErrorResponse = it));
-    function it(
+      (e.isHttpErrorResponse = at));
+    function at(
       e,
       {
         instancePath: t = '',
@@ -11700,13 +11769,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = it.evaluated;
+        c = at.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (e.detail === void 0 && (n = 'detail'))
             return (
-              (it.errors = [
+              (at.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -11722,7 +11791,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'detail')
                 return (
-                  (it.errors = [
+                  (at.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -11735,18 +11804,18 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 );
             n === s &&
               e.detail !== void 0 &&
-              (rt(e.detail, {
+              (it(e.detail, {
                 instancePath: t + '/detail',
                 parentData: e,
                 parentDataProperty: 'detail',
                 rootData: i,
                 dynamicAnchors: a,
               }) ||
-                ((o = o === null ? rt.errors : o.concat(rt.errors)), (s = o.length)));
+                ((o = o === null ? it.errors : o.concat(it.errors)), (s = o.length)));
           }
         } else
           return (
-            (it.errors = [
+            (at.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -11758,14 +11827,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((it.errors = o), s === 0);
+      return ((at.errors = o), s === 0);
     }
-    ((it.evaluated = {
+    ((at.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewContent = ot));
+      (e.isInterviewContent = st));
     function q(
       e,
       {
@@ -11834,7 +11903,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    var at = {
+    var ot = {
       type: 'string',
       enum: ['app', 'employee', 'consultant'],
       title: 'InterviewSpeaker',
@@ -11860,7 +11929,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: at.enum },
+                  params: { allowedValues: ot.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
@@ -11882,7 +11951,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function ot(
+    function st(
       e,
       {
         instancePath: t = '',
@@ -11894,7 +11963,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = ot.evaluated;
+        c = st.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -11905,7 +11974,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.interview_text === void 0 && (n = 'interview_text'))
           )
             return (
-              (ot.errors = [
+              (st.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -11926,7 +11995,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'interview_text'
               )
                 return (
-                  (ot.errors = [
+                  (st.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -11943,7 +12012,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = s;
                 if (typeof n != 'string')
                   return (
-                    (ot.errors = [
+                    (st.errors = [
                       {
                         instancePath: t + '/kind',
                         schemaPath: '#/properties/kind/type',
@@ -11956,7 +12025,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'interview')
                   return (
-                    (ot.errors = [
+                    (st.errors = [
                       {
                         instancePath: t + '/kind',
                         schemaPath: '#/properties/kind/const',
@@ -11998,7 +12067,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = s;
                       if (typeof e.interview_text != 'string')
                         return (
-                          (ot.errors = [
+                          (st.errors = [
                             {
                               instancePath: t + '/interview_text',
                               schemaPath: '#/properties/interview_text/type',
@@ -12018,7 +12087,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (ot.errors = [
+            (st.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12030,15 +12099,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ot.errors = o), s === 0);
+      return ((st.errors = o), s === 0);
     }
-    ((ot.evaluated = {
+    ((st.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewHistory = ct));
-    function st(
+      (e.isInterviewHistory = lt));
+    function ct(
       e,
       {
         instancePath: t = '',
@@ -12050,7 +12119,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = st.evaluated;
+        l = ct.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -12062,7 +12131,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.execution_id === void 0 && (n = 'execution_id'))
           )
             return (
-              (st.errors = [
+              (ct.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12084,7 +12153,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'execution_id'
               )
                 return (
-                  (st.errors = [
+                  (ct.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12136,7 +12205,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = c;
                       if (typeof e.interview_text != 'string')
                         return (
-                          (st.errors = [
+                          (ct.errors = [
                             {
                               instancePath: t + '/interview_text',
                               schemaPath: '#/properties/interview_text/type',
@@ -12187,7 +12256,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             params: {},
                             message: 'must match a schema in anyOf',
                           };
-                          return (o === null ? (o = [e]) : o.push(e), c++, (st.errors = o), !1);
+                          return (o === null ? (o = [e]) : o.push(e), c++, (ct.errors = o), !1);
                         }
                         var u = r === c;
                       } else var u = !0;
@@ -12199,7 +12268,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (st.errors = [
+            (ct.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12211,14 +12280,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((st.errors = o), c === 0);
+      return ((ct.errors = o), c === 0);
     }
-    st.evaluated = {
+    ct.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function ct(
+    function lt(
       e,
       {
         instancePath: t = '',
@@ -12230,13 +12299,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = ct.evaluated;
+        c = lt.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (e.messages === void 0 && (n = 'messages'))
             return (
-              (ct.errors = [
+              (lt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12252,7 +12321,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'messages')
                 return (
-                  (ct.errors = [
+                  (lt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12271,20 +12340,20 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   for (let r = 0; r < e; r++) {
                     let e = s;
                     if (
-                      (st(n[r], {
+                      (ct(n[r], {
                         instancePath: t + '/messages/' + r,
                         parentData: n,
                         parentDataProperty: r,
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? st.errors : o.concat(st.errors)), (s = o.length)),
+                      }) || ((o = o === null ? ct.errors : o.concat(ct.errors)), (s = o.length)),
                       e !== s)
                     )
                       break;
                   }
                 } else
                   return (
-                    (ct.errors = [
+                    (lt.errors = [
                       {
                         instancePath: t + '/messages',
                         schemaPath: '#/properties/messages/type',
@@ -12300,7 +12369,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (ct.errors = [
+            (lt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12312,15 +12381,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ct.errors = o), s === 0);
+      return ((lt.errors = o), s === 0);
     }
-    ((ct.evaluated = {
+    ((lt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewMessage = lt));
-    function lt(
+      (e.isInterviewMessage = ut));
+    function ut(
       e,
       {
         instancePath: t = '',
@@ -12332,7 +12401,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = lt.evaluated;
+        l = ut.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -12344,7 +12413,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.execution_id === void 0 && (n = 'execution_id'))
           )
             return (
-              (lt.errors = [
+              (ut.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12366,7 +12435,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'execution_id'
               )
                 return (
-                  (lt.errors = [
+                  (ut.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12418,7 +12487,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = c;
                       if (typeof e.interview_text != 'string')
                         return (
-                          (lt.errors = [
+                          (ut.errors = [
                             {
                               instancePath: t + '/interview_text',
                               schemaPath: '#/properties/interview_text/type',
@@ -12469,7 +12538,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             params: {},
                             message: 'must match a schema in anyOf',
                           };
-                          return (o === null ? (o = [e]) : o.push(e), c++, (lt.errors = o), !1);
+                          return (o === null ? (o = [e]) : o.push(e), c++, (ut.errors = o), !1);
                         }
                         var u = r === c;
                       } else var u = !0;
@@ -12481,7 +12550,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (lt.errors = [
+            (ut.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12493,15 +12562,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((lt.errors = o), c === 0);
+      return ((ut.errors = o), c === 0);
     }
-    ((lt.evaluated = {
+    ((ut.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewPlan = ut));
-    function ut(
+      (e.isInterviewPlan = dt));
+    function dt(
       e,
       {
         instancePath: t = '',
@@ -12513,13 +12582,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = ut.evaluated;
+        c = dt.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (e.plan === void 0 && (n = 'plan'))
             return (
-              (ut.errors = [
+              (dt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12535,7 +12604,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'plan')
                 return (
-                  (ut.errors = [
+                  (dt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12584,13 +12653,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   params: {},
                   message: 'must match a schema in anyOf',
                 };
-                return (o === null ? (o = [e]) : o.push(e), s++, (ut.errors = o), !1);
+                return (o === null ? (o = [e]) : o.push(e), s++, (dt.errors = o), !1);
               }
             }
           }
         } else
           return (
-            (ut.errors = [
+            (dt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12602,15 +12671,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ut.errors = o), s === 0);
+      return ((dt.errors = o), s === 0);
     }
-    ((ut.evaluated = {
+    ((dt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewPlanView = dt));
-    function dt(
+      (e.isInterviewPlanView = ft));
+    function ft(
       e,
       {
         instancePath: t = '',
@@ -12622,7 +12691,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = dt.evaluated;
+        l = ft.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -12631,7 +12700,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.job_file_id === void 0 && (n = 'job_file_id'))
           )
             return (
-              (dt.errors = [
+              (ft.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12647,7 +12716,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'plan' && n !== 'job_file_id')
                 return (
-                  (dt.errors = [
+                  (ft.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12698,7 +12767,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     params: {},
                     message: 'must match a schema in anyOf',
                   };
-                  return (o === null ? (o = [e]) : o.push(e), c++, (dt.errors = o), !1);
+                  return (o === null ? (o = [e]) : o.push(e), c++, (ft.errors = o), !1);
                 }
                 var d = r === c;
               } else var d = !0;
@@ -12719,7 +12788,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (dt.errors = [
+            (ft.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12731,15 +12800,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((dt.errors = o), c === 0);
+      return ((ft.errors = o), c === 0);
     }
-    ((dt.evaluated = {
+    ((ft.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isInterviewSpeaker = ft));
-    function ft(
+      (e.isInterviewSpeaker = pt));
+    function pt(
       e,
       {
         instancePath: t = '',
@@ -12749,24 +12818,24 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = ft.evaluated;
+      let o = pt.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'app' && e !== 'employee' && e !== 'consultant'
-            ? ((ft.errors = [
+            ? ((pt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: at.enum },
+                  params: { allowedValues: ot.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((ft.errors = null), !0)
-          : ((ft.errors = [
+            : ((pt.errors = null), !0)
+          : ((pt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12778,12 +12847,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((ft.evaluated = {
+    ((pt.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdAreasView = pt));
-    function pt(
+      (e.isJdAreasView = mt));
+    function mt(
       e,
       {
         instancePath: t = '',
@@ -12795,7 +12864,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = pt.evaluated;
+        l = mt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -12804,7 +12873,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.areas === void 0 && (n = 'areas'))
           )
             return (
-              (pt.errors = [
+              (mt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12820,7 +12889,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'areas')
                 return (
-                  (pt.errors = [
+                  (mt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12866,7 +12935,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (pt.errors = [
+                        (mt.errors = [
                           {
                             instancePath: t + '/areas',
                             schemaPath: '#/properties/areas/type',
@@ -12885,7 +12954,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (pt.errors = [
+            (mt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -12897,15 +12966,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((pt.errors = o), c === 0);
+      return ((mt.errors = o), c === 0);
     }
-    ((pt.evaluated = {
+    ((mt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdCapabilitiesView = mt));
-    function mt(
+      (e.isJdCapabilitiesView = ht));
+    function ht(
       e,
       {
         instancePath: t = '',
@@ -12917,7 +12986,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = mt.evaluated;
+        l = ht.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -12927,7 +12996,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.task_links === void 0 && (n = 'task_links'))
           )
             return (
-              (mt.errors = [
+              (ht.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -12943,7 +13012,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'capabilities' && n !== 'task_links')
                 return (
-                  (mt.errors = [
+                  (ht.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -12989,7 +13058,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (mt.errors = [
+                        (ht.errors = [
                           {
                             instancePath: t + '/capabilities',
                             schemaPath: '#/properties/capabilities/type',
@@ -13027,7 +13096,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                       } else
                         return (
-                          (mt.errors = [
+                          (ht.errors = [
                             {
                               instancePath: t + '/task_links',
                               schemaPath: '#/properties/task_links/type',
@@ -13047,7 +13116,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (mt.errors = [
+            (ht.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -13059,15 +13128,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((mt.errors = o), c === 0);
+      return ((ht.errors = o), c === 0);
     }
-    ((mt.evaluated = {
+    ((ht.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdCollaboratorsView = ht));
-    function ht(
+      (e.isJdCollaboratorsView = gt));
+    function gt(
       e,
       {
         instancePath: t = '',
@@ -13079,7 +13148,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = ht.evaluated;
+        l = gt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -13088,7 +13157,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.collaborators === void 0 && (n = 'collaborators'))
           )
             return (
-              (ht.errors = [
+              (gt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -13104,7 +13173,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'collaborators')
                 return (
-                  (ht.errors = [
+                  (gt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -13150,7 +13219,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (ht.errors = [
+                        (gt.errors = [
                           {
                             instancePath: t + '/collaborators',
                             schemaPath: '#/properties/collaborators/type',
@@ -13169,7 +13238,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (ht.errors = [
+            (gt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -13181,15 +13250,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ht.errors = o), c === 0);
+      return ((gt.errors = o), c === 0);
     }
-    ((ht.evaluated = {
+    ((gt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdConditionsView = gt));
-    function gt(
+      (e.isJdConditionsView = _t));
+    function _t(
       e,
       {
         instancePath: t = '',
@@ -13201,7 +13270,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = gt.evaluated;
+        l = _t.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -13210,7 +13279,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.conditions === void 0 && (n = 'conditions'))
           )
             return (
-              (gt.errors = [
+              (_t.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -13226,7 +13295,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'conditions')
                 return (
-                  (gt.errors = [
+                  (_t.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -13272,7 +13341,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (gt.errors = [
+                        (_t.errors = [
                           {
                             instancePath: t + '/conditions',
                             schemaPath: '#/properties/conditions/type',
@@ -13291,7 +13360,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (gt.errors = [
+            (_t.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -13303,9 +13372,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((gt.errors = o), c === 0);
+      return ((_t.errors = o), c === 0);
     }
-    ((gt.evaluated = {
+    ((_t.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
@@ -13407,8 +13476,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdSourceChangesView = vt));
-    function _t(
+      (e.isJdSourceChangesView = yt));
+    function vt(
       e,
       {
         instancePath: t = '',
@@ -13420,7 +13489,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = _t.evaluated;
+        l = vt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -13430,7 +13499,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.covered_through_sequence === void 0 && (n = 'covered_through_sequence'))
           )
             return (
-              (_t.errors = [
+              (vt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -13446,7 +13515,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'snapshot_id' && n !== 'revision_id' && n !== 'covered_through_sequence')
                 return (
-                  (_t.errors = [
+                  (vt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -13506,7 +13575,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (_t.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (vt.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -13528,7 +13597,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (_t.errors = [
+            (vt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -13540,14 +13609,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((_t.errors = o), c === 0);
+      return ((vt.errors = o), c === 0);
     }
-    _t.evaluated = {
+    vt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function vt(
+    function yt(
       e,
       {
         instancePath: t = '',
@@ -13559,7 +13628,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = vt.evaluated;
+        l = yt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -13572,7 +13641,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.comparison_version === void 0 && (n = 'comparison_version'))
           )
             return (
-              (vt.errors = [
+              (yt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -13595,7 +13664,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'comparison_version'
               )
                 return (
-                  (vt.errors = [
+                  (yt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -13635,7 +13704,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     let n = c;
                     if (typeof e.jd_markdown != 'string')
                       return (
-                        (vt.errors = [
+                        (yt.errors = [
                           {
                             instancePath: t + '/jd_markdown',
                             schemaPath: '#/properties/jd_markdown/type',
@@ -13689,7 +13758,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (vt.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (yt.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -13700,13 +13769,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           s = c,
                           l = !1,
                           d = c;
-                        _t(n, {
+                        vt(n, {
                           instancePath: t + '/source_version',
                           parentData: e,
                           parentDataProperty: 'source_version',
                           rootData: i,
                           dynamicAnchors: a,
-                        }) || ((o = o === null ? _t.errors : o.concat(_t.errors)), (c = o.length));
+                        }) || ((o = o === null ? vt.errors : o.concat(vt.errors)), (c = o.length));
                         var f = d === c;
                         l ||= f;
                         let p = c;
@@ -13731,7 +13800,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             params: {},
                             message: 'must match a schema in anyOf',
                           };
-                          return (o === null ? (o = [e]) : o.push(e), c++, (vt.errors = o), !1);
+                          return (o === null ? (o = [e]) : o.push(e), c++, (yt.errors = o), !1);
                         }
                         var u = r === c;
                       } else var u = !0;
@@ -13742,14 +13811,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             s = c,
                             l = !1,
                             d = c;
-                          _t(n, {
+                          vt(n, {
                             instancePath: t + '/comparison_version',
                             parentData: e,
                             parentDataProperty: 'comparison_version',
                             rootData: i,
                             dynamicAnchors: a,
                           }) ||
-                            ((o = o === null ? _t.errors : o.concat(_t.errors)), (c = o.length));
+                            ((o = o === null ? vt.errors : o.concat(vt.errors)), (c = o.length));
                           var p = d === c;
                           l ||= p;
                           let f = c;
@@ -13774,7 +13843,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               params: {},
                               message: 'must match a schema in anyOf',
                             };
-                            return (o === null ? (o = [e]) : o.push(e), c++, (vt.errors = o), !1);
+                            return (o === null ? (o = [e]) : o.push(e), c++, (yt.errors = o), !1);
                           }
                           var u = r === c;
                         } else var u = !0;
@@ -13787,7 +13856,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (vt.errors = [
+            (yt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -13799,15 +13868,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((vt.errors = o), c === 0);
+      return ((yt.errors = o), c === 0);
     }
-    ((vt.evaluated = {
+    ((yt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdSourceContentView = Ct));
-    var yt = {
+      (e.isJdSourceContentView = wt));
+    var bt = {
         properties: {
           kind: {
             type: 'string',
@@ -13837,7 +13906,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         required: ['kind', 'title', 'description', 'body', 'references'],
         title: 'MemoryContent',
       },
-      bt = {
+      xt = {
         properties: {
           source_ref: { $ref: '#/components/schemas/NonemptyText' },
           kind: {
@@ -13855,7 +13924,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         required: ['source_ref', 'kind', 'label'],
         title: 'SourceLink',
       };
-    function xt(
+    function St(
       e,
       {
         instancePath: t = '',
@@ -13867,7 +13936,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = xt.evaluated;
+        c = St.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -13877,7 +13946,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.label === void 0 && (n = 'label'))
           )
             return (
-              (xt.errors = [
+              (St.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -13893,7 +13962,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'source_ref' && n !== 'kind' && n !== 'label')
                 return (
-                  (xt.errors = [
+                  (St.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -13922,7 +13991,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     r = s;
                   if (typeof n != 'string')
                     return (
-                      (xt.errors = [
+                      (St.errors = [
                         {
                           instancePath: t + '/kind',
                           schemaPath: '#/properties/kind/type',
@@ -13935,12 +14004,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     );
                   if (n !== 'interview' && n !== 'work_situation')
                     return (
-                      (xt.errors = [
+                      (St.errors = [
                         {
                           instancePath: t + '/kind',
                           schemaPath: '#/properties/kind/enum',
                           keyword: 'enum',
-                          params: { allowedValues: bt.properties.kind.enum },
+                          params: { allowedValues: xt.properties.kind.enum },
                           message: 'must be equal to one of the allowed values',
                         },
                       ]),
@@ -13953,7 +14022,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     let n = s;
                     if (typeof e.label != 'string')
                       return (
-                        (xt.errors = [
+                        (St.errors = [
                           {
                             instancePath: t + '/label',
                             schemaPath: '#/properties/label/type',
@@ -13966,215 +14035,6 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       );
                     var l = n === s;
                   } else var l = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (xt.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((xt.errors = o), s === 0);
-    }
-    xt.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    };
-    function St(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        s = 0,
-        c = St.evaluated;
-      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.kind === void 0 && (n = 'kind')) ||
-            (e.title === void 0 && (n = 'title')) ||
-            (e.description === void 0 && (n = 'description')) ||
-            (e.body === void 0 && (n = 'body')) ||
-            (e.references === void 0 && (n = 'references'))
-          )
-            return (
-              (St.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = s;
-            for (let n in e)
-              if (
-                n !== 'kind' &&
-                n !== 'title' &&
-                n !== 'description' &&
-                n !== 'body' &&
-                n !== 'references'
-              )
-                return (
-                  (St.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === s) {
-              if (e.kind !== void 0) {
-                let n = e.kind,
-                  r = s;
-                if (typeof n != 'string')
-                  return (
-                    (St.errors = [
-                      {
-                        instancePath: t + '/kind',
-                        schemaPath: '#/properties/kind/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'work_situation' && n !== 'work_understanding')
-                  return (
-                    (St.errors = [
-                      {
-                        instancePath: t + '/kind',
-                        schemaPath: '#/properties/kind/enum',
-                        keyword: 'enum',
-                        params: { allowedValues: yt.properties.kind.enum },
-                        message: 'must be equal to one of the allowed values',
-                      },
-                    ]),
-                    !1
-                  );
-                var l = r === s;
-              } else var l = !0;
-              if (l) {
-                if (e.title !== void 0) {
-                  let n = s;
-                  if (typeof e.title != 'string')
-                    return (
-                      (St.errors = [
-                        {
-                          instancePath: t + '/title',
-                          schemaPath: '#/properties/title/type',
-                          keyword: 'type',
-                          params: { type: 'string' },
-                          message: 'must be string',
-                        },
-                      ]),
-                      !1
-                    );
-                  var l = n === s;
-                } else var l = !0;
-                if (l) {
-                  if (e.description !== void 0) {
-                    let n = s;
-                    if (typeof e.description != 'string')
-                      return (
-                        (St.errors = [
-                          {
-                            instancePath: t + '/description',
-                            schemaPath: '#/properties/description/type',
-                            keyword: 'type',
-                            params: { type: 'string' },
-                            message: 'must be string',
-                          },
-                        ]),
-                        !1
-                      );
-                    var l = n === s;
-                  } else var l = !0;
-                  if (l) {
-                    if (e.body !== void 0) {
-                      let n = s;
-                      if (typeof e.body != 'string')
-                        return (
-                          (St.errors = [
-                            {
-                              instancePath: t + '/body',
-                              schemaPath: '#/properties/body/type',
-                              keyword: 'type',
-                              params: { type: 'string' },
-                              message: 'must be string',
-                            },
-                          ]),
-                          !1
-                        );
-                      var l = n === s;
-                    } else var l = !0;
-                    if (l) {
-                      if (e.references !== void 0) {
-                        let n = e.references,
-                          r = s;
-                        if (s === r) {
-                          if (Array.isArray(n)) {
-                            let e = n.length;
-                            for (let r = 0; r < e; r++) {
-                              let e = s;
-                              if (
-                                (xt(n[r], {
-                                  instancePath: t + '/references/' + r,
-                                  parentData: n,
-                                  parentDataProperty: r,
-                                  rootData: i,
-                                  dynamicAnchors: a,
-                                }) ||
-                                  ((o = o === null ? xt.errors : o.concat(xt.errors)),
-                                  (s = o.length)),
-                                e !== s)
-                              )
-                                break;
-                            }
-                          } else
-                            return (
-                              (St.errors = [
-                                {
-                                  instancePath: t + '/references',
-                                  schemaPath: '#/properties/references/type',
-                                  keyword: 'type',
-                                  params: { type: 'array' },
-                                  message: 'must be array',
-                                },
-                              ]),
-                              !1
-                            );
-                        }
-                        var l = r === s;
-                      } else var l = !0;
-                    }
-                  }
                 }
               }
             }
@@ -14211,8 +14071,217 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       } = {},
     ) {
       let o = null,
+        s = 0,
+        c = Ct.evaluated;
+      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.kind === void 0 && (n = 'kind')) ||
+            (e.title === void 0 && (n = 'title')) ||
+            (e.description === void 0 && (n = 'description')) ||
+            (e.body === void 0 && (n = 'body')) ||
+            (e.references === void 0 && (n = 'references'))
+          )
+            return (
+              (Ct.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = s;
+            for (let n in e)
+              if (
+                n !== 'kind' &&
+                n !== 'title' &&
+                n !== 'description' &&
+                n !== 'body' &&
+                n !== 'references'
+              )
+                return (
+                  (Ct.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === s) {
+              if (e.kind !== void 0) {
+                let n = e.kind,
+                  r = s;
+                if (typeof n != 'string')
+                  return (
+                    (Ct.errors = [
+                      {
+                        instancePath: t + '/kind',
+                        schemaPath: '#/properties/kind/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'work_situation' && n !== 'work_understanding')
+                  return (
+                    (Ct.errors = [
+                      {
+                        instancePath: t + '/kind',
+                        schemaPath: '#/properties/kind/enum',
+                        keyword: 'enum',
+                        params: { allowedValues: bt.properties.kind.enum },
+                        message: 'must be equal to one of the allowed values',
+                      },
+                    ]),
+                    !1
+                  );
+                var l = r === s;
+              } else var l = !0;
+              if (l) {
+                if (e.title !== void 0) {
+                  let n = s;
+                  if (typeof e.title != 'string')
+                    return (
+                      (Ct.errors = [
+                        {
+                          instancePath: t + '/title',
+                          schemaPath: '#/properties/title/type',
+                          keyword: 'type',
+                          params: { type: 'string' },
+                          message: 'must be string',
+                        },
+                      ]),
+                      !1
+                    );
+                  var l = n === s;
+                } else var l = !0;
+                if (l) {
+                  if (e.description !== void 0) {
+                    let n = s;
+                    if (typeof e.description != 'string')
+                      return (
+                        (Ct.errors = [
+                          {
+                            instancePath: t + '/description',
+                            schemaPath: '#/properties/description/type',
+                            keyword: 'type',
+                            params: { type: 'string' },
+                            message: 'must be string',
+                          },
+                        ]),
+                        !1
+                      );
+                    var l = n === s;
+                  } else var l = !0;
+                  if (l) {
+                    if (e.body !== void 0) {
+                      let n = s;
+                      if (typeof e.body != 'string')
+                        return (
+                          (Ct.errors = [
+                            {
+                              instancePath: t + '/body',
+                              schemaPath: '#/properties/body/type',
+                              keyword: 'type',
+                              params: { type: 'string' },
+                              message: 'must be string',
+                            },
+                          ]),
+                          !1
+                        );
+                      var l = n === s;
+                    } else var l = !0;
+                    if (l) {
+                      if (e.references !== void 0) {
+                        let n = e.references,
+                          r = s;
+                        if (s === r) {
+                          if (Array.isArray(n)) {
+                            let e = n.length;
+                            for (let r = 0; r < e; r++) {
+                              let e = s;
+                              if (
+                                (St(n[r], {
+                                  instancePath: t + '/references/' + r,
+                                  parentData: n,
+                                  parentDataProperty: r,
+                                  rootData: i,
+                                  dynamicAnchors: a,
+                                }) ||
+                                  ((o = o === null ? St.errors : o.concat(St.errors)),
+                                  (s = o.length)),
+                                e !== s)
+                              )
+                                break;
+                            }
+                          } else
+                            return (
+                              (Ct.errors = [
+                                {
+                                  instancePath: t + '/references',
+                                  schemaPath: '#/properties/references/type',
+                                  keyword: 'type',
+                                  params: { type: 'array' },
+                                  message: 'must be array',
+                                },
+                              ]),
+                              !1
+                            );
+                        }
+                        var l = r === s;
+                      } else var l = !0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (Ct.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Ct.errors = o), s === 0);
+    }
+    Ct.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function wt(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
         c = 0,
-        l = Ct.evaluated;
+        l = wt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -14222,7 +14291,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.content === void 0 && (n = 'content'))
           )
             return (
-              (Ct.errors = [
+              (wt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -14238,7 +14307,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'citation_id' && n !== 'content')
                 return (
-                  (Ct.errors = [
+                  (wt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -14280,23 +14349,23 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       s = c,
                       l = !1,
                       p = c;
-                    St(n, {
+                    Ct(n, {
                       instancePath: t + '/content',
                       parentData: e,
                       parentDataProperty: 'content',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? St.errors : o.concat(St.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ct.errors : o.concat(Ct.errors)), (c = o.length));
                     var d = p === c;
                     if (((l ||= d), d)) var f = !0;
                     let m = c;
-                    ot(n, {
+                    st(n, {
                       instancePath: t + '/content',
                       parentData: e,
                       parentDataProperty: 'content',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? ot.errors : o.concat(ot.errors)), (c = o.length));
+                    }) || ((o = o === null ? st.errors : o.concat(st.errors)), (c = o.length));
                     var d = m === c;
                     if (((l ||= d), d && f !== !0 && (f = !0), l))
                       ((c = s), o !== null && (s ? (o.length = s) : (o = null)));
@@ -14308,7 +14377,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Ct.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (wt.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -14318,7 +14387,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ct.errors = [
+            (wt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -14330,15 +14399,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ct.errors = o), c === 0);
+      return ((wt.errors = o), c === 0);
     }
-    ((Ct.evaluated = {
+    ((wt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdSourcesView = Ot));
-    var wt = {
+      (e.isJdSourcesView = kt));
+    var Tt = {
         properties: {
           citation_id: { $ref: '#/components/schemas/WireUuid' },
           target_label: {
@@ -14382,12 +14451,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         ],
         title: 'Reference',
       },
-      Tt = {
+      Et = {
         type: 'string',
         enum: ['profile_field', 'area', 'task', 'capability', 'collaborator', 'condition'],
         title: 'SourceTargetKind',
       };
-    function Et(
+    function Dt(
       e,
       {
         instancePath: t = '',
@@ -14397,7 +14466,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = Et.evaluated;
+      let o = Dt.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
@@ -14408,18 +14477,18 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             e !== 'capability' &&
             e !== 'collaborator' &&
             e !== 'condition'
-            ? ((Et.errors = [
+            ? ((Dt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: Tt.enum },
+                  params: { allowedValues: Et.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((Et.errors = null), !0)
-          : ((Et.errors = [
+            : ((Dt.errors = null), !0)
+          : ((Dt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -14431,11 +14500,11 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    Et.evaluated = {
+    Dt.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Dt(
+    function Ot(
       e,
       {
         instancePath: t = '',
@@ -14447,7 +14516,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Dt.evaluated;
+        l = Ot.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -14457,7 +14526,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.item_id === void 0 && (n = 'item_id'))
           )
             return (
-              (Dt.errors = [
+              (Ot.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -14473,7 +14542,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'kind' && n !== 'field' && n !== 'item_id')
                 return (
-                  (Dt.errors = [
+                  (Ot.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -14487,13 +14556,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             if (n === c) {
               if (e.kind !== void 0) {
                 let n = c;
-                Et(e.kind, {
+                Dt(e.kind, {
                   instancePath: t + '/kind',
                   parentData: e,
                   parentDataProperty: 'kind',
                   rootData: i,
                   dynamicAnchors: a,
-                }) || ((o = o === null ? Et.errors : o.concat(Et.errors)), (c = o.length));
+                }) || ((o = o === null ? Dt.errors : o.concat(Dt.errors)), (c = o.length));
                 var u = n === c;
               } else var u = !0;
               if (u) {
@@ -14533,7 +14602,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (Dt.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (Ot.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -14574,7 +14643,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Dt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Ot.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -14584,7 +14653,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Dt.errors = [
+            (Ot.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -14596,9 +14665,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Dt.errors = o), c === 0);
+      return ((Ot.errors = o), c === 0);
     }
-    Dt.evaluated = {
+    Ot.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
@@ -14699,13 +14768,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 if (u) {
                   if (e.target !== void 0) {
                     let n = c;
-                    Dt(e.target, {
+                    Ot(e.target, {
                       instancePath: t + '/target',
                       parentData: e,
                       parentDataProperty: 'target',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? Dt.errors : o.concat(Dt.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ot.errors : o.concat(Ot.errors)), (c = o.length));
                     var u = n === c;
                   } else var u = !0;
                   if (u) {
@@ -14732,7 +14801,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               instancePath: t + '/source_kind',
                               schemaPath: '#/properties/source_kind/enum',
                               keyword: 'enum',
-                              params: { allowedValues: wt.properties.source_kind.enum },
+                              params: { allowedValues: Tt.properties.source_kind.enum },
                               message: 'must be equal to one of the allowed values',
                             },
                           ]),
@@ -14842,7 +14911,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     };
-    function Ot(
+    function kt(
       e,
       {
         instancePath: t = '',
@@ -14854,7 +14923,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ot.evaluated;
+        l = kt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -14863,7 +14932,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.references === void 0 && (n = 'references'))
           )
             return (
-              (Ot.errors = [
+              (kt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -14879,7 +14948,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'references')
                 return (
-                  (Ot.errors = [
+                  (kt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -14925,7 +14994,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (Ot.errors = [
+                        (kt.errors = [
                           {
                             instancePath: t + '/references',
                             schemaPath: '#/properties/references/type',
@@ -14944,7 +15013,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ot.errors = [
+            (kt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -14956,15 +15025,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ot.errors = o), c === 0);
+      return ((kt.errors = o), c === 0);
     }
-    ((Ot.evaluated = {
+    ((kt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJdTasksView = kt));
-    function kt(
+      (e.isJdTasksView = At));
+    function At(
       e,
       {
         instancePath: t = '',
@@ -14976,7 +15045,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = kt.evaluated;
+        l = At.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -14985,7 +15054,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.tasks === void 0 && (n = 'tasks'))
           )
             return (
-              (kt.errors = [
+              (At.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -15001,7 +15070,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'revision_id' && n !== 'tasks')
                 return (
-                  (kt.errors = [
+                  (At.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -15047,7 +15116,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (kt.errors = [
+                        (At.errors = [
                           {
                             instancePath: t + '/tasks',
                             schemaPath: '#/properties/tasks/type',
@@ -15066,7 +15135,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (kt.errors = [
+            (At.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -15078,9 +15147,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((kt.errors = o), c === 0);
+      return ((At.errors = o), c === 0);
     }
-    ((kt.evaluated = {
+    ((At.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
@@ -15418,9 +15487,77 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJobFile = Q));
-    var At = i().fullFormats['date-time'];
+      (e.isJobFile = $));
     function Q(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = Q.evaluated;
+      if (
+        (o.dynamicProps && (o.props = void 0),
+        o.dynamicItems && (o.items = void 0),
+        typeof e != 'number' || e % 1 || isNaN(e) || !isFinite(e))
+      )
+        return (
+          (Q.errors = [
+            {
+              instancePath: t,
+              schemaPath: '#/type',
+              keyword: 'type',
+              params: { type: 'integer' },
+              message: 'must be integer',
+            },
+          ]),
+          !1
+        );
+      if (typeof e == 'number' && isFinite(e)) {
+        if (e > 9007199254740991 || isNaN(e))
+          return (
+            (Q.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/maximum',
+                keyword: 'maximum',
+                params: {
+                  comparison: '<=',
+                  limit: 9007199254740991,
+                },
+                message: 'must be <= 9007199254740991',
+              },
+            ]),
+            !1
+          );
+        if (e < 0 || isNaN(e))
+          return (
+            (Q.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/minimum',
+                keyword: 'minimum',
+                params: {
+                  comparison: '>=',
+                  limit: 0,
+                },
+                message: 'must be >= 0',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Q.errors = null), !0);
+    }
+    Q.evaluated = {
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    var jt = i().fullFormats['date-time'];
+    function $(
       e,
       {
         instancePath: t = '',
@@ -15432,7 +15569,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Q.evaluated;
+        l = $.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -15441,10 +15578,11 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.display_name === void 0 && (n = 'display_name')) ||
             (e.name_revision === void 0 && (n = 'name_revision')) ||
             (e.employee_name === void 0 && (n = 'employee_name')) ||
-            (e.created_at === void 0 && (n = 'created_at'))
+            (e.created_at === void 0 && (n = 'created_at')) ||
+            (e.active_usage_seconds === void 0 && (n = 'active_usage_seconds'))
           )
             return (
-              (Q.errors = [
+              ($.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -15463,10 +15601,11 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'display_name' &&
                 n !== 'name_revision' &&
                 n !== 'employee_name' &&
-                n !== 'created_at'
+                n !== 'created_at' &&
+                n !== 'active_usage_seconds'
               )
                 return (
-                  (Q.errors = [
+                  ($.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -15494,7 +15633,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   let n = c;
                   if (typeof e.display_name != 'string')
                     return (
-                      (Q.errors = [
+                      ($.errors = [
                         {
                           instancePath: t + '/display_name',
                           schemaPath: '#/properties/display_name/type',
@@ -15524,7 +15663,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = c;
                       if (typeof e.employee_name != 'string')
                         return (
-                          (Q.errors = [
+                          ($.errors = [
                             {
                               instancePath: t + '/employee_name',
                               schemaPath: '#/properties/employee_name/type',
@@ -15543,9 +15682,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           r = c;
                         if (c === r && c === r) {
                           if (typeof n == 'string') {
-                            if (!At.validate(n))
+                            if (!jt.validate(n))
                               return (
-                                (Q.errors = [
+                                ($.errors = [
                                   {
                                     instancePath: t + '/created_at',
                                     schemaPath: '#/properties/created_at/format',
@@ -15558,7 +15697,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               );
                           } else
                             return (
-                              (Q.errors = [
+                              ($.errors = [
                                 {
                                   instancePath: t + '/created_at',
                                   schemaPath: '#/properties/created_at/type',
@@ -15572,6 +15711,19 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                         var u = r === c;
                       } else var u = !0;
+                      if (u) {
+                        if (e.active_usage_seconds !== void 0) {
+                          let n = c;
+                          Q(e.active_usage_seconds, {
+                            instancePath: t + '/active_usage_seconds',
+                            parentData: e,
+                            parentDataProperty: 'active_usage_seconds',
+                            rootData: i,
+                            dynamicAnchors: a,
+                          }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (c = o.length));
+                          var u = n === c;
+                        } else var u = !0;
+                      }
                     }
                   }
                 }
@@ -15580,7 +15732,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Q.errors = [
+            ($.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -15592,15 +15744,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Q.errors = o), c === 0);
+      return (($.errors = o), c === 0);
     }
-    ((Q.evaluated = {
+    (($.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isJobFileList = jt));
-    function jt(
+      (e.isJobFileList = Mt));
+    function Mt(
       e,
       {
         instancePath: t = '',
@@ -15612,13 +15764,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = jt.evaluated;
+        c = Mt.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (e.job_files === void 0 && (n = 'job_files'))
             return (
-              (jt.errors = [
+              (Mt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -15634,7 +15786,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'job_files')
                 return (
-                  (jt.errors = [
+                  (Mt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -15653,20 +15805,20 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   for (let r = 0; r < e; r++) {
                     let e = s;
                     if (
-                      (Q(n[r], {
+                      ($(n[r], {
                         instancePath: t + '/job_files/' + r,
                         parentData: n,
                         parentDataProperty: r,
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length)),
+                      }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
                       e !== s)
                     )
                       break;
                   }
                 } else
                   return (
-                    (jt.errors = [
+                    (Mt.errors = [
                       {
                         instancePath: t + '/job_files',
                         schemaPath: '#/properties/job_files/type',
@@ -15677,216 +15829,6 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-              }
-            }
-          }
-        } else
-          return (
-            (jt.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((jt.errors = o), s === 0);
-    }
-    ((jt.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isMemoryContent = Mt));
-    function Mt(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        s = 0,
-        c = Mt.evaluated;
-      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.kind === void 0 && (n = 'kind')) ||
-            (e.title === void 0 && (n = 'title')) ||
-            (e.description === void 0 && (n = 'description')) ||
-            (e.body === void 0 && (n = 'body')) ||
-            (e.references === void 0 && (n = 'references'))
-          )
-            return (
-              (Mt.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = s;
-            for (let n in e)
-              if (
-                n !== 'kind' &&
-                n !== 'title' &&
-                n !== 'description' &&
-                n !== 'body' &&
-                n !== 'references'
-              )
-                return (
-                  (Mt.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === s) {
-              if (e.kind !== void 0) {
-                let n = e.kind,
-                  r = s;
-                if (typeof n != 'string')
-                  return (
-                    (Mt.errors = [
-                      {
-                        instancePath: t + '/kind',
-                        schemaPath: '#/properties/kind/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'work_situation' && n !== 'work_understanding')
-                  return (
-                    (Mt.errors = [
-                      {
-                        instancePath: t + '/kind',
-                        schemaPath: '#/properties/kind/enum',
-                        keyword: 'enum',
-                        params: { allowedValues: yt.properties.kind.enum },
-                        message: 'must be equal to one of the allowed values',
-                      },
-                    ]),
-                    !1
-                  );
-                var l = r === s;
-              } else var l = !0;
-              if (l) {
-                if (e.title !== void 0) {
-                  let n = s;
-                  if (typeof e.title != 'string')
-                    return (
-                      (Mt.errors = [
-                        {
-                          instancePath: t + '/title',
-                          schemaPath: '#/properties/title/type',
-                          keyword: 'type',
-                          params: { type: 'string' },
-                          message: 'must be string',
-                        },
-                      ]),
-                      !1
-                    );
-                  var l = n === s;
-                } else var l = !0;
-                if (l) {
-                  if (e.description !== void 0) {
-                    let n = s;
-                    if (typeof e.description != 'string')
-                      return (
-                        (Mt.errors = [
-                          {
-                            instancePath: t + '/description',
-                            schemaPath: '#/properties/description/type',
-                            keyword: 'type',
-                            params: { type: 'string' },
-                            message: 'must be string',
-                          },
-                        ]),
-                        !1
-                      );
-                    var l = n === s;
-                  } else var l = !0;
-                  if (l) {
-                    if (e.body !== void 0) {
-                      let n = s;
-                      if (typeof e.body != 'string')
-                        return (
-                          (Mt.errors = [
-                            {
-                              instancePath: t + '/body',
-                              schemaPath: '#/properties/body/type',
-                              keyword: 'type',
-                              params: { type: 'string' },
-                              message: 'must be string',
-                            },
-                          ]),
-                          !1
-                        );
-                      var l = n === s;
-                    } else var l = !0;
-                    if (l) {
-                      if (e.references !== void 0) {
-                        let n = e.references,
-                          r = s;
-                        if (s === r) {
-                          if (Array.isArray(n)) {
-                            let e = n.length;
-                            for (let r = 0; r < e; r++) {
-                              let e = s;
-                              if (
-                                (xt(n[r], {
-                                  instancePath: t + '/references/' + r,
-                                  parentData: n,
-                                  parentDataProperty: r,
-                                  rootData: i,
-                                  dynamicAnchors: a,
-                                }) ||
-                                  ((o = o === null ? xt.errors : o.concat(xt.errors)),
-                                  (s = o.length)),
-                                e !== s)
-                              )
-                                break;
-                            }
-                          } else
-                            return (
-                              (Mt.errors = [
-                                {
-                                  instancePath: t + '/references',
-                                  schemaPath: '#/properties/references/type',
-                                  keyword: 'type',
-                                  params: { type: 'array' },
-                                  message: 'must be array',
-                                },
-                              ]),
-                              !1
-                            );
-                        }
-                        var l = r === s;
-                      } else var l = !0;
-                    }
-                  }
-                }
               }
             }
           }
@@ -15911,13 +15853,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isMemoryLayer = Pt));
-    var Nt = {
-      type: 'string',
-      enum: ['work_situation', 'work_understanding'],
-      title: 'MemoryLayer',
-    };
-    function Pt(
+      (e.isMemoryContent = Nt));
+    function Nt(
       e,
       {
         instancePath: t = '',
@@ -15927,24 +15864,239 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = Pt.evaluated;
+      let o = null,
+        s = 0,
+        c = Nt.evaluated;
+      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.kind === void 0 && (n = 'kind')) ||
+            (e.title === void 0 && (n = 'title')) ||
+            (e.description === void 0 && (n = 'description')) ||
+            (e.body === void 0 && (n = 'body')) ||
+            (e.references === void 0 && (n = 'references'))
+          )
+            return (
+              (Nt.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = s;
+            for (let n in e)
+              if (
+                n !== 'kind' &&
+                n !== 'title' &&
+                n !== 'description' &&
+                n !== 'body' &&
+                n !== 'references'
+              )
+                return (
+                  (Nt.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === s) {
+              if (e.kind !== void 0) {
+                let n = e.kind,
+                  r = s;
+                if (typeof n != 'string')
+                  return (
+                    (Nt.errors = [
+                      {
+                        instancePath: t + '/kind',
+                        schemaPath: '#/properties/kind/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'work_situation' && n !== 'work_understanding')
+                  return (
+                    (Nt.errors = [
+                      {
+                        instancePath: t + '/kind',
+                        schemaPath: '#/properties/kind/enum',
+                        keyword: 'enum',
+                        params: { allowedValues: bt.properties.kind.enum },
+                        message: 'must be equal to one of the allowed values',
+                      },
+                    ]),
+                    !1
+                  );
+                var l = r === s;
+              } else var l = !0;
+              if (l) {
+                if (e.title !== void 0) {
+                  let n = s;
+                  if (typeof e.title != 'string')
+                    return (
+                      (Nt.errors = [
+                        {
+                          instancePath: t + '/title',
+                          schemaPath: '#/properties/title/type',
+                          keyword: 'type',
+                          params: { type: 'string' },
+                          message: 'must be string',
+                        },
+                      ]),
+                      !1
+                    );
+                  var l = n === s;
+                } else var l = !0;
+                if (l) {
+                  if (e.description !== void 0) {
+                    let n = s;
+                    if (typeof e.description != 'string')
+                      return (
+                        (Nt.errors = [
+                          {
+                            instancePath: t + '/description',
+                            schemaPath: '#/properties/description/type',
+                            keyword: 'type',
+                            params: { type: 'string' },
+                            message: 'must be string',
+                          },
+                        ]),
+                        !1
+                      );
+                    var l = n === s;
+                  } else var l = !0;
+                  if (l) {
+                    if (e.body !== void 0) {
+                      let n = s;
+                      if (typeof e.body != 'string')
+                        return (
+                          (Nt.errors = [
+                            {
+                              instancePath: t + '/body',
+                              schemaPath: '#/properties/body/type',
+                              keyword: 'type',
+                              params: { type: 'string' },
+                              message: 'must be string',
+                            },
+                          ]),
+                          !1
+                        );
+                      var l = n === s;
+                    } else var l = !0;
+                    if (l) {
+                      if (e.references !== void 0) {
+                        let n = e.references,
+                          r = s;
+                        if (s === r) {
+                          if (Array.isArray(n)) {
+                            let e = n.length;
+                            for (let r = 0; r < e; r++) {
+                              let e = s;
+                              if (
+                                (St(n[r], {
+                                  instancePath: t + '/references/' + r,
+                                  parentData: n,
+                                  parentDataProperty: r,
+                                  rootData: i,
+                                  dynamicAnchors: a,
+                                }) ||
+                                  ((o = o === null ? St.errors : o.concat(St.errors)),
+                                  (s = o.length)),
+                                e !== s)
+                              )
+                                break;
+                            }
+                          } else
+                            return (
+                              (Nt.errors = [
+                                {
+                                  instancePath: t + '/references',
+                                  schemaPath: '#/properties/references/type',
+                                  keyword: 'type',
+                                  params: { type: 'array' },
+                                  message: 'must be array',
+                                },
+                              ]),
+                              !1
+                            );
+                        }
+                        var l = r === s;
+                      } else var l = !0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (Nt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Nt.errors = o), s === 0);
+    }
+    ((Nt.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isMemoryLayer = Ft));
+    var Pt = {
+      type: 'string',
+      enum: ['work_situation', 'work_understanding'],
+      title: 'MemoryLayer',
+    };
+    function Ft(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = Ft.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'work_situation' && e !== 'work_understanding'
-            ? ((Pt.errors = [
+            ? ((Ft.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: Nt.enum },
+                  params: { allowedValues: Pt.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((Pt.errors = null), !0)
-          : ((Pt.errors = [
+            : ((Ft.errors = null), !0)
+          : ((Ft.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -15956,12 +16108,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((Pt.evaluated = {
+    ((Ft.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isMemoryMapItem = Ft));
-    function Ft(
+      (e.isMemoryMapItem = It));
+    function It(
       e,
       {
         instancePath: t = '',
@@ -15973,7 +16125,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ft.evaluated;
+        l = It.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -15983,7 +16135,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.description === void 0 && (n = 'description'))
           )
             return (
-              (Ft.errors = [
+              (It.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -15999,7 +16151,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'object_id' && n !== 'title' && n !== 'description')
                 return (
-                  (Ft.errors = [
+                  (It.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -16027,7 +16179,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   let n = c;
                   if (typeof e.title != 'string')
                     return (
-                      (Ft.errors = [
+                      (It.errors = [
                         {
                           instancePath: t + '/title',
                           schemaPath: '#/properties/title/type',
@@ -16045,7 +16197,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     let n = c;
                     if (typeof e.description != 'string')
                       return (
-                        (Ft.errors = [
+                        (It.errors = [
                           {
                             instancePath: t + '/description',
                             schemaPath: '#/properties/description/type',
@@ -16064,7 +16216,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ft.errors = [
+            (It.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -16076,15 +16228,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ft.errors = o), c === 0);
+      return ((It.errors = o), c === 0);
     }
-    ((Ft.evaluated = {
+    ((It.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isMoveTask = It));
-    function It(
+      (e.isMoveTask = Lt));
+    function Lt(
       e,
       {
         instancePath: t = '',
@@ -16096,7 +16248,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = It.evaluated;
+        l = Lt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -16108,7 +16260,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (It.errors = [
+              (Lt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -16130,7 +16282,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'changes'
               )
                 return (
-                  (It.errors = [
+                  (Lt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -16147,7 +16299,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (It.errors = [
+                    (Lt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -16160,7 +16312,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'move_task')
                   return (
-                    (It.errors = [
+                    (Lt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -16222,7 +16374,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (It.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Lt.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -16264,7 +16416,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (It.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (Lt.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -16278,14 +16430,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             for (let r = 0; r < e; r++) {
                               let e = c;
                               if (
-                                (K(n[r], {
+                                (G(n[r], {
                                   instancePath: t + '/changes/' + r,
                                   parentData: n,
                                   parentDataProperty: r,
                                   rootData: i,
                                   dynamicAnchors: a,
                                 }) ||
-                                  ((o = o === null ? K.errors : o.concat(K.errors)),
+                                  ((o = o === null ? G.errors : o.concat(G.errors)),
                                   (c = o.length)),
                                 e !== c)
                               )
@@ -16293,7 +16445,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             }
                           } else
                             return (
-                              (It.errors = [
+                              (Lt.errors = [
                                 {
                                   instancePath: t + '/changes',
                                   schemaPath: '#/properties/changes/type',
@@ -16315,7 +16467,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (It.errors = [
+            (Lt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -16327,80 +16479,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((It.errors = o), c === 0);
+      return ((Lt.errors = o), c === 0);
     }
-    ((It.evaluated = {
+    ((Lt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isNonblankText = Lt));
-    function Lt(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: o = {},
-      } = {},
-    ) {
-      let s = Lt.evaluated;
-      if (
-        (s.dynamicProps && (s.props = void 0),
-        s.dynamicItems && (s.items = void 0),
-        typeof e == 'string')
-      ) {
-        if (a(e) < 1)
-          return (
-            (Lt.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/minLength',
-                keyword: 'minLength',
-                params: { limit: 1 },
-                message: 'must NOT have fewer than 1 characters',
-              },
-            ]),
-            !1
-          );
-        if (!d.test(e))
-          return (
-            (Lt.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/pattern',
-                keyword: 'pattern',
-                params: {
-                  pattern:
-                    '^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$',
-                },
-                message:
-                  'must match pattern "^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$"',
-              },
-            ]),
-            !1
-          );
-      } else
-        return (
-          (Lt.errors = [
-            {
-              instancePath: t,
-              schemaPath: '#/type',
-              keyword: 'type',
-              params: { type: 'string' },
-              message: 'must be string',
-            },
-          ]),
-          !1
-        );
-      return ((Lt.errors = null), !0);
-    }
-    ((Lt.evaluated = {
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isNonemptyText = Rt));
+      (e.isNonblankText = Rt));
     function Rt(
       e,
       {
@@ -16430,6 +16516,23 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             ]),
             !1
           );
+        if (!d.test(e))
+          return (
+            (Rt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/pattern',
+                keyword: 'pattern',
+                params: {
+                  pattern:
+                    '^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$',
+                },
+                message:
+                  'must match pattern "^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$"',
+              },
+            ]),
+            !1
+          );
       } else
         return (
           (Rt.errors = [
@@ -16449,8 +16552,57 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isNonnegativeInteger = $));
-    function $(
+      (e.isNonemptyText = zt));
+    function zt(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: o = {},
+      } = {},
+    ) {
+      let s = zt.evaluated;
+      if (
+        (s.dynamicProps && (s.props = void 0),
+        s.dynamicItems && (s.items = void 0),
+        typeof e == 'string')
+      ) {
+        if (a(e) < 1)
+          return (
+            (zt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/minLength',
+                keyword: 'minLength',
+                params: { limit: 1 },
+                message: 'must NOT have fewer than 1 characters',
+              },
+            ]),
+            !1
+          );
+      } else
+        return (
+          (zt.errors = [
+            {
+              instancePath: t,
+              schemaPath: '#/type',
+              keyword: 'type',
+              params: { type: 'string' },
+              message: 'must be string',
+            },
+          ]),
+          !1
+        );
+      return ((zt.errors = null), !0);
+    }
+    ((zt.evaluated = {
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isNonnegativeInteger = Bt));
+    function Bt(
       e,
       {
         instancePath: t = '',
@@ -16460,14 +16612,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = $.evaluated;
+      let o = Bt.evaluated;
       if (
         (o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e != 'number' || e % 1 || isNaN(e) || !isFinite(e))
       )
         return (
-          ($.errors = [
+          (Bt.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -16481,7 +16633,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if (typeof e == 'number' && isFinite(e)) {
         if (e > 9007199254740991 || isNaN(e))
           return (
-            ($.errors = [
+            (Bt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/maximum',
@@ -16497,7 +16649,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (e < 0 || isNaN(e))
           return (
-            ($.errors = [
+            (Bt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/minimum',
@@ -16512,14 +16664,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return (($.errors = null), !0);
+      return ((Bt.errors = null), !0);
     }
-    (($.evaluated = {
+    ((Bt.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isPositiveInteger = zt));
-    function zt(
+      (e.isPositiveInteger = Vt));
+    function Vt(
       e,
       {
         instancePath: t = '',
@@ -16529,14 +16681,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = zt.evaluated;
+      let o = Vt.evaluated;
       if (
         (o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e != 'number' || e % 1 || isNaN(e) || !isFinite(e))
       )
         return (
-          (zt.errors = [
+          (Vt.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -16550,7 +16702,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       if (typeof e == 'number' && isFinite(e)) {
         if (e > 9007199254740991 || isNaN(e))
           return (
-            (zt.errors = [
+            (Vt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/maximum',
@@ -16566,7 +16718,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (e < 1 || isNaN(e))
           return (
-            (zt.errors = [
+            (Vt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/minimum',
@@ -16581,14 +16733,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((zt.errors = null), !0);
+      return ((Vt.errors = null), !0);
     }
-    ((zt.evaluated = {
+    ((Vt.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isProfile = Bt));
-    function Bt(
+      (e.isProfile = Ht));
+    function Ht(
       e,
       {
         instancePath: t = '',
@@ -16600,7 +16752,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Bt.evaluated;
+        c = Ht.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -16611,7 +16763,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.purpose === void 0 && (n = 'purpose'))
           )
             return (
-              (Bt.errors = [
+              (Ht.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -16632,7 +16784,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'purpose'
               )
                 return (
-                  (Bt.errors = [
+                  (Ht.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -16683,7 +16835,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     params: {},
                     message: 'must match a schema in anyOf',
                   };
-                  return (o === null ? (o = [e]) : o.push(e), s++, (Bt.errors = o), !1);
+                  return (o === null ? (o = [e]) : o.push(e), s++, (Ht.errors = o), !1);
                 }
                 var u = r === s;
               } else var u = !0;
@@ -16727,7 +16879,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), s++, (Bt.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), s++, (Ht.errors = o), !1);
                   }
                   var u = r === s;
                 } else var u = !0;
@@ -16771,7 +16923,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), s++, (Bt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), s++, (Ht.errors = o), !1);
                     }
                     var u = r === s;
                   } else var u = !0;
@@ -16816,7 +16968,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), s++, (Bt.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), s++, (Ht.errors = o), !1);
                       }
                       var u = r === s;
                     } else var u = !0;
@@ -16827,7 +16979,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Bt.errors = [
+            (Ht.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -16839,15 +16991,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Bt.errors = o), s === 0);
+      return ((Ht.errors = o), s === 0);
     }
-    ((Bt.evaluated = {
+    ((Ht.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isProfileField = Vt));
-    function Vt(
+      (e.isProfileField = Ut));
+    function Ut(
       e,
       {
         instancePath: t = '',
@@ -16857,13 +17009,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = Vt.evaluated;
+      let o = Ut.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'job_title' && e !== 'organization_unit' && e !== 'reports_to' && e !== 'purpose'
-            ? ((Vt.errors = [
+            ? ((Ut.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
@@ -16873,8 +17025,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 },
               ]),
               !1)
-            : ((Vt.errors = null), !0)
-          : ((Vt.errors = [
+            : ((Ut.errors = null), !0)
+          : ((Ut.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -16886,12 +17038,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((Vt.evaluated = {
+    ((Ut.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isPublicCommentary = Ht));
-    function Ht(
+      (e.isPublicCommentary = Wt));
+    function Wt(
       e,
       {
         instancePath: t = '',
@@ -16903,7 +17055,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Ht.evaluated;
+        c = Wt.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -16913,7 +17065,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.text === void 0 && (n = 'text'))
           )
             return (
-              (Ht.errors = [
+              (Wt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -16929,7 +17081,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'response_id' && n !== 'message_id' && n !== 'text')
                 return (
-                  (Ht.errors = [
+                  (Wt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -16982,7 +17134,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ht.errors = [
+            (Wt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -16994,15 +17146,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ht.errors = o), s === 0);
+      return ((Wt.errors = o), s === 0);
     }
-    ((Ht.evaluated = {
+    ((Wt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isPublishedMemory = Ut));
-    function Ut(
+      (e.isPublishedMemory = Gt));
+    function Gt(
       e,
       {
         instancePath: t = '',
@@ -17014,7 +17166,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Ut.evaluated;
+        l = Gt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17025,7 +17177,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.work_understandings === void 0 && (n = 'work_understandings'))
           )
             return (
-              (Ut.errors = [
+              (Gt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17046,7 +17198,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'work_understandings'
               )
                 return (
-                  (Ut.errors = [
+                  (Gt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17094,20 +17246,20 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     params: {},
                     message: 'must match a schema in anyOf',
                   };
-                  return (o === null ? (o = [e]) : o.push(e), c++, (Ut.errors = o), !1);
+                  return (o === null ? (o = [e]) : o.push(e), c++, (Gt.errors = o), !1);
                 }
                 var d = r === c;
               } else var d = !0;
               if (d) {
                 if (e.covered_through_sequence !== void 0) {
                   let n = c;
-                  $(e.covered_through_sequence, {
+                  Q(e.covered_through_sequence, {
                     instancePath: t + '/covered_through_sequence',
                     parentData: e,
                     parentDataProperty: 'covered_through_sequence',
                     rootData: i,
                     dynamicAnchors: a,
-                  }) || ((o = o === null ? $.errors : o.concat($.errors)), (c = o.length));
+                  }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (c = o.length));
                   var d = n === c;
                 } else var d = !0;
                 if (d) {
@@ -17120,21 +17272,21 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         for (let r = 0; r < e; r++) {
                           let e = c;
                           if (
-                            (Ft(n[r], {
+                            (It(n[r], {
                               instancePath: t + '/work_situations/' + r,
                               parentData: n,
                               parentDataProperty: r,
                               rootData: i,
                               dynamicAnchors: a,
                             }) ||
-                              ((o = o === null ? Ft.errors : o.concat(Ft.errors)), (c = o.length)),
+                              ((o = o === null ? It.errors : o.concat(It.errors)), (c = o.length)),
                             e !== c)
                           )
                             break;
                         }
                       } else
                         return (
-                          (Ut.errors = [
+                          (Gt.errors = [
                             {
                               instancePath: t + '/work_situations',
                               schemaPath: '#/properties/work_situations/type',
@@ -17158,14 +17310,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           for (let r = 0; r < e; r++) {
                             let e = c;
                             if (
-                              (Ft(n[r], {
+                              (It(n[r], {
                                 instancePath: t + '/work_understandings/' + r,
                                 parentData: n,
                                 parentDataProperty: r,
                                 rootData: i,
                                 dynamicAnchors: a,
                               }) ||
-                                ((o = o === null ? Ft.errors : o.concat(Ft.errors)),
+                                ((o = o === null ? It.errors : o.concat(It.errors)),
                                 (c = o.length)),
                               e !== c)
                             )
@@ -17173,7 +17325,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           }
                         } else
                           return (
-                            (Ut.errors = [
+                            (Gt.errors = [
                               {
                                 instancePath: t + '/work_understandings',
                                 schemaPath: '#/properties/work_understandings/type',
@@ -17194,7 +17346,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Ut.errors = [
+            (Gt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17206,15 +17358,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Ut.errors = o), c === 0);
+      return ((Gt.errors = o), c === 0);
     }
-    ((Ut.evaluated = {
+    ((Gt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isPublishedMemoryObject = Wt));
-    function Wt(
+      (e.isPublishedMemoryObject = Kt));
+    function Kt(
       e,
       {
         instancePath: t = '',
@@ -17226,7 +17378,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Wt.evaluated;
+        l = Kt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17239,7 +17391,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.body === void 0 && (n = 'body'))
           )
             return (
-              (Wt.errors = [
+              (Kt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17262,7 +17414,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'body'
               )
                 return (
-                  (Wt.errors = [
+                  (Kt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17300,13 +17452,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 if (u) {
                   if (e.layer !== void 0) {
                     let n = c;
-                    Pt(e.layer, {
+                    Ft(e.layer, {
                       instancePath: t + '/layer',
                       parentData: e,
                       parentDataProperty: 'layer',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? Pt.errors : o.concat(Pt.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ft.errors : o.concat(Ft.errors)), (c = o.length));
                     var u = n === c;
                   } else var u = !0;
                   if (u) {
@@ -17314,7 +17466,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = c;
                       if (typeof e.title != 'string')
                         return (
-                          (Wt.errors = [
+                          (Kt.errors = [
                             {
                               instancePath: t + '/title',
                               schemaPath: '#/properties/title/type',
@@ -17332,7 +17484,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         let n = c;
                         if (typeof e.description != 'string')
                           return (
-                            (Wt.errors = [
+                            (Kt.errors = [
                               {
                                 instancePath: t + '/description',
                                 schemaPath: '#/properties/description/type',
@@ -17350,7 +17502,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           let n = c;
                           if (typeof e.body != 'string')
                             return (
-                              (Wt.errors = [
+                              (Kt.errors = [
                                 {
                                   instancePath: t + '/body',
                                   schemaPath: '#/properties/body/type',
@@ -17372,7 +17524,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Wt.errors = [
+            (Kt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17384,15 +17536,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Wt.errors = o), c === 0);
+      return ((Kt.errors = o), c === 0);
     }
-    ((Wt.evaluated = {
+    ((Kt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReasoningSummary = Gt));
-    function Gt(
+      (e.isReasoningSummary = qt));
+    function qt(
       e,
       {
         instancePath: t = '',
@@ -17404,7 +17556,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Gt.evaluated;
+        c = qt.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17416,7 +17568,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.text === void 0 && (n = 'text'))
           )
             return (
-              (Gt.errors = [
+              (qt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17438,7 +17590,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'text'
               )
                 return (
-                  (Gt.errors = [
+                  (qt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17476,25 +17628,25 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 if (l) {
                   if (e.output_index !== void 0) {
                     let n = s;
-                    $(e.output_index, {
+                    Q(e.output_index, {
                       instancePath: t + '/output_index',
                       parentData: e,
                       parentDataProperty: 'output_index',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length));
+                    }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length));
                     var l = n === s;
                   } else var l = !0;
                   if (l) {
                     if (e.summary_index !== void 0) {
                       let n = s;
-                      $(e.summary_index, {
+                      Q(e.summary_index, {
                         instancePath: t + '/summary_index',
                         parentData: e,
                         parentDataProperty: 'summary_index',
                         rootData: i,
                         dynamicAnchors: a,
-                      }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length));
+                      }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length));
                       var l = n === s;
                     } else var l = !0;
                     if (l) {
@@ -17517,7 +17669,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Gt.errors = [
+            (qt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17529,15 +17681,93 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Gt.errors = o), s === 0);
+      return ((qt.errors = o), s === 0);
     }
-    ((Gt.evaluated = {
+    ((qt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReference = Kt));
-    function Kt(
+      (e.isRecordUsageHeartbeatRequest = Jt));
+    function Jt(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = Jt.evaluated;
+      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (e.elapsed_seconds === void 0 && (n = 'elapsed_seconds'))
+            return (
+              (Jt.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = s;
+            for (let n in e)
+              if (n !== 'elapsed_seconds')
+                return (
+                  (Jt.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            n === s &&
+              e.elapsed_seconds !== void 0 &&
+              (rt(e.elapsed_seconds, {
+                instancePath: t + '/elapsed_seconds',
+                parentData: e,
+                parentDataProperty: 'elapsed_seconds',
+                rootData: i,
+                dynamicAnchors: a,
+              }) ||
+                ((o = o === null ? rt.errors : o.concat(rt.errors)), (s = o.length)));
+          }
+        } else
+          return (
+            (Jt.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Jt.errors = o), s === 0);
+    }
+    ((Jt.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isReference = Yt));
+    function Yt(
       e,
       {
         instancePath: t = '',
@@ -17549,7 +17779,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Kt.evaluated;
+        l = Yt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17564,7 +17794,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.source_changed === void 0 && (n = 'source_changed'))
           )
             return (
-              (Kt.errors = [
+              (Yt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17589,7 +17819,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'source_changed'
               )
                 return (
-                  (Kt.errors = [
+                  (Yt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17617,7 +17847,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   let n = c;
                   if (typeof e.target_label != 'string')
                     return (
-                      (Kt.errors = [
+                      (Yt.errors = [
                         {
                           instancePath: t + '/target_label',
                           schemaPath: '#/properties/target_label/type',
@@ -17633,13 +17863,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 if (u) {
                   if (e.target !== void 0) {
                     let n = c;
-                    Dt(e.target, {
+                    Ot(e.target, {
                       instancePath: t + '/target',
                       parentData: e,
                       parentDataProperty: 'target',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? Dt.errors : o.concat(Dt.errors)), (c = o.length));
+                    }) || ((o = o === null ? Ot.errors : o.concat(Ot.errors)), (c = o.length));
                     var u = n === c;
                   } else var u = !0;
                   if (u) {
@@ -17648,7 +17878,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         r = c;
                       if (typeof n != 'string')
                         return (
-                          (Kt.errors = [
+                          (Yt.errors = [
                             {
                               instancePath: t + '/source_kind',
                               schemaPath: '#/properties/source_kind/type',
@@ -17661,12 +17891,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         );
                       if (n !== 'interview' && n !== 'work_situation' && n !== 'work_understanding')
                         return (
-                          (Kt.errors = [
+                          (Yt.errors = [
                             {
                               instancePath: t + '/source_kind',
                               schemaPath: '#/properties/source_kind/enum',
                               keyword: 'enum',
-                              params: { allowedValues: wt.properties.source_kind.enum },
+                              params: { allowedValues: Tt.properties.source_kind.enum },
                               message: 'must be equal to one of the allowed values',
                             },
                           ]),
@@ -17679,7 +17909,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         let n = c;
                         if (typeof e.source_label != 'string')
                           return (
-                            (Kt.errors = [
+                            (Yt.errors = [
                               {
                                 instancePath: t + '/source_label',
                                 schemaPath: '#/properties/source_label/type',
@@ -17697,7 +17927,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           let n = c;
                           if (typeof e.needs_recheck != 'boolean')
                             return (
-                              (Kt.errors = [
+                              (Yt.errors = [
                                 {
                                   instancePath: t + '/needs_recheck',
                                   schemaPath: '#/properties/needs_recheck/type',
@@ -17715,7 +17945,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             let n = c;
                             if (typeof e.jd_changed != 'boolean')
                               return (
-                                (Kt.errors = [
+                                (Yt.errors = [
                                   {
                                     instancePath: t + '/jd_changed',
                                     schemaPath: '#/properties/jd_changed/type',
@@ -17733,7 +17963,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               let n = c;
                               if (typeof e.source_changed != 'boolean')
                                 return (
-                                  (Kt.errors = [
+                                  (Yt.errors = [
                                     {
                                       instancePath: t + '/source_changed',
                                       schemaPath: '#/properties/source_changed/type',
@@ -17757,7 +17987,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Kt.errors = [
+            (Yt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17769,15 +17999,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Kt.errors = o), c === 0);
+      return ((Yt.errors = o), c === 0);
     }
-    ((Kt.evaluated = {
+    ((Yt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isRemoveDetail = qt));
-    function qt(
+      (e.isRemoveDetail = Xt));
+    function Xt(
       e,
       {
         instancePath: t = '',
@@ -17789,7 +18019,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = qt.evaluated;
+        l = Xt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17798,7 +18028,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.detail_id === void 0 && (n = 'detail_id'))
           )
             return (
-              (qt.errors = [
+              (Xt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17814,7 +18044,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'detail_id')
                 return (
-                  (qt.errors = [
+                  (Xt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17831,7 +18061,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (qt.errors = [
+                    (Xt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -17844,7 +18074,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'remove_detail')
                   return (
-                    (qt.errors = [
+                    (Xt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -17874,7 +18104,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (qt.errors = [
+            (Xt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17886,15 +18116,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((qt.errors = o), c === 0);
+      return ((Xt.errors = o), c === 0);
     }
-    ((qt.evaluated = {
+    ((Xt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isRenameJobFileRequest = Jt));
-    function Jt(
+      (e.isRenameJobFileRequest = Zt));
+    function Zt(
       e,
       {
         instancePath: t = '',
@@ -17906,7 +18136,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Jt.evaluated;
+        l = Zt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -17916,7 +18146,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.display_name === void 0 && (n = 'display_name'))
           )
             return (
-              (Jt.errors = [
+              (Zt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -17932,7 +18162,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'expected_name_revision' && n !== 'display_name')
                 return (
-                  (Jt.errors = [
+                  (Zt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -17970,13 +18200,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 if (u) {
                   if (e.display_name !== void 0) {
                     let n = c;
-                    L(e.display_name, {
+                    I(e.display_name, {
                       instancePath: t + '/display_name',
                       parentData: e,
                       parentDataProperty: 'display_name',
                       rootData: i,
                       dynamicAnchors: a,
-                    }) || ((o = o === null ? L.errors : o.concat(L.errors)), (c = o.length));
+                    }) || ((o = o === null ? I.errors : o.concat(I.errors)), (c = o.length));
                     var u = n === c;
                   } else var u = !0;
                 }
@@ -17985,7 +18215,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Jt.errors = [
+            (Zt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -17997,15 +18227,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Jt.errors = o), c === 0);
+      return ((Zt.errors = o), c === 0);
     }
-    ((Jt.evaluated = {
+    ((Zt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderArea = Yt));
-    function Yt(
+      (e.isReorderArea = Qt));
+    function Qt(
       e,
       {
         instancePath: t = '',
@@ -18017,7 +18247,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Yt.evaluated;
+        l = Qt.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18027,7 +18257,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_area_id === void 0 && (n = 'before_area_id'))
           )
             return (
-              (Yt.errors = [
+              (Qt.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18043,7 +18273,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'area_id' && n !== 'before_area_id')
                 return (
-                  (Yt.errors = [
+                  (Qt.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18060,7 +18290,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Yt.errors = [
+                    (Qt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18073,7 +18303,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_area')
                   return (
-                    (Yt.errors = [
+                    (Qt.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18135,7 +18365,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Yt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Qt.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -18145,7 +18375,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Yt.errors = [
+            (Qt.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18157,15 +18387,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Yt.errors = o), c === 0);
+      return ((Qt.errors = o), c === 0);
     }
-    ((Yt.evaluated = {
+    ((Qt.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderCapability = Xt));
-    function Xt(
+      (e.isReorderCapability = $t));
+    function $t(
       e,
       {
         instancePath: t = '',
@@ -18177,7 +18407,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Xt.evaluated;
+        l = $t.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18187,7 +18417,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_capability_id === void 0 && (n = 'before_capability_id'))
           )
             return (
-              (Xt.errors = [
+              ($t.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18203,7 +18433,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'capability_id' && n !== 'before_capability_id')
                 return (
-                  (Xt.errors = [
+                  ($t.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18220,7 +18450,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Xt.errors = [
+                    ($t.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18233,7 +18463,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_capability')
                   return (
-                    (Xt.errors = [
+                    ($t.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18295,7 +18525,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Xt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, ($t.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -18305,7 +18535,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Xt.errors = [
+            ($t.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18317,15 +18547,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Xt.errors = o), c === 0);
+      return (($t.errors = o), c === 0);
     }
-    ((Xt.evaluated = {
+    (($t.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderCollaborator = Zt));
-    function Zt(
+      (e.isReorderCollaborator = en));
+    function en(
       e,
       {
         instancePath: t = '',
@@ -18337,7 +18567,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Zt.evaluated;
+        l = en.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18347,7 +18577,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_collaborator_id === void 0 && (n = 'before_collaborator_id'))
           )
             return (
-              (Zt.errors = [
+              (en.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18363,7 +18593,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'collaborator_id' && n !== 'before_collaborator_id')
                 return (
-                  (Zt.errors = [
+                  (en.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18380,7 +18610,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Zt.errors = [
+                    (en.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18393,7 +18623,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_collaborator')
                   return (
-                    (Zt.errors = [
+                    (en.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18455,7 +18685,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Zt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (en.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -18465,7 +18695,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Zt.errors = [
+            (en.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18477,15 +18707,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Zt.errors = o), c === 0);
+      return ((en.errors = o), c === 0);
     }
-    ((Zt.evaluated = {
+    ((en.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderCondition = Qt));
-    function Qt(
+      (e.isReorderCondition = tn));
+    function tn(
       e,
       {
         instancePath: t = '',
@@ -18497,7 +18727,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Qt.evaluated;
+        l = tn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18507,7 +18737,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_condition_id === void 0 && (n = 'before_condition_id'))
           )
             return (
-              (Qt.errors = [
+              (tn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18523,7 +18753,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'condition_id' && n !== 'before_condition_id')
                 return (
-                  (Qt.errors = [
+                  (tn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18540,7 +18770,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (Qt.errors = [
+                    (tn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18553,7 +18783,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_condition')
                   return (
-                    (Qt.errors = [
+                    (tn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18615,7 +18845,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Qt.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (tn.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -18625,7 +18855,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Qt.errors = [
+            (tn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18637,15 +18867,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Qt.errors = o), c === 0);
+      return ((tn.errors = o), c === 0);
     }
-    ((Qt.evaluated = {
+    ((tn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderDetail = $t));
-    function $t(
+      (e.isReorderDetail = nn));
+    function nn(
       e,
       {
         instancePath: t = '',
@@ -18657,7 +18887,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = $t.evaluated;
+        l = nn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18668,7 +18898,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_detail_id === void 0 && (n = 'before_detail_id'))
           )
             return (
-              ($t.errors = [
+              (nn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18689,7 +18919,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'before_detail_id'
               )
                 return (
-                  ($t.errors = [
+                  (nn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18706,7 +18936,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    ($t.errors = [
+                    (nn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18719,7 +18949,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_detail')
                   return (
-                    ($t.errors = [
+                    (nn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18794,7 +19024,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, ($t.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (nn.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -18805,7 +19035,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            ($t.errors = [
+            (nn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18817,15 +19047,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return (($t.errors = o), c === 0);
+      return ((nn.errors = o), c === 0);
     }
-    (($t.evaluated = {
+    ((nn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReorderTaskCapability = en));
-    function en(
+      (e.isReorderTaskCapability = rn));
+    function rn(
       e,
       {
         instancePath: t = '',
@@ -18837,7 +19067,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = en.evaluated;
+        l = rn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -18848,7 +19078,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.before_capability_id === void 0 && (n = 'before_capability_id'))
           )
             return (
-              (en.errors = [
+              (rn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -18869,7 +19099,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'before_capability_id'
               )
                 return (
-                  (en.errors = [
+                  (rn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -18886,7 +19116,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (en.errors = [
+                    (rn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -18899,7 +19129,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'reorder_task_capability')
                   return (
-                    (en.errors = [
+                    (rn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -18974,7 +19204,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (en.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (rn.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -18985,7 +19215,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (en.errors = [
+            (rn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -18997,15 +19227,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((en.errors = o), c === 0);
+      return ((rn.errors = o), c === 0);
     }
-    ((en.evaluated = {
+    ((rn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReviseArea = tn));
-    function tn(
+      (e.isReviseArea = an));
+    function an(
       e,
       {
         instancePath: t = '',
@@ -19017,7 +19247,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = tn.evaluated;
+        l = an.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -19027,7 +19257,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
-              (tn.errors = [
+              (an.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -19043,7 +19273,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'area_id' && n !== 'changes')
                 return (
-                  (tn.errors = [
+                  (an.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -19060,7 +19290,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (tn.errors = [
+                    (an.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -19073,7 +19303,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'revise_area')
                   return (
-                    (tn.errors = [
+                    (an.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -19106,7 +19336,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length > 2)
                           return (
-                            (tn.errors = [
+                            (an.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/maxItems',
@@ -19119,7 +19349,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           );
                         if (n.length < 1)
                           return (
-                            (tn.errors = [
+                            (an.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -19146,597 +19376,6 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               e !== c)
                             )
                               break;
-                          }
-                        }
-                      } else
-                        return (
-                          (tn.errors = [
-                            {
-                              instancePath: t + '/changes',
-                              schemaPath: '#/properties/changes/type',
-                              keyword: 'type',
-                              params: { type: 'array' },
-                              message: 'must be array',
-                            },
-                          ]),
-                          !1
-                        );
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (tn.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((tn.errors = o), c === 0);
-    }
-    ((tn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isReviseCapability = nn));
-    function nn(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = nn.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.capability_id === void 0 && (n = 'capability_id')) ||
-            (e.changes === void 0 && (n = 'changes'))
-          )
-            return (
-              (nn.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'capability_id' && n !== 'changes')
-                return (
-                  (nn.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (nn.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'revise_capability')
-                  return (
-                    (nn.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'revise_capability' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.capability_id !== void 0) {
-                  let n = c;
-                  s(e.capability_id, {
-                    instancePath: t + '/capability_id',
-                    parentData: e,
-                    parentDataProperty: 'capability_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.changes !== void 0) {
-                    let n = e.changes,
-                      r = c;
-                    if (c === r) {
-                      if (Array.isArray(n)) {
-                        if (n.length > 2)
-                          return (
-                            (nn.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/maxItems',
-                                keyword: 'maxItems',
-                                params: { limit: 2 },
-                                message: 'must NOT have more than 2 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        if (n.length < 1)
-                          return (
-                            (nn.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/minItems',
-                                keyword: 'minItems',
-                                params: { limit: 1 },
-                                message: 'must NOT have fewer than 1 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        {
-                          let e = n.length;
-                          for (let r = 0; r < e; r++) {
-                            let e = c;
-                            if (
-                              (ze(n[r], {
-                                instancePath: t + '/changes/' + r,
-                                parentData: n,
-                                parentDataProperty: r,
-                                rootData: i,
-                                dynamicAnchors: a,
-                              }) ||
-                                ((o = o === null ? ze.errors : o.concat(ze.errors)),
-                                (c = o.length)),
-                              e !== c)
-                            )
-                              break;
-                          }
-                        }
-                      } else
-                        return (
-                          (nn.errors = [
-                            {
-                              instancePath: t + '/changes',
-                              schemaPath: '#/properties/changes/type',
-                              keyword: 'type',
-                              params: { type: 'array' },
-                              message: 'must be array',
-                            },
-                          ]),
-                          !1
-                        );
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (nn.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((nn.errors = o), c === 0);
-    }
-    ((nn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isReviseCollaborator = rn));
-    function rn(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = rn.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
-            (e.changes === void 0 && (n = 'changes'))
-          )
-            return (
-              (rn.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'collaborator_id' && n !== 'changes')
-                return (
-                  (rn.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (rn.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'revise_collaborator')
-                  return (
-                    (rn.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'revise_collaborator' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.collaborator_id !== void 0) {
-                  let n = c;
-                  s(e.collaborator_id, {
-                    instancePath: t + '/collaborator_id',
-                    parentData: e,
-                    parentDataProperty: 'collaborator_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.changes !== void 0) {
-                    let n = e.changes,
-                      r = c;
-                    if (c === r) {
-                      if (Array.isArray(n)) {
-                        if (n.length > 2)
-                          return (
-                            (rn.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/maxItems',
-                                keyword: 'maxItems',
-                                params: { limit: 2 },
-                                message: 'must NOT have more than 2 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        if (n.length < 1)
-                          return (
-                            (rn.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/minItems',
-                                keyword: 'minItems',
-                                params: { limit: 1 },
-                                message: 'must NOT have fewer than 1 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        {
-                          let e = n.length;
-                          for (let r = 0; r < e; r++) {
-                            let e = c;
-                            if (
-                              (he(n[r], {
-                                instancePath: t + '/changes/' + r,
-                                parentData: n,
-                                parentDataProperty: r,
-                                rootData: i,
-                                dynamicAnchors: a,
-                              }) ||
-                                ((o = o === null ? he.errors : o.concat(he.errors)),
-                                (c = o.length)),
-                              e !== c)
-                            )
-                              break;
-                          }
-                        }
-                      } else
-                        return (
-                          (rn.errors = [
-                            {
-                              instancePath: t + '/changes',
-                              schemaPath: '#/properties/changes/type',
-                              keyword: 'type',
-                              params: { type: 'array' },
-                              message: 'must be array',
-                            },
-                          ]),
-                          !1
-                        );
-                    }
-                    var u = r === c;
-                  } else var u = !0;
-                }
-              }
-            }
-          }
-        } else
-          return (
-            (rn.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'object' },
-                message: 'must be object',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((rn.errors = o), c === 0);
-    }
-    ((rn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.isReviseCondition = an));
-    function an(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        c = 0,
-        l = an.evaluated;
-      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
-        if (e && typeof e == 'object' && !Array.isArray(e)) {
-          let n;
-          if (
-            (e.action === void 0 && (n = 'action')) ||
-            (e.condition_id === void 0 && (n = 'condition_id')) ||
-            (e.changes === void 0 && (n = 'changes'))
-          )
-            return (
-              (an.errors = [
-                {
-                  instancePath: t,
-                  schemaPath: '#/required',
-                  keyword: 'required',
-                  params: { missingProperty: n },
-                  message: "must have required property '" + n + "'",
-                },
-              ]),
-              !1
-            );
-          {
-            let n = c;
-            for (let n in e)
-              if (n !== 'action' && n !== 'condition_id' && n !== 'changes')
-                return (
-                  (an.errors = [
-                    {
-                      instancePath: t,
-                      schemaPath: '#/additionalProperties',
-                      keyword: 'additionalProperties',
-                      params: { additionalProperty: n },
-                      message: 'must NOT have additional properties',
-                    },
-                  ]),
-                  !1
-                );
-            if (n === c) {
-              if (e.action !== void 0) {
-                let n = e.action,
-                  r = c;
-                if (typeof n != 'string')
-                  return (
-                    (an.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/type',
-                        keyword: 'type',
-                        params: { type: 'string' },
-                        message: 'must be string',
-                      },
-                    ]),
-                    !1
-                  );
-                if (n !== 'revise_condition')
-                  return (
-                    (an.errors = [
-                      {
-                        instancePath: t + '/action',
-                        schemaPath: '#/properties/action/const',
-                        keyword: 'const',
-                        params: { allowedValue: 'revise_condition' },
-                        message: 'must be equal to constant',
-                      },
-                    ]),
-                    !1
-                  );
-                var u = r === c;
-              } else var u = !0;
-              if (u) {
-                if (e.condition_id !== void 0) {
-                  let n = c;
-                  s(e.condition_id, {
-                    instancePath: t + '/condition_id',
-                    parentData: e,
-                    parentDataProperty: 'condition_id',
-                    rootData: i,
-                    dynamicAnchors: a,
-                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                  var u = n === c;
-                } else var u = !0;
-                if (u) {
-                  if (e.changes !== void 0) {
-                    let n = e.changes,
-                      r = c;
-                    if (c === r) {
-                      if (Array.isArray(n)) {
-                        if (n.length > 2)
-                          return (
-                            (an.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/maxItems',
-                                keyword: 'maxItems',
-                                params: { limit: 2 },
-                                message: 'must NOT have more than 2 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        if (n.length < 1)
-                          return (
-                            (an.errors = [
-                              {
-                                instancePath: t + '/changes',
-                                schemaPath: '#/properties/changes/minItems',
-                                keyword: 'minItems',
-                                params: { limit: 1 },
-                                message: 'must NOT have fewer than 1 items',
-                              },
-                            ]),
-                            !1
-                          );
-                        {
-                          let e = n.length;
-                          for (let r = 0; r < e; r++) {
-                            let e = n[r],
-                              s = c,
-                              l = c,
-                              u = !1,
-                              p = null,
-                              m = c;
-                            j(e, {
-                              instancePath: t + '/changes/' + r,
-                              parentData: n,
-                              parentDataProperty: r,
-                              rootData: i,
-                              dynamicAnchors: a,
-                            }) ||
-                              ((o = o === null ? j.errors : o.concat(j.errors)), (c = o.length));
-                            var d = m === c;
-                            if (d) {
-                              ((u = !0), (p = 0));
-                              var f = !0;
-                            }
-                            let h = c;
-                            A(e, {
-                              instancePath: t + '/changes/' + r,
-                              parentData: n,
-                              parentDataProperty: r,
-                              rootData: i,
-                              dynamicAnchors: a,
-                            }) ||
-                              ((o = o === null ? A.errors : o.concat(A.errors)), (c = o.length));
-                            var d = h === c;
-                            if (
-                              (d && u
-                                ? ((u = !1), (p = [p, 1]))
-                                : d && ((u = !0), (p = 1), f !== !0 && (f = !0)),
-                              u)
-                            )
-                              ((c = l), o !== null && (l ? (o.length = l) : (o = null)));
-                            else {
-                              let e = {
-                                instancePath: t + '/changes/' + r,
-                                schemaPath: '#/properties/changes/items/oneOf',
-                                keyword: 'oneOf',
-                                params: { passingSchemas: p },
-                                message: 'must match exactly one schema in oneOf',
-                              };
-                              return (o === null ? (o = [e]) : o.push(e), c++, (an.errors = o), !1);
-                            }
-                            if (s !== c) break;
                           }
                         }
                       } else
@@ -19780,7 +19419,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReviseDetail = on));
+      (e.isReviseCapability = on));
     function on(
       e,
       {
@@ -19799,8 +19438,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.detail_id === void 0 && (n = 'detail_id')) ||
-            (e.text === void 0 && (n = 'text'))
+            (e.capability_id === void 0 && (n = 'capability_id')) ||
+            (e.changes === void 0 && (n = 'changes'))
           )
             return (
               (on.errors = [
@@ -19817,7 +19456,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'detail_id' && n !== 'text')
+              if (n !== 'action' && n !== 'capability_id' && n !== 'changes')
                 return (
                   (on.errors = [
                     {
@@ -19847,14 +19486,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'revise_detail')
+                if (n !== 'revise_capability')
                   return (
                     (on.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'revise_detail' },
+                        params: { allowedValue: 'revise_capability' },
                         message: 'must be equal to constant',
                       },
                     ]),
@@ -19863,28 +19502,83 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.detail_id !== void 0) {
+                if (e.capability_id !== void 0) {
                   let n = c;
-                  s(e.detail_id, {
-                    instancePath: t + '/detail_id',
+                  s(e.capability_id, {
+                    instancePath: t + '/capability_id',
                     parentData: e,
-                    parentDataProperty: 'detail_id',
+                    parentDataProperty: 'capability_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
                   var u = n === c;
                 } else var u = !0;
                 if (u) {
-                  if (e.text !== void 0) {
-                    let n = c;
-                    f(e.text, {
-                      instancePath: t + '/text',
-                      parentData: e,
-                      parentDataProperty: 'text',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? f.errors : o.concat(f.errors)), (c = o.length));
-                    var u = n === c;
+                  if (e.changes !== void 0) {
+                    let n = e.changes,
+                      r = c;
+                    if (c === r) {
+                      if (Array.isArray(n)) {
+                        if (n.length > 2)
+                          return (
+                            (on.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/maxItems',
+                                keyword: 'maxItems',
+                                params: { limit: 2 },
+                                message: 'must NOT have more than 2 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        if (n.length < 1)
+                          return (
+                            (on.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/minItems',
+                                keyword: 'minItems',
+                                params: { limit: 1 },
+                                message: 'must NOT have fewer than 1 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        {
+                          let e = n.length;
+                          for (let r = 0; r < e; r++) {
+                            let e = c;
+                            if (
+                              (Be(n[r], {
+                                instancePath: t + '/changes/' + r,
+                                parentData: n,
+                                parentDataProperty: r,
+                                rootData: i,
+                                dynamicAnchors: a,
+                              }) ||
+                                ((o = o === null ? Be.errors : o.concat(Be.errors)),
+                                (c = o.length)),
+                              e !== c)
+                            )
+                              break;
+                          }
+                        }
+                      } else
+                        return (
+                          (on.errors = [
+                            {
+                              instancePath: t + '/changes',
+                              schemaPath: '#/properties/changes/type',
+                              keyword: 'type',
+                              params: { type: 'array' },
+                              message: 'must be array',
+                            },
+                          ]),
+                          !1
+                        );
+                    }
+                    var u = r === c;
                   } else var u = !0;
                 }
               }
@@ -19911,7 +19605,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReviseJdProfileRequest = cn));
+      (e.isReviseCollaborator = sn));
     function sn(
       e,
       {
@@ -19923,15 +19617,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       } = {},
     ) {
       let o = null,
-        s = 0,
-        c = sn.evaluated;
-      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        c = 0,
+        l = sn.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.field === void 0 && (n = 'field')) ||
-            (e.value === void 0 && (n = 'value'))
+            (e.collaborator_id === void 0 && (n = 'collaborator_id')) ||
+            (e.changes === void 0 && (n = 'changes'))
           )
             return (
               (sn.errors = [
@@ -19946,9 +19640,9 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
               !1
             );
           {
-            let n = s;
+            let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'field' && n !== 'value')
+              if (n !== 'action' && n !== 'collaborator_id' && n !== 'changes')
                 return (
                   (sn.errors = [
                     {
@@ -19961,10 +19655,10 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   ]),
                   !1
                 );
-            if (n === s) {
+            if (n === c) {
               if (e.action !== void 0) {
                 let n = e.action,
-                  r = s;
+                  r = c;
                 if (typeof n != 'string')
                   return (
                     (sn.errors = [
@@ -19978,45 +19672,100 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'set_field')
+                if (n !== 'revise_collaborator')
                   return (
                     (sn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
                         keyword: 'const',
-                        params: { allowedValue: 'set_field' },
+                        params: { allowedValue: 'revise_collaborator' },
                         message: 'must be equal to constant',
                       },
                     ]),
                     !1
                   );
-                var l = r === s;
-              } else var l = !0;
-              if (l) {
-                if (e.field !== void 0) {
-                  let n = s;
-                  k(e.field, {
-                    instancePath: t + '/field',
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.collaborator_id !== void 0) {
+                  let n = c;
+                  s(e.collaborator_id, {
+                    instancePath: t + '/collaborator_id',
                     parentData: e,
-                    parentDataProperty: 'field',
+                    parentDataProperty: 'collaborator_id',
                     rootData: i,
                     dynamicAnchors: a,
-                  }) || ((o = o === null ? k.errors : o.concat(k.errors)), (s = o.length));
-                  var l = n === s;
-                } else var l = !0;
-                if (l) {
-                  if (e.value !== void 0) {
-                    let n = s;
-                    f(e.value, {
-                      instancePath: t + '/value',
-                      parentData: e,
-                      parentDataProperty: 'value',
-                      rootData: i,
-                      dynamicAnchors: a,
-                    }) || ((o = o === null ? f.errors : o.concat(f.errors)), (s = o.length));
-                    var l = n === s;
-                  } else var l = !0;
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.changes !== void 0) {
+                    let n = e.changes,
+                      r = c;
+                    if (c === r) {
+                      if (Array.isArray(n)) {
+                        if (n.length > 2)
+                          return (
+                            (sn.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/maxItems',
+                                keyword: 'maxItems',
+                                params: { limit: 2 },
+                                message: 'must NOT have more than 2 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        if (n.length < 1)
+                          return (
+                            (sn.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/minItems',
+                                keyword: 'minItems',
+                                params: { limit: 1 },
+                                message: 'must NOT have fewer than 1 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        {
+                          let e = n.length;
+                          for (let r = 0; r < e; r++) {
+                            let e = c;
+                            if (
+                              (he(n[r], {
+                                instancePath: t + '/changes/' + r,
+                                parentData: n,
+                                parentDataProperty: r,
+                                rootData: i,
+                                dynamicAnchors: a,
+                              }) ||
+                                ((o = o === null ? he.errors : o.concat(he.errors)),
+                                (c = o.length)),
+                              e !== c)
+                            )
+                              break;
+                          }
+                        }
+                      } else
+                        return (
+                          (sn.errors = [
+                            {
+                              instancePath: t + '/changes',
+                              schemaPath: '#/properties/changes/type',
+                              keyword: 'type',
+                              params: { type: 'array' },
+                              message: 'must be array',
+                            },
+                          ]),
+                          !1
+                        );
+                    }
+                    var u = r === c;
+                  } else var u = !0;
                 }
               }
             }
@@ -20035,13 +19784,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((sn.errors = o), s === 0);
+      return ((sn.errors = o), c === 0);
     }
-    sn.evaluated = {
+    ((sn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
-    };
+    }),
+      (e.isReviseCondition = cn));
     function cn(
       e,
       {
@@ -20059,8 +19809,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
           if (
-            (e.command_id === void 0 && (n = 'command_id')) ||
-            (e.expected_revision_id === void 0 && (n = 'expected_revision_id')) ||
+            (e.action === void 0 && (n = 'action')) ||
+            (e.condition_id === void 0 && (n = 'condition_id')) ||
             (e.changes === void 0 && (n = 'changes'))
           )
             return (
@@ -20078,7 +19828,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'changes')
+              if (n !== 'action' && n !== 'condition_id' && n !== 'changes')
                 return (
                   (cn.errors = [
                     {
@@ -20092,24 +19842,44 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   !1
                 );
             if (n === c) {
-              if (e.command_id !== void 0) {
-                let n = c;
-                s(e.command_id, {
-                  instancePath: t + '/command_id',
-                  parentData: e,
-                  parentDataProperty: 'command_id',
-                  rootData: i,
-                  dynamicAnchors: a,
-                }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
-                var u = n === c;
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (cn.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'revise_condition')
+                  return (
+                    (cn.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'revise_condition' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
               } else var u = !0;
               if (u) {
-                if (e.expected_revision_id !== void 0) {
+                if (e.condition_id !== void 0) {
                   let n = c;
-                  s(e.expected_revision_id, {
-                    instancePath: t + '/expected_revision_id',
+                  s(e.condition_id, {
+                    instancePath: t + '/condition_id',
                     parentData: e,
-                    parentDataProperty: 'expected_revision_id',
+                    parentDataProperty: 'condition_id',
                     rootData: i,
                     dynamicAnchors: a,
                   }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
@@ -20121,15 +19891,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       r = c;
                     if (c === r) {
                       if (Array.isArray(n)) {
-                        if (n.length > 4)
+                        if (n.length > 2)
                           return (
                             (cn.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/maxItems',
                                 keyword: 'maxItems',
-                                params: { limit: 4 },
-                                message: 'must NOT have more than 4 items',
+                                params: { limit: 2 },
+                                message: 'must NOT have more than 2 items',
                               },
                             ]),
                             !1
@@ -20156,28 +19926,28 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               u = !1,
                               p = null,
                               m = c;
-                            sn(e, {
+                            j(e, {
                               instancePath: t + '/changes/' + r,
                               parentData: n,
                               parentDataProperty: r,
                               rootData: i,
                               dynamicAnchors: a,
                             }) ||
-                              ((o = o === null ? sn.errors : o.concat(sn.errors)), (c = o.length));
+                              ((o = o === null ? j.errors : o.concat(j.errors)), (c = o.length));
                             var d = m === c;
                             if (d) {
                               ((u = !0), (p = 0));
                               var f = !0;
                             }
                             let h = c;
-                            de(e, {
+                            A(e, {
                               instancePath: t + '/changes/' + r,
                               parentData: n,
                               parentDataProperty: r,
                               rootData: i,
                               dynamicAnchors: a,
                             }) ||
-                              ((o = o === null ? de.errors : o.concat(de.errors)), (c = o.length));
+                              ((o = o === null ? A.errors : o.concat(A.errors)), (c = o.length));
                             var d = h === c;
                             if (
                               (d && u
@@ -20240,7 +20010,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isReviseTask = ln));
+      (e.isReviseDetail = ln));
     function ln(
       e,
       {
@@ -20259,8 +20029,8 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           let n;
           if (
             (e.action === void 0 && (n = 'action')) ||
-            (e.task_id === void 0 && (n = 'task_id')) ||
-            (e.changes === void 0 && (n = 'changes'))
+            (e.detail_id === void 0 && (n = 'detail_id')) ||
+            (e.text === void 0 && (n = 'text'))
           )
             return (
               (ln.errors = [
@@ -20277,7 +20047,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           {
             let n = c;
             for (let n in e)
-              if (n !== 'action' && n !== 'task_id' && n !== 'changes')
+              if (n !== 'action' && n !== 'detail_id' && n !== 'text')
                 return (
                   (ln.errors = [
                     {
@@ -20307,9 +20077,469 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     ]),
                     !1
                   );
-                if (n !== 'revise_task')
+                if (n !== 'revise_detail')
                   return (
                     (ln.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'revise_detail' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var u = r === c;
+              } else var u = !0;
+              if (u) {
+                if (e.detail_id !== void 0) {
+                  let n = c;
+                  s(e.detail_id, {
+                    instancePath: t + '/detail_id',
+                    parentData: e,
+                    parentDataProperty: 'detail_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.text !== void 0) {
+                    let n = c;
+                    f(e.text, {
+                      instancePath: t + '/text',
+                      parentData: e,
+                      parentDataProperty: 'text',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? f.errors : o.concat(f.errors)), (c = o.length));
+                    var u = n === c;
+                  } else var u = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (ln.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((ln.errors = o), c === 0);
+    }
+    ((ln.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isReviseJdProfileRequest = dn));
+    function un(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = un.evaluated;
+      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.field === void 0 && (n = 'field')) ||
+            (e.value === void 0 && (n = 'value'))
+          )
+            return (
+              (un.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = s;
+            for (let n in e)
+              if (n !== 'action' && n !== 'field' && n !== 'value')
+                return (
+                  (un.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === s) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = s;
+                if (typeof n != 'string')
+                  return (
+                    (un.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'set_field')
+                  return (
+                    (un.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/const',
+                        keyword: 'const',
+                        params: { allowedValue: 'set_field' },
+                        message: 'must be equal to constant',
+                      },
+                    ]),
+                    !1
+                  );
+                var l = r === s;
+              } else var l = !0;
+              if (l) {
+                if (e.field !== void 0) {
+                  let n = s;
+                  k(e.field, {
+                    instancePath: t + '/field',
+                    parentData: e,
+                    parentDataProperty: 'field',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? k.errors : o.concat(k.errors)), (s = o.length));
+                  var l = n === s;
+                } else var l = !0;
+                if (l) {
+                  if (e.value !== void 0) {
+                    let n = s;
+                    f(e.value, {
+                      instancePath: t + '/value',
+                      parentData: e,
+                      parentDataProperty: 'value',
+                      rootData: i,
+                      dynamicAnchors: a,
+                    }) || ((o = o === null ? f.errors : o.concat(f.errors)), (s = o.length));
+                    var l = n === s;
+                  } else var l = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (un.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((un.errors = o), s === 0);
+    }
+    un.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    };
+    function dn(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = dn.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.command_id === void 0 && (n = 'command_id')) ||
+            (e.expected_revision_id === void 0 && (n = 'expected_revision_id')) ||
+            (e.changes === void 0 && (n = 'changes'))
+          )
+            return (
+              (dn.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'command_id' && n !== 'expected_revision_id' && n !== 'changes')
+                return (
+                  (dn.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.command_id !== void 0) {
+                let n = c;
+                s(e.command_id, {
+                  instancePath: t + '/command_id',
+                  parentData: e,
+                  parentDataProperty: 'command_id',
+                  rootData: i,
+                  dynamicAnchors: a,
+                }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                var u = n === c;
+              } else var u = !0;
+              if (u) {
+                if (e.expected_revision_id !== void 0) {
+                  let n = c;
+                  s(e.expected_revision_id, {
+                    instancePath: t + '/expected_revision_id',
+                    parentData: e,
+                    parentDataProperty: 'expected_revision_id',
+                    rootData: i,
+                    dynamicAnchors: a,
+                  }) || ((o = o === null ? s.errors : o.concat(s.errors)), (c = o.length));
+                  var u = n === c;
+                } else var u = !0;
+                if (u) {
+                  if (e.changes !== void 0) {
+                    let n = e.changes,
+                      r = c;
+                    if (c === r) {
+                      if (Array.isArray(n)) {
+                        if (n.length > 4)
+                          return (
+                            (dn.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/maxItems',
+                                keyword: 'maxItems',
+                                params: { limit: 4 },
+                                message: 'must NOT have more than 4 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        if (n.length < 1)
+                          return (
+                            (dn.errors = [
+                              {
+                                instancePath: t + '/changes',
+                                schemaPath: '#/properties/changes/minItems',
+                                keyword: 'minItems',
+                                params: { limit: 1 },
+                                message: 'must NOT have fewer than 1 items',
+                              },
+                            ]),
+                            !1
+                          );
+                        {
+                          let e = n.length;
+                          for (let r = 0; r < e; r++) {
+                            let e = n[r],
+                              s = c,
+                              l = c,
+                              u = !1,
+                              p = null,
+                              m = c;
+                            un(e, {
+                              instancePath: t + '/changes/' + r,
+                              parentData: n,
+                              parentDataProperty: r,
+                              rootData: i,
+                              dynamicAnchors: a,
+                            }) ||
+                              ((o = o === null ? un.errors : o.concat(un.errors)), (c = o.length));
+                            var d = m === c;
+                            if (d) {
+                              ((u = !0), (p = 0));
+                              var f = !0;
+                            }
+                            let h = c;
+                            de(e, {
+                              instancePath: t + '/changes/' + r,
+                              parentData: n,
+                              parentDataProperty: r,
+                              rootData: i,
+                              dynamicAnchors: a,
+                            }) ||
+                              ((o = o === null ? de.errors : o.concat(de.errors)), (c = o.length));
+                            var d = h === c;
+                            if (
+                              (d && u
+                                ? ((u = !1), (p = [p, 1]))
+                                : d && ((u = !0), (p = 1), f !== !0 && (f = !0)),
+                              u)
+                            )
+                              ((c = l), o !== null && (l ? (o.length = l) : (o = null)));
+                            else {
+                              let e = {
+                                instancePath: t + '/changes/' + r,
+                                schemaPath: '#/properties/changes/items/oneOf',
+                                keyword: 'oneOf',
+                                params: { passingSchemas: p },
+                                message: 'must match exactly one schema in oneOf',
+                              };
+                              return (o === null ? (o = [e]) : o.push(e), c++, (dn.errors = o), !1);
+                            }
+                            if (s !== c) break;
+                          }
+                        }
+                      } else
+                        return (
+                          (dn.errors = [
+                            {
+                              instancePath: t + '/changes',
+                              schemaPath: '#/properties/changes/type',
+                              keyword: 'type',
+                              params: { type: 'array' },
+                              message: 'must be array',
+                            },
+                          ]),
+                          !1
+                        );
+                    }
+                    var u = r === c;
+                  } else var u = !0;
+                }
+              }
+            }
+          }
+        } else
+          return (
+            (dn.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'object' },
+                message: 'must be object',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((dn.errors = o), c === 0);
+    }
+    ((dn.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.isReviseTask = fn));
+    function fn(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        c = 0,
+        l = fn.evaluated;
+      if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
+        if (e && typeof e == 'object' && !Array.isArray(e)) {
+          let n;
+          if (
+            (e.action === void 0 && (n = 'action')) ||
+            (e.task_id === void 0 && (n = 'task_id')) ||
+            (e.changes === void 0 && (n = 'changes'))
+          )
+            return (
+              (fn.errors = [
+                {
+                  instancePath: t,
+                  schemaPath: '#/required',
+                  keyword: 'required',
+                  params: { missingProperty: n },
+                  message: "must have required property '" + n + "'",
+                },
+              ]),
+              !1
+            );
+          {
+            let n = c;
+            for (let n in e)
+              if (n !== 'action' && n !== 'task_id' && n !== 'changes')
+                return (
+                  (fn.errors = [
+                    {
+                      instancePath: t,
+                      schemaPath: '#/additionalProperties',
+                      keyword: 'additionalProperties',
+                      params: { additionalProperty: n },
+                      message: 'must NOT have additional properties',
+                    },
+                  ]),
+                  !1
+                );
+            if (n === c) {
+              if (e.action !== void 0) {
+                let n = e.action,
+                  r = c;
+                if (typeof n != 'string')
+                  return (
+                    (fn.errors = [
+                      {
+                        instancePath: t + '/action',
+                        schemaPath: '#/properties/action/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ]),
+                    !1
+                  );
+                if (n !== 'revise_task')
+                  return (
+                    (fn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -20342,7 +20572,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       if (Array.isArray(n)) {
                         if (n.length < 1)
                           return (
-                            (ln.errors = [
+                            (fn.errors = [
                               {
                                 instancePath: t + '/changes',
                                 schemaPath: '#/properties/changes/minItems',
@@ -20358,14 +20588,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           for (let r = 0; r < e; r++) {
                             let e = c;
                             if (
-                              (K(n[r], {
+                              (G(n[r], {
                                 instancePath: t + '/changes/' + r,
                                 parentData: n,
                                 parentDataProperty: r,
                                 rootData: i,
                                 dynamicAnchors: a,
                               }) ||
-                                ((o = o === null ? K.errors : o.concat(K.errors)), (c = o.length)),
+                                ((o = o === null ? G.errors : o.concat(G.errors)), (c = o.length)),
                               e !== c)
                             )
                               break;
@@ -20373,7 +20603,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         }
                       } else
                         return (
-                          (ln.errors = [
+                          (fn.errors = [
                             {
                               instancePath: t + '/changes',
                               schemaPath: '#/properties/changes/type',
@@ -20393,7 +20623,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (ln.errors = [
+            (fn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20405,15 +20635,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((ln.errors = o), c === 0);
+      return ((fn.errors = o), c === 0);
     }
-    ((ln.evaluated = {
+    ((fn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isSetTaskCapability = un));
-    function un(
+      (e.isSetTaskCapability = pn));
+    function pn(
       e,
       {
         instancePath: t = '',
@@ -20425,7 +20655,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = un.evaluated;
+        l = pn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -20436,7 +20666,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.linked === void 0 && (n = 'linked'))
           )
             return (
-              (un.errors = [
+              (pn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -20452,7 +20682,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'action' && n !== 'task_id' && n !== 'capability_id' && n !== 'linked')
                 return (
-                  (un.errors = [
+                  (pn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -20469,7 +20699,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   r = c;
                 if (typeof n != 'string')
                   return (
-                    (un.errors = [
+                    (pn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/type',
@@ -20482,7 +20712,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   );
                 if (n !== 'set_task_capability')
                   return (
-                    (un.errors = [
+                    (pn.errors = [
                       {
                         instancePath: t + '/action',
                         schemaPath: '#/properties/action/const',
@@ -20524,7 +20754,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       let n = c;
                       if (typeof e.linked != 'boolean')
                         return (
-                          (un.errors = [
+                          (pn.errors = [
                             {
                               instancePath: t + '/linked',
                               schemaPath: '#/properties/linked/type',
@@ -20544,7 +20774,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (un.errors = [
+            (pn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20556,15 +20786,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((un.errors = o), c === 0);
+      return ((pn.errors = o), c === 0);
     }
-    ((un.evaluated = {
+    ((pn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isSourceLink = dn));
-    function dn(
+      (e.isSourceLink = mn));
+    function mn(
       e,
       {
         instancePath: t = '',
@@ -20576,7 +20806,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = dn.evaluated;
+        c = mn.evaluated;
       if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -20586,7 +20816,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.label === void 0 && (n = 'label'))
           )
             return (
-              (dn.errors = [
+              (mn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -20602,7 +20832,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'source_ref' && n !== 'kind' && n !== 'label')
                 return (
-                  (dn.errors = [
+                  (mn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -20631,7 +20861,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     r = s;
                   if (typeof n != 'string')
                     return (
-                      (dn.errors = [
+                      (mn.errors = [
                         {
                           instancePath: t + '/kind',
                           schemaPath: '#/properties/kind/type',
@@ -20644,12 +20874,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     );
                   if (n !== 'interview' && n !== 'work_situation')
                     return (
-                      (dn.errors = [
+                      (mn.errors = [
                         {
                           instancePath: t + '/kind',
                           schemaPath: '#/properties/kind/enum',
                           keyword: 'enum',
-                          params: { allowedValues: bt.properties.kind.enum },
+                          params: { allowedValues: xt.properties.kind.enum },
                           message: 'must be equal to one of the allowed values',
                         },
                       ]),
@@ -20662,7 +20892,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                     let n = s;
                     if (typeof e.label != 'string')
                       return (
-                        (dn.errors = [
+                        (mn.errors = [
                           {
                             instancePath: t + '/label',
                             schemaPath: '#/properties/label/type',
@@ -20681,7 +20911,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (dn.errors = [
+            (mn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20693,15 +20923,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((dn.errors = o), s === 0);
+      return ((mn.errors = o), s === 0);
     }
-    ((dn.evaluated = {
+    ((mn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isSourceTargetKind = fn));
-    function fn(
+      (e.isSourceTargetKind = hn));
+    function hn(
       e,
       {
         instancePath: t = '',
@@ -20711,7 +20941,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = fn.evaluated;
+      let o = hn.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
@@ -20722,18 +20952,18 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             e !== 'capability' &&
             e !== 'collaborator' &&
             e !== 'condition'
-            ? ((fn.errors = [
+            ? ((hn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: Tt.enum },
+                  params: { allowedValues: Et.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((fn.errors = null), !0)
-          : ((fn.errors = [
+            : ((hn.errors = null), !0)
+          : ((hn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20745,12 +20975,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((fn.evaluated = {
+    ((hn.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isSourceVersion = pn));
-    function pn(
+      (e.isSourceVersion = gn));
+    function gn(
       e,
       {
         instancePath: t = '',
@@ -20762,7 +20992,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = pn.evaluated;
+        l = gn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -20772,7 +21002,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.covered_through_sequence === void 0 && (n = 'covered_through_sequence'))
           )
             return (
-              (pn.errors = [
+              (gn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -20788,7 +21018,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'snapshot_id' && n !== 'revision_id' && n !== 'covered_through_sequence')
                 return (
-                  (pn.errors = [
+                  (gn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -20848,7 +21078,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (pn.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (gn.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -20870,7 +21100,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (pn.errors = [
+            (gn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20882,15 +21112,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((pn.errors = o), c === 0);
+      return ((gn.errors = o), c === 0);
     }
-    ((pn.evaluated = {
+    ((gn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isSubmitInterviewInput = mn));
-    function mn(
+      (e.isSubmitInterviewInput = _n));
+    function _n(
       e,
       {
         instancePath: t = '',
@@ -20902,7 +21132,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = mn.evaluated;
+        l = _n.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -20911,7 +21141,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.text === void 0 && (n = 'text'))
           )
             return (
-              (mn.errors = [
+              (_n.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -20927,7 +21157,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'command_id' && n !== 'text')
                 return (
-                  (mn.errors = [
+                  (_n.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -20967,7 +21197,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (mn.errors = [
+            (_n.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -20979,15 +21209,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((mn.errors = o), c === 0);
+      return ((_n.errors = o), c === 0);
     }
-    ((mn.evaluated = {
+    ((_n.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isTarget = hn));
-    function hn(
+      (e.isTarget = vn));
+    function vn(
       e,
       {
         instancePath: t = '',
@@ -20999,7 +21229,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = hn.evaluated;
+        l = vn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -21009,7 +21239,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.item_id === void 0 && (n = 'item_id'))
           )
             return (
-              (hn.errors = [
+              (vn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -21025,7 +21255,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'kind' && n !== 'field' && n !== 'item_id')
                 return (
-                  (hn.errors = [
+                  (vn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -21039,13 +21269,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             if (n === c) {
               if (e.kind !== void 0) {
                 let n = c;
-                Et(e.kind, {
+                Dt(e.kind, {
                   instancePath: t + '/kind',
                   parentData: e,
                   parentDataProperty: 'kind',
                   rootData: i,
                   dynamicAnchors: a,
-                }) || ((o = o === null ? Et.errors : o.concat(Et.errors)), (c = o.length));
+                }) || ((o = o === null ? Dt.errors : o.concat(Dt.errors)), (c = o.length));
                 var u = n === c;
               } else var u = !0;
               if (u) {
@@ -21085,7 +21315,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (hn.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (vn.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -21126,7 +21356,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (hn.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (vn.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -21136,7 +21366,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (hn.errors = [
+            (vn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21148,15 +21378,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((hn.errors = o), c === 0);
+      return ((vn.errors = o), c === 0);
     }
-    ((hn.evaluated = {
+    ((vn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isTaskChange = gn));
-    function gn(
+      (e.isTaskChange = yn));
+    function yn(
       e,
       {
         instancePath: t = '',
@@ -21168,19 +21398,19 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = gn.evaluated;
+        c = yn.evaluated;
       (c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0));
       let l = s,
         u = !1,
         d = null,
         f = s;
-      U(e, {
+      H(e, {
         instancePath: t,
         parentData: n,
         parentDataProperty: r,
         rootData: i,
         dynamicAnchors: a,
-      }) || ((o = o === null ? U.errors : o.concat(U.errors)), (s = o.length));
+      }) || ((o = o === null ? H.errors : o.concat(H.errors)), (s = o.length));
       var m = f === s;
       if (m) {
         ((u = !0), (d = 0));
@@ -21199,25 +21429,25 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       else {
         m && ((u = !0), (d = 1), h !== !0 && (h = !0));
         let c = s;
-        W(e, {
+        U(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? W.errors : o.concat(W.errors)), (s = o.length));
+        }) || ((o = o === null ? U.errors : o.concat(U.errors)), (s = o.length));
         var m = c === s;
         if (m && u) ((u = !1), (d = [d, 2]));
         else {
           m && ((u = !0), (d = 2), h !== !0 && (h = !0));
           let c = s;
-          G(e, {
+          W(e, {
             instancePath: t,
             parentData: n,
             parentDataProperty: r,
             rootData: i,
             dynamicAnchors: a,
-          }) || ((o = o === null ? G.errors : o.concat(G.errors)), (s = o.length));
+          }) || ((o = o === null ? W.errors : o.concat(W.errors)), (s = o.length));
           var m = c === s;
           m && u ? ((u = !1), (d = [d, 3])) : m && ((u = !0), (d = 3), h !== !0 && (h = !0));
         }
@@ -21231,16 +21461,16 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           params: { passingSchemas: d },
           message: 'must match exactly one schema in oneOf',
         };
-        return (o === null ? (o = [e]) : o.push(e), s++, (gn.errors = o), !1);
+        return (o === null ? (o = [e]) : o.push(e), s++, (yn.errors = o), !1);
       }
-      return ((gn.errors = o), (c.props = h), s === 0);
+      return ((yn.errors = o), (c.props = h), s === 0);
     }
-    ((gn.evaluated = {
+    ((yn.evaluated = {
       dynamicProps: !0,
       dynamicItems: !1,
     }),
-      (e.isTaskField = _n));
-    function _n(
+      (e.isTaskField = bn));
+    function bn(
       e,
       {
         instancePath: t = '',
@@ -21250,24 +21480,24 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: a = {},
       } = {},
     ) {
-      let o = _n.evaluated;
+      let o = bn.evaluated;
       return (
         o.dynamicProps && (o.props = void 0),
         o.dynamicItems && (o.items = void 0),
         typeof e == 'string'
           ? e !== 'title' && e !== 'description'
-            ? ((_n.errors = [
+            ? ((bn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/enum',
                   keyword: 'enum',
-                  params: { allowedValues: Je.enum },
+                  params: { allowedValues: Ye.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ]),
               !1)
-            : ((_n.errors = null), !0)
-          : ((_n.errors = [
+            : ((bn.errors = null), !0)
+          : ((bn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21279,12 +21509,12 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1)
       );
     }
-    ((_n.evaluated = {
+    ((bn.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isTaskLink = vn));
-    function vn(
+      (e.isTaskLink = xn));
+    function xn(
       e,
       {
         instancePath: t = '',
@@ -21296,7 +21526,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = vn.evaluated;
+        l = xn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -21305,7 +21535,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.capability_id === void 0 && (n = 'capability_id'))
           )
             return (
-              (vn.errors = [
+              (xn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -21321,7 +21551,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'task_id' && n !== 'capability_id')
                 return (
-                  (vn.errors = [
+                  (xn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -21361,7 +21591,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (vn.errors = [
+            (xn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21373,15 +21603,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((vn.errors = o), c === 0);
+      return ((xn.errors = o), c === 0);
     }
-    ((vn.evaluated = {
+    ((xn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isTurnJdChanges = yn));
-    function yn(
+      (e.isTurnJdChanges = Sn));
+    function Sn(
       e,
       {
         instancePath: t = '',
@@ -21393,7 +21623,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = yn.evaluated;
+        l = Sn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -21402,7 +21632,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.markdown === void 0 && (n = 'markdown'))
           )
             return (
-              (yn.errors = [
+              (Sn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -21418,7 +21648,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'execution_id' && n !== 'markdown')
                 return (
-                  (yn.errors = [
+                  (Sn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -21446,7 +21676,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                   let n = c;
                   if (typeof e.markdown != 'string')
                     return (
-                      (yn.errors = [
+                      (Sn.errors = [
                         {
                           instancePath: t + '/markdown',
                           schemaPath: '#/properties/markdown/type',
@@ -21464,7 +21694,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (yn.errors = [
+            (Sn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21476,15 +21706,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((yn.errors = o), c === 0);
+      return ((Sn.errors = o), c === 0);
     }
-    ((yn.evaluated = {
+    ((Sn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isTurnTools = bn));
-    function bn(
+      (e.isTurnTools = Cn));
+    function Cn(
       e,
       {
         instancePath: t = '',
@@ -21496,7 +21726,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = bn.evaluated;
+        l = Cn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -21505,7 +21735,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.calls === void 0 && (n = 'calls'))
           )
             return (
-              (bn.errors = [
+              (Cn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -21521,7 +21751,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             for (let n in e)
               if (n !== 'execution_id' && n !== 'calls')
                 return (
-                  (bn.errors = [
+                  (Cn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -21567,7 +21797,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       }
                     } else
                       return (
-                        (bn.errors = [
+                        (Cn.errors = [
                           {
                             instancePath: t + '/calls',
                             schemaPath: '#/properties/calls/type',
@@ -21586,7 +21816,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (bn.errors = [
+            (Cn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21598,15 +21828,15 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((bn.errors = o), c === 0);
+      return ((Cn.errors = o), c === 0);
     }
-    ((bn.evaluated = {
+    ((Cn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isWireUuid = xn));
-    function xn(
+      (e.isWireUuid = wn));
+    function wn(
       e,
       {
         instancePath: t = '',
@@ -21616,7 +21846,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         dynamicAnchors: c = {},
       } = {},
     ) {
-      let l = xn.evaluated;
+      let l = wn.evaluated;
       if (
         (l.dynamicProps && (l.props = void 0),
         l.dynamicItems && (l.items = void 0),
@@ -21624,7 +21854,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       ) {
         if (a(e) > 36)
           return (
-            (xn.errors = [
+            (wn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/maxLength',
@@ -21637,7 +21867,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (a(e) < 36)
           return (
-            (xn.errors = [
+            (wn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/minLength',
@@ -21650,7 +21880,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (!o.test(e))
           return (
-            (xn.errors = [
+            (wn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/pattern',
@@ -21667,7 +21897,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
         if (!n.test(e))
           return (
-            (xn.errors = [
+            (wn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/format',
@@ -21680,7 +21910,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           );
       } else
         return (
-          (xn.errors = [
+          (wn.errors = [
             {
               instancePath: t,
               schemaPath: '#/type',
@@ -21691,14 +21921,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           ]),
           !1
         );
-      return ((xn.errors = null), !0);
+      return ((wn.errors = null), !0);
     }
-    ((xn.evaluated = {
+    ((wn.evaluated = {
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.isWorkTask = Sn));
-    function Sn(
+      (e.isWorkTask = Tn));
+    function Tn(
       e,
       {
         instancePath: t = '',
@@ -21710,7 +21940,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         c = 0,
-        l = Sn.evaluated;
+        l = Tn.evaluated;
       if ((l.dynamicProps && (l.props = void 0), l.dynamicItems && (l.items = void 0), c === 0)) {
         if (e && typeof e == 'object' && !Array.isArray(e)) {
           let n;
@@ -21723,7 +21953,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             (e.requirements === void 0 && (n = 'requirements'))
           )
             return (
-              (Sn.errors = [
+              (Tn.errors = [
                 {
                   instancePath: t,
                   schemaPath: '#/required',
@@ -21746,7 +21976,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                 n !== 'requirements'
               )
                 return (
-                  (Sn.errors = [
+                  (Tn.errors = [
                     {
                       instancePath: t,
                       schemaPath: '#/additionalProperties',
@@ -21806,7 +22036,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                       params: {},
                       message: 'must match a schema in anyOf',
                     };
-                    return (o === null ? (o = [e]) : o.push(e), c++, (Sn.errors = o), !1);
+                    return (o === null ? (o = [e]) : o.push(e), c++, (Tn.errors = o), !1);
                   }
                   var u = r === c;
                 } else var u = !0;
@@ -21850,7 +22080,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                         params: {},
                         message: 'must match a schema in anyOf',
                       };
-                      return (o === null ? (o = [e]) : o.push(e), c++, (Sn.errors = o), !1);
+                      return (o === null ? (o = [e]) : o.push(e), c++, (Tn.errors = o), !1);
                     }
                     var u = r === c;
                   } else var u = !0;
@@ -21895,7 +22125,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                           params: {},
                           message: 'must match a schema in anyOf',
                         };
-                        return (o === null ? (o = [e]) : o.push(e), c++, (Sn.errors = o), !1);
+                        return (o === null ? (o = [e]) : o.push(e), c++, (Tn.errors = o), !1);
                       }
                       var u = r === c;
                     } else var u = !0;
@@ -21924,7 +22154,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                             }
                           } else
                             return (
-                              (Sn.errors = [
+                              (Tn.errors = [
                                 {
                                   instancePath: t + '/outcomes',
                                   schemaPath: '#/properties/outcomes/type',
@@ -21963,7 +22193,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
                               }
                             } else
                               return (
-                                (Sn.errors = [
+                                (Tn.errors = [
                                   {
                                     instancePath: t + '/requirements',
                                     schemaPath: '#/properties/requirements/type',
@@ -21986,7 +22216,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
           }
         } else
           return (
-            (Sn.errors = [
+            (Tn.errors = [
               {
                 instancePath: t,
                 schemaPath: '#/type',
@@ -21998,113 +22228,14 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
             !1
           );
       }
-      return ((Sn.errors = o), c === 0);
-    }
-    ((Sn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.response0 = Cn));
-    function Cn(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        s = 0,
-        c = Cn.evaluated;
-      return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        nt(e, {
-          instancePath: t,
-          parentData: n,
-          parentDataProperty: r,
-          rootData: i,
-          dynamicAnchors: a,
-        }) || ((o = o === null ? nt.errors : o.concat(nt.errors)), (s = o.length)),
-        (Cn.errors = o),
-        s === 0
-      );
-    }
-    ((Cn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.response2 = wn));
-    function wn(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        s = 0,
-        c = wn.evaluated;
-      return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        Q(e, {
-          instancePath: t,
-          parentData: n,
-          parentDataProperty: r,
-          rootData: i,
-          dynamicAnchors: a,
-        }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length)),
-        (wn.errors = o),
-        s === 0
-      );
-    }
-    ((wn.evaluated = {
-      props: !0,
-      dynamicProps: !1,
-      dynamicItems: !1,
-    }),
-      (e.response3 = Tn));
-    function Tn(
-      e,
-      {
-        instancePath: t = '',
-        parentData: n,
-        parentDataProperty: r,
-        rootData: i = e,
-        dynamicAnchors: a = {},
-      } = {},
-    ) {
-      let o = null,
-        s = 0,
-        c = Tn.evaluated;
-      return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        jt(e, {
-          instancePath: t,
-          parentData: n,
-          parentDataProperty: r,
-          rootData: i,
-          dynamicAnchors: a,
-        }) || ((o = o === null ? jt.errors : o.concat(jt.errors)), (s = o.length)),
-        (Tn.errors = o),
-        s === 0
-      );
+      return ((Tn.errors = o), c === 0);
     }
     ((Tn.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response4 = En));
+      (e.response0 = En));
     function En(
       e,
       {
@@ -22121,13 +22252,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Q(e, {
+        nt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length)),
+        }) || ((o = o === null ? nt.errors : o.concat(nt.errors)), (s = o.length)),
         (En.errors = o),
         s === 0
       );
@@ -22137,7 +22268,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response5 = Dn));
+      (e.response2 = Dn));
     function Dn(
       e,
       {
@@ -22154,13 +22285,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Q(e, {
+        $(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length)),
+        }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
         (Dn.errors = o),
         s === 0
       );
@@ -22170,7 +22301,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response6 = On));
+      (e.response3 = On));
     function On(
       e,
       {
@@ -22187,13 +22318,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        ct(e, {
+        Mt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? ct.errors : o.concat(ct.errors)), (s = o.length)),
+        }) || ((o = o === null ? Mt.errors : o.concat(Mt.errors)), (s = o.length)),
         (On.errors = o),
         s === 0
       );
@@ -22203,7 +22334,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response7 = kn));
+      (e.response4 = kn));
     function kn(
       e,
       {
@@ -22220,13 +22351,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Q(e, {
+        $(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Q.errors : o.concat(Q.errors)), (s = o.length)),
+        }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
         (kn.errors = o),
         s === 0
       );
@@ -22236,7 +22367,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response8 = An));
+      (e.response5 = An));
     function An(
       e,
       {
@@ -22249,17 +22380,17 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        l = An.evaluated;
+        c = An.evaluated;
       return (
-        l.dynamicProps && (l.props = void 0),
-        l.dynamicItems && (l.items = void 0),
-        c(e, {
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        $(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? c.errors : o.concat(c.errors)), (s = o.length)),
+        }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
         (An.errors = o),
         s === 0
       );
@@ -22269,7 +22400,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response9 = jn));
+      (e.response6 = jn));
     function jn(
       e,
       {
@@ -22282,17 +22413,17 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        l = jn.evaluated;
+        c = jn.evaluated;
       return (
-        l.dynamicProps && (l.props = void 0),
-        l.dynamicItems && (l.items = void 0),
-        c(e, {
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        lt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? c.errors : o.concat(c.errors)), (s = o.length)),
+        }) || ((o = o === null ? lt.errors : o.concat(lt.errors)), (s = o.length)),
         (jn.errors = o),
         s === 0
       );
@@ -22302,7 +22433,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response10 = Mn));
+      (e.response7 = Mn));
     function Mn(
       e,
       {
@@ -22319,13 +22450,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        dt(e, {
+        $(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? dt.errors : o.concat(dt.errors)), (s = o.length)),
+        }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
         (Mn.errors = o),
         s === 0
       );
@@ -22335,7 +22466,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response11 = Nn));
+      (e.response8 = Nn));
     function Nn(
       e,
       {
@@ -22352,13 +22483,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Oe(e, {
+        $(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Oe.errors : o.concat(Oe.errors)), (s = o.length)),
+        }) || ((o = o === null ? $.errors : o.concat($.errors)), (s = o.length)),
         (Nn.errors = o),
         s === 0
       );
@@ -22368,7 +22499,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response12 = Pn));
+      (e.response9 = Pn));
     function Pn(
       e,
       {
@@ -22381,17 +22512,17 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Pn.evaluated;
+        l = Pn.evaluated;
       return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        N(e, {
+        l.dynamicProps && (l.props = void 0),
+        l.dynamicItems && (l.items = void 0),
+        c(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
+        }) || ((o = o === null ? c.errors : o.concat(c.errors)), (s = o.length)),
         (Pn.errors = o),
         s === 0
       );
@@ -22401,7 +22532,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response13 = Fn));
+      (e.response10 = Fn));
     function Fn(
       e,
       {
@@ -22414,17 +22545,17 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     ) {
       let o = null,
         s = 0,
-        c = Fn.evaluated;
+        l = Fn.evaluated;
       return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        N(e, {
+        l.dynamicProps && (l.props = void 0),
+        l.dynamicItems && (l.items = void 0),
+        c(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
+        }) || ((o = o === null ? c.errors : o.concat(c.errors)), (s = o.length)),
         (Fn.errors = o),
         s === 0
       );
@@ -22434,7 +22565,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response14 = In));
+      (e.response11 = In));
     function In(
       e,
       {
@@ -22451,13 +22582,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        N(e, {
+        ft(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
+        }) || ((o = o === null ? ft.errors : o.concat(ft.errors)), (s = o.length)),
         (In.errors = o),
         s === 0
       );
@@ -22467,7 +22598,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response15 = Ln));
+      (e.response12 = Ln));
     function Ln(
       e,
       {
@@ -22484,13 +22615,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        N(e, {
+        ke(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
+        }) || ((o = o === null ? ke.errors : o.concat(ke.errors)), (s = o.length)),
         (Ln.errors = o),
         s === 0
       );
@@ -22500,7 +22631,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response16 = Rn));
+      (e.response13 = Rn));
     function Rn(
       e,
       {
@@ -22533,7 +22664,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response17 = zn));
+      (e.response14 = zn));
     function zn(
       e,
       {
@@ -22547,45 +22678,26 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       let o = null,
         s = 0,
         c = zn.evaluated;
-      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
-        if (Array.isArray(e)) {
-          let n = e.length;
-          for (let r = 0; r < n; r++) {
-            let n = s;
-            if (
-              (Gt(e[r], {
-                instancePath: t + '/' + r,
-                parentData: e,
-                parentDataProperty: r,
-                rootData: i,
-                dynamicAnchors: a,
-              }) || ((o = o === null ? Gt.errors : o.concat(Gt.errors)), (s = o.length)),
-              n !== s)
-            )
-              break;
-          }
-        } else
-          return (
-            (zn.errors = [
-              {
-                instancePath: t,
-                schemaPath: '#/type',
-                keyword: 'type',
-                params: { type: 'array' },
-                message: 'must be array',
-              },
-            ]),
-            !1
-          );
-      }
-      return ((zn.errors = o), s === 0);
+      return (
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        N(e, {
+          instancePath: t,
+          parentData: n,
+          parentDataProperty: r,
+          rootData: i,
+          dynamicAnchors: a,
+        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
+        (zn.errors = o),
+        s === 0
+      );
     }
     ((zn.evaluated = {
-      items: !0,
+      props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response20 = Bn));
+      (e.response15 = Bn));
     function Bn(
       e,
       {
@@ -22602,13 +22714,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Y(e, {
+        N(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
+        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
         (Bn.errors = o),
         s === 0
       );
@@ -22618,7 +22730,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response21 = Vn));
+      (e.response16 = Vn));
     function Vn(
       e,
       {
@@ -22635,13 +22747,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Y(e, {
+        N(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
+        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
         (Vn.errors = o),
         s === 0
       );
@@ -22651,7 +22763,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response22 = Hn));
+      (e.response17 = Hn));
     function Hn(
       e,
       {
@@ -22668,13 +22780,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        pt(e, {
+        N(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? pt.errors : o.concat(pt.errors)), (s = o.length)),
+        }) || ((o = o === null ? N.errors : o.concat(N.errors)), (s = o.length)),
         (Hn.errors = o),
         s === 0
       );
@@ -22684,7 +22796,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response23 = Un));
+      (e.response18 = Un));
     function Un(
       e,
       {
@@ -22698,26 +22810,45 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       let o = null,
         s = 0,
         c = Un.evaluated;
-      return (
-        c.dynamicProps && (c.props = void 0),
-        c.dynamicItems && (c.items = void 0),
-        pt(e, {
-          instancePath: t,
-          parentData: n,
-          parentDataProperty: r,
-          rootData: i,
-          dynamicAnchors: a,
-        }) || ((o = o === null ? pt.errors : o.concat(pt.errors)), (s = o.length)),
-        (Un.errors = o),
-        s === 0
-      );
+      if ((c.dynamicProps && (c.props = void 0), c.dynamicItems && (c.items = void 0), s === 0)) {
+        if (Array.isArray(e)) {
+          let n = e.length;
+          for (let r = 0; r < n; r++) {
+            let n = s;
+            if (
+              (qt(e[r], {
+                instancePath: t + '/' + r,
+                parentData: e,
+                parentDataProperty: r,
+                rootData: i,
+                dynamicAnchors: a,
+              }) || ((o = o === null ? qt.errors : o.concat(qt.errors)), (s = o.length)),
+              n !== s)
+            )
+              break;
+          }
+        } else
+          return (
+            (Un.errors = [
+              {
+                instancePath: t,
+                schemaPath: '#/type',
+                keyword: 'type',
+                params: { type: 'array' },
+                message: 'must be array',
+              },
+            ]),
+            !1
+          );
+      }
+      return ((Un.errors = o), s === 0);
     }
     ((Un.evaluated = {
-      props: !0,
+      items: !0,
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response24 = Wn));
+      (e.response21 = Wn));
     function Wn(
       e,
       {
@@ -22734,13 +22865,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        mt(e, {
+        Y(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? mt.errors : o.concat(mt.errors)), (s = o.length)),
+        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
         (Wn.errors = o),
         s === 0
       );
@@ -22750,7 +22881,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response25 = Gn));
+      (e.response22 = Gn));
     function Gn(
       e,
       {
@@ -22767,13 +22898,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        mt(e, {
+        Y(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? mt.errors : o.concat(mt.errors)), (s = o.length)),
+        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
         (Gn.errors = o),
         s === 0
       );
@@ -22783,7 +22914,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response26 = Kn));
+      (e.response23 = Kn));
     function Kn(
       e,
       {
@@ -22800,13 +22931,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        ht(e, {
+        mt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? ht.errors : o.concat(ht.errors)), (s = o.length)),
+        }) || ((o = o === null ? mt.errors : o.concat(mt.errors)), (s = o.length)),
         (Kn.errors = o),
         s === 0
       );
@@ -22816,7 +22947,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response27 = qn));
+      (e.response24 = qn));
     function qn(
       e,
       {
@@ -22833,13 +22964,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        ht(e, {
+        mt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? ht.errors : o.concat(ht.errors)), (s = o.length)),
+        }) || ((o = o === null ? mt.errors : o.concat(mt.errors)), (s = o.length)),
         (qn.errors = o),
         s === 0
       );
@@ -22849,7 +22980,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response28 = Jn));
+      (e.response25 = Jn));
     function Jn(
       e,
       {
@@ -22866,13 +22997,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        gt(e, {
+        ht(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? gt.errors : o.concat(gt.errors)), (s = o.length)),
+        }) || ((o = o === null ? ht.errors : o.concat(ht.errors)), (s = o.length)),
         (Jn.errors = o),
         s === 0
       );
@@ -22882,7 +23013,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response29 = Yn));
+      (e.response26 = Yn));
     function Yn(
       e,
       {
@@ -22899,13 +23030,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        gt(e, {
+        ht(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? gt.errors : o.concat(gt.errors)), (s = o.length)),
+        }) || ((o = o === null ? ht.errors : o.concat(ht.errors)), (s = o.length)),
         (Yn.errors = o),
         s === 0
       );
@@ -22915,7 +23046,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response30 = Xn));
+      (e.response27 = Xn));
     function Xn(
       e,
       {
@@ -22932,13 +23063,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        kt(e, {
+        gt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? kt.errors : o.concat(kt.errors)), (s = o.length)),
+        }) || ((o = o === null ? gt.errors : o.concat(gt.errors)), (s = o.length)),
         (Xn.errors = o),
         s === 0
       );
@@ -22948,7 +23079,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response31 = Zn));
+      (e.response28 = Zn));
     function Zn(
       e,
       {
@@ -22965,13 +23096,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        kt(e, {
+        gt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? kt.errors : o.concat(kt.errors)), (s = o.length)),
+        }) || ((o = o === null ? gt.errors : o.concat(gt.errors)), (s = o.length)),
         (Zn.errors = o),
         s === 0
       );
@@ -22981,7 +23112,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response32 = Qn));
+      (e.response29 = Qn));
     function Qn(
       e,
       {
@@ -22998,13 +23129,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Z(e, {
+        _t(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Z.errors : o.concat(Z.errors)), (s = o.length)),
+        }) || ((o = o === null ? _t.errors : o.concat(_t.errors)), (s = o.length)),
         (Qn.errors = o),
         s === 0
       );
@@ -23014,7 +23145,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response33 = $n));
+      (e.response30 = $n));
     function $n(
       e,
       {
@@ -23031,13 +23162,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Ot(e, {
+        _t(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Ot.errors : o.concat(Ot.errors)), (s = o.length)),
+        }) || ((o = o === null ? _t.errors : o.concat(_t.errors)), (s = o.length)),
         ($n.errors = o),
         s === 0
       );
@@ -23047,7 +23178,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response34 = er));
+      (e.response31 = er));
     function er(
       e,
       {
@@ -23064,13 +23195,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Ct(e, {
+        At(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Ct.errors : o.concat(Ct.errors)), (s = o.length)),
+        }) || ((o = o === null ? At.errors : o.concat(At.errors)), (s = o.length)),
         (er.errors = o),
         s === 0
       );
@@ -23080,7 +23211,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response35 = tr));
+      (e.response32 = tr));
     function tr(
       e,
       {
@@ -23097,13 +23228,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        vt(e, {
+        At(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? vt.errors : o.concat(vt.errors)), (s = o.length)),
+        }) || ((o = o === null ? At.errors : o.concat(At.errors)), (s = o.length)),
         (tr.errors = o),
         s === 0
       );
@@ -23113,7 +23244,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response37 = nr));
+      (e.response33 = nr));
     function nr(
       e,
       {
@@ -23130,13 +23261,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Y(e, {
+        Z(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
+        }) || ((o = o === null ? Z.errors : o.concat(Z.errors)), (s = o.length)),
         (nr.errors = o),
         s === 0
       );
@@ -23146,7 +23277,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response38 = rr));
+      (e.response34 = rr));
     function rr(
       e,
       {
@@ -23163,13 +23294,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        yn(e, {
+        kt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? yn.errors : o.concat(yn.errors)), (s = o.length)),
+        }) || ((o = o === null ? kt.errors : o.concat(kt.errors)), (s = o.length)),
         (rr.errors = o),
         s === 0
       );
@@ -23179,7 +23310,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response39 = ir));
+      (e.response35 = ir));
     function ir(
       e,
       {
@@ -23196,13 +23327,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        bn(e, {
+        wt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? bn.errors : o.concat(bn.errors)), (s = o.length)),
+        }) || ((o = o === null ? wt.errors : o.concat(wt.errors)), (s = o.length)),
         (ir.errors = o),
         s === 0
       );
@@ -23212,7 +23343,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response40 = ar));
+      (e.response36 = ar));
     function ar(
       e,
       {
@@ -23229,13 +23360,13 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Ut(e, {
+        yt(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Ut.errors : o.concat(Ut.errors)), (s = o.length)),
+        }) || ((o = o === null ? yt.errors : o.concat(yt.errors)), (s = o.length)),
         (ar.errors = o),
         s === 0
       );
@@ -23245,7 +23376,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       dynamicProps: !1,
       dynamicItems: !1,
     }),
-      (e.response41 = or));
+      (e.response38 = or));
     function or(
       e,
       {
@@ -23262,18 +23393,150 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
       return (
         c.dynamicProps && (c.props = void 0),
         c.dynamicItems && (c.items = void 0),
-        Wt(e, {
+        Y(e, {
           instancePath: t,
           parentData: n,
           parentDataProperty: r,
           rootData: i,
           dynamicAnchors: a,
-        }) || ((o = o === null ? Wt.errors : o.concat(Wt.errors)), (s = o.length)),
+        }) || ((o = o === null ? Y.errors : o.concat(Y.errors)), (s = o.length)),
         (or.errors = o),
         s === 0
       );
     }
-    or.evaluated = {
+    ((or.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.response39 = sr));
+    function sr(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = sr.evaluated;
+      return (
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        Sn(e, {
+          instancePath: t,
+          parentData: n,
+          parentDataProperty: r,
+          rootData: i,
+          dynamicAnchors: a,
+        }) || ((o = o === null ? Sn.errors : o.concat(Sn.errors)), (s = o.length)),
+        (sr.errors = o),
+        s === 0
+      );
+    }
+    ((sr.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.response40 = cr));
+    function cr(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = cr.evaluated;
+      return (
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        Cn(e, {
+          instancePath: t,
+          parentData: n,
+          parentDataProperty: r,
+          rootData: i,
+          dynamicAnchors: a,
+        }) || ((o = o === null ? Cn.errors : o.concat(Cn.errors)), (s = o.length)),
+        (cr.errors = o),
+        s === 0
+      );
+    }
+    ((cr.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.response41 = lr));
+    function lr(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = lr.evaluated;
+      return (
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        Gt(e, {
+          instancePath: t,
+          parentData: n,
+          parentDataProperty: r,
+          rootData: i,
+          dynamicAnchors: a,
+        }) || ((o = o === null ? Gt.errors : o.concat(Gt.errors)), (s = o.length)),
+        (lr.errors = o),
+        s === 0
+      );
+    }
+    ((lr.evaluated = {
+      props: !0,
+      dynamicProps: !1,
+      dynamicItems: !1,
+    }),
+      (e.response42 = ur));
+    function ur(
+      e,
+      {
+        instancePath: t = '',
+        parentData: n,
+        parentDataProperty: r,
+        rootData: i = e,
+        dynamicAnchors: a = {},
+      } = {},
+    ) {
+      let o = null,
+        s = 0,
+        c = ur.evaluated;
+      return (
+        c.dynamicProps && (c.props = void 0),
+        c.dynamicItems && (c.items = void 0),
+        Kt(e, {
+          instancePath: t,
+          parentData: n,
+          parentDataProperty: r,
+          rootData: i,
+          dynamicAnchors: a,
+        }) || ((o = o === null ? Kt.errors : o.concat(Kt.errors)), (s = o.length)),
+        (ur.errors = o),
+        s === 0
+      );
+    }
+    ur.evaluated = {
       props: !0,
       dynamicProps: !1,
       dynamicItems: !1,
@@ -23315,68 +23578,74 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
         validate: a.response6,
       },
     },
-    'POST /api/job-files/{job_file_id}/rename': {
+    'POST /api/job-files/{job_file_id}/usage-heartbeat': {
       200: {
         kind: 'json',
         validate: a.response7,
       },
     },
-    'POST /api/job-files/{job_file_id}/inputs': {
+    'POST /api/job-files/{job_file_id}/rename': {
       200: {
         kind: 'json',
         validate: a.response8,
       },
-      202: {
+    },
+    'POST /api/job-files/{job_file_id}/inputs': {
+      200: {
         kind: 'json',
         validate: a.response9,
+      },
+      202: {
+        kind: 'json',
+        validate: a.response10,
       },
     },
     'GET /api/job-files/{job_file_id}/interview-plan': {
       200: {
         kind: 'json',
-        validate: a.response10,
+        validate: a.response11,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/current': {
       200: {
         kind: 'json',
-        validate: a.response11,
+        validate: a.response12,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}': {
       200: {
         kind: 'json',
-        validate: a.response12,
+        validate: a.response13,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/by-command/{command_id}': {
       200: {
         kind: 'json',
-        validate: a.response13,
+        validate: a.response14,
       },
     },
     'POST /api/job-files/{job_file_id}/consultant-turns/{execution_id}/pause': {
       200: {
         kind: 'json',
-        validate: a.response14,
+        validate: a.response15,
       },
     },
     'POST /api/job-files/{job_file_id}/consultant-turns/{execution_id}/cancel': {
       200: {
         kind: 'json',
-        validate: a.response15,
+        validate: a.response16,
       },
     },
     'POST /api/job-files/{job_file_id}/consultant-turns/{execution_id}/resume': {
       200: {
         kind: 'json',
-        validate: a.response16,
+        validate: a.response17,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/reasoning-summaries': {
       200: {
         kind: 'json',
-        validate: a.response17,
+        validate: a.response18,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream': {
@@ -23389,97 +23658,97 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     'GET /api/job-files/{job_file_id}/jd/profile': {
       200: {
         kind: 'json',
-        validate: a.response20,
+        validate: a.response21,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/profile': {
       200: {
         kind: 'json',
-        validate: a.response21,
+        validate: a.response22,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/areas': {
       200: {
         kind: 'json',
-        validate: a.response22,
+        validate: a.response23,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/areas': {
       200: {
         kind: 'json',
-        validate: a.response23,
+        validate: a.response24,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/capabilities': {
       200: {
         kind: 'json',
-        validate: a.response24,
+        validate: a.response25,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/capabilities': {
       200: {
         kind: 'json',
-        validate: a.response25,
+        validate: a.response26,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/collaborators': {
       200: {
         kind: 'json',
-        validate: a.response26,
+        validate: a.response27,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/collaborators': {
       200: {
         kind: 'json',
-        validate: a.response27,
+        validate: a.response28,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/conditions': {
       200: {
         kind: 'json',
-        validate: a.response28,
+        validate: a.response29,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/conditions': {
       200: {
         kind: 'json',
-        validate: a.response29,
+        validate: a.response30,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/tasks': {
       200: {
         kind: 'json',
-        validate: a.response30,
+        validate: a.response31,
       },
     },
     'POST /api/job-files/{job_file_id}/jd/tasks': {
       200: {
         kind: 'json',
-        validate: a.response31,
+        validate: a.response32,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/work': {
       200: {
         kind: 'json',
-        validate: a.response32,
+        validate: a.response33,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/sources': {
       200: {
         kind: 'json',
-        validate: a.response33,
+        validate: a.response34,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/sources/{citation_id}': {
       200: {
         kind: 'json',
-        validate: a.response34,
+        validate: a.response35,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/sources/{citation_id}/changes': {
       200: {
         kind: 'json',
-        validate: a.response35,
+        validate: a.response36,
       },
     },
     'GET /api/job-files/{job_file_id}/jd/export.pdf': {
@@ -23491,31 +23760,31 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
     'POST /api/job-files/{job_file_id}/consultant-turns/{execution_id}/undo-jd': {
       200: {
         kind: 'json',
-        validate: a.response37,
+        validate: a.response38,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/jd-changes': {
       200: {
         kind: 'json',
-        validate: a.response38,
+        validate: a.response39,
       },
     },
     'GET /api/job-files/{job_file_id}/consultant-turns/{execution_id}/tools': {
       200: {
         kind: 'json',
-        validate: a.response39,
+        validate: a.response40,
       },
     },
     'GET /api/job-files/{job_file_id}/memory': {
       200: {
         kind: 'json',
-        validate: a.response40,
+        validate: a.response41,
       },
     },
     'GET /api/job-files/{job_file_id}/memory/{snapshot_id}/objects/{object_id}': {
       200: {
         kind: 'json',
-        validate: a.response41,
+        validate: a.response42,
       },
     },
   },
@@ -23563,69 +23832,71 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), (e = null)),
   ve = a.isExecutionStatus,
   A = a.isFieldChange,
   j = a.isHealthStatus,
-  ye = a.isHttpErrorDetail,
-  be = a.isHttpErrorResponse,
-  xe = a.isInterviewContent,
-  Se = a.isInterviewHistory,
-  Ce = a.isInterviewMessage,
-  M = a.isInterviewPlan,
-  we = a.isInterviewPlanView,
-  Te = a.isInterviewSpeaker,
-  N = a.isJdAreasView,
+  ye = a.isHeartbeatElapsedSeconds,
+  be = a.isHttpErrorDetail,
+  xe = a.isHttpErrorResponse,
+  Se = a.isInterviewContent,
+  Ce = a.isInterviewHistory,
+  M = a.isInterviewMessage,
+  we = a.isInterviewPlan,
+  Te = a.isInterviewPlanView,
+  N = a.isInterviewSpeaker,
+  Ee = a.isJdAreasView,
   P = a.isJdCapabilitiesView,
   F = a.isJdCollaboratorsView,
-  I = a.isJdConditionsView,
-  Ee = a.isJdProfileView,
-  L = a.isJdSourceChangesView,
-  De = a.isJdSourceContentView,
-  R = a.isJdSourcesView,
-  Oe = a.isJdTasksView,
-  ke = a.isJdWorkView,
-  Ae = a.isJobFile,
-  je = a.isJobFileList,
-  Me = a.isMemoryContent,
-  Ne = a.isMemoryLayer,
-  Pe = a.isMemoryMapItem,
-  Fe = a.isMoveTask,
-  Ie = a.isNonblankText,
-  z = a.isNonemptyText,
-  Le = a.isNonnegativeInteger,
-  Re = a.isPositiveInteger,
-  ze = a.isProfile,
-  B = a.isProfileField,
-  Be = a.isPublicCommentary,
-  Ve = a.isPublishedMemory,
-  He = a.isPublishedMemoryObject,
-  Ue = a.isReasoningSummary,
-  V = a.isReference,
-  We = a.isRemoveDetail,
-  Ge = a.isRenameJobFileRequest,
-  H = a.isReorderArea,
-  Ke = a.isReorderCapability,
-  qe = a.isReorderCollaborator,
-  Je = a.isReorderCondition,
-  Ye = a.isReorderDetail,
-  U = a.isReorderTaskCapability,
-  W = a.isReviseArea,
-  G = a.isReviseCapability,
+  De = a.isJdConditionsView,
+  I = a.isJdProfileView,
+  Oe = a.isJdSourceChangesView,
+  L = a.isJdSourceContentView,
+  ke = a.isJdSourcesView,
+  Ae = a.isJdTasksView,
+  je = a.isJdWorkView,
+  Me = a.isJobFile,
+  Ne = a.isJobFileList,
+  Pe = a.isMemoryContent,
+  Fe = a.isMemoryLayer,
+  Ie = a.isMemoryMapItem,
+  Le = a.isMoveTask,
+  R = a.isNonblankText,
+  Re = a.isNonemptyText,
+  ze = a.isNonnegativeInteger,
+  Be = a.isPositiveInteger,
+  z = a.isProfile,
+  Ve = a.isProfileField,
+  He = a.isPublicCommentary,
+  Ue = a.isPublishedMemory,
+  We = a.isPublishedMemoryObject,
+  B = a.isReasoningSummary,
+  Ge = a.isRecordUsageHeartbeatRequest,
+  Ke = a.isReference,
+  V = a.isRemoveDetail,
+  qe = a.isRenameJobFileRequest,
+  Je = a.isReorderArea,
+  Ye = a.isReorderCapability,
+  Xe = a.isReorderCollaborator,
+  H = a.isReorderCondition,
+  U = a.isReorderDetail,
+  W = a.isReorderTaskCapability,
+  G = a.isReviseArea,
+  Ze = a.isReviseCapability,
   K = a.isReviseCollaborator,
-  Xe = a.isReviseCondition,
-  Ze = a.isReviseDetail,
-  Qe = a.isReviseJdProfileRequest,
-  $e = a.isReviseTask,
-  et = a.isSetTaskCapability,
-  tt = a.isSourceLink,
-  nt = a.isSourceTargetKind,
-  rt = a.isSourceVersion,
-  it = a.isSubmitInterviewInput,
-  q = a.isTarget,
-  at = a.isTaskChange,
-  J = a.isTaskField,
-  ot = a.isTaskLink,
-  st = a.isTurnJdChanges,
-  ct = a.isTurnTools,
-  lt = a.isWireUuid,
-  ut = a.isWorkTask;
+  Qe = a.isReviseCondition,
+  $e = a.isReviseDetail,
+  et = a.isReviseJdProfileRequest,
+  tt = a.isReviseTask,
+  nt = a.isSetTaskCapability,
+  rt = a.isSourceLink,
+  it = a.isSourceTargetKind,
+  at = a.isSourceVersion,
+  q = a.isSubmitInterviewInput,
+  ot = a.isTarget,
+  J = a.isTaskChange,
+  st = a.isTaskField,
+  ct = a.isTaskLink,
+  lt = a.isTurnJdChanges,
+  ut = a.isTurnTools,
+  dt = a.isWireUuid,
+  ft = a.isWorkTask;
 export {
   s as isAcceptedInterviewInput,
   c as isAddDetail,
@@ -23671,68 +23942,70 @@ export {
   ve as isExecutionStatus,
   A as isFieldChange,
   j as isHealthStatus,
-  ye as isHttpErrorDetail,
-  be as isHttpErrorResponse,
-  xe as isInterviewContent,
-  Se as isInterviewHistory,
-  Ce as isInterviewMessage,
-  M as isInterviewPlan,
-  we as isInterviewPlanView,
-  Te as isInterviewSpeaker,
-  N as isJdAreasView,
+  ye as isHeartbeatElapsedSeconds,
+  be as isHttpErrorDetail,
+  xe as isHttpErrorResponse,
+  Se as isInterviewContent,
+  Ce as isInterviewHistory,
+  M as isInterviewMessage,
+  we as isInterviewPlan,
+  Te as isInterviewPlanView,
+  N as isInterviewSpeaker,
+  Ee as isJdAreasView,
   P as isJdCapabilitiesView,
   F as isJdCollaboratorsView,
-  I as isJdConditionsView,
-  Ee as isJdProfileView,
-  L as isJdSourceChangesView,
-  De as isJdSourceContentView,
-  R as isJdSourcesView,
-  Oe as isJdTasksView,
-  ke as isJdWorkView,
-  Ae as isJobFile,
-  je as isJobFileList,
-  Me as isMemoryContent,
-  Ne as isMemoryLayer,
-  Pe as isMemoryMapItem,
-  Fe as isMoveTask,
-  Ie as isNonblankText,
-  z as isNonemptyText,
-  Le as isNonnegativeInteger,
-  Re as isPositiveInteger,
-  ze as isProfile,
-  B as isProfileField,
-  Be as isPublicCommentary,
-  Ve as isPublishedMemory,
-  He as isPublishedMemoryObject,
-  Ue as isReasoningSummary,
-  V as isReference,
-  We as isRemoveDetail,
-  Ge as isRenameJobFileRequest,
-  H as isReorderArea,
-  Ke as isReorderCapability,
-  qe as isReorderCollaborator,
-  Je as isReorderCondition,
-  Ye as isReorderDetail,
-  U as isReorderTaskCapability,
-  W as isReviseArea,
-  G as isReviseCapability,
+  De as isJdConditionsView,
+  I as isJdProfileView,
+  Oe as isJdSourceChangesView,
+  L as isJdSourceContentView,
+  ke as isJdSourcesView,
+  Ae as isJdTasksView,
+  je as isJdWorkView,
+  Me as isJobFile,
+  Ne as isJobFileList,
+  Pe as isMemoryContent,
+  Fe as isMemoryLayer,
+  Ie as isMemoryMapItem,
+  Le as isMoveTask,
+  R as isNonblankText,
+  Re as isNonemptyText,
+  ze as isNonnegativeInteger,
+  Be as isPositiveInteger,
+  z as isProfile,
+  Ve as isProfileField,
+  He as isPublicCommentary,
+  Ue as isPublishedMemory,
+  We as isPublishedMemoryObject,
+  B as isReasoningSummary,
+  Ge as isRecordUsageHeartbeatRequest,
+  Ke as isReference,
+  V as isRemoveDetail,
+  qe as isRenameJobFileRequest,
+  Je as isReorderArea,
+  Ye as isReorderCapability,
+  Xe as isReorderCollaborator,
+  H as isReorderCondition,
+  U as isReorderDetail,
+  W as isReorderTaskCapability,
+  G as isReviseArea,
+  Ze as isReviseCapability,
   K as isReviseCollaborator,
-  Xe as isReviseCondition,
-  Ze as isReviseDetail,
-  Qe as isReviseJdProfileRequest,
-  $e as isReviseTask,
-  et as isSetTaskCapability,
-  tt as isSourceLink,
-  nt as isSourceTargetKind,
-  rt as isSourceVersion,
-  it as isSubmitInterviewInput,
-  q as isTarget,
-  at as isTaskChange,
-  J as isTaskField,
-  ot as isTaskLink,
-  st as isTurnJdChanges,
-  ct as isTurnTools,
-  lt as isWireUuid,
-  ut as isWorkTask,
+  Qe as isReviseCondition,
+  $e as isReviseDetail,
+  et as isReviseJdProfileRequest,
+  tt as isReviseTask,
+  nt as isSetTaskCapability,
+  rt as isSourceLink,
+  it as isSourceTargetKind,
+  at as isSourceVersion,
+  q as isSubmitInterviewInput,
+  ot as isTarget,
+  J as isTaskChange,
+  st as isTaskField,
+  ct as isTaskLink,
+  lt as isTurnJdChanges,
+  ut as isTurnTools,
+  dt as isWireUuid,
+  ft as isWorkTask,
   o as responsePolicies,
 };

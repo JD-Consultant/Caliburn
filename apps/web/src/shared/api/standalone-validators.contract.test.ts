@@ -33,6 +33,7 @@ describe('standalone HTTP guards', () => {
       employee_name: '合成',
       name_revision: 1,
       created_at,
+      active_usage_seconds: 0,
     };
     expect(isJobFile(value)).toBe(accepted);
     expect(isJobFileList({ job_files: [value] })).toBe(accepted);

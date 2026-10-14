@@ -13,6 +13,7 @@ import {
   createJobFile as create,
   renameJobFile as rename,
   deleteJobFile as remove,
+  recordJobFileUsageHeartbeat as recordHeartbeat,
 } from '../../shared/api/generated/http/sdk.gen';
 
 export const jobFilesQuery = queryOptions({
@@ -51,6 +52,18 @@ export function renameJobFile(jobFileId: string, command: RenameJobFileRequest):
     throwOnError: true,
     meta: {
       correlation: { jobFileId, commandId: command.command_id },
+      scope: scope<JobFile>((value) => value.job_file_id === jobFileId),
+    },
+  }).then(({ data }) => data);
+}
+
+export function recordUsageHeartbeat(jobFileId: string, elapsedSeconds: number): Promise<JobFile> {
+  return recordHeartbeat({
+    path: { job_file_id: jobFileId },
+    body: { elapsed_seconds: elapsedSeconds },
+    throwOnError: true,
+    meta: {
+      correlation: { jobFileId },
       scope: scope<JobFile>((value) => value.job_file_id === jobFileId),
     },
   }).then(({ data }) => data);

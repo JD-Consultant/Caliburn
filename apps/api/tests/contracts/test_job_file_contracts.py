@@ -12,6 +12,7 @@ from caliburn.transport.http.models.job_files import (
     CreateJobFileRequest,
     InterviewHistory,
     JobFileList,
+    RecordUsageHeartbeatRequest,
     RenameJobFileRequest,
 )
 from tests.fixtures.http_contracts import http_schema
@@ -39,6 +40,7 @@ from tests.fixtures.http_contracts import http_schema
             RenameJobFileRequest,
             {"command_id": str(uuid4()), "display_name": "新名稱", "expected_name_revision": 1},
         ),
+        (RecordUsageHeartbeatRequest, {"elapsed_seconds": 20}),
         (
             JobFileList,
             {
@@ -49,6 +51,7 @@ from tests.fixtures.http_contracts import http_schema
                         "name_revision": 1,
                         "employee_name": "員工",
                         "created_at": "2026-09-29T00:00:00Z",
+                        "active_usage_seconds": 0,
                     }
                 ]
             },
@@ -79,6 +82,17 @@ def test_http_contract_round_trip(model: type[BaseModel], payload: dict[str, obj
     assert not validator.is_valid(invalid)
     with pytest.raises(ValidationError):
         model.model_validate(invalid)
+
+
+@pytest.mark.parametrize("elapsed_seconds", [0, -1, 61, "20", True])
+def test_usage_heartbeat_seconds_is_a_bounded_integer_not_a_coerced_value(
+    elapsed_seconds: object,
+) -> None:
+    payload = {"elapsed_seconds": elapsed_seconds}
+    schema = http_schema(RecordUsageHeartbeatRequest)
+    assert not Draft202012Validator(schema).is_valid(payload)
+    with pytest.raises(ValidationError):
+        RecordUsageHeartbeatRequest.model_validate(payload)
 
 
 @pytest.mark.parametrize("sequence", [0, -1, "1", True])

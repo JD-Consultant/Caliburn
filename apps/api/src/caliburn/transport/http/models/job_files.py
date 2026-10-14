@@ -5,7 +5,9 @@ from pydantic import AwareDatetime, StrictStr
 from caliburn.features.interviews.models import InterviewSpeaker
 from caliburn.transport.http.models.common import (
     DisplayName,
+    HeartbeatElapsedSeconds,
     HttpModel,
+    NonnegativeInteger,
     PositiveInteger,
     WireUuid,
 )
@@ -29,6 +31,11 @@ class JobFile(HttpModel):
     name_revision: PositiveInteger
     employee_name: StrictStr
     created_at: AwareDatetime
+    active_usage_seconds: NonnegativeInteger
+
+
+class RecordUsageHeartbeatRequest(HttpModel):
+    elapsed_seconds: HeartbeatElapsedSeconds
 
 
 class JobFileList(HttpModel):

@@ -25,6 +25,11 @@ class StaleJobFileNameError(ValueError):
     """The current label has changed since the client read it."""
 
 
+def validate_elapsed_seconds(value: int) -> None:
+    if type(value) is not int or not (1 <= value <= 60):
+        raise ValueError("elapsed_seconds must be an integer between 1 and 60")
+
+
 def validate_label(value: str, field_name: str) -> None:
     if not value.strip() or len(value) > 200 or "\x00" in value:
         raise ValueError(f"{field_name} must contain 1–200 characters, not be blank or contain NUL")
@@ -59,12 +64,21 @@ class RenameJobFile:
 
 
 @dataclass(frozen=True, slots=True)
+class RecordUsageHeartbeat:
+    elapsed_seconds: int
+
+    def __post_init__(self) -> None:
+        validate_elapsed_seconds(self.elapsed_seconds)
+
+
+@dataclass(frozen=True, slots=True)
 class JobFile:
     job_file_id: UUID
     display_name: str
     name_revision: int
     employee_name: str
     created_at: datetime
+    active_usage_seconds: int
 
 
 @dataclass(frozen=True, slots=True)

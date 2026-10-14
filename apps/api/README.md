@@ -97,7 +97,8 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 下列入口涵蓋職務檔案、正式訪談與人工 JD 編輯。讀取入口提供目前資料或固定修訂；修改入口沿命令與讀取基底處理重送及衝突。具體 HTTP 型別由 `transport/http/models/` 維護，對外格式由 `/openapi.json` 發布：
 
 - `POST /api/job-files`：`command_id`、`display_name`、`employee_name`；新建立回 201，同一命令重送回原結果／200，不同輸入重用命令回 409。
-- `GET /api/job-files`、`GET /api/job-files/{job_file_id}`：清單／目前檔案 metadata。
+- `GET /api/job-files`、`GET /api/job-files/{job_file_id}`：清單／目前檔案 metadata，含 `active_usage_seconds`。
+- `POST /api/job-files/{job_file_id}/usage-heartbeat`：`elapsed_seconds`（1–60 的整數）；原子加總進 `active_usage_seconds`，回最新 `JobFile`。前端在職務檔案工作畫面開著時定時呼叫，累計實際使用時間；未知檔案回 404，數值超出範圍回 422。純計時用途，不影響訪談、JD 或 Memory 狀態。
 - `POST /api/job-files/{job_file_id}/rename`：`command_id`、`expected_name_revision`、`display_name`；只改檔案標籤。同命令回原結果／200，過期修訂或改 payload 重用命令回 409。GET 的 `name_revision` 作下次改名基準，不能在重送時偷換。成功後再 GET 目前名稱；員工姓名與訪談不變。
 - `GET /api/job-files/{job_file_id}/interviews`：只有已正式化的訪談；目前建立後只有來源為 App 的開場第 1 則。未完成原文不在這裡出現。
 - `GET /api/job-files/{job_file_id}/jd/profile`：目前正式修訂與四欄基本資料；新檔案為 null，代表尚未提供。

@@ -16,7 +16,26 @@ const chipColor: Record<TurnBadge['tone'], 'info' | 'warning' | 'success' | 'err
   neutral: 'default',
 };
 
-export function FileBar({ file, turn }: { file: JobFile; turn: ConsultantTurn | null }) {
+function formatUsageDuration(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remaining = seconds % 60;
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return hours > 0
+    ? `${hours}:${pad(minutes)}:${pad(remaining)}`
+    : `${pad(minutes)}:${pad(remaining)}`;
+}
+
+export function FileBar({
+  file,
+  turn,
+  activeUsageSeconds,
+}: {
+  file: JobFile;
+  turn: ConsultantTurn | null;
+  activeUsageSeconds: number;
+}) {
   const badge = describeTurnBadge(turn);
   return (
     <header className="file-bar">
@@ -36,6 +55,9 @@ export function FileBar({ file, turn }: { file: JobFile; turn: ConsultantTurn | 
         <h1>{file.display_name}</h1>
         <span className="file-bar-meta">受訪員工：{file.employee_name}</span>
       </div>
+      <span className="file-bar-usage-timer" aria-label="累計使用時間" title="累計使用時間">
+        已使用 {formatUsageDuration(activeUsageSeconds)}
+      </span>
       <PublishedMemoryViewer jobFileId={file.job_file_id} />
       {badge && (
         <Chip size="small" variant="outlined" color={chipColor[badge.tone]} label={badge.label} />

@@ -19,6 +19,7 @@ from caliburn.features.job_files.models import (
     JobFile,
     JobFileCreation,
     JobFileNotFoundError,
+    RecordUsageHeartbeat,
     RenameJobFile,
 )
 from caliburn.workflows.consultant_turns.supervisor import ConsultantSupervisor
@@ -56,6 +57,12 @@ class JobFileWorkflow:
     async def read_file(self, job_file_id: UUID) -> JobFile:
         async with self.sessions() as session:
             return await job_file_queries.read_job_file(session, job_file_id)
+
+    async def record_usage_heartbeat(
+        self, job_file_id: UUID, command: RecordUsageHeartbeat
+    ) -> JobFile:
+        async with self.sessions.begin() as session:
+            return await job_file_service.record_usage_heartbeat(session, job_file_id, command)
 
     async def delete(self, job_file_id: UUID) -> None:
         # SQL terminal state is not proof that a local invocation has exited.

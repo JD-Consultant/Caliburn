@@ -15,6 +15,7 @@ def to_job_file(record: persistence.JobFileRecord) -> JobFile:
         name_revision=record.name_revision,
         employee_name=record.employee_name,
         created_at=record.created_at,
+        active_usage_seconds=record.active_usage_seconds,
     )
 
 

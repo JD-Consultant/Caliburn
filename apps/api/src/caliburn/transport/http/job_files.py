@@ -12,6 +12,7 @@ from caliburn.features.job_files.models import (
     CreationCommandConflictError,
     JobFileCreationDeletedError,
     JobFileNotFoundError,
+    RecordUsageHeartbeat,
     RenameCommandConflictError,
     RenameJobFile,
     StaleJobFileNameError,
@@ -22,6 +23,7 @@ from caliburn.transport.http.models.job_files import (
     InterviewMessage,
     JobFile,
     JobFileList,
+    RecordUsageHeartbeatRequest,
     RenameJobFileRequest,
 )
 from caliburn.workflows.job_files import JobFileWorkflow
@@ -115,6 +117,25 @@ async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> Inter
             for entry in messages
         ]
     )
+
+
+@router.post(
+    "/{job_file_id}/usage-heartbeat",
+    response_model=JobFile,
+    operation_id="record_job_file_usage_heartbeat",
+)
+async def record_usage_heartbeat(
+    job_file_id: UUID,
+    body: RecordUsageHeartbeatRequest,
+    workflow: JobFiles,
+) -> JobFile:
+    try:
+        result = await workflow.record_usage_heartbeat(
+            job_file_id, RecordUsageHeartbeat(elapsed_seconds=body.elapsed_seconds)
+        )
+    except JobFileNotFoundError as error:
+        raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
+    return JobFile.model_validate(result, from_attributes=True)
 
 
 @router.post("/{job_file_id}/rename", response_model=JobFile, operation_id="rename_job_file")

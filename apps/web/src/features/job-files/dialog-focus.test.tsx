@@ -64,6 +64,7 @@ test('改名轉場完成不搶走使用者已選擇的返回按鈕焦點', () =>
         employee_name: '合成員工',
         created_at: '2026-09-29T10:00:00Z',
         name_revision: 1,
+        active_usage_seconds: 0,
       }}
       onClose={vi.fn()}
     />,

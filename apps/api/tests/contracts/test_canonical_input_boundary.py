@@ -25,7 +25,7 @@ PLAIN_UUID = "12345678-1234-4234-8234-1234567890ab"
 @pytest.fixture
 def http_boundary():
     commands = []
-    job = JobFile(uuid4(), "工作", 1, "員工", datetime.now(UTC))
+    job = JobFile(uuid4(), "工作", 1, "員工", datetime.now(UTC), 0)
 
     async def rename(job_file_id, command):
         commands.append(command)

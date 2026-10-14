@@ -563,6 +563,8 @@ export type HealthStatus = {
   status: 'ok';
 };
 
+export type HeartbeatElapsedSeconds = number;
+
 /**
  * HttpErrorDetail
  */
@@ -803,6 +805,7 @@ export type JobFile = {
    * Created At
    */
   created_at: string;
+  active_usage_seconds: NonnegativeInteger;
 };
 
 /**
@@ -968,6 +971,13 @@ export type ReasoningSummary = {
   output_index: NonnegativeInteger;
   summary_index: NonnegativeInteger;
   text: NonemptyText;
+};
+
+/**
+ * RecordUsageHeartbeatRequest
+ */
+export type RecordUsageHeartbeatRequest = {
+  elapsed_seconds: HeartbeatElapsedSeconds;
 };
 
 /**
@@ -1527,6 +1537,38 @@ export type ReadInterviewHistoryResponses = {
 
 export type ReadInterviewHistoryResponse =
   ReadInterviewHistoryResponses[keyof ReadInterviewHistoryResponses];
+
+export type RecordJobFileUsageHeartbeatData = {
+  body: RecordUsageHeartbeatRequest;
+  path: {
+    /**
+     * Job File Id
+     */
+    job_file_id: string;
+  };
+  query?: never;
+  url: '/api/job-files/{job_file_id}/usage-heartbeat';
+};
+
+export type RecordJobFileUsageHeartbeatErrors = {
+  /**
+   * Invalid HTTP input
+   */
+  422: HttpErrorResponse;
+};
+
+export type RecordJobFileUsageHeartbeatError =
+  RecordJobFileUsageHeartbeatErrors[keyof RecordJobFileUsageHeartbeatErrors];
+
+export type RecordJobFileUsageHeartbeatResponses = {
+  /**
+   * Successful Response
+   */
+  200: JobFile;
+};
+
+export type RecordJobFileUsageHeartbeatResponse =
+  RecordJobFileUsageHeartbeatResponses[keyof RecordJobFileUsageHeartbeatResponses];
 
 export type RenameJobFileData = {
   body: RenameJobFileRequest;

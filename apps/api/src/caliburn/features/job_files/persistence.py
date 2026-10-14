@@ -19,7 +19,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.job_files.models import CreateJobFile, JobFile, RenameJobFile
+from caliburn.features.job_files.models import (
+    CreateJobFile,
+    JobFile,
+    RecordUsageHeartbeat,
+    RenameJobFile,
+)
 
 
 class JobFileRecord(Base):
@@ -34,6 +39,10 @@ class JobFileRecord(Base):
             name="employee_name_length",
         ),
         CheckConstraint("name_revision BETWEEN 1 AND 9007199254740991", name="name_revision_range"),
+        CheckConstraint(
+            "active_usage_seconds BETWEEN 0 AND 9007199254740991",
+            name="active_usage_seconds_range",
+        ),
     )
 
     job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
@@ -42,6 +51,7 @@ class JobFileRecord(Base):
     name_revision: Mapped[int] = mapped_column(BigInteger, server_default="1")
     employee_name: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    active_usage_seconds: Mapped[int] = mapped_column(BigInteger, server_default="0")
 
 
 class JobFileCreationRecord(Base):
@@ -147,6 +157,7 @@ async def read_creation(session: AsyncSession, command_id: UUID) -> JobFile | No
                 JobFileRecord.initial_display_name,
                 JobFileRecord.employee_name,
                 JobFileRecord.created_at,
+                JobFileRecord.active_usage_seconds,
             )
             .outerjoin(
                 JobFileRecord, JobFileRecord.job_file_id == JobFileCreationRecord.result_file_id
@@ -158,7 +169,14 @@ async def read_creation(session: AsyncSession, command_id: UUID) -> JobFile | No
         return None
     if row.job_file_id is None:
         raise RuntimeError("Live creation receipt has no job file")
-    return JobFile(row.job_file_id, row.initial_display_name, 1, row.employee_name, row.created_at)
+    return JobFile(
+        row.job_file_id,
+        row.initial_display_name,
+        1,
+        row.employee_name,
+        row.created_at,
+        row.active_usage_seconds,
+    )
 
 
 async def read_job_file(session: AsyncSession, job_file_id: UUID) -> JobFileRecord | None:
@@ -172,6 +190,22 @@ async def lock_job_file(session: AsyncSession, job_file_id: UUID) -> JobFileReco
             .where(JobFileRecord.job_file_id == job_file_id)
             .with_for_update()
             .execution_options(populate_existing=True)
+        )
+    ).one_or_none()
+
+
+async def accumulate_usage_seconds(
+    session: AsyncSession, job_file_id: UUID, command: RecordUsageHeartbeat
+) -> JobFileRecord | None:
+    """Atomic SQL-level add; concurrent heartbeats from other tabs never overwrite each other."""
+    return (
+        await session.scalars(
+            update(JobFileRecord)
+            .where(JobFileRecord.job_file_id == job_file_id)
+            .values(
+                active_usage_seconds=JobFileRecord.active_usage_seconds + command.elapsed_seconds
+            )
+            .returning(JobFileRecord)
         )
     ).one_or_none()
 

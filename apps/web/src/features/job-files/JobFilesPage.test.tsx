@@ -27,6 +27,7 @@ test('each row has a single link, a 24-hour minute-precision date and a rename b
               employee_name: '合成員工甲',
               created_at: created.toISOString(),
               name_revision: 1,
+              active_usage_seconds: 0,
             },
           ],
         }),

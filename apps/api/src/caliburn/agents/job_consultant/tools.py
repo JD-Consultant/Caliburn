@@ -28,6 +28,7 @@ from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
     occupation_reference_definitions,
 )
+from caliburn.transport.model_tools.task_hints import TaskHintTools, search_task_hints_definition
 
 CONSULTANT_MEMORY_READ_NAMES = (
     "read_work_situation_map",
@@ -53,6 +54,7 @@ def consultant_tool_definitions(
         *context_compaction_definitions(),
         *(interview_plan_definitions() if interview_plans_enabled else []),
         *(occupation_reference_definitions() if occupation_references_enabled else []),
+        *([search_task_hints_definition()] if occupation_references_enabled else []),
     ]
 
 
@@ -67,6 +69,7 @@ class ConsultantTools:
         compaction: ContextCompactionTools,
         *,
         occupation_references: OccupationReferenceTools | None = None,
+        task_hints: TaskHintTools | None = None,
         interview_plans: InterviewPlanTools | None = None,
     ) -> None:
         self.memory_reads = memory_reads
@@ -76,6 +79,7 @@ class ConsultantTools:
         self.consolidation = consolidation
         self.compaction = compaction
         self.occupation_references = occupation_references
+        self.task_hints = task_hints
         self.interview_plans = interview_plans
 
     def standard_tools(self, ensure_active: Callable[[], Awaitable[None]]) -> list[BaseTool]:
@@ -127,6 +131,9 @@ class ConsultantTools:
                 return await prepare(call.name, call.arguments, operation_id)
 
             return NativeToolBinding(prepare_call, execute)
+
+        if self.task_hints is not None:
+            add(self.task_hints.definitions(), read_binding(self.task_hints.invoke))
 
         for owner in (self.interview_plans, self.occupation_references):
             if owner is None:

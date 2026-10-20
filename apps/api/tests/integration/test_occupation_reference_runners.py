@@ -33,6 +33,7 @@ from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
     occupation_reference_definitions,
 )
+from caliburn.transport.model_tools.task_hints import search_task_hints_definition
 from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
 from caliburn.workflows.work_memory.candidates import MemoryCandidateWorkflow
 from tests.fixtures.response_loop import response_at
@@ -269,7 +270,10 @@ def test_committed_reference_command_recovers_or_stays_out_of_formal_state(
             ):
                 definitions = original_definitions(interview_plans_enabled=interview_plans_enabled)
                 if occupation_references_enabled:
-                    references = occupation_reference_definitions()
+                    references = [
+                        *occupation_reference_definitions(),
+                        search_task_hints_definition(),
+                    ]
                     for definition in references:
                         definition["description"] = description
                     definitions += references

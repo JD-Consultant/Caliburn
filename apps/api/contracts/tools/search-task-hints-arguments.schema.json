@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SearchTaskHintsArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12000,
+      "pattern": "[^\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]",
+      "description": "以自然語言描述一項具體工作任務或職責片段，保留動作、對象與情境。只找任務層級的公版內容，不回傳也不綁定任何職位身分；必須有非空白內容，最多 12,000 字元。"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "description": "只填 query；用於幫員工回想這類任務通常涉及的內容方向，不是認定員工職位或已完成的工作。"
+}

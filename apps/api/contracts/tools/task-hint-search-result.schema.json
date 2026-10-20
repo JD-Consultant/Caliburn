@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskHintSearchResult",
+  "description": "去識別化的任務提示：只有任務名稱與其知識/技能/產出/行為指標，不含任何職位身分。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskHint"
+      }
+    }
+  },
+  "required": [
+    "hints"
+  ],
+  "$defs": {
+    "TaskName": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": ["string", "null"]
+        },
+        "name": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["code", "name"]
+    },
+    "NamedContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": ["string", "null"]
+        },
+        "name": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["code", "name"]
+    },
+    "Indicator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": ["string", "null"]
+        },
+        "text": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["code", "text"]
+    },
+    "CompetencyBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "competency_level": {
+          "type": ["integer", "null"],
+          "maximum": 9007199254740991
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NamedContent" }
+        },
+        "indicators": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Indicator" }
+        },
+        "knowledge": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NamedContent" }
+        },
+        "skills": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NamedContent" }
+        }
+      },
+      "required": ["competency_level", "outputs", "indicators", "knowledge", "skills"]
+    },
+    "TaskHint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TaskName" }
+        },
+        "competency_blocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/CompetencyBlock" }
+        }
+      },
+      "required": ["names", "competency_blocks"]
+    }
+  }
+}

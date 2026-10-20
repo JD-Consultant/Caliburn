@@ -73,6 +73,7 @@ from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
 )
+from caliburn.transport.model_tools.task_hints import TaskHintTools
 from caliburn.workflows.consultant_turns.completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_turns.context import ConsultantContextWorkflow
 from caliburn.workflows.executions.context_history import RoleContextHistory
@@ -281,6 +282,7 @@ class ConsultantRunner:
     ) -> ConsultantTools:
         jd_references = JdModelReferences(self.sessions, writer.scope.job_file_id)
         references = None
+        task_hints = None
         if _references_enabled(context.request):
             if self.occupation_references is None:
                 raise ExecutionStateError("The saved Turn requires its occupation reference client")
@@ -291,6 +293,7 @@ class ConsultantRunner:
                 self.occupation_references,
                 writer,
             )
+            task_hints = TaskHintTools(self.occupation_references)
         return ConsultantTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), context.memory_binding),
             JdReadTools(
@@ -319,6 +322,7 @@ class ConsultantRunner:
             MemoryConsolidationTools(MemoryConsolidationWorkflow(self.sessions), writer),
             ContextCompactionTools(role_history),
             occupation_references=references,
+            task_hints=task_hints,
             interview_plans=(
                 InterviewPlanTools(InterviewPlanWorkflow(self.sessions), writer)
                 if has_interview_plan_tools(context.request)
@@ -377,7 +381,7 @@ class ConsultantRunner:
 
 def _references_enabled(request: ResponseRequest) -> bool:
     """Use the original captured capability bundle, not today's runtime configuration."""
-    required = set(OccupationReferenceTools.names)
+    required = set(OccupationReferenceTools.names) | set(TaskHintTools.names)
     declared = [
         tool["name"] for tool in request.create_payload()["tools"] if tool["name"] in required
     ]

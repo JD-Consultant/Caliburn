@@ -41,6 +41,7 @@ from caliburn.transport.model_tools.occupation_references import (
     OccupationReferenceTools,
     occupation_reference_definitions,
 )
+from caliburn.transport.model_tools.task_hints import search_task_hints_definition
 from caliburn.workflows.work_memory.reads import CandidateMemoryRead, PublishedMemoryRead
 from tests.contracts.test_tool_schema_strictness import SchemaWalk
 from tests.fixtures.native_tools import ensure_active, invoke_tool
@@ -90,11 +91,14 @@ def test_default_role_definitions_keep_reference_tools_disabled():
         }
 
 
-def test_enabled_consultant_adds_five_reference_contracts_only():
+def test_enabled_consultant_adds_six_reference_contracts_only():
     default = consultant_tool_definitions()
     enabled = consultant_tool_definitions(occupation_references_enabled=True)
     assert enabled[: len(default)] == default
-    assert tuple(item["name"] for item in enabled[len(default) :]) == OccupationReferenceTools.names
+    assert tuple(item["name"] for item in enabled[len(default) :]) == (
+        *OccupationReferenceTools.names,
+        "search_task_hints",
+    )
     assert "read_excluded_work" not in {item["name"] for item in enabled}
 
 
@@ -257,6 +261,7 @@ async def test_write_handler_preserves_the_captured_request(
         [
             *consultant_tool_definitions(),
             *occupation_reference_definitions(),
+            search_task_hints_definition(),
         ]
     )
     original_payload = saved.create_payload()

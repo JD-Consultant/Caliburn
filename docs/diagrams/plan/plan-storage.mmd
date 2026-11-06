@@ -1,0 +1,19 @@
+%% title: 後端（現行）：Plan 目前內容與完整快照 ER
+%% legend: 實表與外鍵關係；省略長度及版本檢查。零到多為資料庫基數；成功初始化會同交易保存首版快照。
+erDiagram
+    direction TB
+    WORKSPACES["workspaces｜外部既有表"] {
+        uuid id PK "Workspace 身分"
+    }
+    PLANS["plans｜目前內容"] {
+        uuid workspace_id PK,FK "根識別，參照 workspaces.id"
+        bigint version "目前版本，從 1 遞增"
+        text body "NULL 目前無正文；空字串為空正文"
+    }
+    PLAN_VERSIONS["plan_versions｜完整版本快照"] {
+        uuid workspace_id PK,FK "參照 plans.workspace_id"
+        bigint version PK "與 workspace_id 組成複合主鍵"
+        text body "可空；該版本完整 Markdown"
+    }
+    WORKSPACES ||--o| PLANS : "每 Workspace 至多一份"
+    PLANS ||--o{ PLAN_VERSIONS : "完整版本快照"

@@ -1,0 +1,63 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 310
+    nodeSpacing: 24
+    rankSpacing: 38
+    padding: 14
+---
+%% title: Caliburn｜資料歸屬與查讀邊界
+%% legend: 框表示資料歸屬；不是 ER、外鍵或部署圖。業務表與官方 Saver 表可在同一 PG database，但不自動共用交易。隱藏線僅作排版；精確引用鍵與基數見各模組 ER。
+flowchart TB
+  subgraph postgres["PostgreSQL · 一個 database"]
+    direction TB
+    subgraph businessDb["業務資料 · 所有職務資料限定所屬 Workspace"]
+      direction TB
+      subgraph records[" "]
+        direction LR
+        workspace["Workspace<br/>身分、受訪者、生命週期"]
+        interview["Interview<br/>原話、逐題問答與發話者<br/>順序、來源身分與撤回"]
+        references["Model References<br/>Workspace＋種類／UUID 映射<br/>業務刪除／取消不回收短碼"]
+        workspace ~~~ interview ~~~ references
+      end
+      subgraph versions[" "]
+        direction LR
+        jd["Job Description<br/>關聯式內容＋JSONB 完整快照<br/>同交易保存內容、引用與版本<br/>來源：訪談／固定 Memory 發布版"]
+        memory["Memory<br/>情境、理解、來源與涵蓋範圍<br/>不可變完整發布快照<br/>訪談來源由 Interview 管理"]
+        plan["Plan<br/>目前計畫正文與版本<br/>完整恢復快照"]
+        jd ~~~ memory ~~~ plan
+      end
+      records ~~~ versions
+    end
+    subgraph execution["Agent 執行資料 · 官方 Saver 管理，模組不直接 CRUD 私有表"]
+      direction LR
+      checkpoint["官方 Checkpoint 表<br/>Graph State、模型／工具原件<br/>interrupt、Task 結果與恢復位置"]
+    end
+    businessDb ~~~ execution
+  end
+  questions["執行資料的公開查讀 · 不另建業務表<br/>Agent：Workspace／Turn／Step 定位<br/>HumanQuestions：問答與等待狀態投影<br/>正式原話仍由 Interview 保存"]
+  subgraph reference["Occupation Reference owner · 跨 Workspace 共用公版資產"]
+    direction LR
+    sources["來源檔案<br/>PDF、OCS JSON、解析診斷"]
+    index[("Qdrant · 向量資料庫<br/>固定來源／hash、向量索引<br/>ready manifest")]
+    weights["模型資產<br/>Embedding／Reranker 權重"]
+    sources ~~~ index ~~~ weights
+  end
+  postgres ~~~ questions ~~~ reference
+
+  classDef owner fill:#f2f6fa,stroke:#5f758b,color:#182b3a
+  classDef data fill:#ffffff,stroke:#879bad,color:#243746
+  class workspace,references,jd,interview,memory,plan,questions owner
+  class checkpoint,sources,index,weights data
+  style postgres fill:#fafbfd,stroke:#7d91a5,stroke-width:2px
+  style businessDb fill:#ffffff,stroke:#b5c2ce
+  style records fill:transparent,stroke:none
+  style versions fill:transparent,stroke:none
+  style execution fill:#ffffff,stroke:#9aabbc
+  style reference fill:#ffffff,stroke:#9aabbc

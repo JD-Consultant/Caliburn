@@ -1,47 +1,60 @@
-# 快速開始：在 Windows 使用 Caliburn
+# 第一次使用 Caliburn
 
-用 Docker 啟動 App、資料庫與 PDF 匯出。資料庫密碼自動產生，其餘設定使用預設值；不必另裝 Node、Python 或 PostgreSQL。
+本頁使用 Docker 啟動單一應用程式、PostgreSQL 與 Qdrant，資料保存於 Compose 管理的 named volumes。只有 Agent 使用模型的能力依配置啟用，公版模組與資料服務屬標準部署。
 
-## 準備 Docker 與專案
+## 1. 準備環境與設定
 
-安裝 [Git for Windows](https://git-scm.com/install/windows) 與 [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)。依 Docker 提示完成 WSL 2 設定，使用 Linux containers，並保持 Docker Desktop 開啟。
-
-在 PowerShell 取得專案；已有專案時，直接進入原目錄：
+安裝可執行 Linux containers 的 Docker 與 Docker Compose，取得本專案後進入 repository 根目錄。以下命令用於首次尚無設定檔的 checkout：
 
 ```powershell
-git clone https://github.com/JD-Consultant/Caliburn.git
-cd Caliburn
+Copy-Item .env.compose.example .env
+New-Item -ItemType Directory -Force .local
 ```
 
-不使用 Git 時，可從[專案頁](https://github.com/JD-Consultant/Caliburn)選 **Code → Download ZIP**，解壓後在含 `compose.jd-app.yaml` 的目錄開啟 PowerShell。
+編輯根 `.env`，將 `CALIBURN_POSTGRES_PASSWORD` 換成自己的資料庫密碼，使用 URL-safe 字元。此檔供 Compose 插值；不要把密碼提交 Git。完整可調項見 [.env.compose.example](../../.env.compose.example)。
 
-## 設定 AI 金鑰（可略過）
+預設只綁本機：應用 `8101`、PostgreSQL `55441`、Qdrant `6335`。Compose 專案名為 `caliburn-rebuild`，啟停與更新須使用同一專案名以存取既有 volumes。
 
-要使用 AI，在 `apps/api/.env` 寫入一行：`OPENAI_API_KEY=` 後接自己的 key。確認檔名不是 `.env.txt`；已有檔案時沿用，金鑰勿提交或分享。
-
-沒有 key 可略過，仍可人工編輯 JD 與匯出 PDF。
-
-## 初始化並啟動
-
-在專案根目錄執行：
+## 2. 建置、初始化與啟動
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-docker.ps1
+docker compose build app
+docker compose up -d --wait postgres qdrant
+docker compose run --rm app python -m caliburn.migrate upgrade head
+docker compose up -d --wait
+docker compose ps
 ```
 
-首次需連網下載依賴。腳本會檢查 Docker、完成初始化並啟動服務；保留既有設定，失敗即停。`Bypass` 只作用於本次 PowerShell 程序。
+依序建置映像、啟動資料服務、明示遷移業務 Schema，再啟動應用。日常啟動不自動遷移。首次 build 會安裝鎖定套件、PDF 用的 Chromium 與字型；不下載公版模型權重或外部語料。
 
-完成後開啟 [Caliburn](http://127.0.0.1:8100/)。下次使用按[日常啟停](README.md#日常啟停與更新)，不需重新初始化。
+開啟 [Caliburn](http://127.0.0.1:8101)。可先建立檔案、人工編修 JD、查看歷史及匯出 PDF。健康入口是 [/api/health](http://127.0.0.1:8101/api/health)，API 文件位於 [/api/docs](http://127.0.0.1:8101/api/docs)。健康成功不代表公版索引、模型權重或 Agent 已就緒。
 
-## 建立第一份職務檔案
+## 3. 啟用 AI 訪談
 
-1. 按「建立職務檔案」，填入檔案名稱與受訪員工姓名，再按「建立」。進入工作區即表示檔案已保存。
-2. 已設定 key 時，送出一句工作說明，確認收到顧問回應；這會使用 OpenAI 額度。未設 key 時，訪談送出會被拒絕，輸入仍保留。
+將 [Agent 範例](../../apps/backend/agent.example.json)複製為根 `.local/agent.json`，依需要選擇 Bundle／Plugin。建立 `.local/app.env`，設定：
 
-頁面能開啟不代表 key 有效；操作失敗時查[問題診斷](README.md#診斷)。
+```dotenv
+CALIBURN_REBUILD_AGENT_CONFIG=/opt/caliburn/local/agent.json
+CALIBURN_REBUILD_AGENT_CHECKPOINT_CONNINFO=postgresql://caliburn:YOUR_URL_SAFE_PASSWORD@postgres:5432/caliburn?options=-csearch_path%3Dagent_checkpoints
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+```
 
-## 之後要做什麼
+密碼須與根 `.env` 相同；`app.env` 由容器讀取，不會自動展開另一檔的變數。機密只放程序環境，Agent JSON 只放非秘密的模型與 Plugin 設定。模型請求會將必要工作資料外送至配置的 provider。
 
-- [操作手冊](README.md)：啟停、更新、備份與自訂設定。
-- [原生開發](native-development.md)：修改程式與測試。
-- [公版參考與 RAG](rag.md)：加入公版查找。
+首次啟用 Agent 時先建立範例連線指定的專用 schema，再明示初始化官方 Checkpoint，最後重建應用容器以載入設定：
+
+```powershell
+docker compose exec postgres psql -U caliburn -d caliburn -c 'CREATE SCHEMA IF NOT EXISTS agent_checkpoints'
+docker compose run --rm app python -m caliburn.migrate upgrade head --with-checkpoints
+docker compose up -d --force-recreate app
+```
+
+Plugin 可分別選取，必要依賴缺漏會拒絕啟動，不自動補開；詳細配置與恢復相容版本見 [Agent](../../apps/backend/src/caliburn/modules/agent/README.md#明示設定)。未啟用 Agent 不會自動呼叫模型。
+
+## 4. 準備公版檢索
+
+公版模組已隨應用組裝，預設配置為 [docker/reference.json](../../docker/reference.json)。搜尋需要既有 Hugging Face cache 放在根 `.local/models`，以及與配置相符、已完成建置的 Qdrant collection。缺少資源會回不可用，不會自動下載權重或建索引。
+
+來源轉換、權重版本、建新索引與配置切換見[公版維護](rag.md)。完成這些準備後，選取 Job Reference Plugin 的顧問即可查找公版；公版線索仍須經員工確認。
+
+日常啟停、更新、備份與排錯見[操作手冊](README.md)，修改程式見[原生開發](native-development.md)。

@@ -1,1 +1,0 @@
-"""Work-situation analysis role."""

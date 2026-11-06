@@ -1,0 +1,46 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 280
+    nodeSpacing: 28
+    rankSpacing: 34
+    padding: 12
+---
+%% title: Agent、能力服務與 Bundle｜靜態責任及依賴方向
+%% legend: 架構規格，非實作或驗收進度。只列主要靜態依賴；虛線箭頭由依賴者指向被依賴者，不表示執行順序。具體 Bundle 位於 caliburn/bundles，但不屬於邏輯 Core；Core 只依插件契約執行已註冊 callable，不 import 具體 Bundle 或能力。能力查讀不以 Bundle 啟用為前提。
+flowchart TB
+  host["Host 組裝<br/>固定配置、資源與 Bundle 選用"]
+  http["HTTP 接入<br/>通用入口與能力專屬入口"]
+  bundles["具體 Bundle · bundles/<br/>可選 Tool／Prompt／Context<br/>不屬於邏輯 Core"]
+  abilities["能力模組<br/>human_questions／Memory／JD 等<br/>自有規則、用例及語意投影"]
+  app["通用 Agent Application<br/>准入、受理、續跑及 SSE"]
+  core["Core 公開執行／查讀＋插件契約<br/>通用 Loop、State、PluginStep"]
+  saver["LangGraph／PostgreSQL Saver<br/>原生 Checkpoint 與恢復資料"]
+  references["Model References<br/>Workspace 內短碼↔種類／UUID<br/>共用持久映射，無業務資格規則"]
+
+  host -.->|載入與選取| bundles
+  host -.->|建立服務| app
+  host -.->|組裝 Agent| core
+  host -.->|同一服務綁各 Bundle Key| references
+  http -.->|通用用例| app
+  http -.->|能力用例| abilities
+  bundles -.->|公開能力| abilities
+  bundles -.->|批次定位| references
+  bundles -.->|插件契約| core
+  abilities -.->|問答查讀與協調續跑| app
+  abilities -.->|通用恢復契約| core
+  app -.->|驅動與查讀| core
+  core -.->|原生保存與載入| saver
+
+  classDef generic fill:#f2f6fa,stroke:#5f758b,stroke-width:1px,color:#182b3a
+  classDef capability fill:#ffffff,stroke:#73879b,stroke-width:1px,color:#182b3a
+  classDef adapter fill:#eef2f6,stroke:#73879b,stroke-width:1px,color:#182b3a
+  class host,http,app,core,saver generic
+  class abilities,references capability
+  class bundles adapter

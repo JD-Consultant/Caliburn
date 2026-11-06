@@ -1,0 +1,21 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    nodeSpacing: 24
+    padding: 10
+    wrappingWidth: 300
+---
+%% title: 現行 State 更新方式：Node 內計算，Graph 套用並保存
+%% legend: 藍框為一個 Graph Node；框內函式呼叫沒有獨立保存點。僅畫順序執行與同步保存；省略例外。
+flowchart TD
+    input[/Graph 傳入 State/] --> invoke_handler
+    subgraph execution[" "]
+        invoke_handler[呼叫工具或 Hook] --> result[取得回傳值或局部 update]
+        result --> use[後續程式直接使用區域變數<br/>例如把 output 組成模型輸入]
+        use --> returned[/return 局部欄位更新/]
+    end
+    returned --> apply[Graph 套用 channel 更新<br/>覆寫或依宣告的 reducer 合併]
+    apply --> checkpoint[(Checkpointer 保存<br/>本 Agent 使用 sync)]
+    checkpoint --> next[下一個 Node<br/>讀取更新後的 State]
+    style execution fill:#eef5ff,stroke:#3569a8,color:#153c70

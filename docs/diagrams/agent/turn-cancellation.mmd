@@ -1,0 +1,21 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    padding: 8
+    wrappingWidth: 300
+---
+%% title: 現行整輪取消：停止、State 保存與插件撤回
+%% legend: Agent 協調執行；插件擁有業務撤回。drain 等原生執行邊界，不保證立即終止同步工具，也不撤銷已提交效果。不保證跨模組原子取消，保存失敗不回完成。
+flowchart TD
+    request[/收到本輪取消要求/] --> block[Agent 服務阻止該輪新執行與恢復]
+    block --> stop[要求原生 drain<br/>等待目前 invocation 收束]
+    stop --> completed{已正常完成？}
+    completed -->|是| conflict([回衝突，不撤銷已完成輪])
+    completed -->|否| admission[(同一 State 保存 pending<br/>冷啟動也拒絕恢復)]
+    admission --> cleanup[[插件依契約收尾／補償<br/>不以停止 Graph 代替業務撤回]]
+    cleanup --> result{必要收尾已完成？}
+    result -->|是| record[(同一 State 保存 completed<br/>後續拒絕恢復)]
+    record --> finish([回報 204 取消完成])
+    result -->|否| unresolved([回 503、保持 pending<br/>同一取消入口重試])
+    finish --> newturn[/下一次輸入使用新 turn_id<br/>Core 與插件重新初始化/]

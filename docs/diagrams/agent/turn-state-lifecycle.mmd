@@ -1,0 +1,22 @@
+---
+config:
+  flowchart:
+    rankSpacing: 24
+    nodeSpacing: 28
+    padding: 8
+    wrappingWidth: 310
+---
+%% title: 現行 State 生命週期：同 Thread 新輪與同輪恢復
+%% legend: 同 Agent＋Workspace 使用同 Thread；Turn 是一次輸入的工作，run_id 是一次執行嘗試。本圖說明資料生命週期，不是另一張 Graph；服務物件不進 State。
+flowchart TD
+    newturn[/准入新輪：首次輸入、上輪正常完成<br/>或上輪取消已完成/] --> load[載入同 Thread 目前 State<br/>以 config.metadata.turn_id 關聯新輪]
+    load --> input[(input checkpoint：新輸入已耐久<br/>values 仍可能是前輪資料)]
+    input --> started[(__start__ 完成後保存<br/>套入新輪輸入並重設 Core 當輪欄位<br/>model_step 從 0 開始)]
+    started --> init[initialize_turn<br/>以 turn_input 重建當輪 model_request]
+    init --> plugins[插件決定自身 channel 保留／重設<br/>按需選取歷史與本輪資料]
+    plugins --> loop[模型／工具與插件 Node<br/>逐步回傳更新並保存]
+    loop --> completed[(全部輪尾工作成功後保存<br/>turn_completed=True<br/>保留 turn_input 與最後 Response)]
+    completed --> finish([下輪仍使用同一 Thread])
+    resume[/恢復同輪：同 thread、同 turn_id<br/>新 run_id；None 或人工回答 Command/] --> saved[(載入 Checkpoint 與 pending 資料<br/>可能仍待 __start__ 套用本輪輸入)]
+    saved --> pending[接續待執行 Node<br/>中斷 Node 從頭重跑<br/>已保存完成的 Node／Task 結果可復用]
+    pending --> continue([沿原有流程完成本輪<br/>不另建 turn_id 或重跑已完成初始化])

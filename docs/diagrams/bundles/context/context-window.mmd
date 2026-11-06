@@ -1,0 +1,30 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    nodeSpacing: 24
+    padding: 8
+    wrappingWidth: 300
+---
+%% title: 現行 Context 輪首：固定材料、整理歷史，再追加本輪輸入
+%% legend: on_turn_start 的 prepare_window Node 內流程。capture 與 compact_history 是原生 Task，不是新服務或資料表；同輪恢復復用已保存 Task。96K 為預設門檻；只有同窗沿用且選用輪前壓縮才計數。
+flowchart TD
+    start([輪首普通 PluginStep 已完成]) --> previous[查同 Agent／Workspace 上一成功窗口<br/>版本不相容時視為沒有可沿用窗口]
+    previous --> renew{沒有窗口或貢獻者要求重建？}
+    renew -->|是| fresh[以空 input 準備新窗口]
+    renew -->|否| history[沿用完整原生 input]
+    fresh --> prepare
+    history --> prepare[依配置順序呼叫各貢獻者 prepare<br/>材料與 owner 版本一起取得]
+    prepare --> project[另行取得本輪輸入投影<br/>尚未加入歷史請求]
+    project --> captured[(capture Task 保存選取與投影結果)]
+    captured --> enabled{同窗沿用且有輪前壓縮回呼？}
+    enabled -->|否| append
+    enabled -->|是| count[SDK 計數：歷史 input<br/>加當前提示、工具與支援設定]
+    count --> threshold{input_tokens ≥ 96K？}
+    threshold -->|是| compact[SDK 原生 compact<br/>取得完整 CompactedResponse]
+    threshold -->|否| none[結果為 None；沿用歷史]
+    compact --> saved
+    none --> saved[(compact_history Task 保存結果)]
+    saved --> append[採用完整 compact output 或沿用歷史<br/>再追加已捕捉的本輪輸入]
+    append --> adopted[(Node 回傳局部更新<br/>Graph 保存 model_request 與已採用壓縮回應)]
+    adopted --> finish([開始第一個模型步<br/>差異注入與 160K 檢查沿步前流程])

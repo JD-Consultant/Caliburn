@@ -1,0 +1,16 @@
+---
+config:
+  look: classic
+---
+%% title: 後端（現行）：JD 用例與儲存契約
+%% legend: 模組依賴示意（非 C4／UML）；實線＝依賴，虛線＝實作契約。不表示呼叫先後。
+flowchart LR
+    Routes["HTTP 業務路由<br/>Workspace 範圍"] --> Application["Application<br/>編修／查詢／歷史用例"]
+    Bundle["JD Bundle<br/>模型工具／取消轉接"] --> Application
+    Application --> Domain["JobDescription<br/>聚合根"]
+    Application --> Ports["Repository／UoW<br/>查詢／歷史契約"]
+    Storage["SQLAlchemy adapter<br/>關聯式內容＋完整快照"] -.實作.-> Ports
+    Application --> Sources["來源查驗／展開契約<br/>CitationSources／CitationSourceQueries"]
+    SourceAdapter["來源 adapter<br/>借 Interview／Memory 公開查讀"] -.實作.-> Sources
+    Application --> Completed["完成輪端點契約<br/>CompletedTurnReader"]
+    Host["Host 完成輪 reader<br/>核 Agent 完成資格＋Bundle 投影"] -.提供.-> Completed

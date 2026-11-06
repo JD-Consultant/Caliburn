@@ -113,7 +113,7 @@ if (values.list) {
 }
 if (!values['mermaid-dir']) throw new Error('請提供 --mermaid-dir（Mermaid dist 目錄）；--browser 可指定既有 Chromium。先用 --list 檢查圖源與引用。');
 const mermaidDir = path.resolve(values['mermaid-dir']);
-const require = createRequire(path.join(root, 'apps/web/package.json'));
+const require = createRequire(path.join(root, 'package.json'));
 const { chromium } = require('@playwright/test');
 const version = JSON.parse(await readFile(path.join(mermaidDir, '../package.json'), 'utf8')).version;
 if (version !== '12.1.0') throw new Error('文件渲染鎖定 Mermaid 12.1.0，目前版本：' + version);
@@ -167,13 +167,25 @@ try {
       let frameWidth = Math.max(width, label.getComputedTextLength() + 32);
       let headerHeight = 48;
       if (legend) {
-        const lines = legend.match(/.{1,36}/gu) ?? [];
-        for (const line of lines) {
-          const lineNode = addText(line, headerHeight + 6, 13);
-          frameWidth = Math.max(frameWidth, lineNode.getComputedTextLength() + 32);
-          headerHeight += 21;
+        const lineWidth = frameWidth - 32;
+        const segments = new Intl.Segmenter('zh-Hant', { granularity: 'word' }).segment(legend);
+        let lineNode = addText('', headerHeight + 6, 13);
+        let line = '';
+        for (const { segment } of segments) {
+          lineNode.textContent = line + segment;
+          if (line.trim() && segment.trim() && lineNode.getComputedTextLength() > lineWidth) {
+            lineNode.textContent = line;
+            frameWidth = Math.max(frameWidth, lineNode.getComputedTextLength() + 32);
+            headerHeight += 21;
+            lineNode = addText(segment, headerHeight + 6, 13);
+            line = segment;
+          } else {
+            line += segment;
+          }
         }
-        headerHeight += 12;
+        // 單一識別符寬於圖面時擴框，保留原文，不拆詞或截斷。
+        frameWidth = Math.max(frameWidth, lineNode.getComputedTextLength() + 32);
+        headerHeight += 33;
       }
       diagram.setAttribute('x', String((frameWidth - box.width) / 2));
       diagram.setAttribute('y', String(headerHeight));

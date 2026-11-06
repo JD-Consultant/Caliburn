@@ -1,0 +1,57 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 20px
+  sequence:
+    mirrorActors: false
+    width: 130
+    actorMargin: 40
+    actorFontSize: 20
+    messageFontSize: 18
+    noteFontSize: 18
+    diagramMarginX: 16
+    diagramMarginY: 18
+    messageMargin: 24
+    noteMargin: 12
+    wrap: true
+---
+%% title: 現行人工問答｜回答與原輪接續
+%% legend: 實線為等待完成的呼叫，開放箭頭為非同步排程，虛線為回覆。Agent 合併 Application、Core 與原生保存視角；Core 不解讀問答。callback 均為同步純函式，不做資料庫 I/O。
+sequenceDiagram
+  participant HTTP as HTTP 介面
+  participant Q as 問答服務
+  participant Agent as Agent<br/>執行與保存
+  participant Tool as 提問 Tool
+  participant Interview as Interview<br/>正式訪談
+
+  HTTP->>Q: POST answers
+  Q->>Agent: resume_interrupt
+  Agent->>Agent: 鎖內查原件<br/>並核准入
+  Agent->>Q: is_saved<br/>核對指定結果
+  Q-->>Agent: 同答已存／未存
+  alt 已保存相同答案
+    Agent-->>Q: TurnSubmission
+    Q-->>HTTP: 200；不另啟工作
+  else 新答案，且無活動工作
+    Agent->>Q: prepare<br/>依原 interrupt 驗答
+    Q-->>Agent: 原等待點<br/>與正規化答案
+    Agent-)Agent: 按 interrupt ID<br/>排程原輪恢復
+    Agent->>Tool: 重入原工具 Node
+    Tool->>Tool: 重用已存<br/>問題 task 結果
+    Tool->>Agent: 重入 interrupt
+    Agent-->>Tool: 取回恢復答案
+    Tool->>Tool: 核對完整回答
+    Tool->>Interview: task：保存答案
+    Interview-->>Tool: 逐題答案已提交
+    Tool-->>Agent: 原 call 的題答結果
+    Agent->>Agent: 原生保存<br/>工具結果
+    Agent->>Q: is_saved<br/>核對保存結果
+    Q-->>Agent: 指定答案已保存
+    Agent-->>Q: TurnSubmission
+    Q-->>HTTP: 202；答案結果已存
+  end
+  Note over HTTP,Interview: HTTP 成功只確認指定答案結果，不代表整輪完成

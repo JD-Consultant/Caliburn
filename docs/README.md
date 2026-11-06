@@ -1,36 +1,23 @@
 # Caliburn 文件導覽
 
-本目錄說明 Caliburn 的產品目的、架構、現行契約、實作與操作方式。正式產品位於 `apps/api`、`apps/web`；各主題文件維護自己的規則與已知限制，本頁提供閱讀入口。
+正式產品位於 `apps/backend` 與 `apps/frontend`。本目錄提供產品、架構、開發規範與操作入口；模組與 Bundle 的詳細契約就近維護，不在本目錄複製第二套 Schema 或執行流程。
 
-## 依讀者任務查閱
+## 依工作查閱
 
-| 你現在要做什麼 | 直接入口與閱讀順序 |
+| 工作 | 閱讀順序 |
 |---|---|
-| 第一次了解產品與系統 | [產品介紹](product/README.md) → [架構導覽](architecture/README.md) |
-| 第一次安裝並使用 | [快速開始](operations/getting-started.md)：Docker 基本模式 |
-| 啟停、更新或排查問題 | [操作手冊](operations/README.md)、[原生開發](operations/native-development.md)、[RAG 操作](operations/rag.md) |
-| 修改程式、Prompt、Tool 或 Context | [貢獻指南](../CONTRIBUTING.md#驗證與提交) → 受影響的[實作與契約接線](implementation/README.md) |
-| 查現行規則及設計取捨 | [架構](architecture/README.md) → 負責該規則的正文；限制見[驗證範圍](architecture/verification.md) |
-| 查訪談、工作分析及 JD 的已採用內容要求 | [產品內容判準](product/concepts.md#內容判準)與正式角色提示 |
-| 選擇測試與判讀限制 | [驗證範圍](architecture/verification.md)、[驗證責任](implementation/verification-plan.md)及各 App README |
+| 了解產品 | [產品介紹](product/README.md) → [產品概念與內容判準](product/concepts.md) |
+| 安裝與使用 | [快速開始](operations/getting-started.md) → [操作手冊](operations/README.md) |
+| 了解系統 | [架構導覽](architecture/README.md) → [系統責任規格](../apps/backend/architecture.md) |
+| 查模組、Bundle 與流程 | [模組與 Bundle](../apps/backend/README.md#檔案位置) → [實作入口](implementation/README.md) |
+| 開發與審查 | [貢獻指南](../CONTRIBUTING.md) → [程式規範](standards/README.md) |
+| 核對契約與生成 | [契約策略](standards/contract-strategy.md) → [資料與契約接線](implementation/data-and-contracts.md) |
+| 選擇驗證 | [驗證範圍](architecture/verification.md) → [驗證責任](implementation/verification-plan.md) |
+| 維護公版來源／索引 | [公版操作](operations/rag.md) → [公版模組](../apps/backend/src/caliburn/modules/occupation_reference/README.md) |
+| 維護圖面 | [圖庫](diagrams/README.md)及負責該圖的模組文件 |
 
-## 文件維護責任
+## 文件責任
 
-| 文件層次 | 責任 |
-|---|---|
-| [產品](product/README.md) | 使用情境、目標、資訊關係與非目標 |
-| [程式規範](standards/README.md) | 模組組織、程式寫法、資源、測試、Log 及契約策略 |
-| [架構](architecture/README.md) | 模組責任、資料流、生命週期、保存與運作邊界 |
-| [實作與契約接線](implementation/README.md) | 現行技術選型、程式接線、角色權限、資料資格、工具操作、正式生效條件及驗證對照 |
-| [操作](operations/README.md) | 啟停、更新、備份與排錯；App README 補元件設定與測試 |
-| [現行設計取捨](architecture/design-decisions.md) | 正式取捨及採用理由；[架構與現行責任](architecture/README.md)提供有效狀態 |
-| [圖庫](diagrams/README.md) | 架構圖源及衍生圖片 |
+產品文件說明使用者目標與內容判準；架構文件說明跨模組責任與限制；模組 README 維護能力、資料及交易，Bundle README 維護 Agent 接入；操作文件及後端／前端 README 維護命令。入口只導航，規則在負責正文修改。
 
-修改、驗證及文件維護見[貢獻指南](../CONTRIBUTING.md)。公開文件保留必要契約、官方來源與已知限制，讓新 checkout 可獨立使用；研究、內部流程、決策及工作原件只留本機。
-
-## 程式與本機環境
-
-- `apps/api/`、`apps/web/`：現行產品、測試及元件說明。
-- 獨立 RAG：分工見 [RAG 架構](architecture/rag-pipeline.md)，設定見 [RAG 操作](operations/rag.md)。
-- `scripts/`、`.github/`、workspace 與 lock：開發、建置及依賴設定。
-- `.tmp/`、本機依賴、`.env`、IDE 與代理個人設定不屬於公開交付。
+公開文件讓新 checkout 能獨立理解、建置與驗證。研究、內部決策、工作紀錄及完整測試輸出留在本機，不是公開使用的前置。文件維護與檢查見[貢獻指南](../CONTRIBUTING.md#文件維護)。

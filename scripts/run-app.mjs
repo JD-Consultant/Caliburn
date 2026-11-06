@@ -1,104 +1,92 @@
+/** Root commands select one backend project; uv owns env loading and execution. */
+import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { runAppProcesses } from "./app-processes.mjs";
 
-export { runAppProcesses } from "./app-processes.mjs";
+const root = fileURLToPath(new URL("../", import.meta.url));
+const operations = {
+  dev: ["caliburn.server"],
+  start: ["caliburn.server"],
+  status: ["caliburn.status"],
+  migrate: ["caliburn.migrate", "upgrade", "head"],
+};
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const allowedModes = new Set(["dev", "start"]);
-
-export function parseMode(value) {
-  if (!allowedModes.has(value)) {
-    throw new Error(`Unsupported App mode: ${value ?? "<missing>"}`);
+export function webBuildDirectory(directory) {
+  const dist = path.join(directory, "apps/frontend/dist");
+  if (!existsSync(path.join(dist, "index.html"))) {
+    throw new Error("The web UI is not built. Run `pnpm build` first.");
   }
-  return value;
+  return dist;
 }
 
-/**
- * 後端只有此啟動入口；額外參數原樣轉交，設定由明示環境提供。
- */
-export function backendInvocation(root, { pythonExecutable, keyFileExists, extraArgs = [] }) {
-  const keyFile = path.join(root, "apps", "api", ".env");
+export function backendInvocation(directory, { mode, args = [] }) {
+  if (!Object.hasOwn(operations, mode))
+    throw new Error(`Unsupported operation: ${mode}`);
+  const cwd = path.join(directory, "apps/backend");
   return {
-    command: pythonExecutable,
+    command: "uv",
     args: [
-      "apps/api/scripts/run_backend.py",
-      ...(keyFileExists ? ["--key-file", keyFile] : []),
-      ...extraArgs,
+      "run",
+      "--locked",
+      ...(["dev", "start"].includes(mode) ? ["--extra", "local-models"] : []),
+      ...(existsSync(path.join(cwd, ".env")) ? ["--env-file", ".env"] : []),
+      "python",
+      "-m",
+      ...operations[mode],
+      ...args,
     ],
+    cwd,
+    env:
+      mode === "start"
+        ? { CALIBURN_REBUILD_WEB_DIST: webBuildDirectory(directory) }
+        : {},
   };
 }
 
-/** 保留 uv run 的鎖定同步與自訂環境；服務啟動後不再依賴 uv wrapper 存活。 */
-export async function prepareBackendPython(root, { env, run = runAppProcesses } = {}) {
-  const result = await run([{
-    command: "uv",
-    args: ["run", "--project", "apps/api", "--locked", "python", "-c",
-      "import json, sys; print(json.dumps(sys.executable))"],
-  }], { cwd: root, env, captureStdout: true });
-  if (result.code !== 0 || result.signal) {
-    throw new Error("Backend environment preparation failed; no App services were started.");
-  }
-  let executable;
+/** Keep this parent alive until the server has released its resources. */
+export async function runInvocation(invocation) {
+  const child = spawn(invocation.command, invocation.args, {
+    cwd: invocation.cwd,
+    env: { ...process.env, ...invocation.env },
+    stdio: "inherit",
+    windowsHide: true,
+    // POSIX gets one forwarded signal; Windows keeps shared console delivery.
+    detached: process.platform !== "win32",
+  });
+  // Windows delivers console Ctrl+C to the child too. Sending it again would
+  // turn the server's graceful shutdown into a second, forced interruption.
+  const interrupt = () => {
+    if (process.platform !== "win32") child.kill("SIGINT");
+  };
+  const terminate = () => child.kill("SIGTERM");
+  process.on("SIGINT", interrupt);
+  process.on("SIGTERM", terminate);
   try {
-    executable = JSON.parse(result.stdout);
-  } catch {
-    // 不從 .venv 或 PATH 猜路徑，避免繞過 uv 選定的專案環境。
+    return await new Promise((resolve, reject) => {
+      child.once("error", reject);
+      child.once("close", (code, signal) =>
+        resolve(code ?? (signal === "SIGINT" ? 130 : 1)),
+      );
+    });
+  } finally {
+    process.off("SIGINT", interrupt);
+    process.off("SIGTERM", terminate);
   }
-  if (typeof executable !== "string" || !path.isAbsolute(executable)) {
-    throw new Error("uv did not report an absolute Python executable.");
-  }
-  return executable;
 }
 
-/** start 由 API 提供已建置介面；不在啟動時隱含建置。 */
-export function webBuildDirectory(root, exists = existsSync) {
-  const directory = path.join(root, "apps", "web", "dist");
-  if (!exists(path.join(directory, "index.html"))) {
-    throw new Error("The web UI is not built. Run `pnpm build` first.");
-  }
-  return directory;
-}
-
-export function frontendDevInvocation(pnpmExecutable) {
-  const args = ["--filter", "@caliburn/frontend", "--fail-if-no-match", "run", "dev"];
-  const extension = path.extname(pnpmExecutable).toLowerCase();
-  if ([".js", ".cjs", ".mjs"].includes(extension)) {
-    return { command: process.execPath, args: [pnpmExecutable, ...args] };
-  }
-  return { command: pnpmExecutable, args };
-}
-
-async function main() {
-  const mode = parseMode(process.argv[2]);
-  const env = { ...process.env };
-  let frontend;
-
-  if (mode === "start") {
-    env.CALIBURN_WEB_BUILD_DIRECTORY = webBuildDirectory(repoRoot);
-  } else {
-    const pnpmExecutable = process.env.npm_execpath;
-    if (!pnpmExecutable) {
-      throw new Error("Run this launcher through the repository pnpm script.");
-    }
-    frontend = frontendDevInvocation(pnpmExecutable);
-  }
-
-  const pythonExecutable = await prepareBackendPython(repoRoot, { env });
-  const backend = backendInvocation(repoRoot, {
-    pythonExecutable,
-    keyFileExists: existsSync(path.join(repoRoot, "apps", "api", ".env")),
-    extraArgs: process.argv.slice(3),
-  });
-  const invocations = frontend ? [backend, frontend] : [backend];
-  const result = await runAppProcesses(invocations, { cwd: repoRoot, env });
-  process.exitCode = result.signal ? 1 : (result.code ?? 1);
-}
-
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().catch((error) => {
-    console.error(error instanceof Error ? error.message : error);
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  try {
+    const invocation = backendInvocation(root, {
+      mode: process.argv[2],
+      args: process.argv.slice(3),
+    });
+    process.exitCode = await runInvocation(invocation);
+  } catch (error) {
+    console.error(error.message);
     process.exitCode = 1;
-  });
+  }
 }

@@ -1,0 +1,14 @@
+%% title: 後端（現行）：模型短碼與 Workspace ER
+%% legend: 四欄皆 NOT NULL。UK 是 workspace_id＋resource_kind＋resource_id 的複合唯一約束；resource_kind 有十一種類 CHECK。虛線是非識別 FK；resource_id 沒有多型業務 FK。
+erDiagram
+    direction TB
+    workspaces ||..o{ model_references : "所屬 Workspace／級聯刪除"
+    workspaces {
+        uuid id PK
+    }
+    model_references {
+        bigint reference_number PK "GENERATED ALWAYS AS IDENTITY；非業務順序"
+        uuid workspace_id FK,UK "複合 UK 的一部分"
+        text resource_kind UK "複合 UK 的一部分；十一種類 CHECK"
+        uuid resource_id UK "複合 UK 的一部分；非 FK"
+    }

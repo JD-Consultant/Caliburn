@@ -1,0 +1,10 @@
+{
+  "collection": "occupation_references_selected",
+  "qdrant_url": "http://qdrant:6333",
+  "cache_dir": "/opt/caliburn/local/models",
+  "device": "cpu",
+  "use_fp16": false,
+  "batch_size": 8,
+  "candidate_limit": 20,
+  "admission_timeout_seconds": 5.0
+}

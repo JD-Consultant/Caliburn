@@ -1,0 +1,9 @@
+{
+  "collection": "occupation_references_selected",
+  "qdrant_url": "http://127.0.0.1:6333",
+  "device": "cuda",
+  "use_fp16": true,
+  "batch_size": 8,
+  "candidate_limit": 20,
+  "admission_timeout_seconds": 5.0
+}

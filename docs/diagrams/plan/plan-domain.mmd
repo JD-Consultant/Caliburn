@@ -1,0 +1,23 @@
+%% title: 後端（現行）：Plan 單一聚合根及恢復快照
+%% legend: 領域型別圖；實線是身分關聯，虛線是使用依賴。Workspace 屬外部聚合，資料庫外鍵另見 ER。
+classDiagram
+    direction TB
+    class Workspace["Workspace（外部聚合）"] {
+        UUID id
+    }
+    class Plan["Plan（唯一聚合根）"] {
+        UUID workspace_id
+        int version
+        str_or_none body
+        apply_patch(diff)
+        restore(snapshot)
+    }
+    class PlanSnapshot["PlanSnapshot（不可變版本快照）"] {
+        UUID workspace_id
+        int version
+        str_or_none body
+    }
+    Workspace "1" <-- "0..1" Plan : workspace_id 引用
+    Plan ..> PlanSnapshot : 以指定快照恢復正文
+    note for Plan "目前內容，無子實體"
+    note for PlanSnapshot "獨立讀取，不載入全部歷史"

@@ -1,6 +1,6 @@
 # 文件圖源與圖片
 
-本目錄集中文件設計圖與產品截圖，供公開責任文件共用。設計圖依責任文件分目錄，保存 `.mmd` 圖源、同名 PNG 與可放大的 SVG；產品截圖放在 `screenshots/`。公開圖源只收架構及操作說明所需內容。
+本目錄集中現行文件設計圖，供公開責任文件共用。圖源依能力 owner 分目錄，保存 `.mmd`、同名 PNG 與可放大的 SVG。公開圖源只收架構及操作說明所需內容。
 
 產品權責、圖說及適用範圍由各責任文件維護；研究與報告專用圖源留在本機，不列入公開圖庫。圖名保留「現行」「目標／未實作」「候選」或「歷史」，截圖註明日期及受測範圍；集中存放不會改變狀態。
 
@@ -49,46 +49,30 @@
 
 正文嵌入 PNG 並附圖源／SVG。更新時核對圖面語意與正文是否一致，檢查解析渲染、中文、裁切、箭線與圖例，並同步引用；能渲染不證明符號或產品契約正確。截圖與既有來源素材保留原格式與位元組，搬移時核對雜湊及來源說明。
 
-## 產品截圖
-
-| 圖片 | 日期、用途與來源 |
-|---|---|
-| [職務檔案清單](screenshots/job-file-list.jpg) | 2026-10-05，呈現改名與刪除入口；此圖只展示操作位置，不是行為驗收證據 |
-
-截圖保留原始格式，不配 `.mmd` 或衍生 SVG，也不交由 Mermaid 重繪。
-
 ## 按責任文件查圖
 
 | 責任文件 | 圖面內容 | 圖源目錄 |
 |---|---|---|
-| [產品介紹](../product/README.md) | 使用者的核心流程 | [來源](product/README/) |
-| [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README/) |
-| [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries/) |
-| [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence/) |
-| [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations/) |
-| [程式組織](../standards/code-organization.md) | 模組依賴 | [來源](standards/code-organization/) |
-| [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution/) |
-| [Agent 程序監督](../implementation/agent-supervision.md) | 正常關閉與共用資源釋放 | [來源](implementation/agent-supervision/) |
-| [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests/) |
-| [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage/) |
-| [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選、快照與調度證據 | [來源](implementation/memory-storage/) |
-| [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage/) |
-| [介面與交付](../implementation/interface-and-delivery.md) | 命令恢復、跨分頁 hint、串流、來源查詢 | [來源](implementation/interface-and-delivery/) |
+| [ Workspace 模組](../../apps/backend/src/caliburn/modules/workspace/README.md) | 直接歸屬 ER、Workspace 整份刪除與清理流程 | [來源](workspace/) |
+| [模型短碼](../../apps/backend/src/caliburn/modules/model_references/README.md) | 持久短碼映射、Workspace FK 與唯一性 | [來源](model-references/) |
+| [公版模組](../../apps/backend/src/caliburn/modules/occupation_reference/README.md) | 匯入、索引、搜尋與固定來源回讀 | [來源](occupation-reference/) |
+| [ JD 模組](../../apps/backend/src/caliburn/modules/job_description/README.md) | Application 接線、關聯式內容、完整快照與來源引用 ER | [來源](job-description/) |
+| [ Plan 模組與 Bundle](../../apps/backend/src/caliburn/modules/plan/README.md) | 單一聚合根、目前正文與恢復快照 ER；編修、取消與下一輪窗口時序 | [來源](plan/) |
+| [訪談模組](../../apps/backend/src/caliburn/modules/interview/README.md) | 輪次、逐題訊息及同輪回答外鍵 ER | [來源](interview/) |
+| [ Memory 模組](../../apps/backend/src/caliburn/modules/memory/README.md) | 單根、情境／理解與完整發布三表 ER | [來源](memory/) |
+| [ Agent 模組](../../apps/backend/src/caliburn/modules/agent/README.md) | 固定組裝、四接點 Loop／State、同 Thread 輪次、工具 wrapper、人工回答與取消收尾 | [來源](agent/) |
+| [系統責任規格](../../apps/backend/architecture.md) | 系統邊界、模組歸屬、應用／資料容器、資料權責；引用局部流程，不複製圖源 | [來源](system/) |
+| [插件分責](../../apps/backend/architecture.md#4-bundleplugin-與依賴) | Host、通用 Core、能力模組與 Bundle 的靜態依賴 | [來源](agent/plugin-dependencies.mmd) |
+| [問答分責](../../apps/backend/src/caliburn/modules/human_questions/README.md) | 問答能力、提問工具與通用恢復時序 | [來源](human-questions/) |
+| [ JD Bundle](../../apps/backend/src/caliburn/bundles/job_description/README.md) | 工具參數、可信執行資料與 JD 交易接線 | [來源](bundles/job-description/) |
+| [ Memory Bundle](../../apps/backend/src/caliburn/bundles/memory/README.md) | 固定訪談窗口、B1／B2、發布與後續換窗 | [來源](bundles/memory/) |
+| [ Context Bundle](../../apps/backend/src/caliburn/bundles/context/README.md) | 輪首換窗、歷史壓縮與每個模型步前的原生壓縮 | [來源](bundles/context/) |
 
 ## 圖面重用
 
 同一張公開設計圖只維護一份可編輯圖源，引用方補充其視角與省略範圍。
 
-## Agent 六張流程圖
-
-| 要看什麼 | 圖片 | 可編輯來源 |
-|---|---|---|
-| 跨工作採用哪份歷史 | [查看](implementation/agent-execution/history-adoption.png) | [Mermaid](implementation/agent-execution/history-adoption.mmd) |
-| 單次模型及工具 Step | [查看](implementation/agent-execution/model-tool-step.png) | [Mermaid](implementation/agent-execution/model-tool-step.mmd) |
-| 多 Step 如何接續 | [查看](implementation/agent-execution/response-loop.png) | [Mermaid](implementation/agent-execution/response-loop.mmd) |
-| 暫停、續作及 final 如何分流 | [查看](implementation/agent-execution/step-control.png) | [Mermaid](implementation/agent-execution/step-control.mmd) |
-| 輪前歷史如何準備 | [查看](implementation/agent-execution/history-preparation.png) | [Mermaid](implementation/agent-execution/history-preparation.mmd) |
-| 原件保存失敗如何補存 | [查看](implementation/agent-execution/result-save-recovery.png) | [Mermaid](implementation/agent-execution/result-save-recovery.mmd) |
+系統的 README 層次沿[文件分責](../../apps/backend/architecture.md#10-readme-與圖面的閱讀層次)：系統放跨模組視角；模組放局部流程、資料與交易；Bundle 放配置與 Agent 接入，只有複雜流程才另畫圖。圖源按負責能力歸檔，正文各自引用同一 PNG／SVG，不在每個 README 再存一份圖片。
 
 ## 編輯與重繪
 
@@ -96,19 +80,19 @@
 
 `%% title:` 提供獨立圖片的圖名與狀態，未提供時取責任正文的圖片 alt；`%% legend:` 提供必要圖例。既有 `%% diagram:` 只作唯一性檢查，不是產品 ID，也不需要再維護報告對應程式表。
 
-在 repository 根目錄執行；先依 Web README 安裝既有開發依賴。Mermaid 是文件工具，不加入產品執行依賴。
+在 repository 根目錄執行；先以 `pnpm install --frozen-lockfile` 安裝根開發依賴。Mermaid 是文件工具，不加入產品執行依賴。
 
 ```powershell
 npm install --prefix .tmp/doc-diagram-runtime --no-save --package-lock=false mermaid@12.1.0
-npm --prefix apps/web exec -- playwright install chromium
+pnpm exec playwright install chromium
 node scripts/render-doc-diagrams.mjs --list
 node scripts/render-doc-diagrams.mjs --mermaid-dir .tmp/doc-diagram-runtime/node_modules/mermaid/dist --output .tmp/doc-diagrams
 ```
 
-已有相容 Chromium 可加 `--browser <執行檔路徑>`。`--select <路徑>` 可指定圖源、引用正文或其目錄，且可重複使用，只重繪本次修改的圖；不加則渲染全部。`--list` 只驗證及列出來源／引用，不需要瀏覽器或 Mermaid。舊 `--reports` 命令仍接受，會提示報告已納入預設範圍，不再生成第二組報告圖片。
+已有相容 Chromium 可加 `--browser <執行檔路徑>`。`--select <路徑>` 可指定圖源、引用正文或其目錄，且可重複使用，只重繪本次修改的圖；不加則渲染全部。`--list` 只驗證及列出來源／引用，不需要瀏覽器或 Mermaid。
 
 ```powershell
-node scripts/render-doc-diagrams.mjs --mermaid-dir .tmp/doc-diagram-runtime/node_modules/mermaid/dist --select docs/diagrams/implementation/agent-execution --output .tmp/doc-diagrams-agent
+node scripts/render-doc-diagrams.mjs --mermaid-dir .tmp/doc-diagram-runtime/node_modules/mermaid/dist --select docs/diagrams/agent --output .tmp/doc-diagrams-agent
 ```
 
 命令更新圖源旁的 SVG／PNG；`--output` 只指定本次驗證 manifest 的暫存目錄。每份 manifest 記錄成功時間、發現總數、選中數、所有正文引用，以及 renderer／圖源／輸出的 SHA256；局部重繪不能當成全圖驗證。`--list` 的現有輸出 hash 只是盤點，不代表本次已重新渲染。中央圖源缺正文引用、受維護正文仍留內嵌 Mermaid、來源不存在或 marker 重複時直接報錯。

@@ -1,0 +1,29 @@
+%% title: 後端（現行）：訪談輪次、訊息與同輪回答 ER
+%% legend: 僅畫實表 FK；實線父鍵參與子主鍵，虛線為非識別關係；?＝可空。自關聯為同 Workspace／Turn 的複合 FK，非 Agent Checkpoint FK；Domain 非空輪與原題限制見 README。
+erDiagram
+    direction TB
+    workspaces ||--o{ interview_turns : "所屬 Workspace"
+    interview_turns ||..o{ interview_messages : "同輪訊息"
+    interview_messages |o..o| interview_messages : "回答指回同輪訊息"
+    workspaces {
+        uuid id PK
+    }
+    interview_turns {
+        uuid workspace_id PK,FK "與 turn_id 合成主鍵"
+        uuid turn_id PK "一般對話沿用外部 ID；無 Agent FK"
+        text kind "conversation / opening"
+        bigint sequence UK "輪次保存序；identity 非版本"
+        timestamptz created_at
+        timestamptz? withdrawn_at "有值時整輪撤回"
+    }
+    interview_messages {
+        uuid id PK "訪談模組產生；穩定來源 ID"
+        uuid workspace_id FK "與 turn_id 合成外鍵"
+        uuid turn_id FK "所屬訪談輪次"
+        int position "本輪內追加序"
+        text speaker "app / employee / consultant"
+        text kind "text / question / answer"
+        jsonb content "文字／完整題目／結構化答案"
+        uuid? reply_to_message_id FK,UK "與 workspace_id／turn_id 合成自 FK；答案必填"
+        timestamptz created_at
+    }

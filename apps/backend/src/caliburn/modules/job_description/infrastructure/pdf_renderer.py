@@ -82,11 +82,10 @@ class PdfRenderer:
             raise PdfRenderError("pdf_font_unavailable") from error
         if not font or len(font) > 40_000_000:
             raise PdfRenderError("pdf_font_unavailable")
-        factory = (
-            asyncio.ProactorEventLoop
-            if sys.platform == "win32"
-            else asyncio.new_event_loop
-        )
+        if sys.platform == "win32":
+            factory = asyncio.ProactorEventLoop
+        else:
+            factory = asyncio.new_event_loop
         with asyncio.Runner(loop_factory=factory) as runner:
             return runner.run(self._print(body_html, font))
 

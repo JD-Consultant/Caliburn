@@ -1,0 +1,125 @@
+.jd-editable {
+  min-width: 0;
+}
+.jd-field-label {
+  display: block;
+  color: var(--cb-text-muted);
+  font-size: 0.8125rem;
+  margin-bottom: 4px;
+}
+.inline-text {
+  position: relative;
+  border-radius: var(--cb-radius-sm, 4px);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-height: 1.5em;
+}
+.inline-text__placeholder {
+  color: var(--cb-text-faint);
+}
+.inline-text__edit {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.inline-text:has(> .inline-text__edit:focus-visible) {
+  outline: 2px solid var(--cb-focus);
+  outline-offset: 4px;
+}
+.inline-text__edit:focus-visible {
+  outline: none;
+}
+.inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  scroll-margin-block: 3.5rem 1rem;
+}
+.inline-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.jd-draft-hint {
+  font-size: 0.75rem;
+  color: var(--cb-text-muted);
+  margin-inline-start: 8px;
+}
+.jd-edit-notice {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  max-height: 45dvh;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--cb-border);
+  padding: 12px 16px;
+  background: var(--cb-canvas);
+  color: var(--cb-text);
+}
+.jd-edit-notice p,
+.jd-field-recovery p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.jd-edit-notice details {
+  margin-block: 8px;
+}
+.jd-edit-notice summary {
+  cursor: pointer;
+}
+.jd-edit-notice ul {
+  padding-left: 22px;
+}
+.jd-edit-notice li {
+  margin-block: 12px;
+}
+.jd-notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.jd-field-recovery {
+  padding: 8px;
+  border: 1px solid var(--cb-border);
+  font-size: 0.8125rem;
+}
+.jd-field-recovery p {
+  margin: 0 0 8px;
+}
+.jd-editor-navigation {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.jd-editor-navigation p {
+  font-size: 0.8125rem;
+  color: var(--cb-text-muted);
+}
+@media (hover: hover) and (pointer: fine) {
+  .inline-text:not([data-disabled]) {
+    cursor: text;
+  }
+  .inline-text:not([data-disabled]):hover {
+    background: var(--cb-hover);
+    box-shadow: 0 0 0 4px var(--cb-hover);
+  }
+}
+@media (pointer: coarse) {
+  .inline-edit__actions .MuiIconButton-root {
+    inline-size: 40px;
+    block-size: 40px;
+  }
+}
+@media (forced-colors: active) {
+  .inline-text:has(> .inline-text__edit:focus-visible) {
+    outline-color: Highlight;
+  }
+}

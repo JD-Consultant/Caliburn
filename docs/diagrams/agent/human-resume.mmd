@@ -1,0 +1,19 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    padding: 8
+    wrappingWidth: 300
+---
+%% title: 現行人工回答：保存問題後暫停，同輪恢復再保存答案
+%% legend: 內建提問 Bundle 的局部流程；thread、turn_id、model_step、call_id 不變，run_id 更新。Node 重跑時復用已保存 Task 結果；業務提交與 Task 保存之間仍有重複效果窗口。
+flowchart TD
+    start([工具需要人回答]) --> recorded[原生 Task 呼叫 Interview<br/>保存正式問題及其 UUID]
+    recorded --> ask[配置問題短碼、組成待答內容<br/>工具 handler 呼叫 interrupt]
+    ask --> wait[LangGraph 保存中斷資訊<br/>暫停本次執行]
+    wait --> question[/Host 讀取 values chunk 頂層 interrupts<br/>將問題交給人；保留已保存 State/]
+    question --> answer[/"問答能力驗答；Agent 核對恢復資格<br/>同 thread；Command(resume={interrupt_id: answer})"/]
+    answer --> restart[LangGraph 從中斷 Node 起點重跑<br/>復用已保存問題；interrupt 回傳答案]
+    restart --> saved[原生 Task 呼叫 Interview 保存答案<br/>配置答案短碼並組成工具結果]
+    saved --> tool[execute_tool 接回同 call 結果<br/>更新工作請求並保存]
+    tool --> finish([回到工具批次流程])

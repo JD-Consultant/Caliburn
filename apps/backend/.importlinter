@@ -1,0 +1,506 @@
+[importlinter]
+root_package = caliburn
+include_external_packages = true
+
+[importlinter:contract:domain]
+name = Domain does not depend on application or technical adapters
+type = forbidden
+source_modules =
+    caliburn.shared.domain
+    caliburn.modules.workspace.domain
+    caliburn.modules.job_description.domain
+    caliburn.modules.plan.domain
+    caliburn.modules.interview.domain
+    caliburn.modules.memory.domain
+    caliburn.modules.occupation_reference.domain
+forbidden_modules =
+    caliburn.shared.application
+    caliburn.modules.workspace.application
+    caliburn.modules.job_description.application
+    caliburn.modules.plan.application
+    caliburn.modules.interview.application
+    caliburn.modules.memory.application
+    caliburn.shared.infrastructure
+    caliburn.modules.workspace.infrastructure
+    caliburn.modules.job_description.infrastructure
+    caliburn.modules.plan.infrastructure
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.agent.infrastructure
+    caliburn.shared.presentation
+    caliburn.modules.workspace.presentation
+    caliburn.modules.job_description.presentation
+    caliburn.modules.plan.presentation
+    caliburn.modules.interview.presentation
+    caliburn.modules.memory.presentation
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    langgraph
+    langchain_core
+    openai
+    caliburn.modules.occupation_reference.application
+    caliburn.modules.occupation_reference.infrastructure
+    caliburn.modules.occupation_reference.presentation
+    caliburn.modules.occupation_reference.bootstrap
+    qdrant_client
+    pdfplumber
+    torch
+    transformers
+
+[importlinter:contract:application]
+name = Application depends on domain and owned ports
+type = forbidden
+source_modules =
+    caliburn.shared.application
+    caliburn.modules.workspace.application
+    caliburn.modules.job_description.application
+    caliburn.modules.plan.application
+    caliburn.modules.interview.application
+    caliburn.modules.memory.application
+    caliburn.modules.occupation_reference.application
+forbidden_modules =
+    caliburn.shared.infrastructure
+    caliburn.modules.workspace.infrastructure
+    caliburn.modules.job_description.infrastructure
+    caliburn.modules.plan.infrastructure
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.agent.infrastructure
+    caliburn.shared.presentation
+    caliburn.modules.workspace.presentation
+    caliburn.modules.job_description.presentation
+    caliburn.modules.plan.presentation
+    caliburn.modules.interview.presentation
+    caliburn.modules.memory.presentation
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    langgraph
+    langchain_core
+    openai
+    caliburn.modules.occupation_reference.infrastructure
+    caliburn.modules.occupation_reference.presentation
+    caliburn.modules.occupation_reference.bootstrap
+    qdrant_client
+    pdfplumber
+    torch
+    transformers
+
+[importlinter:contract:presentation]
+name = HTTP does not know concrete storage
+type = forbidden
+source_modules =
+    caliburn.shared.presentation
+    caliburn.modules.workspace.presentation
+    caliburn.modules.job_description.presentation
+    caliburn.modules.plan.presentation
+    caliburn.modules.interview.presentation
+    caliburn.modules.memory.presentation
+    caliburn.modules.occupation_reference.presentation
+forbidden_modules =
+    caliburn.shared.infrastructure
+    caliburn.modules.workspace.infrastructure
+    caliburn.modules.job_description.infrastructure
+    caliburn.modules.plan.infrastructure
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.agent.infrastructure
+    caliburn.host
+    sqlalchemy
+    psycopg
+    openai
+    caliburn.modules.occupation_reference.infrastructure
+    caliburn.modules.occupation_reference.bootstrap
+    qdrant_client
+    pdfplumber
+    torch
+    transformers
+
+[importlinter:contract:infrastructure]
+name = Persistence does not depend on HTTP or composition
+type = forbidden
+source_modules =
+    caliburn.shared.infrastructure
+    caliburn.modules.workspace.infrastructure
+    caliburn.modules.job_description.infrastructure
+    caliburn.modules.plan.infrastructure
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.occupation_reference.infrastructure
+forbidden_modules =
+    caliburn.shared.presentation
+    caliburn.modules.workspace.presentation
+    caliburn.modules.job_description.presentation
+    caliburn.modules.plan.presentation
+    caliburn.modules.interview.presentation
+    caliburn.modules.memory.presentation
+    caliburn.host
+    fastapi
+    caliburn.modules.occupation_reference.presentation
+    caliburn.modules.occupation_reference.bootstrap
+
+[importlinter:contract:shared]
+name = Shared code does not depend on business modules
+type = forbidden
+source_modules =
+    caliburn.shared
+forbidden_modules =
+    caliburn.modules
+
+[importlinter:contract:plan_workspace_queries]
+name = Plan uses public Workspace persistence queries
+type = forbidden
+source_modules =
+    caliburn.modules.plan
+forbidden_modules =
+    caliburn.modules.workspace.infrastructure.persistence.orm_models
+allow_indirect_imports = true
+
+[importlinter:contract:plan_independence]
+name = Plan does not depend on Agent or Bundles
+type = forbidden
+source_modules =
+    caliburn.modules.plan
+forbidden_modules =
+    caliburn.modules.agent
+    caliburn.bundles
+
+[importlinter:contract:agent_loop]
+name = Agent loop does not depend on business or transport
+type = forbidden
+source_modules =
+    caliburn.modules.agent.infrastructure.langgraph
+forbidden_modules =
+    caliburn.modules.human_questions
+    caliburn.bundles
+    caliburn.modules.agent.bootstrap
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.plan
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.shared
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    caliburn.modules.occupation_reference
+
+[importlinter:contract:plan_bundle]
+name = Plan Bundle uses public module and plugin contracts
+type = forbidden
+source_modules =
+    caliburn.bundles.plan
+forbidden_modules =
+    caliburn.modules.plan.infrastructure
+    caliburn.modules.plan.presentation
+    caliburn.modules.plan.domain.plan
+    caliburn.modules.plan.domain.editing
+    caliburn.modules.plan.domain.snapshot
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.agent.application
+    caliburn.modules.agent.agent
+    caliburn.modules.agent.bootstrap
+    caliburn.host
+    sqlalchemy
+    psycopg
+allow_indirect_imports = true
+
+[importlinter:contract:model_adapter]
+name = Model adapter does not depend on business or transport
+type = forbidden
+source_modules =
+    caliburn.modules.agent.infrastructure.openai
+forbidden_modules =
+    caliburn.modules.human_questions
+    caliburn.bundles
+    caliburn.modules.agent.bootstrap
+    caliburn.modules.agent.infrastructure.langgraph
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.plan
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.shared
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    caliburn.modules.occupation_reference
+
+[importlinter:contract:cycles]
+name = Internal packages and modules are acyclic
+type = acyclic_siblings
+ancestors = caliburn
+
+[importlinter:contract:agent_model_references]
+name = Agent remains independent of model references
+type = forbidden
+source_modules =
+    caliburn.modules.agent
+forbidden_modules =
+    caliburn.modules.model_references
+
+[importlinter:contract:model_references_independence]
+name = Model references do not depend on business modules or Agent
+type = forbidden
+source_modules =
+    caliburn.modules.model_references
+forbidden_modules =
+    caliburn.modules.agent
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.modules.plan
+    caliburn.modules.human_questions
+    caliburn.modules.occupation_reference
+    caliburn.bundles
+
+[importlinter:contract:model_reference_contracts]
+name = Model reference contracts remain free of I/O
+type = forbidden
+source_modules =
+    caliburn.modules.model_references.contracts
+forbidden_modules =
+    caliburn.modules.model_references.persistence
+    caliburn.modules.model_references.orm_models
+    sqlalchemy
+    psycopg
+
+[importlinter:contract:bundle_model_references]
+name = Bundles use public model reference contracts
+type = forbidden
+source_modules =
+    caliburn.bundles
+forbidden_modules =
+    caliburn.modules.model_references.persistence
+    caliburn.modules.model_references.orm_models
+allow_indirect_imports = true
+
+[importlinter:contract:jd_bundle]
+name = JD Bundle uses public module and plugin contracts
+type = forbidden
+source_modules =
+    caliburn.bundles.job_description
+forbidden_modules =
+    caliburn.modules.job_description.infrastructure
+    caliburn.modules.job_description.presentation
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.agent.application
+    caliburn.modules.agent.infrastructure
+    caliburn.host
+    sqlalchemy
+    psycopg
+allow_indirect_imports = true
+
+[importlinter:contract:agent_contracts_and_preparation]
+name = Agent contracts and preparation do not depend on business or adapters
+type = forbidden
+source_modules =
+    caliburn.modules.agent.state
+    caliburn.modules.agent.plugins
+forbidden_modules =
+    caliburn.modules.human_questions
+    caliburn.bundles
+    caliburn.modules.agent.bootstrap
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.plan
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.shared
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    caliburn.modules.occupation_reference
+
+[importlinter:contract:agent_application]
+name = Agent application owns coordination without business storage or HTTP
+type = forbidden
+source_modules =
+    caliburn.modules.agent.application
+forbidden_modules =
+    caliburn.modules.human_questions
+    caliburn.bundles
+    caliburn.modules.agent.presentation
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.plan
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    caliburn.modules.occupation_reference
+
+[importlinter:contract:agent_presentation]
+name = Agent HTTP only calls application capabilities
+type = forbidden
+source_modules =
+    caliburn.modules.agent.presentation
+forbidden_modules =
+    caliburn.modules.human_questions
+    caliburn.modules.workspace
+    caliburn.bundles
+    caliburn.modules.agent.agent
+    caliburn.modules.agent.infrastructure
+    caliburn.host
+    sqlalchemy
+    psycopg
+    openai
+    caliburn.modules.occupation_reference
+allow_indirect_imports = true
+
+[importlinter:contract:agent_core_entry]
+name = Agent Core entry does not depend on application or HTTP
+type = forbidden
+source_modules =
+    caliburn.modules.agent.agent
+forbidden_modules =
+    caliburn.modules.plan
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.modules.human_questions
+    caliburn.bundles
+    caliburn.modules.agent.application
+    caliburn.modules.agent.presentation
+    fastapi
+    caliburn.modules.occupation_reference
+
+[importlinter:contract:human_questions]
+name = Human questions only interpret supplied data
+type = forbidden
+source_modules =
+    caliburn.modules.human_questions.questions
+forbidden_modules =
+    caliburn.bundles
+    caliburn.modules.agent.application
+    caliburn.modules.agent.presentation
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.agent.agent
+    caliburn.modules.agent.bootstrap
+    caliburn.host
+    fastapi
+    sqlalchemy
+    psycopg
+    langgraph
+    langchain_core
+    openai
+
+[importlinter:contract:interview_independence]
+name = Interview owns dialogue without Agent or Bundles
+type = forbidden
+source_modules =
+    caliburn.modules.interview
+    caliburn.modules.memory
+forbidden_modules =
+    caliburn.modules.agent
+    caliburn.modules.human_questions
+    caliburn.bundles
+
+[importlinter:contract:interview_workspace_queries]
+name = Interview uses public Workspace persistence queries
+type = forbidden
+source_modules =
+    caliburn.modules.interview
+    caliburn.modules.memory
+forbidden_modules =
+    caliburn.modules.workspace.infrastructure.persistence.orm_models
+allow_indirect_imports = true
+
+[importlinter:contract:memory_independence]
+name = Memory does not depend on Agent or Bundles
+type = forbidden
+source_modules =
+    caliburn.modules.memory
+forbidden_modules =
+    caliburn.modules.agent
+    caliburn.bundles
+
+[importlinter:contract:memory_owner_queries]
+name = Memory uses public Workspace and Interview persistence queries
+type = forbidden
+source_modules =
+    caliburn.modules.memory
+forbidden_modules =
+    caliburn.modules.workspace.infrastructure.persistence.orm_models
+    caliburn.modules.interview.infrastructure.persistence.orm_models
+allow_indirect_imports = true
+
+[importlinter:contract:memory_bundle]
+name = Memory Bundle uses public module and plugin contracts
+type = forbidden
+source_modules =
+    caliburn.bundles.memory
+forbidden_modules =
+    caliburn.modules.memory.infrastructure
+    caliburn.modules.memory.presentation
+    caliburn.modules.interview.infrastructure
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.agent.application
+    caliburn.host
+    sqlalchemy
+    psycopg
+allow_indirect_imports = true
+
+[importlinter:contract:occupation_reference_independence]
+name = Occupation reference owns public sources without Agent or employee state
+type = forbidden
+source_modules =
+    caliburn.modules.occupation_reference
+forbidden_modules =
+    caliburn.modules.agent
+    caliburn.modules.workspace
+    caliburn.modules.job_description
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.modules.plan
+    caliburn.modules.human_questions
+    caliburn.modules.model_references
+    caliburn.bundles
+
+[importlinter:contract:job_reference_bundle]
+name = Job Reference Bundle uses public reference and plugin contracts
+type = forbidden
+source_modules =
+    caliburn.bundles.job_reference
+forbidden_modules =
+    caliburn.modules.occupation_reference.infrastructure
+    caliburn.modules.occupation_reference.presentation
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.agent.application
+    caliburn.modules.agent.bootstrap
+    caliburn.host
+    sqlalchemy
+    psycopg
+allow_indirect_imports = true
+
+[importlinter:contract:context_bundle]
+name = Context uses public Agent contracts without business modules or storage
+type = forbidden
+source_modules =
+    caliburn.bundles.context
+forbidden_modules =
+    caliburn.modules.agent.application
+    caliburn.modules.agent.infrastructure
+    caliburn.modules.agent.presentation
+    caliburn.modules.workspace
+    caliburn.modules.interview
+    caliburn.modules.memory
+    caliburn.modules.job_description
+    caliburn.modules.plan
+    caliburn.bundles.memory
+    caliburn.bundles.interview
+    caliburn.bundles.plan
+    caliburn.host
+    sqlalchemy
+    psycopg
+allow_indirect_imports = true

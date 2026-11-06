@@ -1,0 +1,53 @@
+/* Existing JD editor primitives consume aliases of the original UI tokens. */
+:root {
+  --page-gutter: 24px;
+  --app-header-height: var(--cb-header-h);
+  --canvas: var(--cb-canvas);
+  --paper: var(--cb-surface);
+  --ink: var(--cb-text);
+  --muted: var(--cb-text-muted);
+  --accent: var(--cb-accent);
+  --accent-hover: var(--cb-accent-hover);
+  --line: var(--cb-border);
+  --control-border: var(--cb-border-control);
+  --soft: var(--cb-accent-soft);
+}
+body {
+  font-family: var(--cb-font-sans);
+}
+.app-header .header-actions {
+  margin-inline-start: auto;
+}
+.workspace-root .pane--jd > * {
+  min-width: 0;
+}
+.workspace-root .jd-workspace-toolbar {
+  top: 0;
+}
+.history-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.route-error {
+  max-width: 720px;
+  margin: 48px auto;
+  padding: 24px;
+}
+.file-bar .icon-button {
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 6px;
+}
+.file-bar .MuiButton-root {
+  white-space: nowrap;
+}
+@media (max-width: 599.95px) {
+  :root {
+    --page-gutter: 12px;
+  }
+  .history-container {
+    padding: 12px;
+  }
+}

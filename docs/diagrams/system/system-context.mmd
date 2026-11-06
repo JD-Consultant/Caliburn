@@ -1,0 +1,30 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 320
+    nodeSpacing: 24
+    rankSpacing: 32
+    padding: 12
+---
+%% title: Caliburn｜系統邊界
+%% legend: 人員、產品與外部軟體系統；箭頭標示使用或外送關係。省略內部模組、資料庫及部署細節。
+flowchart TB
+    employee["員工 · 人員<br/>說明實際工作、回答訪談"]
+    consultant["真人顧問 · 人員<br/>核對依據、編修職務內容"]
+    maintainer["維護者 · 人員<br/>匯入公版、管理固定索引版本"]
+    system["Caliburn · 軟體系統<br/>引導訪談、管理分析資料<br/>人與 AI 共同編修 JD"]
+    provider["OpenAI API · 外部軟體系統<br/>模型回覆、工具呼叫建議<br/>原生 Context 壓縮"]
+    employee -->|提供工作原話與回答| system
+    consultant -->|查閱來源、修改與恢復 JD| system
+    maintainer -->|透過維護 CLI 匯入與建索引| system
+    system -->|發送配置允許的模型請求| provider
+  classDef person fill:#f2f6fa,stroke:#637d95,color:#182b3a
+  classDef main fill:#e6eef8,stroke:#3569a8,color:#153c70
+  class employee,consultant,maintainer person
+  class system main

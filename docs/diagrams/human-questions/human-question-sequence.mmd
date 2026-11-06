@@ -1,0 +1,45 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 20px
+  sequence:
+    mirrorActors: false
+    width: 130
+    actorMargin: 40
+    actorFontSize: 20
+    messageFontSize: 18
+    noteFontSize: 18
+    diagramMarginX: 16
+    diagramMarginY: 18
+    messageMargin: 24
+    noteMargin: 12
+    wrap: true
+---
+%% title: 現行人工問答｜提出問題與查讀等待
+%% legend: 實線為等待完成的呼叫，虛線為回覆。Agent 合併 Application、Core 與原生保存視角；Core 不解讀問答。Interview 與原生保存各自提交；省略短碼服務。
+sequenceDiagram
+  participant HTTP as HTTP 介面
+  participant Q as 問答服務
+  participant Agent as Agent<br/>執行與保存
+  participant Tool as 提問 Tool
+  participant Interview as Interview<br/>正式訪談
+
+  Note over Agent,Interview: 前提：已建立本輪正式訪談輸入
+  Agent->>Tool: 執行提問工具
+  Tool->>Interview: task：保存問題
+  Interview-->>Tool: 逐題 UUID 與原文
+  Tool->>Tool: 組成待答內容
+  Tool->>Agent: interrupt(payload)
+  Agent->>Agent: 保存 interrupt<br/>與執行位置
+  Note over Agent,Interview: 本次執行返回，保留原輪等待
+
+  HTTP->>Q: GET questions
+  Q->>Agent: 查本輪執行原件
+  Agent-->>Q: interrupt 與歷史
+  Q->>Q: 投影實際題目<br/>與等待狀態
+  Q-->>HTTP: 題目與等待狀態
+  Note over HTTP,Interview: 查讀不執行模型；問答服務沒有獨立資料表

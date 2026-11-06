@@ -1,0 +1,32 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 320
+    nodeSpacing: 24
+    rankSpacing: 32
+    padding: 12
+---
+%% title: Workspace｜整份刪除與 Checkpoint 清理
+%% legend: Workspace Application 決定刪除順序，Host 提供停工與 Saver 清理。業務資料與 Checkpoint 分段提交。省略 HTTP 欄位與各子表。
+flowchart TB
+    request(["DELETE Workspace"])
+    suspend["Host 暫停此 Workspace 新工作<br/>等待 Agent 與 Memory 在途工作收束"]
+    business["WorkspaceService.delete<br/>短交易刪除根資料，FK 級聯業務資料"]
+    committed{"業務提交已確認？"}
+    saver["官方 Saver 按 workspace_id metadata 找出 Thread<br/>逐一 adelete_thread；未配置 Saver 則略過"]
+    cleared{"清理全部成功？"}
+    success["清理已確認完成：成功 204"]
+    failure["錯誤結果：不宣稱整份刪除成功<br/>只有確認回滾才可說業務資料未刪"]
+    partial["清理失敗結果：不回 204<br/>業務資料可能已刪；可用同一 ID 重試"]
+    release(["釋放暫停範圍後回覆"])
+    request --> suspend --> business --> committed
+    committed -->|是| saver --> cleared
+    committed -->|否或結果未知| failure --> release
+    cleared -->|是| success --> release
+    cleared -->|否或結果未知| partial --> release

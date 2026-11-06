@@ -1,0 +1,4 @@
+# Full local corpora and generated batches are not product source files.
+*
+!.gitignore
+!README.md

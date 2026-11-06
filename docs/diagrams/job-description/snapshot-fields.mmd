@@ -1,0 +1,21 @@
+%% title: 後端（現行）：JD 快照與恢復來源完整欄位
+%% legend: ?＝可空，其餘 NOT NULL。JD 僅列關係鍵。快照主鍵＝JD ID＋版號；恢復來源以同一 JD ID＋舊版號作複合外鍵。
+erDiagram
+    direction LR
+    job_descriptions ||--o{ job_description_snapshots : "整份歷史"
+    job_description_snapshots |o..o{ job_description_snapshots : "恢復來源／同 JD"
+
+    job_descriptions {
+        uuid id PK "僅列關係鍵"
+    }
+    job_description_snapshots {
+        uuid job_description_id PK,FK
+        int version PK "JD 保存版號"
+        int schema_version "JSON 格式版號"
+        jsonb content "整份 JD 內容"
+        timestamptz recorded_at "UTC 記錄時間"
+        text kind "created／edited／restored"
+        int? restored_from_version FK "恢復時必填；同 JD 複合 FK"
+        text? correlation_id "來源識別"
+        text? reverts_correlation_id "撤銷來源識別"
+    }

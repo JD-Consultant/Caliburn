@@ -1,0 +1,50 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 260
+    nodeSpacing: 24
+    rankSpacing: 34
+    padding: 12
+---
+%% title: Memory Bundle（現行）｜分析、發布與後續換窗
+%% legend: 前提為 A 已由 Core 確認完成且保存整理意圖；每個 Workspace 的分析依序執行。箭頭是控制順序；B1/B2 子流程的正式完成與失敗條件見正文。模型等待不持有業務交易。兩個換窗插件指 memory_window 與 Context window；發布版相對前窗比較。
+flowchart TB
+  completed(["Host 收到 A 完成通知<br/>且該輪有整理意圖"])
+  admit["Coordinator 核對准入<br/>以意圖輪最後正式訊息決定來源上界"]
+  start["MemoryService.start 短交易<br/>核對未涵蓋工作／重試資格<br/>固定來源窗口並保存分析階段"]
+  work{"本次已建立新分析？"}
+  skipped(["本次不啟動新分析"])
+  b1[["B1 情境分析<br/>核對原生輪次與最終完成 JSON"]]
+  handoff["Memory 用例短交易<br/>核對版本／來源，保存 B1→B2 交接"]
+  b2[["B2 理解分析<br/>核對原生輪次與最終完成 JSON"]]
+  publish["Memory 用例短交易<br/>核對版本／來源<br/>發布完整不可變快照"]
+  next(["發布後下一個 A 新輪<br/>固定新的發布版<br/>執行中的 A 保持原版"])
+  renew{"兩個換窗插件啟用<br/>且發布版已改變？"}
+  window["重建 Map 與未涵蓋原話<br/>由 Context 公開換窗接點接入"]
+  ready(["A 使用本輪固定材料繼續訪談"])
+  discard["已知不可完成時，由 Memory 用例<br/>還原發布基準並保存目前失敗狀態"]
+  retry(["累積六則新增且有效的已完成輪訊息<br/>後續再核准入；不延伸原意圖的來源上界"])
+
+  completed --> admit --> start --> work
+  work -->|"否：已涵蓋或重試未滿"| skipped
+  work -->|"是"| b1
+  b1 -->|"正式完成"| handoff --> b2
+  b2 -->|"正式完成"| publish --> next --> renew
+  renew -->|"是"| window --> ready
+  renew -->|"否；其他換窗條件見 Context"| ready
+  b1 -->|"完成判定失敗、執行上限或來源失效"| discard
+  b2 -->|"完成判定失敗、執行上限或來源失效"| discard
+  handoff -->|"固定來源失效"| discard
+  publish -->|"固定來源失效"| discard
+  discard --> retry
+
+  classDef operation fill:#f2f6fa,stroke:#5f758b,color:#182b3a
+  classDef boundary fill:#ffffff,stroke:#879bad,color:#243746
+  class admit,start,b1,handoff,b2,publish,window,discard operation
+  class completed,skipped,next,ready,retry boundary

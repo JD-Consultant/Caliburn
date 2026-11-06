@@ -1,6 +1,4 @@
-# Fast pull-request smoke only. Real PostgreSQL, browser, provider, and complete
-# product verification are run deliberately before delivery and recorded in docs.
-name: product-smoke
+name: product-check
 
 on:
   pull_request:
@@ -11,13 +9,28 @@ permissions:
   contents: read
 
 concurrency:
-  group: product-smoke-${{ github.workflow }}-${{ github.ref }}
+  group: product-check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  smoke:
-    runs-on: windows-latest
-    timeout-minutes: 20
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:18.6-bookworm
+        env:
+          POSTGRES_USER: caliburn_test
+          POSTGRES_PASSWORD: synthetic-test-password
+          POSTGRES_DB: caliburn_test
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U caliburn_test -d caliburn_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      PYTHONUTF8: "1"
+      CALIBURN_POSTGRES_PASSWORD: synthetic-container-password
+      CALIBURN_REBUILD_TEST_DATABASE_URL: postgresql+psycopg://caliburn_test:synthetic-test-password@127.0.0.1:5432/caliburn_test
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: pnpm/setup@v3.0.0
@@ -30,12 +43,27 @@ jobs:
         with:
           version: "0.12.20"
           enable-cache: true
-          cache-dependency-glob: apps/api/uv.lock
+          cache-dependency-glob: apps/backend/uv.lock
       - name: Install locked dependencies
         run: |
           pnpm install --frozen-lockfile
-          uv sync --project apps/api --locked
-      - name: Lint, type-check, test (no database) and build
+          uv sync --project apps/backend --locked
+      - name: Check product and real PostgreSQL behavior
+        run: |
+          pnpm check
+          pnpm test:integration
+          pnpm test:docker
+      - name: Build the standalone application image
+        run: docker compose build app
+      - name: Initialize the isolated container database and start the app
+        run: |
+          docker compose up -d --wait postgres qdrant
+          docker compose run --rm app python -m caliburn.migrate upgrade head
+          docker compose up -d --wait app
+      - name: Verify the installed app, same-origin Web, database and PDF
         env:
-          PYTHONUTF8: "1"
-        run: pnpm run check
+          CALIBURN_SMOKE_URL: http://127.0.0.1:8101
+        run: pnpm test:smoke
+      - name: Stop this job's isolated deployment
+        if: always()
+        run: docker compose down

@@ -1,0 +1,36 @@
+%% title: 後端（現行）：Workspace、JD、協作與條件完整欄位
+%% legend: ?＝可空，其餘 NOT NULL；PK／FK／UK＝主鍵／外鍵／唯一鍵。複合約束見模組 README。
+erDiagram
+    direction TB
+    workspaces ||..o| job_descriptions : "至多一份 JD"
+    job_descriptions ||..o{ collaboration_entries : "協作"
+    job_descriptions ||..o{ job_conditions : "條件"
+
+    workspaces {
+        uuid id PK "Workspace 身分"
+        text interviewee_name "受訪者姓名"
+    }
+    job_descriptions {
+        uuid id PK "JD 身分"
+        uuid workspace_id FK,UK "所屬 Workspace"
+        text? job_title "職務名稱"
+        text? organization_unit "所屬單位"
+        text? reports_to "匯報對象"
+        text? purpose "職務目的"
+        int? baseline_competency_level "基準職能級別 1–6"
+        int version "JD 版本；初始 1"
+    }
+    collaboration_entries {
+        uuid id PK
+        uuid job_description_id FK
+        text collaborator_name "協作對象"
+        text? scope "協作範圍"
+        int position "JD 協作清單內順序"
+    }
+    job_conditions {
+        uuid id PK
+        uuid job_description_id FK
+        text kind "條件分類"
+        text text "條件正文"
+        int position "同分類內順序"
+    }

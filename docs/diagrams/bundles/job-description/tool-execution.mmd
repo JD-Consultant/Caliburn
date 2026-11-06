@@ -1,0 +1,40 @@
+---
+config:
+  sequence:
+    actorMargin: 40
+    messageMargin: 26
+    noteMargin: 8
+---
+%% title: 現行 JD 寫工具：模型意圖、已見版本與正式保存
+%% legend: 以 revise_jd_item 為例，省略參數拒絕與業務錯誤分支。模型不提供 Workspace、UUID 或版本；衝突回 target_stale，由模型重讀後決定，不自動換版重送。
+sequenceDiagram
+    participant Model as 模型
+    participant Core as Core／LangGraph
+    participant Plugin as JD Bundle<br/>工具 handler
+    participant Refs as Model References
+    participant JD as JD 公開用例／PG
+    Core->>Model: 發送當步請求
+    Model-->>Core: revise_jd_item：read_ref、changes
+    Core->>Plugin: StructuredTool 驗參數並注入 ToolRuntime
+    Note over Plugin: 從可信 State 取 Workspace、JD、Turn<br/>expected_version 使用模型已見 jd_version
+    rect rgb(242, 246, 250)
+        Note over Plugin,JD: 原生 Task：save_content
+        Plugin->>JD: 查指定 Workspace／JD
+        JD-->>Plugin: 目前內容及版本
+        Plugin->>Plugin: 核對範圍及已見版本仍相同
+        Plugin->>Refs: 在 Workspace 內解析 read_ref
+        Refs-->>Plugin: 正式 UUID 與種類
+        Plugin->>Plugin: 核對種類／歸屬，轉為公開用例參數
+        Plugin->>JD: 修改目標；攜帶同一 expected_version
+        JD->>JD: 鎖定根、核版本與規則<br/>一次交易保存內容及歷史
+        JD-->>Plugin: 已保存版本與結果
+    end
+    Note over Core,Plugin: 原生 Task 結果保存後才配置新短碼<br/>DB 提交至 Task 保存仍非同一交易
+    opt 本次也建立新項目
+        Plugin->>Refs: 配置新項目的持久短碼
+        Refs-->>Plugin: 可供模型使用的短碼
+    end
+    Plugin-->>Core: Command：配對 ToolMessage＋jd_version
+    Core->>Core: 轉成 function_call_output<br/>連同插件更新同步保存
+    Note over Core: 若同一回應還有工具，沿已更新 State 逐一執行
+    Core->>Model: 該批工具處理完，下一步請求攜帶配對結果

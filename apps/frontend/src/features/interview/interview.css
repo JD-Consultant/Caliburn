@@ -1,0 +1,13 @@
+/* Shared legacy styles own chat typography, messages, and the composer. */
+.interview-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  min-width: 0;
+}
+.interview-scroll {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}

@@ -1,0 +1,67 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 320
+    nodeSpacing: 24
+    rankSpacing: 32
+    padding: 12
+---
+%% title: Caliburn｜後端模組歸屬
+%% legend: 框表示程式責任與包含關係，不代表獨立程序或執行順序。隱藏連線僅供排版；依賴與資料庫另圖說明。
+flowchart TB
+  subgraph backend["Python 應用後端"]
+    direction TB
+    host["Host／HTTP 邊界<br/>配置、資源生命週期、模組與 Agent 組裝"]
+    subgraph business["業務與能力模組 · 公開用例及自有規則"]
+      direction TB
+      subgraph authoring[" "]
+        direction LR
+        workspace["Workspace<br/>歸屬與生命週期"]
+        jd["Job Description<br/>編修、引用與歷史"]
+        interview["Interview<br/>原話、逐題問答與撤回"]
+        questions["Human Questions<br/>待答表單與回答協調"]
+        workspace ~~~ jd ~~~ interview ~~~ questions
+      end
+      subgraph knowledge[" "]
+        direction LR
+        memory["Memory<br/>情境、理解與發布"]
+        plan["Plan<br/>計畫正文與版本"]
+        references["Model References<br/>Workspace 持久短碼"]
+        occupation["Occupation Reference<br/>公版匯入與檢索"]
+        memory ~~~ plan ~~~ references ~~~ occupation
+      end
+      authoring ~~~ knowledge
+    end
+    subgraph agent["Agent 模組 · 通用執行"]
+      direction LR
+      application["Application／API<br/>受理、串流、查讀與控制"]
+      core["Core／Infrastructure<br/>模型與工具 Loop、Checkpoint"]
+      extension["Plugin 契約與組裝<br/>Hook、Node、State、資源"]
+      application ~~~ core ~~~ extension
+    end
+    subgraph bundles["Bundle · 可選 Plugin 組合，負責模型接入"]
+      direction LR
+      conversation["Consultant／Interview<br/>Human Questions<br/>顧問 Prompt、原話與提問工具"]
+      editing["Job Description／Plan<br/>編修工具、導覽與版本接線"]
+      analysis["Memory／Context<br/>Job Reference<br/>分析、上下文策略與公版工具"]
+      conversation ~~~ editing ~~~ analysis
+    end
+    shared["Shared · 純基底與技術共用"]
+    host ~~~ business ~~~ agent ~~~ bundles ~~~ shared
+  end
+  style authoring fill:transparent,stroke:none
+  style knowledge fill:transparent,stroke:none
+  classDef module fill:#f2f6fa,stroke:#637d95,color:#182b3a
+  classDef host fill:#e8eef5,stroke:#4b6d8b,color:#182b3a
+  class workspace,jd,interview,questions,memory,plan,references,occupation,application,core,extension module
+  class host,shared,conversation,editing,analysis host
+  style backend fill:#fafbfd,stroke:#8ea1b3
+  style business fill:#ffffff,stroke:#bdcbd7
+  style agent fill:#ffffff,stroke:#bdcbd7
+  style bundles fill:#ffffff,stroke:#bdcbd7

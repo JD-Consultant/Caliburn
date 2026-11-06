@@ -1,103 +1,20 @@
 # Caliburn 架構導覽
 
-Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據的職務說明書（JD）。本機 Web 工作區提供訪談與編輯，後端協調 AI 分析、業務規則及資料保存；背景 Memory 支援長訪談，來源關係讓人回查分析與 JD 的依據。
+系統採單一 FastAPI 應用程序，能力模組管資料與規則，Agent 插件管模型接入，Core 管執行。完整模組圖、部署圖、資料所有權及跨模組流程由[系統架構與責任規格](../../apps/backend/architecture.md)維護。
 
-本頁先說明產品旅程，再按責任列出架構主題。需求與使用情境見[產品介紹](../product/README.md)。各主題正文維護現行規則，未驗效果由驗證章節說明。
+## 依問題閱讀
 
-本文直接呈現圖面；修改時可從圖旁的「圖源」連結開啟獨立 Mermaid 檔。查找與重繪方式見[圖源索引](../diagrams/README.md)。
-
-## 第一次閱讀
-
-先讀完本頁，再依序閱讀：
-
-1. [系統責任](system-boundaries.md)：理解產品流程與模組分工。
-2. [資料如何保存](persistence.md)：理解資料保存與正式採用。
-3. [互動與部署](delivery-and-operations.md)：理解畫面與程序如何協作。
-
-需要修改程式時，再進入[實作目錄](../implementation/README.md)。查單一功能可直接用下方索引，不必先讀歷史 ADR 或全部設計稿。
-
-一份**職務檔案**是一組彼此隔離的訪談、JD、工作記憶及工作計畫。
-
-文中的 **A** 是與員工對話、分析並編修 JD 的顧問角色；**B1** 在背景整理具體工作情境，**B2** 再整理工作理解，兩者的成果共同形成 Memory。它們是 AI 分工名稱，不表示三個獨立服務。
-
-| 讀到的名稱 | 先這樣理解；完整責任另見對應章節 |
+| 問題 | 入口 |
 |---|---|
-| JD（Job Description） | 最後交付的職務說明書；由人與 A 共同編修 |
-| Memory（工作記憶） | 根據正式訪談整理的員工工作情境與理解；不是聊天全文，也不是執行 checkpoint |
-| Plan（工作計畫） | A 保存的焦點、工作方向及剩餘訪談／分析／JD 編修安排 |
-| Changes（變更檢視） | 讓 A 查詢 JD 及其引用來源的變化；看見變更不代表認定改動正確 |
-| Turn（一輪顧問工作） | 一次員工輸入所開啟的 A 工作，直到完成、取消或最終失敗；暫停後續作仍是同一輪 |
-| Step（一次模型與工具步驟） | 一次模型回應及其要求的工具處理；一輪可能有多個 Step，Step 完成不等於 JD 正式提交 |
-| 候選／正式資料 | 候選可暫存、預覽及恢復；通過共同完成邊界後，才成為後續工作可採用的正式結果 |
-
-這些名稱的權限與彼此關係由[系統責任](system-boundaries.md)維護；保存、正式資格及恢復條件由[資料與交易](persistence.md)維護。
-
-## 一眼看懂：操作者的主要流程
-
-下圖呈現操作者選擇下一步的現行流程。箭頭表示操作順序；背景整理不列為訪談的前置步驟，也不指定 Agent 的工作順序。形狀與路徑匯合的含義見圖內圖例及[讀圖約定](../diagrams/README.md#讀圖約定)。
-
-<!-- diagram: product-activities -->
-
-![現行：一眼看懂：操作者的主要流程](../diagrams/architecture/README/product-activities.png)
-
-[圖源](../diagrams/architecture/README/product-activities.mmd) · [SVG](../diagrams/architecture/README/product-activities.svg)
-
-員工說明工作，顧問追問責任、條件與結果，資料足夠時逐步編修 JD。員工也能直接改稿，或繼續訪談補充、更正；流程不限定輪數，也不要求每輪都改稿。顧問可先引用有效原話，不必等背景 Memory 整理完成。PDF 匯出目前正式 JD，不包含候選修改。
-
-## 從整體進到各主題
-
-| 架構主題 | 這裡回答的問題 |
-|---|---|
-| [系統責任與資料流](system-boundaries.md) | 模組與 A／B1／B2 如何分工；Memory、Plan、Changes 與 JD 各負責什麼 |
-| [資料保存與交易](persistence.md) | 正式資料、候選、不可變修訂與執行位置如何保存；提交及恢復如何核對 |
-| [互動、部署與安全](delivery-and-operations.md) | 畫面、串流、PDF、本機服務及外部模型如何協作 |
-| [公版參考與 RAG](rag-pipeline.md) | 公版解析、索引、查讀及 JD App 如何分工，哪些資料各自保存 |
-| [設計取捨](design-decisions.md) | 為何選用這些機制，替代方案與代價是什麼；架構圖如何閱讀 |
-| [驗證與限制](verification.md) | 用哪些反例檢驗行為，已有什麼證據，哪些效果仍未驗 |
-
-### 依問題找圖與表
-
-圖表放在負責解釋該問題的文件，入口只提供索引。第一次閱讀先選「整體」欄，需要細節時再進入執行、資料表或測試文件。
-
-| 想先弄懂的問題 | 整體圖表 | 深入時再讀 |
-|---|---|---|
-| 誰使用產品，哪些部分在本機、哪些在外部？ | [系統情境與容器](system-boundaries.md#2-app-拆開後有哪些責任)、[部署圖](delivery-and-operations.md#2-最小部署視角) | [靜態程式依賴](../standards/code-organization.md#2-依賴方向與可檢查限制) |
-| 一次員工回答如何成為 JD 的一部分？ | [正式採用與交易](persistence.md) | [模型與工具 Step](../implementation/agent-execution.md#44-有界多-step-接續) |
-| 暫停、取消或中斷後怎麼辦？ | [共用執行與恢復](../implementation/agent-execution.md)、[提交後恢復時序](persistence.md#4-重試取消與執行恢復) | [外送重試流程](../implementation/model-requests.md#5-單一外送重試責任) |
-| 背景整理如何與下一輪訪談並行？ | [A／B1／B2 角色表](system-boundaries.md#3-ai-分析角色共用執行機制分別處理工作)、[正式採用與交易](persistence.md) | [Memory 保存關係](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
-| Plan 的本輪安排何時能供後輪接續？ | [Plan 採用流程](persistence.md#plan-從本輪候選到後輪可採用) | [正文修改機制](../implementation/memory-body-editing.md) |
-| 內容、版本及引用如何連在一起？ | [資料責任與固定修訂](persistence.md#1-業務資料與執行資料) | [訪談 ER](../implementation/interview-storage.md#1-原文正式資格與執行身分分開不複製原話)、[JD ER](../implementation/jd-storage.md#2-固定修訂與目前正式頭)、[Memory ER](../implementation/memory-storage.md#21-固定物件修訂) |
-| 如何知道畫面、模型與保存結果是否一致？ | [使用者操作表](delivery-and-operations.md#1-使用者看到的主要流程)、[診斷資料來源](delivery-and-operations.md#5-執行觀測與問題排查) | [SSE 時序](../implementation/interface-and-delivery.md#2-串流不是保存權威)、[驗證責任表](../implementation/verification-plan.md#1-分層測試不以-mock-冒充產品) |
-
-產品細節由[實作與契約接線](../implementation/README.md)維護。私人設計與決策原件不作公開閱讀前提。
+| 哪些責任在同一程序、誰依賴誰 | [系統邊界](system-boundaries.md)、[程式組織](../standards/code-organization.md) |
+| 誰保存資料、取消與恢復做什麼 | [保存與恢復](persistence.md) |
+| 如何部署、有哪些信任限制 | [交付與運作](delivery-and-operations.md) |
+| 公版如何解析、索引及搜尋 | [公版能力](rag-pipeline.md) |
+| 已採用的主要取捨 | [設計取捨](design-decisions.md) |
+| 測試能證明哪些範圍 | [驗證範圍](verification.md) |
 
 ## 架構與實作的維護分工
 
-本目錄保留系統責任、資料權威、跨層生命週期與設計取捨。[程式規範](../standards/README.md)維護模組、寫法及契約策略；[實作](../implementation/README.md)記錄當前選型、具體接線、工具契約與驗證對照。修改同一規則時只改其責任文件，其他層保留必要摘要與連結。
+系統規格維護跨模組契約；各[模組及 Bundle](../../apps/backend/README.md#檔案位置)維護局部資料、交易、Prompt、工具及 Plugin 設定。正式 HTTP 欄位由 OpenAPI 產生，工具由其實際定義維護。本文與[實作導覽](../implementation/README.md)不另維護欄位清單、狀態機或第二套圖源。
 
-| 要改的內容 | 維護位置 | 另一層如何承接 |
-|---|---|---|
-| 模組責任、來源資格、候選與正式資料的界線 | 本目錄及連到的詳細契約 | 實作文件引用規則，說明負責模組與驗證方式 |
-| SQL、schema、固定修訂的保存表示、程式組裝、恢復演算法 | [實作接線](../implementation/README.md) | 架構只交代保證與限制，不複寫表格、欄位或步驟 |
-| 模組組織、命名、寫法、測試及契約策略 | [程式規範](../standards/README.md)；驗證流程見[貢獻指南](../../CONTRIBUTING.md) | 架構及實作引用適用規則 |
-| 已採用的工作分析及 JD 內容界線 | [產品內容判準](../product/concepts.md#內容判準)及正式角色提示 | 實作說明資料與工具如何落實 |
-| 驗證結果、已知限制與原件 | [驗證範圍](verification.md) | 實作驗證文件只維護測試責任及方法，不另抄通過清單 |
-| 安裝、設定、命令及排錯操作 | [runbook](../operations/README.md)與 App README | 架構說明運作邊界，實作說明接線，各自連到操作來源 |
-
-## 閱讀時先分清三件事
-
-- **分析與成果。** A 引導訪談並編修 JD；B1／B2 把正式訪談整理成工作情境與工作理解。Plan 保存 A 的工作安排，Changes 提供按需變更資訊，兩者各自獨立。責任與現行能力見[長任務元件分工](system-boundaries.md#21-長任務的元件分工)。
-- **候選與正式資料。** 候選可保存、預覽與恢復，完成後才正式採用。A 每輪固定一版 Memory，背景發布不改變執行中的基準，JD 歷史依據也不自動換版。
-- **執行紀錄與來源。** 模型輸出及工具結果支援接續推論；正式訪談才授予相應來源資格。取消輸入、中間訊息及推理摘要即使可回看，也不因此成為正式來源。看過差異也不等於已確認 JD 依據。
-
-### 業務規則與交易機制
-
-業務模組決定哪些結果必須一起成立，App 以短交易協調操作，PostgreSQL 保證原子提交與持久保存。LangGraph 保存執行位置；恢復仍須核對原業務結果。正式提交與恢復的詳細界線集中在[資料與交易](persistence.md)。
-
-## 目前範圍與已知限制
-
-現行產品使用 React／MUI、FastAPI、PostgreSQL、LangGraph 與 OpenAI Responses API，採本機模組化單體。Memory 為單向 B1 → B2 → 發布。App 可明示啟用獨立 RAG 的公版查讀；RAG 不成為預設啟動依賴。
-
-現行輪前與輪中均採原生 compaction。Plan 尚未證明穩定品質增益；真人省時、學習負擔及部分長旅程分支仍未驗，詳見[驗證與限制](verification.md)。
-
-專用全稿審核、原話語意搜尋與跨機還原尚未提供；其餘範圍及非目標由[系統責任](system-boundaries.md#1-核心閉環與範圍)維護。
+圖面與規格說明責任，不能當作真資料庫、真瀏覽器或模型品質已驗收的證據。

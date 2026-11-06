@@ -1,0 +1,39 @@
+---
+config:
+  theme: neutral
+  sequence:
+    mirrorActors: false
+    actorMargin: 28
+    messageMargin: 24
+---
+%% title: 公版查找 Bundle（現行）｜短碼提交與來源回讀
+%% legend: 實線實心箭頭為等待完成的呼叫，虛線為回覆。只畫有結果的成功搜尋與後續任務回讀；圖中 PostgreSQL 只保存 Workspace 短碼，公版原件仍由公版模組的 Qdrant 管理。
+sequenceDiagram
+  participant Agent as Agent 工具執行
+  participant Bundle as Job Reference Bundle
+  participant Public as 公版模組<br/>SearchRunner / ReferenceSearch
+  participant Refs as Model References
+  participant PG as PostgreSQL<br/>共用短碼儲存
+
+  Note over Agent,Bundle: 模型只填 query；Workspace 由可信 ToolRuntime 注入
+  Agent->>Bundle: search_occupation_references(query)
+  Bundle->>Public: runner.run(search(query, limit=5))
+  Public-->>Bundle: 最多五份固定來源 UUID、目錄及檢索證據
+  Bundle->>Refs: get_or_create_refs(Workspace, occupation targets)
+  Refs->>PG: 取得或新增同 Workspace 的來源別名並提交
+  PG-->>Refs: 提交完成
+  Refs-->>Bundle: occupation_n 與來源 UUID 的對應
+  Bundle->>Bundle: 投影完整目錄並檢查輸出容量<br/>不回檢索分數／政策
+  Bundle-->>Agent: JSON references 陣列，使用 occupation_n
+
+  Note over Refs,PG: 已提交別名在取消後保留；無公版選用狀態
+  Agent->>Bundle: read_occupation_reference(occupation_n, uN-tN)
+  Bundle->>Refs: resolve_refs(可信 Workspace, occupation_n)
+  Refs->>PG: 查同 Workspace 別名
+  PG-->>Refs: 固定來源 UUID 與資源種類
+  Refs-->>Bundle: ReferenceTarget
+  Bundle->>Bundle: 核對種類為 occupation
+  Bundle->>Public: read_task(來源 UUID, task_id)
+  Note right of Public: 核 manifest、原件身分及任務位置<br/>不執行 embedding／rerank
+  Public-->>Bundle: 固定來源中的完整任務群組
+  Bundle-->>Agent: JSON 任務物件，保留全部區塊與 O/P/K/S

@@ -1,0 +1,23 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    nodeSpacing: 26
+    padding: 8
+    wrappingWidth: 290
+---
+%% title: 現行 Agent 組裝：選取 Plugin，固定服務與執行流程
+%% legend: 後端的啟動與關閉流程。Plugin 選名不重排 factory 宣告；服務依賴只決定開啟順序，各 phase 的 run_last 尾段最後執行。
+flowchart TD
+    host([Host 啟動<br/>建立 client／saver 與共用資源]) --> load[每個 Bundle factory 載入一次<br/>按名稱選取 Plugin；保留宣告順序]
+    load --> declarations[收集所選 Prompt／工具／State<br/>驗證 Plugin 前提與 phase 尾段]
+    declarations --> services[依服務相依開啟 open_services<br/>ServiceCollection 按配置序合成固定 tuple]
+    services --> compile[編譯可重用 Graph<br/>各 phase 普通步驟後接 run_last 尾段]
+    compile --> agent[Agent 就緒<br/>固定拓撲與設定；沒有熱插拔]
+    agent --> invoke[/每次帶 Workspace 與輸入／恢復指令<br/>State 由該 Thread Checkpoint 載入/]
+    invoke --> execute[執行已登記 Hook／子圖／工具<br/>插件按需呼叫業務公開方法]
+    execute --> release[執行結束釋放當次參照<br/>保留 Graph、服務與連線池]
+    release -->|下一次執行| invoke
+    release -->|Host 關閉| stop[停止或完成所有 invocation<br/>等待執行收束]
+    stop --> close[反序關閉 Agent 自有插件服務<br/>Host 關閉其 client／saver／共用資源]
+    close --> finish([關閉完成])

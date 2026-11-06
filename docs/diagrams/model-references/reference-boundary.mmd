@@ -1,0 +1,30 @@
+%% title: 後端（現行）：共用短碼提交與查讀（公版消費端示例）
+%% legend: 公版搜尋後查讀的正常路徑，不代表所有 Bundle 的資格檢查順序。實線實心箭頭為同步等待，虛線為回覆；映射交易不包含業務或 Checkpoint，解析不保證來源仍可讀。
+sequenceDiagram
+    participant Bundle as 公版 Bundle
+    participant Owner as 公版來源服務
+    participant Mapper as ModelReferences
+    participant DB as PostgreSQL
+    Bundle->>Owner: search(query)，由既有 runner 執行
+    Owner-->>Bundle: 搜尋結果含固定公版 UUID
+    Note over Bundle,Mapper: Workspace 來自可信 runtime；種類指定 occupation
+    Bundle->>Mapper: get_or_create_refs(Workspace, targets)
+    Mapper->>DB: BEGIN；INSERT ON CONFLICT DO NOTHING
+    Mapper->>DB: 同交易另發 SELECT（READ COMMITTED）
+    DB-->>Mapper: 完整映射列
+    Mapper->>Mapper: 核對批次完整
+    Mapper->>DB: COMMIT
+    DB-->>Mapper: 提交成功
+    Mapper-->>Bundle: targets 對應短碼
+    Note over Bundle: 搜尋結果的 reference_id 使用 occupation_N
+    Note over Bundle: 後續 read_occupation_reference 收到此短碼
+    Bundle->>Mapper: resolve_refs(可信 Workspace, refs)
+    Mapper->>Mapper: 核整批格式與 BIGINT 範圍
+    Mapper->>DB: 依 Workspace 與配號 SELECT
+    DB-->>Mapper: 映射列
+    Mapper->>Mapper: 核完整前綴與全批存在
+    Mapper-->>Bundle: ReferenceTarget（種類／UUID）
+    Bundle->>Bundle: 核種類為 occupation
+    Bundle->>Owner: 以來源 UUID 讀固定公版（task_id 為 null）
+    Owner-->>Bundle: 固定文件或來源不可用錯誤
+    Note over Bundle: 投影工具回傳，或轉譯具體修正方向

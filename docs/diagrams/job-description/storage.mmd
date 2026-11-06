@@ -1,0 +1,81 @@
+%% title: 後端（現行）：JD 關聯式目前資料與完整快照
+%% legend: 實表與外鍵關係，僅列主要關係鍵；正文欄位見分圖。來源引用只畫根歸屬，其目標／來源外鍵見來源引用圖及模組 README；快照自參照見快照分圖。
+erDiagram
+    direction TB
+
+    workspaces ||..o| job_descriptions : "至多一份 JD"
+    job_descriptions ||..o{ duties : "職責"
+    job_descriptions ||..o{ job_tasks : "任務"
+    duties |o..o{ job_tasks : "可選分類／同 JD"
+    job_tasks ||..o{ task_outcomes : "成果 O"
+    job_tasks ||..o{ task_requirements : "要求 P"
+    job_descriptions ||..o{ knowledge : "共用知識 K"
+    job_descriptions ||..o{ skills : "共用技能 S"
+    job_tasks ||--o{ task_knowledge : "引用 K"
+    knowledge ||--o{ task_knowledge : "同 JD 定義"
+    job_tasks ||--o{ task_skills : "引用 S"
+    skills ||--o{ task_skills : "同 JD 定義"
+    job_descriptions ||..o{ collaboration_entries : "協作"
+    job_descriptions ||..o{ job_conditions : "條件"
+    job_descriptions ||..o{ job_description_citations : "來源引用"
+    job_descriptions ||--o{ job_description_snapshots : "完整快照"
+
+    workspaces {
+        uuid id PK
+    }
+    job_descriptions {
+        uuid id PK
+        uuid workspace_id FK,UK
+    }
+    duties {
+        uuid id PK
+        uuid job_description_id FK
+    }
+    job_tasks {
+        uuid id PK
+        uuid job_description_id FK
+        uuid? duty_id FK "與 JD 組成複合 FK"
+    }
+    task_outcomes {
+        uuid id PK
+        uuid task_id FK
+    }
+    task_requirements {
+        uuid id PK
+        uuid task_id FK
+    }
+    knowledge {
+        uuid id PK
+        uuid job_description_id FK
+    }
+    skills {
+        uuid id PK
+        uuid job_description_id FK
+    }
+    task_knowledge {
+        uuid task_id PK,FK
+        uuid knowledge_id PK,FK
+        uuid job_description_id FK "兩端共用"
+    }
+    task_skills {
+        uuid task_id PK,FK
+        uuid skill_id PK,FK
+        uuid job_description_id FK "兩端共用"
+    }
+    collaboration_entries {
+        uuid id PK
+        uuid job_description_id FK
+    }
+    job_conditions {
+        uuid id PK
+        uuid job_description_id FK
+    }
+    job_description_citations {
+        uuid id PK
+        uuid job_description_id FK "與 workspace_id 組成根 FK"
+        uuid workspace_id FK
+    }
+    job_description_snapshots {
+        uuid job_description_id PK,FK
+        int version PK
+    }

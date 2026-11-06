@@ -1,0 +1,45 @@
+%% title: 後端（現行）：共用 K/S 與 Task 引用完整欄位
+%% legend: ?＝可空，其餘 NOT NULL。JD／Task 僅列關係鍵；雙 PK 欄組成一個主鍵。引用兩端各以 ID＋同一 JD ID 組成外鍵。
+erDiagram
+    direction TB
+    job_descriptions ||..o{ knowledge : "定義 K"
+    job_descriptions ||..o{ skills : "定義 S"
+    job_descriptions ||..o{ job_tasks : "擁有"
+    knowledge ||--o{ task_knowledge : "被引用"
+    job_tasks ||--o{ task_knowledge : "引用 K"
+    job_tasks ||--o{ task_skills : "引用 S"
+    skills ||--o{ task_skills : "被引用"
+
+    job_descriptions {
+        uuid id PK "僅列關係鍵"
+    }
+    job_tasks {
+        uuid id PK "僅列關係鍵"
+        uuid job_description_id FK
+    }
+    knowledge {
+        uuid id PK
+        uuid job_description_id FK
+        text name "知識名稱"
+        text? description "知識說明"
+        int position "JD 知識清單內順序"
+    }
+    skills {
+        uuid id PK
+        uuid job_description_id FK
+        text name "技能名稱"
+        text? description "技能說明"
+        int position "JD 技能清單內順序"
+    }
+    task_knowledge {
+        uuid task_id PK,FK
+        uuid knowledge_id PK,FK
+        uuid job_description_id FK "兩端共用的 JD 範圍"
+        int position "Task 的 K 引用順序"
+    }
+    task_skills {
+        uuid task_id PK,FK
+        uuid skill_id PK,FK
+        uuid job_description_id FK "兩端共用的 JD 範圍"
+        int position "Task 的 S 引用順序"
+    }

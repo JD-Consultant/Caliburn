@@ -1,8 +1,0 @@
-/* Generated from apps/api/contracts; do not edit. */
-
-export interface DeleteJdItemArguments {
-  /**
-   * 要整項刪除的既有職責、任務、知識／技能、協作對象或共通條件定位。原樣使用目前仍有效的 jd_map、read_jd 或成功建立回傳提供的 read_ref，不依名稱或序號自行組出。
-   */
-  read_ref: string;
-}

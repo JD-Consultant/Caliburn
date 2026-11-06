@@ -1,0 +1,30 @@
+---
+config:
+  flowchart:
+    rankSpacing: 20
+    nodeSpacing: 28
+    padding: 8
+    wrappingWidth: 320
+---
+%% title: 現行 Agent Loop：單輪執行與四個插件接點
+%% legend: model step 包含模型及整批工具。雙線框展開為已選的有序 PluginStep，沒有步驟便通過；菱形是路由，不是 Node。正常串行路徑以 sync 保存各 super-step；例外、中斷與圖外取消另見局部流程。
+flowchart TD
+    start([__start__ 完成<br/>本輪輸入已套入 State]) --> initialize{{initialize_turn<br/>以 turn_input 建立工作請求}}
+    initialize --> turn[[on_turn_start]]
+    turn --> begin[begin_model_step<br/>核上限；步號 +1<br/>清 model_response 並保存]
+    begin --> before[[before_model_step]]
+    before --> validate[validate_request_policy]
+    validate --> model[call_model<br/>確認完整有效回應]
+    model --> calls{回應含工具？}
+    calls -->|有| tool[execute_tool<br/>執行一個工具、回傳更新並保存]
+    tool --> pending{本批還有工具？}
+    pending -->|有| tool
+    pending -->|沒有| after
+    calls -->|沒有| after[[after_model_step]]
+    after --> route{符合回應完成規則？}
+    route -->|否：有工具或 commentary| begin
+    route -->|是| ending[[on_turn_end]]
+    ending --> completed[finish_turn<br/>turn_completed = True 並保存]
+    completed --> finish([本輪結束])
+    classDef plugin fill:#eaf2ff,stroke:#3569a8,color:#153c70
+    class turn,before,after,ending plugin

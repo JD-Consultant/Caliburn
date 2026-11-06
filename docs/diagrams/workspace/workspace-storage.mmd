@@ -1,0 +1,32 @@
+%% title: 後端（現行）：Workspace 直接歸屬 ER
+%% legend: 只列直接指向 workspaces 的實表與關係鍵；其餘內容及歷史表見各模組 ER。所有圖示 FK 均 ON DELETE CASCADE；官方 Saver 與 Qdrant 不在此級聯範圍。
+erDiagram
+    direction LR
+    workspaces ||..o| job_descriptions : "至多一份 JD"
+    workspaces ||--o| plans : "至多一份 Plan"
+    workspaces ||--o| work_memories : "至多一份 Memory"
+    workspaces ||--o{ interview_turns : "訪談輪次"
+    workspaces ||..o{ model_references : "持久模型短碼"
+
+    workspaces {
+        uuid id PK
+        text interviewee_name
+    }
+    job_descriptions {
+        uuid id PK
+        uuid workspace_id FK,UK
+    }
+    plans {
+        uuid workspace_id PK,FK
+    }
+    work_memories {
+        uuid workspace_id PK,FK
+    }
+    interview_turns {
+        uuid workspace_id PK,FK
+        uuid turn_id PK
+    }
+    model_references {
+        bigint reference_number PK
+        uuid workspace_id FK
+    }

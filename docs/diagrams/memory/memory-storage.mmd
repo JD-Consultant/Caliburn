@@ -1,0 +1,42 @@
+---
+config:
+  theme: neutral
+  look: classic
+  layout: dagre
+---
+%% title: 後端（現行）：Memory 目前資料與固定發布 ER
+%% legend: 實表與外鍵關係；實線為識別關係，虛線為非識別關係。省略 CHECK 與 JSON 內部結構。source_ids 及 covered_through_message_id 不是 SQL 外鍵；跨模組來源資格由公開用例核對。
+erDiagram
+    direction TB
+    WORKSPACE["workspaces｜外部模組"] {
+        uuid id PK
+    }
+    MEMORY["work_memories｜WorkMemory 聚合根"] {
+        uuid workspace_id PK,FK
+        bigint version "目前稿的並行版本"
+        bigint published_version FK "可空；指向同 Workspace 快照"
+        jsonb analysis "可空；目前階段、基準與固定來源窗口"
+        jsonb failure "可空；最近分析失敗與當時訪談範圍"
+    }
+    ITEM["memory_items｜目前情境與理解"] {
+        uuid workspace_id PK,FK
+        uuid item_id PK "改名保留、重建換新 ID"
+        text kind "situation 或 understanding"
+        text title "同 Workspace、同 kind 唯一"
+        text description "導覽"
+        text body "完整 Markdown"
+        uuid[] source_ids "訪談 ID 或情境 ID；非 FK"
+        bigint changed_version "目前保留內容與來源鏈的變動標記"
+    }
+    SNAPSHOT["memory_snapshots｜完整發布快照"] {
+        uuid workspace_id PK,FK
+        bigint version PK "發布時的根版本"
+        integer schema_version "JSON 保存格式"
+        uuid covered_through_message_id "固定訪談涵蓋上界；非 FK"
+        timestamptz published_at
+        jsonb content "兩層完整內容、來源與變動版號"
+    }
+    WORKSPACE ||--o| MEMORY : "至多一個根"
+    MEMORY ||--o{ ITEM : "管理目前集合"
+    MEMORY ||--o{ SNAPSHOT : "每次發布固定完整圖"
+    MEMORY |o..o| SNAPSHOT : "published_version 選定同 Workspace 已發布版"

@@ -1,0 +1,26 @@
+---
+config:
+  flowchart:
+    rankSpacing: 20
+    nodeSpacing: 24
+    padding: 8
+    wrappingWidth: 300
+---
+%% title: 逐工具執行：原生 wrapper 與保存邊界
+%% legend: 圖示無 Task；藍框為一個 execute_tool Node，內框為呼叫階段。例外與中斷向外傳遞。
+flowchart TD
+    start([模型回覆含工具]) --> invoke
+    subgraph execution[" "]
+        invoke[取下一個 call<br/>ToolNode.ainvoke] --> before[有序 wrap_tool_call<br/>前置判斷；args 尚未完成工具驗證]
+        before --> allowed{允許執行？}
+        allowed -->|是，execute 一次| handler[ToolNode 注入 ToolRuntime<br/>StructuredTool 驗參數並呼叫 handler]
+        allowed -->|否，execute 零次| denied[建立配對工具結果]
+        handler --> after[已進入包覆層的後置處理<br/>保留配對訊息與插件更新]
+        denied --> after
+        after --> returned[/Core 轉為 SDK 工具結果<br/>return 結果與插件局部更新/]
+    end
+    returned --> save[(Graph 套用更新<br/>Checkpointer 同步保存)]
+    save --> pending{還有工具？}
+    pending -->|有，依序執行| invoke
+    pending -->|沒有| finished([after_model_step<br/>接回主 Loop])
+    style execution fill:#eef5ff,stroke:#3569a8,color:#153c70

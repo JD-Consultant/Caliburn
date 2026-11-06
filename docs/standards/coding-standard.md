@@ -265,7 +265,7 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 
 真人使用／測試與合成對照都須能方便查閱執行證據，不能只有實驗腳本保留資料。一般 log 只記必要的安全中繼資料，如錯誤分類、關聯身分與耗時；受控診斷可查工作正文，兩者的保存與存取邊界分開。
 
-[本機診斷](../operations/README.md#查閱-ai-執行原件)與正式操作資料是現有查閱路徑；DataGrip、CLI、現成 trace 平台或開發者介面皆可按定位成本選用，不要求放進受訪者 UI。觀測工具可替換，正式保存及業務裁決仍由原責任模組負責。
+[執行查讀](../operations/README.md#查閱-ai-執行原件)與正式操作資料是現有查閱路徑；DataGrip、CLI、現成 trace 平台或開發者介面皆可按定位成本選用，不要求放進受訪者 UI。觀測工具可替換，正式保存及業務裁決仍由原責任模組負責。
 
 #### 實際輸入與執行因果
 
@@ -281,7 +281,7 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 - 已放進 Context 的導覽／正文。
 - 經工具實際讀到的內容。
 
-Plan 與 JD 亦按其既有版本／候選契約查閱。不能拿目前最新內容解釋過去一輪，也不能把可讀取視為已提供給模型；壓縮後只呈現實際可查的資料，不推造不可見內容。
+Plan 與 JD 亦按其既有版本／恢復契約查閱。不能拿目前最新內容解釋過去一輪，也不能把可讀取視為已提供給模型；壓縮後只呈現實際可查的資料，不推造不可見內容。
 
 **執行因果。** 能沿同一次工作關聯「模型要求 → App 綁定的可信 scope → handler 結果 → 正式保存／採用」，不讓模型參數冒充 App 權限。工具回傳與業務操作可能不是一對一，沿原操作身分及修訂因果核對。
 
@@ -289,7 +289,7 @@ Plan 與 JD 亦按其既有版本／候選契約查閱。不能拿目前最新�
 
 **資料缺失。** 明示缺失、截斷、遮蔽及擷取時點；單次查閱不冒充持續更新的全量紀錄。`recorded` 只表示取得回傳，不保證成功或正式採用；`not_recorded` 不能推定未執行。部分輸出與未知用量如實保留，不補造結果或歸零。
 
-**診斷失敗。** 診斷／匯出失敗不得改寫正式結果或觸發業務重送。這不豁免 checkpoint、操作結果、額度等原本具有恢復／准入責任的耐久保存；它們仍依[執行接線](../implementation/agent-execution.md)處理失敗。
+**診斷失敗。** 診斷／匯出失敗不得改寫正式結果或觸發業務重送。這不豁免 checkpoint、操作結果、額度等原本具有恢復／准入責任的耐久保存；它們仍依[執行接線](../../apps/backend/src/caliburn/modules/agent/README.md)處理失敗。
 
 **權限與外送。** 正文查閱權限、一般統計與外送目的地分開控管；啟用本機診斷不等於允許第三方 exporter 外送。敏感欄位遮蔽不代表整份訪談已匿名化。
 
@@ -325,7 +325,7 @@ OpenTelemetry GenAI 欄位仍在 Development；本頁採觀測責任，不直接
 | ERROR | 操作未能完成的非預期失敗 |
 | CRITICAL | 服務無法繼續 |
 
-正常使用者取消、驗證拒絕及沒有資料不一律記 ERROR；安全異常另依實際風險。既有 provider 故障分類與等級沿[執行接線](../implementation/agent-execution.md)，不能僅靠 HTTP status 判斷整個工作結果。
+正常使用者取消、驗證拒絕及沒有資料不一律記 ERROR；安全異常另依實際風險。既有 provider 故障分類與等級沿[執行接線](../../apps/backend/src/caliburn/modules/agent/README.md)，不能僅靠 HTTP status 判斷整個工作結果。
 
 **記錄責任。** 由掌握事件語意的邊界記錄重要開始、結果、重試、取消及恢復，避免每層 catch 同一例外後重印 stack。需要其他層事件時記其不同階段與關聯，不假裝新故障。
 
@@ -364,9 +364,9 @@ Log 記事件，trace 關聯執行跨度，受控診斷提供必要正文；三�
 
 | 檢查 | 本案執行方式 | 不能證明 |
 |---|---|---|
-| Python 格式／基本正確性／命名 | Ruff formatter＋E／F／I／UP／B／ASYNC；補 N、A、RUF006、RUF100 | 名稱是否符合業務、某 task 是否耐久 |
+| Python 格式／基本正確性／命名 | Ruff formatter 與後端 pyproject 選定規則 | 名稱是否符合業務、某 task 是否耐久 |
 | Python 型別 | mypy strict；公開邊界及可疑動態值審查 | runtime payload 一定合法 |
-| TS／React | TypeScript strict；ESLint recommended type-checked、Hooks、Promise、型別 import、switch 分支覆蓋、已棄用 API（`no-deprecated`）；Prettier | 後端已提交、UI 旅程可用 |
+| TS／React | TypeScript strict；ESLint type-checked、Hooks 與實際選定規則；Prettier | 後端已提交、UI 旅程可用 |
 | 靜態分層 | 既有 import／AST 邊界檢查 | 任意動態呼叫也安全，或所有責任切分合理 |
 | 用例正確性 | 相應單元／整合／產品反例 | 程式易讀與無過度設計 |
 | 審查 | 本頁責任、名稱、副作用、錯誤／恢復與抽象判準 | 不以個人喜好取代契約／實測 |
@@ -379,10 +379,10 @@ Log 記事件，trace 關聯執行跨度，受控診斷提供必要正文；三�
 |---|---|---|
 | 模組與依賴 | 同一規則集中、修改範圍可理解；公開入口不洩漏私有狀態，無循環依賴或無用途抽象 | [程式組織](code-organization.md)、本頁 §3–4 |
 | Interface 與契約 | 輸入、回傳、錯誤、副作用與版本語意明確；schema／生成物與實際 handler 相符 | 本頁 §2、§4–5、[契約策略](contract-strategy.md) |
-| 權限、網路與秘密 | App 驗作用範圍；本機 Host／Origin、可信外送目的地及資料範圍沿有效配置；秘密不進模型參數或前端，client 生命週期明確 | [介面 §5](../implementation/interface-and-delivery.md#5-安全與操作邊界)、[信任邊界](../architecture/delivery-and-operations.md#4-信任與權限邊界)、本頁 §4–5 |
-| 資料、交易與恢復 | 正式來源唯一、候選與採用可辨、競爭及結果不明沿原操作核對；診斷不參與業務裁決 | [資料接線](../implementation/data-and-contracts.md)、[保存架構](../architecture/persistence.md) |
-| 並行、取消與重試 | 資源有人關閉、工作有人收尾；取消語意不混淆、重試責任不疊乘、已發生效果不重做 | 本頁 §5、[執行接線](../implementation/agent-execution.md) |
-| 前端與跨層呈現 | 生成契約有 runtime 驗證；草稿、串流與正式結果分明，過時回應不跨檔案，內容安全呈現 | 本頁 §6、[介面與交付](../implementation/interface-and-delivery.md) |
+| 權限、網路與秘密 | App 驗作用範圍；本機 Host／Origin、可信外送目的地及資料範圍沿有效配置；秘密不進模型參數或前端，client 生命週期明確 | [前端接線](../../apps/frontend/README.md)、[信任邊界](../architecture/delivery-and-operations.md#4-信任與權限邊界)、本頁 §4–5 |
+| 資料、交易與恢復 | 正式來源唯一、目前內容與歷史／發布版本可辨、競爭及結果不明沿原操作核對；診斷不參與業務裁決 | [資料接線](../implementation/data-and-contracts.md)、[保存架構](../architecture/persistence.md) |
+| 並行、取消與重試 | 資源有人關閉、工作有人收尾；取消語意不混淆、重試責任不疊乘、已發生效果不重做 | 本頁 §5、[執行接線](../../apps/backend/src/caliburn/modules/agent/README.md) |
+| 前端與跨層呈現 | 生成契約有 runtime 驗證；草稿、串流與正式結果分明，過時回應不跨檔案，內容安全呈現 | 本頁 §6、[介面與交付](../../apps/frontend/README.md) |
 | 可測性、對照與觀測 | Prompt／Tool／元件在責任邊界替換，沿正式路徑驗證；可從實際輸入追到結果且證據不洩密 | 本頁 §4、§7、[貢獻指南](../../CONTRIBUTING.md#驗證與提交) |
 | 效能與持續維護 | I/O、交易、並行量與正文成本有界；依量測找瓶頸，避免重複計算／狀態及為未來泛化 | 本頁 §3–6、[貢獻指南](../../CONTRIBUTING.md#驗證與提交) |
 
@@ -390,7 +390,7 @@ Log 記事件，trace 關聯執行跨度，受控診斷提供必要正文；三�
 
 ### 設定、執行與例外
 
-命令沿 [backend README](../../apps/api/README.md)與 [frontend README](../../apps/web/README.md)，規則的實際設定以 pyproject／eslint／tsconfig 為準，不在本頁手抄第二份 config。設定變更先跑反例確認能報錯，再驗既有程式，記入原任務 evidence；未覆蓋的項目如實列為審查責任。
+命令沿 [backend README](../../apps/backend/README.md)與 [frontend README](../../apps/frontend/README.md)，規則的實際設定以 pyproject／eslint／tsconfig 為準，不在本頁手抄第二份 config。新增或變更檢查規則時先跑反例確認能報錯，再驗既有程式，記入原任務 evidence；未覆蓋的項目如實列為審查責任。
 
 核對實際受測檔案、版本、設定及例外，本機與交付檢查沿相同入口。工具結果另留意兩個界線：
 
@@ -403,9 +403,7 @@ Log 記事件，trace 關聯執行跨度，受控診斷提供必要正文；三�
 
 例外用最窄的 suppression，列原因及 rule code；禁止全檔 `type: ignore`／大範圍停用 lint 掩蓋缺陷。`RUF100` 用於清理已不需要的 noqa，不保證所有人工理由合理。
 
-依據：[Ruff rules](https://docs.astral.sh/ruff/rules/)、[RUF006](https://docs.astral.sh/ruff/rules/asyncio-dangling-task/)、[typed linting](https://typescript-eslint.io/getting-started/typed-linting/)、[no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/)、[switch exhaustiveness](https://typescript-eslint.io/rules/switch-exhaustiveness-check/)、[no-deprecated](https://typescript-eslint.io/rules/no-deprecated/)。這是目前工具鏈的有界增補，非要求換框架。
-
-`no-deprecated` 用於 `apps/web`，補足 TypeScript 不會對 `@deprecated` 報錯的檢查。使用方式與其餘型別 lint 規則相同；驗證見規範稽核。
+依據：[Ruff rules](https://docs.astral.sh/ruff/rules/)、[RUF006](https://docs.astral.sh/ruff/rules/asyncio-dangling-task/)、[typed linting](https://typescript-eslint.io/getting-started/typed-linting/)、[no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/)、[switch exhaustiveness](https://typescript-eslint.io/rules/switch-exhaustiveness-check/)、[no-deprecated](https://typescript-eslint.io/rules/no-deprecated/)。上述是可依需要採用的規則說明；是否啟用以目前配置為準。
 
 **規則維護。** 規則依成熟工程規範、框架契約或可核對的維護／錯誤案例持續修訂，同步本頁、設定與必要回歸；工具設定變動用代表性反例核實檢查效果。
 

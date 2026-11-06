@@ -1,0 +1,52 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 260
+    nodeSpacing: 24
+    rankSpacing: 34
+    padding: 12
+---
+%% title: 公版模組（現行）｜索引與查詢兩條獨立路徑
+%% legend: 左右兩欄是分別觸發的用例，不是單次串行流程。欄內實線箭頭是控制順序；跨欄虛線只表示對外部 Qdrant 的資料寫入／讀取。CLI 與 FastAPI 分別啟動、共用模組程式。D 為全文路徑，T 為概述／任務路徑；搜尋結果是模組回傳，Bundle 另作模型投影。
+flowchart LR
+  subgraph maintenance["路徑一 · 維護 CLI 程序<br/>由管理者明示啟動"]
+    direction TB
+    source[/"PDF 或完整來源 JSON"/]
+    prepare["PDF 轉換／驗證<br/>已有完整 JSON 可直接驗證"]
+    select["選定來源<br/>每個 OCS code 一份完整 JSON"]
+    build["建立新的 Qdrant collection<br/>固定來源 bytes／ID，清洗投影並 embedding"]
+    ready["寫入成功並核對點數<br/>最後保存 ready manifest"]
+    activate["管理者切換後端配置並重啟<br/>不覆寫舊 collection"]
+    done(["維護用例完成"])
+    source --> prepare --> select --> build --> ready --> activate --> done
+  end
+
+  store[("Qdrant collection<br/>完整固定來源、D/T 向量、ready manifest<br/>跨 Workspace 共用，不是 PostgreSQL 業務表")]
+
+  subgraph search["路徑二 · FastAPI 後端內的搜尋<br/>由 HTTP／Bundle 獨立呼叫"]
+    direction TB
+    query[/"query 與 limit<br/>HTTP 可指定上限<br/>Bundle 固定五份"/]
+    validate["核對索引 ready<br/>及 embedding／前處理身分"]
+    embed["本機 embedding<br/>產生查詢向量"]
+    retrieve["D/T 兩路各取候選<br/>按公版分組，再取完整聯集"]
+    candidates{"有候選？"}
+    rerank["讀回候選原始來源，重建清洗正文<br/>本機 reranker 排序"]
+    quota["排序後才套回傳上限<br/>最多五份，保留來源與檢索證據"]
+    result[/"搜尋結果；無候選則回空清單"/]
+    query --> validate --> embed --> retrieve --> candidates
+    candidates -->|"有"| rerank --> quota --> result
+    candidates -->|"無"| result
+  end
+  maintenance -.->|"寫入原件／向量<br/>成功後發布 ready manifest"| store
+  store -.->|"讀取後端目前配置<br/>collection 的索引與原件"| search
+
+  classDef operation fill:#f2f6fa,stroke:#5f758b,color:#182b3a
+  classDef data fill:#ffffff,stroke:#879bad,color:#243746
+  class prepare,select,build,ready,activate,validate,embed,retrieve,rerank,quota operation
+  class source,store,query,result data

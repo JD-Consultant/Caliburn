@@ -1,0 +1,65 @@
+---
+config:
+  theme: neutral
+  look: classic
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  sequence:
+    actorMargin: 36
+    boxMargin: 12
+    messageMargin: 24
+    noteMargin: 12
+    wrap: true
+---
+%% title: Caliburn 系統架構｜一次 JD 編修的保存邊界
+%% legend: 實線為同步呼叫，虛線為回覆；示範有內容變更的編修。HTTP 與模型工具共用公開用例；業務交易不包含模型等待或 Checkpoint。
+sequenceDiagram
+  participant Core as Agent Core／Graph
+  participant Entry as HTTP／JD 工具
+  participant App as JD Application
+  participant Repo as Repository／UoW
+  participant Root as JobDescription 根
+  participant DB as 業務 PostgreSQL
+  participant CP as 官方 Checkpointer
+
+  opt Agent 發起工具呼叫
+    Core->>Entry: 執行已登記工具（模型參數＋可信 Runtime）
+  end
+  Note over Entry,App: HTTP 轉換輸入；工具從可信執行範圍取得 Workspace 與版本
+  Entry->>App: 公開編修用例（Workspace、JD、期望版本、修改意圖）
+  App->>Repo: 開啟一次用例的 UoW
+  Repo->>DB: BEGIN；依 Workspace＋JD 鎖根並載入完整聚合
+  DB-->>Repo: 同份 JD 的目前內容與版本
+  Repo-->>App: 已載入的聚合與版本
+  App->>App: 核對期望版本與輸入組合
+  opt 版本與輸入前置成立
+    App->>Root: 修改內容、關係與邏輯順序
+    Root-->>App: 修改後聚合，或具名領域拒絕
+  end
+
+  alt 前置或領域規則拒絕
+    App->>Repo: 結束用例，撤回本次交易
+    Repo->>DB: ROLLBACK
+    App-->>Entry: 具名拒絕；沒有部分保存
+  else 有效編修
+    App->>Repo: 保存聚合與本次來源識別
+    Repo->>DB: 只同步變動的關聯式目前資料
+    Repo->>DB: 前移 JD 版本並新增 JSONB 完整快照
+    Note over Repo,DB: 同一短交易保存目前內容、版本與完整快照
+    Repo-->>App: 本次保存版本
+    App->>Repo: commit
+    Repo->>DB: COMMIT
+    DB-->>Repo: 提交確認
+    Repo-->>App: 提交完成
+    App-->>Entry: 本次完整 JD 與新版本
+    opt 由 Agent 工具發起
+      Entry-->>Core: 工具結果與插件 State update
+      Core->>Core: execute_tool Node 返回局部 State update
+      Core->>CP: 框架保存合併後的 State 與執行位置
+      CP-->>Core: Checkpoint 保存確認；可續下一 Node
+      Note over DB,CP: 兩個保存邊界；Checkpoint 失敗不撤銷已提交 JD
+    end
+  end
+
+  Note over App,DB: 取消整輪由常設協調呼叫 JD 恢復用例，形成新版本；不跨模型等待持有交易

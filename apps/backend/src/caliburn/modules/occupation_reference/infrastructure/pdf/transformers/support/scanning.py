@@ -1,0 +1,135 @@
+"""Recover names from positioned words and merge units across PDF pages."""
+
+import re
+
+from ocs_contract.models import CodeText, OcuUnit
+
+from ...parsers.models import PDFDocument
+from . import dedupe as dd
+from . import text as txt
+
+
+def scan_ocu_names_from_text(pdf: PDFDocument) -> dict[str, str]:
+    """Extract OCU T-code → name mapping from the leftmost page column.
+
+    Uses bbox word positions to handle historical PDFs where merged table
+    cells cause pdfplumber to return None for most rows.
+    """
+    names: dict[str, str] = {}
+    ocu_code_re = re.compile(r"^T\d+$")
+    pure_code_re = re.compile(r"^[KSOP]\d+(?:[.\-]\d+)*$", re.IGNORECASE)
+
+    for page in pdf.pages:
+        words = [word for word in page.words if word["x1"] <= page.width * 0.12]
+        current_ocu: str | None = None
+        name_parts: list[str] = []
+        ocu_x: float = 0.0
+
+        for word in words:
+            text = word["text"].strip()
+            if not text:
+                continue
+            wx = float(word.get("x0", 0))
+            if ocu_code_re.match(text):
+                if current_ocu and name_parts and current_ocu not in names:
+                    names[current_ocu] = "".join(name_parts)
+                current_ocu = text
+                name_parts = []
+                ocu_x = wx
+            elif current_ocu and wx <= ocu_x + 30 and not pure_code_re.match(text):
+                name_parts.append(text)
+
+        if current_ocu and name_parts and current_ocu not in names:
+            names[current_ocu] = "".join(name_parts)
+
+    return names
+
+
+def scan_task_names_from_words(pdf: PDFDocument) -> dict[str, str]:
+    """Extract T{n}.{m} → name mapping from word-level bbox positions.
+
+    Words are bucketed into 5px rows to handle sub-pixel y differences.
+    Only words within ±30px of the task-code x-position are captured.
+    """
+    names: dict[str, str] = {}
+    task_re = re.compile(r"^T\d+\.\d+$")
+
+    for page in pdf.pages:
+        words = sorted(
+            page.words,
+            key=lambda w: (round(w["top"] / 5) * 5, w["x0"]),
+        )
+        current_task: str | None = None
+        task_x: float = 0.0
+        parts: list[str] = []
+
+        for word in words:
+            text = word["text"].split("\n")[0].strip()
+            if not text:
+                continue
+            wx = float(word.get("x0", 0))
+            if task_re.match(text):
+                if current_task and parts and current_task not in names:
+                    names[current_task] = "".join(parts)
+                current_task = text
+                parts = []
+                task_x = wx
+            elif current_task is not None and task_x - 5 <= wx <= task_x + 30:
+                parts.append(text)
+
+        if current_task and parts and current_task not in names:
+            names[current_task] = "".join(parts)
+
+    return names
+
+
+def derive_task_code_from_p_codes(indicators: list[CodeText]) -> str | None:
+    """Derive task code from P-code when the task-code table cell is None.
+
+    P-code format: P{ocu}.{task}.{seq} → T{ocu}.{task}. E.g. P1.1.1 → T1.1.
+    """
+    for ind in indicators:
+        m = re.match(r"P\.?(\d+)\.(\d+)", ind.code or "", re.IGNORECASE)
+        if m:
+            return f"T{m.group(1)}.{m.group(2)}"
+    return None
+
+
+def is_generic_unit_name(name: str | None) -> bool:
+    """Return True when *name* is a placeholder rather than a real OCU name."""
+    return txt.normalize_text(name) in {"主要職責", "工作任務", "unknown", ""}
+
+
+def merge_ocu_unit(unit: OcuUnit, ocu_units: list[OcuUnit]) -> None:
+    """Merge *unit* into *ocu_units*, combining tasks for matching OCU codes."""
+    for existing in ocu_units:
+        if existing.ocu_code != unit.ocu_code:
+            continue
+        assert existing.tasks is not None
+        assert unit.tasks is not None
+        task_map = {t.task_codes[0].code: t for t in existing.tasks if t.task_codes}
+        for task in unit.tasks:
+            if not task.task_codes:
+                continue
+            primary = task.task_codes[0].code
+            if primary in task_map:
+                target = task_map[primary]
+                target.competency_blocks = (target.competency_blocks or []) + (
+                    task.competency_blocks or []
+                )
+                target.competency_blocks = [
+                    dd.dedupe_block(b) for b in target.competency_blocks
+                ]
+                assert target.task_codes is not None
+                existing_codes = {e.code for e in target.task_codes}
+                for entry in task.task_codes:
+                    if entry.code not in existing_codes:
+                        target.task_codes.append(entry)
+            else:
+                existing.tasks.append(task)
+        if is_generic_unit_name(existing.ocu_name) and not is_generic_unit_name(
+            unit.ocu_name
+        ):
+            existing.ocu_name = unit.ocu_name
+        return
+    ocu_units.append(unit)

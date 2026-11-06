@@ -1,0 +1,30 @@
+{
+  "agent_id": "consultant",
+  "resume_version": "13",
+  "model": "gpt-6-luna",
+  "max_output_tokens": 16384,
+  "max_active_turns": 8,
+  "reasoning_effort": "low",
+  "sdk_timeout_seconds": 120,
+  "bundles": [
+    {"module": "caliburn.bundles.consultant", "plugins": ["consultant"]},
+    {
+      "module": "caliburn.bundles.interview",
+      "plugins": ["interview", "interview_source_prompt"]
+    },
+    {
+      "module": "caliburn.bundles.memory",
+      "plugins": ["memory_context", "memory_prompt", "memory_read", "memory_consolidation", "memory_window"]
+    },
+    {"module": "caliburn.bundles.human_questions", "plugins": ["human_questions"]},
+    {
+      "module": "caliburn.bundles.plan",
+      "plugins": ["plan_tools", "plan_lifecycle", "plan_prompt", "plan_context"]
+    },
+    {
+      "module": "caliburn.bundles.context",
+      "plugins": ["window", "native_compaction"],
+      "config": {"history_threshold_tokens": 96000, "threshold_tokens": 160000}
+    }
+  ]
+}

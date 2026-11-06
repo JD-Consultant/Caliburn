@@ -7,9 +7,10 @@ __pycache__/
 dist/
 .turbo/
 .env
+.local/
 uv.lock.bak
 
-# caches / generated output (api has no nested .gitignore — harden at root)
+# Caches and generated output.
 .pytest_cache/
 .pytest-*/
 pytest-cache-files-*/
@@ -20,6 +21,7 @@ pytest-cache-files-*/
 .pnpm-store/
 .uv-cache*/
 pnpm-debug.log*
+debug.log
 .research-tmp/
 tmp/
 output/
@@ -51,9 +53,6 @@ Thumbs.db
 /docs/superpowers/specs/
 /experiments/
 /scratch/
-/apps/ocs-indexer/docs/plans/
-/apps/ocs-indexer/docs/specs/
-/apps/pdf-to-json/SETUP_COMPLETE.md
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 /AGENTS.override.md
@@ -67,18 +66,13 @@ Codex.local.md
 /docs/diagrams/specs/
 /docs/BUG_LOG.md
 /docs/DESIGN_DECISIONS.md
-/apps/ocs-indexer/docs/BUG_LOG.md
-/apps/ocs-indexer/docs/DESIGN_DECISIONS.md
 /docs/roadmap.md
-/packages/consultant-memory/read-tools-results.md
 /docs/standards/work-analysis/2026-09-09-job-analysis-and-jd-content-research.md
 /docs/guides/2026-09-09-job-analysis-and-jd-content-research.md
 /docs/standards/work-analysis/2026-09-09-jd-sample-basis-and-review.md
 /docs/guides/2026-09-09-jd-sample-basis-and-review.md
 
 # Historical private aliases remain excluded if recreated locally.
-/apps/api/evals/interview_v4/reports/
-/apps/api/evals/interview_vnext/reports/
 /docs/IMPLEMENTATION_PLAN.md
 /docs/PROJECT-STATUS.md
 /docs/V2_PLAN.md

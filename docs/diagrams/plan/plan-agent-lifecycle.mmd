@@ -1,0 +1,50 @@
+---
+config:
+  sequence:
+    mirrorActors: false
+    actorMargin: 28
+    messageMargin: 24
+---
+%% title: 後端（現行）：Plan 取消撤回與下一輪窗口
+%% legend: 實線為等待完成的呼叫，虛線為回覆。版號為範例；前成功窗口已見 v7。省略模型往返、其他插件與 Checkpoint 寫入，非跨層共同交易。
+sequenceDiagram
+    participant A as Agent 執行協調
+    participant C as Context 窗口插件
+    participant P as Plan 插件
+    participant M as Plan 公開用例／查詢
+    Note over A,M: 本輪開始：目前 v7，輪前基準與模型已見版分開保存
+    A->>P: on_turn_start
+    P->>M: initialize_plan
+    M-->>P: 目前 v7
+    P-->>A: 輪前基準 7；已見版尚未設定
+    A->>C: on_turn_start 最後階段
+    C->>P: prepare_plan_window（同版延續）
+    P-->>C: 沿前成功窗口：已見版 7
+    C-->>A: 捕捉本輪窗口及已見版
+    Note over A,M: 本輪透過 edit 保存 v8、v9；取消基準仍為 7
+    A->>A: 收到取消，停止並等待在途寫入收束
+    A->>P: on_turn_cancel（目標輪 State）
+    P->>M: get_current
+    M-->>P: 目前 v9
+    P->>M: restore_plan（expected=9，target=7）
+    Note over P,M: 同一短交易保存 v7 正文為新 v10；保留中間歷史
+    M-->>P: 目前 v10
+    P-->>A: 撤回成功
+    A->>A: 所有取消回呼成功後標記已取消
+    Note over A,M: 下一輪重新初始化；取消輪的窗口與工具後綴不延續
+    A->>P: on_turn_start
+    P->>M: initialize_plan
+    M-->>P: 目前 v10
+    P-->>A: 新基準 10；已見版尚未設定
+    A->>C: 準備下一輪窗口
+    alt Memory 換版／無可延續窗口等重建條件
+        C->>P: prepare_plan_window（重建）
+        P->>M: get_current
+        M-->>P: v10 正文與版本
+        P-->>C: 注入正文；已見版 10
+    else 同版延續前成功窗口
+        C->>P: prepare_plan_window（延續）
+        P-->>C: 不重貼正文；已見版仍為 7
+        Note over C,P: 直接 edit 會 stale；read 取得 v10 後可再編輯
+    end
+    C-->>A: 同一 capture 保存請求與已見版

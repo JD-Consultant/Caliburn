@@ -1,0 +1,35 @@
+---
+config:
+  theme: neutral
+  look: classic
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: Microsoft JhengHei, Noto Sans CJK TC, sans-serif
+    fontSize: 16px
+  flowchart:
+    wrappingWidth: 320
+    nodeSpacing: 24
+    rankSpacing: 32
+    padding: 12
+---
+%% title: Caliburn｜應用與資料容器
+%% legend: 容器表示可執行應用或資料儲存，不等於 Docker。箭頭是具名存取關係；省略模組內部呼叫與實際主機配置。後端目前按單 worker 設計。
+flowchart TB
+  subgraph system["Caliburn"]
+    web["Web · 瀏覽器應用<br/>React／TypeScript／MUI<br/>訪談、JD、Memory 與 Plan"]
+    backend["後端 · 一個 Python 應用程序<br/>FastAPI／LangGraph／OpenAI SDK<br/>Web 靜態檔、API、已選 Plugin 與公版運算"]
+    postgres[("PostgreSQL · 關聯式儲存<br/>業務表與官方 Checkpoint 表<br/>SQLAlchemy 與 Saver 分管交易")]
+    qdrant[("Qdrant · 向量儲存<br/>公版固定來源與索引")]
+    files["檔案儲存<br/>PDF、解析 JSON／診斷<br/>模型權重與列印字型"]
+    web -->|HTTP JSON／SSE| backend
+    backend -->|PostgreSQL 協定：業務與 Checkpoint| postgres
+    backend -->|HTTP：索引與查詢| qdrant
+    backend -->|檔案 I/O：來源與模型資產| files
+  end
+  provider["OpenAI API · 外部系統<br/>Responses／原生壓縮"]
+  backend -->|HTTPS：官方 SDK| provider
+  classDef app fill:#e6eef8,stroke:#3569a8,color:#153c70
+  classDef data fill:#f2f6fa,stroke:#637d95,color:#182b3a
+  class web,backend app
+  class postgres,qdrant,files data
+  style system fill:#fafbfd,stroke:#8ea1b3

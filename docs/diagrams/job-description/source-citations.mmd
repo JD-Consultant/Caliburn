@@ -1,0 +1,29 @@
+%% title: 後端（現行）：JD 引用的根歸屬與固定來源 ER
+%% legend: 實表與外鍵關係；?＝可空。每筆引用的來源二擇一。省略六種內容目標的可空 FK 與排序，見模組 README；item_id 是快照 JSON 定位，不是 memory_items 外鍵。
+erDiagram
+    direction TB
+    job_descriptions ||..o{ job_description_citations : "同 JD 與 Workspace"
+    interview_messages |o..o{ job_description_citations : "訪談來源"
+    memory_snapshots |o..o{ job_description_citations : "固定發布來源"
+
+    job_descriptions {
+        uuid id PK
+        uuid workspace_id FK,UK
+    }
+    job_description_citations {
+        uuid id PK
+        uuid job_description_id FK "與 workspace_id 組成根 FK"
+        uuid workspace_id FK "亦與 published_version 組成來源 FK"
+        uuid? message_id FK "訪談來源時必填"
+        bigint? published_version FK "Memory 來源時必填"
+        uuid? item_id "Memory 來源時必填；非 FK"
+        bool jd_changed "支持內容是否待核對"
+    }
+    interview_messages {
+        uuid id PK
+    }
+    memory_snapshots {
+        uuid workspace_id PK,FK
+        bigint version PK
+        jsonb content "含該版項目與完整來源"
+    }

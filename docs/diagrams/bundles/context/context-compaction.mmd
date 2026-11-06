@@ -1,0 +1,24 @@
+---
+config:
+  flowchart:
+    rankSpacing: 22
+    nodeSpacing: 24
+    padding: 8
+    wrappingWidth: 300
+---
+%% title: 現行 Context 步前壓縮：計數完整請求，採用後重算
+%% legend: before_model_step 的 run_last 尾段，普通插件已完成本步材料更新。160K 是預設應用門檻，不是模型硬上限。計數／外送／保存失敗向外傳出；模型已完成時不再進入本流程。
+flowchart TD
+    start([完整 model_request 已準備]) --> prior{本輪已做步前壓縮<br/>且尚無新增 input items？}
+    prior -->|是：不再壓縮| recount
+    prior -->|否| count[SDK input_tokens.count<br/>計入提示、工具、input 與支援設定]
+    count --> threshold{input_tokens ≥ 160K？}
+    threshold -->|否| none[(Task 保存 None<br/>請求保持不變)]
+    none --> finish
+    threshold -->|是| compact[SDK responses.compact<br/>取得完整 CompactedResponse]
+    compact --> task[(原生 Task 保存完整回應)]
+    task --> adopt[(compact Node 採用全部 output<br/>保存壓縮回應與壓後 item 數)]
+    adopt --> recount[check_capacity：SDK 重新計數<br/>原生 Task 保存計數結果]
+    recount --> over{input_tokens ≥ 160K？}
+    over -->|是| stop([拋 AgentLimitError<br/>停止本次執行，不無限重壓])
+    over -->|否| finish([交回 Core 檢查請求政策<br/>然後呼叫模型])
